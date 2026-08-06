@@ -109,6 +109,7 @@ export function rollFollowUps(
 
 export function createInitialState(): GameState {
   return {
+    clinicName: "森林诊所",
     doctor: {
       reputation: 10,
       sanity: 100,
@@ -138,6 +139,7 @@ export function createInitialState(): GameState {
  * 纯函数，供 loadGame 与测试直接使用。
  */
 export function migrateGameState(data: GameState): GameState {
+  if (!data.clinicName) data.clinicName = "森林诊所";
   if (!Array.isArray(data.discharged)) data.discharged = [];
   if (!data.followUpCount) data.followUpCount = {};
   if (!Array.isArray(data.todayFollowUps)) data.todayFollowUps = [];

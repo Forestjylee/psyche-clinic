@@ -19,6 +19,10 @@ describe("createInitialState 复诊字段默认值", () => {
     expect(g.todayFollowUps).toEqual([]);
     expect(g.followUpIdleDays).toEqual({});
   });
+  it("初始诊所名默认为森林诊所", () => {
+    const g = createInitialState();
+    expect(g.clinicName).toBe("森林诊所");
+  });
 });
 
 describe("migrateGameState 旧存档兼容", () => {
@@ -41,6 +45,14 @@ describe("migrateGameState 旧存档兼容", () => {
     expect(migrated.followUpCount).toEqual({});
     expect(migrated.todayFollowUps).toEqual([]);
     expect(migrated.followUpIdleDays).toEqual({});
+    expect(migrated.clinicName).toBe("森林诊所");
+  });
+
+  it("已有诊所名的存档不被覆盖", () => {
+    const fresh = createInitialState();
+    fresh.clinicName = "湖心诊所";
+    const migrated = migrateGameState(fresh);
+    expect(migrated.clinicName).toBe("湖心诊所");
   });
 
   it("已有复诊字段的新存档不被覆盖", () => {

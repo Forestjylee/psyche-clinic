@@ -1,0 +1,20 @@
+- generic [ref=f39e1]:
+  - alert [ref=f39e2]
+  - main [ref=f39e8]:
+    - generic [ref=f39e9]:
+      - generic [ref=f39e11]: 暖心小诊室
+      - generic [ref=f39e12]: COZY CLINIC
+      - generic [ref=f39e13]: 你不必是心理学家，也能成为某个人暗夜里的那束光。
+      - generic [ref=f39e15]:
+        - button "开始新游戏" [ref=f39e16] [cursor=pointer]
+        - button "继续游戏" [ref=f39e17] [cursor=pointer]
+      - dialog "给诊所命名" [ref=f39e22]:
+        - heading "给诊所取个名字" [level=4] [ref=f39e23]
+        - paragraph [ref=f39e24]: 它是你的，也是每一位推开门的患者的。叫什么都好，随你心意。
+        - textbox "诊所名称" [active] [ref=f39e25]: 森林诊所
+        - generic [ref=f39e26]:
+          - button "取消" [ref=f39e27] [cursor=pointer]
+          - button "开始营业" [ref=f39e28] [cursor=pointer]
+      - button "免责声明" [ref=f39e18] [cursor=pointer]
+      - generic [ref=f39e19]: 「有时候，一个人需要的不是诊断，而是被认真听见。」
+      - generic [ref=f39e20]: 这不是一场考试，没有标准答案。你愿意倾听，本身就是在治愈。进度会自动保存到本地，下次打开可继续。

@@ -33,7 +33,7 @@ export function HUD() {
             <path d="M24 20.5 v 7.5 M20.3 24.25 H27.7" stroke="#e86b4a" strokeWidth="2.6" strokeLinecap="round" />
           </svg>
         </div>
-        <div className="hud-title">暖心小诊室</div>
+        <div className="hud-title">{game.clinicName}</div>
       </div>
       <div className="hud-stats">
         <div className="hud-stat">

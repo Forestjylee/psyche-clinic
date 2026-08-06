@@ -53,7 +53,7 @@ export class DialogueEngine {
         this.getInitialTrustBonus(),
     };
     this.minRounds =
-      scenario.difficulty === "困难" ? 15 : scenario.difficulty === "普通" ? 10 : 5;
+      scenario.difficulty === "困难" ? 8 : scenario.difficulty === "普通" ? 6 : 5;
     this.currentNode = scenario.dialogues[scenario.startNode];
   }
 
@@ -254,35 +254,64 @@ export class DialogueEngine {
    * 二选一后继续导向真实结局节点；若轮次仍不足会在 enterNode 里再次补齐。
    */
   private buildPadNode(round: number, realEnding: DialogueNode): DialogueNode {
-    const lines = [
-      "……谢谢你肯听我讲这么多。有些话，连我自己都没想到会说出来。",
-      "我好像……很久没有这样把心里的话说完整过了。",
-      "其实道理我都懂，只是从来没人陪我坐下来，一件件捋清楚。",
-      "每次说完这些，我都觉得胸口那块石头轻了一点。",
-      "你问的那些问题，我以前从没认真想过。让我再想想……",
-      "原来有些结，不是要解开，只是需要被看见。",
-      "跟你说话的时候，时间好像过得特别快。",
-      "我要是早点来听你说这些，也许就不会绕那么多弯了。",
+    // 过渡独白库：按对话阶段推进（倾诉→觉察→整合），避免重复倾听感
+    const phaseLines: string[][] = [
+      // 倾诉期：患者继续表达
+      [
+        "……有些话在我心里压了很久，一直找不到人说。",
+        "每次关上门，房间里就只剩我和那些翻来覆去的念头。",
+        "说出来是不是就好一点？其实我也不知道，但至少……不闷在心里了。",
+        "朋友都说我看起来好好的，可我笑完之后更累了。",
+        "白天在人前撑得越用力，晚上一个人就越容易塌下来。",
+      ],
+      // 觉察期：患者开始看到自己的模式
+      [
+        "你刚才那么一问，我忽然有点明白自己为什么总那样做了。",
+        "我一直以为那是别人要我做的，现在想想，好像也有我自己的一份。",
+        "原来我不是做不到，是打从心里不敢去试。",
+        "有些事我一直绕着走，今天绕不过去了。",
+        "我习惯先把最坏的情况想好，这样真发生了，就不会太疼。",
+        "说出口才发现，我好像一直对自己太苛刻了。",
+      ],
+      // 整合期：情绪稳定，开始向解决靠近
+      [
+        "听你这么说，我好像没那么慌了。",
+        "谢谢你没有笑话我。我以为这些事说出来会被人当成矫情。",
+        "胸口那块石头，好像真的轻了一点。",
+        "我想先从小事开始试试，哪怕只做一点点。",
+        "跟你说话的时候，时间好像过得特别快。",
+        "如果早点有人这样听我说，也许我不会绕这么多弯。",
+      ],
     ];
+    // 按轮次推进阶段，避免一直停留在同一类台词
+    const phaseIdx = Math.min(Math.floor(round / 3), phaseLines.length - 1);
+    const lines = phaseLines[phaseIdx];
     const line = lines[round % lines.length];
     const choiceId = `_pad_c_${round}`;
     const padChoice: DialogueNode = {
       id: choiceId,
       speaker: "doctor",
-      text: "（让他把话说完，不急着下结论。）",
+      text: "（陪着他，让话自然流出来。）",
       choices: [
         {
           id: `${choiceId}_a`,
           text: "安静地听完，不打断。",
           kind: "empathy",
-          effect: { trust: 3, mood: 2 },
+          effect: { trust: 4, mood: 3 },
           next: realEnding.id,
         },
         {
           id: `${choiceId}_b`,
-          text: "温和地回应：这些心事，值得被认真对待。",
+          text: "顺着他的话追问一句细节。",
+          kind: "probe",
+          effect: { trust: 3, truth: 5, mood: -1 },
+          next: realEnding.id,
+        },
+        {
+          id: `${choiceId}_c`,
+          text: "急着打断，抛出一句结论性建议。",
           kind: "logic",
-          effect: { trust: 2, defense: -2 },
+          effect: { trust: -3, defense: 6, mood: -2 },
           next: realEnding.id,
         },
       ],
@@ -291,7 +320,7 @@ export class DialogueEngine {
       id: `_pad_${round}`,
       speaker: "patient",
       text: line,
-      emotion: "calm",
+      emotion: phaseIdx >= 2 ? "calm" : "anxious",
       autoNext: choiceId,
       // 内嵌过渡医生节点，continue() 优先解析
       _padChoice: padChoice,

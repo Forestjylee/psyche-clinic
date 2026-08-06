@@ -12,11 +12,13 @@ import {
 export function TitleScreen() {
   const { hasSave, newGame, continueGame, playSound } = useGame();
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [showNaming, setShowNaming] = useState(false);
+  const [clinicName, setClinicName] = useState("森林诊所");
 
   return (
     <div className="title-screen">
       <div className="title-bg-art" />
-      <div className="title-main">暖心小诊室</div>
+      <div className="title-main">森林心理诊所</div>
       <div className="title-sub">COZY CLINIC</div>
       <div className="title-tagline">
         你不必是心理学家，也能成为某个人暗夜里的那束光。
@@ -27,7 +29,8 @@ export function TitleScreen() {
           className="title-btn primary"
           onClick={() => {
             playSound("click");
-            newGame();
+            setClinicName("森林诊所");
+            setShowNaming(true);
           }}
         >
           开始新游戏
@@ -44,6 +47,54 @@ export function TitleScreen() {
           </button>
         ) : null}
       </div>
+      {showNaming ? (
+        <div
+          className="disclaimer-backdrop"
+          onClick={() => setShowNaming(false)}
+        >
+          <div
+            className="naming-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-label="给诊所命名"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h4 className="naming-title">给诊所取个名字</h4>
+            <p className="naming-desc">它是你的，也是每一位推开门的患者的。叫什么都好，随你心意。</p>
+            <input
+              className="naming-input"
+              value={clinicName}
+              maxLength={10}
+              autoFocus
+              onChange={(e) => setClinicName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  playSound("click");
+                  newGame(clinicName);
+                }
+              }}
+              aria-label="诊所名称"
+            />
+            <div className="naming-actions">
+              <button
+                className="disclaimer-close"
+                onClick={() => setShowNaming(false)}
+              >
+                取消
+              </button>
+              <button
+                className="title-btn primary naming-confirm"
+                onClick={() => {
+                  playSound("click");
+                  newGame(clinicName);
+                }}
+              >
+                开始营业
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <button
         className="disclaimer-btn"
         onClick={() => {

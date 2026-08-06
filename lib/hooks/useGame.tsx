@@ -80,7 +80,7 @@ interface GameContextValue {
   endingData: EndingData | null;
   achievementEngine: AchievementEngine | null;
   // 场景切换
-  newGame: () => void;
+  newGame: (clinicName?: string) => void;
   continueGame: () => void;
   backToTitle: () => void;
   enterClinic: () => void;
@@ -226,9 +226,12 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     setSceneState(s);
   }, []);
 
-  const newGame = useCallback(() => {
+  const newGame = useCallback((clinicName?: string) => {
     clearSave();
     gameRef.current = createInitialState();
+    if (clinicName && clinicName.trim()) {
+      gameRef.current.clinicName = clinicName.trim();
+    }
     setGame({ ...gameRef.current });
     achRef.current?.onGameStateSynced(gameRef.current);
     setSceneState("clinic");

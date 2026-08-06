@@ -7,7 +7,7 @@ const GameShell = dynamic(() => import("@/components/game/GameShell"), {
   ssr: false,
   loading: () => (
     <div className="title-screen">
-      <div className="title-main">暖心小诊室</div>
+      <div className="title-main">森林心理诊所</div>
       <div className="title-sub">COZY CLINIC</div>
       <div className="title-divider" />
       <div className="title-quote">载入中…</div>

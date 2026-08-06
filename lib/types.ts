@@ -227,6 +227,8 @@ export interface ClinicUpgrade {
 
 /** 游戏全局状态 */
 export interface GameState {
+  /** 诊所名称（玩家自定义，默认"森林诊所"） */
+  clinicName: string;
   doctor: DoctorStats;
   /** 已解锁技能 id */
   skills: string[];
