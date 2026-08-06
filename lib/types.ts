@@ -299,3 +299,4 @@ export interface AchievementProgress {
 
 /** 成就全部进度表（存盘结构） */
 export type AchievementProgressMap = Record<string, AchievementProgress>;
+
