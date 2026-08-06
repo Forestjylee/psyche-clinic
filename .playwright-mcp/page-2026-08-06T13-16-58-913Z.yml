@@ -1,0 +1,97 @@
+- generic [active] [ref=f7e1]:
+  - alert [ref=f7e2]
+  - generic [ref=f7e21]:
+    - generic [ref=f7e22]:
+      - generic [ref=f7e23]: 心
+      - generic [ref=f7e24]: 心灵诊疗室
+    - generic [ref=f7e25]:
+      - generic [ref=f7e26]:
+        - generic [ref=f7e27]: 声
+        - generic [ref=f7e28]:
+          - generic [ref=f7e29]: 声望
+          - generic [ref=f7e30]: "10"
+      - generic [ref=f7e34]:
+        - generic [ref=f7e35]: 神
+        - generic [ref=f7e36]:
+          - generic [ref=f7e37]: 理智
+          - generic [ref=f7e38]: "100"
+      - generic [ref=f7e42]:
+        - generic [ref=f7e43]: 金
+        - generic [ref=f7e44]:
+          - generic [ref=f7e45]: 金钱
+          - generic [ref=f7e46]: "500"
+      - generic [ref=f7e48]:
+        - generic [ref=f7e49]: "1"
+        - generic [ref=f7e50]:
+          - generic [ref=f7e51]: 等级
+          - generic [ref=f7e52]: 0/100
+      - generic [ref=f7e54]: 第 1 天
+      - button "🔊" [ref=f7e55] [cursor=pointer]
+  - main [ref=f7e494]:
+    - generic [ref=f7e495]:
+      - button "◂ 返回诊所" [ref=f7e496] [cursor=pointer]
+      - heading "剧 本 工 坊" [level=2] [ref=f7e497]
+      - paragraph [ref=f7e498]: 从症状、职业、真相模板中组合，生成独一无二的患者剧本。每次生成的姓名、数值、对话细节都会不同。
+      - generic [ref=f7e499]:
+        - generic [ref=f7e500]:
+          - generic [ref=f7e501]: 症 状 主 题
+          - combobox [ref=f7e502] [cursor=pointer]:
+            - option "随机" [selected]
+            - option "重度抑郁"
+            - option "广泛性焦虑"
+            - option "强迫症状"
+            - option "顽固性失眠"
+            - option "创伤后应激"
+            - option "解离症状"
+        - generic [ref=f7e503]:
+          - generic [ref=f7e504]: 真 相 类 型
+          - combobox [ref=f7e505] [cursor=pointer]:
+            - option "随机" [selected]
+            - option "家庭暴力"
+            - option "职场霸凌"
+            - option "未解的哀伤"
+            - option "童年创伤"
+            - option "性别认同困扰"
+            - option "留守儿童创伤"
+            - option "产后抑郁"
+            - option "校园欺凌"
+            - option "进食障碍"
+            - option "解离性身份障碍"
+            - option "退伍军人创伤"
+            - option "斯德哥尔摩综合征"
+            - option "邪教创伤"
+            - option "阿尔茨海默早期"
+            - option "社会退缩"
+            - option "学业完美主义与自伤"
+            - option "痴呆照护者耗竭"
+            - option "性侵幸存者复杂创伤"
+        - generic [ref=f7e506]:
+          - generic [ref=f7e507]: 职 业
+          - combobox [ref=f7e508] [cursor=pointer]:
+            - option "随机" [selected]
+            - option "中学教师（32岁）"
+            - option "急诊科医生（38岁）"
+            - option "互联网产品经理（29岁）"
+            - option "全职主妇（34岁）"
+            - option "退休民警（58岁）"
+            - option "话剧演员（27岁）"
+            - option "高三学生（18岁）"
+            - option "餐饮店老板（45岁）"
+        - generic [ref=f7e509]:
+          - generic [ref=f7e510]: 难 度
+          - combobox [ref=f7e511] [cursor=pointer]:
+            - option "按声望自动" [selected]
+            - option "简单"
+            - option "普通"
+            - option "困难"
+        - generic [ref=f7e512]:
+          - generic [ref=f7e513]: 性 别
+          - combobox [ref=f7e514] [cursor=pointer]:
+            - option "随机" [selected]
+            - option "女"
+            - option "男"
+        - generic [ref=f7e515]:
+          - button "按参数生成" [ref=f7e516] [cursor=pointer]
+          - button "完全随机" [ref=f7e517] [cursor=pointer]
+      - generic [ref=f7e518]: ◆ 已生成剧本（0 / 8）
+      - generic [ref=f7e519]: 尚未生成任何剧本。上方选择参数后点击「生成新剧本」，或直接「随机生成」。

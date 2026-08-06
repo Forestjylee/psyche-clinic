@@ -1,0 +1,110 @@
+- generic [active] [ref=f7e1]:
+  - alert [ref=f7e2]
+  - generic [ref=f7e21]:
+    - generic [ref=f7e22]:
+      - generic [ref=f7e23]: 心
+      - generic [ref=f7e24]: 心灵诊疗室
+    - generic [ref=f7e25]:
+      - generic [ref=f7e26]:
+        - generic [ref=f7e27]: 声
+        - generic [ref=f7e28]:
+          - generic [ref=f7e29]: 声望
+          - generic [ref=f7e30]: "10"
+      - generic [ref=f7e34]:
+        - generic [ref=f7e35]: 神
+        - generic [ref=f7e36]:
+          - generic [ref=f7e37]: 理智
+          - generic [ref=f7e38]: "100"
+      - generic [ref=f7e42]:
+        - generic [ref=f7e43]: 金
+        - generic [ref=f7e44]:
+          - generic [ref=f7e45]: 金钱
+          - generic [ref=f7e46]: "500"
+      - generic [ref=f7e48]:
+        - generic [ref=f7e49]: "1"
+        - generic [ref=f7e50]:
+          - generic [ref=f7e51]: 等级
+          - generic [ref=f7e52]: 0/100
+      - generic [ref=f7e54]: 第 1 天
+      - button "🔊" [ref=f7e55] [cursor=pointer]
+  - main [ref=f7e56]:
+    - generic [ref=f7e57]:
+      - generic [ref=f7e58]:
+        - generic [ref=f7e59]:
+          - heading "诊 疗 大 厅" [level=1] [ref=f7e60]
+          - paragraph [ref=f7e61]: 候诊室里有人等你。不必急着「治好」谁——先坐下来，听他说。
+        - generic [ref=f7e62]:
+          - generic [ref=f7e63]:
+            - generic [ref=f7e64]: "0"
+            - generic [ref=f7e65]: 已接诊
+          - generic [ref=f7e66]:
+            - generic [ref=f7e67]: "0"
+            - generic [ref=f7e68]: 技能
+          - generic [ref=f7e69]:
+            - generic [ref=f7e70]: "0"
+            - generic [ref=f7e71]: 设施
+      - generic [ref=f7e72]:
+        - generic [ref=f7e73]:
+          - generic [ref=f7e74]:
+            - text: ◆ 候 诊 室
+            - generic [ref=f7e75]: 3 位患者
+          - generic [ref=f7e76]:
+            - generic [ref=f7e88] [cursor=pointer]:
+              - generic [ref=f7e89]:
+                - generic [ref=f7e90]: 陈洛
+                - generic [ref=f7e91]: 简单
+              - generic [ref=f7e92]: 28岁程序员 · 自助预约
+              - generic [ref=f7e93]: 一个戴黑框眼镜的年轻人顶着黑眼圈走进来，说自己已经两周没合过眼了。
+            - generic [ref=f7e105] [cursor=pointer]:
+              - generic [ref=f7e106]:
+                - generic [ref=f7e107]: 林晓
+                - generic [ref=f7e108]: 简单
+              - generic [ref=f7e109]: 高二女生 · 被班主任转介
+              - generic [ref=f7e110]: 班主任说她因为期中考试拿了年级第二，在教室里哭了一整节课，用指甲掐自己的手背。
+            - generic [ref=f7e122]:
+              - generic [ref=f7e123]:
+                - generic [ref=f7e124]: 周明远
+                - generic [ref=f7e125]: 困难
+              - generic [ref=f7e126]: 地产公司董事长 · 私人预约
+              - generic [ref=f7e127]: 秘书替他预约时特意叮嘱：周先生最近常说自己看见已故合伙人，公司上下都传他疯了。希望您 discreet。
+              - generic [ref=f7e128]: 🔒 需要声望 30（当前 10）
+        - generic [ref=f7e129]:
+          - generic [ref=f7e130]:
+            - heading "医 生 成 长" [level=3] [ref=f7e131]
+            - button "技能树 LV.1 · 0/100" [ref=f7e132] [cursor=pointer]:
+              - generic [ref=f7e133]: 技能树
+              - generic [ref=f7e134]: LV.1 · 0/100
+            - button "诊所升级 500 金" [ref=f7e135] [cursor=pointer]:
+              - generic [ref=f7e136]: 诊所升级
+              - generic [ref=f7e137]: 500 金
+            - button "患者来信 0 封" [ref=f7e138] [cursor=pointer]:
+              - generic [ref=f7e139]: 患者来信
+              - generic [ref=f7e140]: 0 封
+            - button "成就图鉴 1 / 38" [ref=f7e141] [cursor=pointer]:
+              - generic [ref=f7e142]: 成就图鉴
+              - generic [ref=f7e143]: 1 / 38
+            - button "剧本工坊 无限剧本" [ref=f7e144] [cursor=pointer]:
+              - generic [ref=f7e145]: 剧本工坊
+              - generic [ref=f7e146]: 无限剧本
+            - button "休息一日 理智 +15" [ref=f7e147] [cursor=pointer]:
+              - generic [ref=f7e148]: 休息一日
+              - generic [ref=f7e149]: 理智 +15
+          - generic [ref=f7e150]:
+            - heading "诊 所 状 态" [level=3] [ref=f7e151]
+            - generic [ref=f7e152]:
+              - generic [ref=f7e153]:
+                - generic [ref=f7e154]: 已接诊患者
+                - generic [ref=f7e155]: 0 / 3
+              - generic [ref=f7e156]:
+                - generic [ref=f7e157]: 已解锁技能
+                - generic [ref=f7e158]: 0 / 9
+              - generic [ref=f7e159]:
+                - generic [ref=f7e160]: 诊所升级
+                - generic [ref=f7e161]: 0 / 5
+              - generic [ref=f7e162]:
+                - generic [ref=f7e163]: 游戏天数
+                - generic [ref=f7e164]: 第 1 天
+          - generic [ref=f7e165]:
+            - heading "操 作" [level=3] [ref=f7e166]
+            - button "保存游戏" [ref=f7e167] [cursor=pointer]
+            - button "返回标题" [ref=f7e169] [cursor=pointer]

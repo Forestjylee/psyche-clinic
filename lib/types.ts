@@ -161,6 +161,8 @@ export interface PatientScenario {
   followUpStart?: string;
   /** 最多复诊次数（达到后结案离场，默认 2） */
   maxFollowUps?: number;
+  /** 复诊记忆碎片：复诊剧情中触发的新碎片（初诊碎片不重复） */
+  followUpFragments?: MemoryFragment[];
 }
 
 /** 记忆碎片：诊疗中真相揭示到阈值时触发的一次性闪回 */

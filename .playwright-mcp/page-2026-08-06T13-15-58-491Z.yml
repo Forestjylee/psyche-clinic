@@ -1,0 +1,100 @@
+- generic [active] [ref=f7e1]:
+  - alert [ref=f7e2]
+  - generic [ref=f7e21]:
+    - generic [ref=f7e22]:
+      - generic [ref=f7e23]: 心
+      - generic [ref=f7e24]: 心灵诊疗室
+    - generic [ref=f7e25]:
+      - generic [ref=f7e26]:
+        - generic [ref=f7e27]: 声
+        - generic [ref=f7e28]:
+          - generic [ref=f7e29]: 声望
+          - generic [ref=f7e30]: "10"
+      - generic [ref=f7e34]:
+        - generic [ref=f7e35]: 神
+        - generic [ref=f7e36]:
+          - generic [ref=f7e37]: 理智
+          - generic [ref=f7e38]: "100"
+      - generic [ref=f7e42]:
+        - generic [ref=f7e43]: 金
+        - generic [ref=f7e44]:
+          - generic [ref=f7e45]: 金钱
+          - generic [ref=f7e46]: "500"
+      - generic [ref=f7e48]:
+        - generic [ref=f7e49]: "1"
+        - generic [ref=f7e50]:
+          - generic [ref=f7e51]: 等级
+          - generic [ref=f7e52]: 0/100
+      - generic [ref=f7e54]: 第 1 天
+      - button "🔊" [ref=f7e55] [cursor=pointer]
+  - main [ref=f7e171]:
+    - generic [ref=f7e172]:
+      - button "◂ 返回诊所" [ref=f7e173] [cursor=pointer]
+      - heading "技 能 树" [level=2] [ref=f7e174]
+      - paragraph [ref=f7e175]: 通过接诊积累经验，习得不同流派的诊疗技艺。当前 EXP：0 / 100
+      - generic [ref=f7e176]:
+        - generic [ref=f7e177]: ▸ 精神分析学派
+        - generic [ref=f7e178]:
+          - generic [ref=f7e179]:
+            - generic [ref=f7e180]:
+              - text: 解梦术
+              - generic [ref=f7e181]: 80EXP
+            - generic [ref=f7e182]: 弗洛伊德学派。可通过梦境解析快速揭示患者潜意识，对话中 truth +15。
+            - button "经验不足" [disabled] [ref=f7e183] [cursor=pointer]
+          - generic [ref=f7e184]:
+            - generic [ref=f7e185]:
+              - text: 自由联想
+              - generic [ref=f7e186]: 120EXP
+            - generic [ref=f7e187]: 引导患者自由联想，降低防御效果翻倍。
+            - button "需前置技能" [disabled] [ref=f7e188] [cursor=pointer]
+      - generic [ref=f7e189]:
+        - generic [ref=f7e190]: ▸ 认知行为学派
+        - generic [ref=f7e191]:
+          - generic [ref=f7e192]:
+            - generic [ref=f7e193]:
+              - text: 认知重构
+              - generic [ref=f7e194]: 80EXP
+            - generic [ref=f7e195]: CBT 基础。识别患者非理性信念，逻辑选项效果增强。
+            - button "经验不足" [disabled] [ref=f7e196] [cursor=pointer]
+          - generic [ref=f7e197]:
+            - generic [ref=f7e198]:
+              - text: 暴露疗法
+              - generic [ref=f7e199]: 120EXP
+            - generic [ref=f7e200]: 系统脱敏，对恐惧类患者 mood 恢复 +20。
+            - button "需前置技能" [disabled] [ref=f7e201] [cursor=pointer]
+          - generic [ref=f7e202]:
+            - generic [ref=f7e203]:
+              - text: 危机干预
+              - generic [ref=f7e204]: 180EXP
+            - generic [ref=f7e205]: 面对高风险患者（自杀/犯罪）时，解锁关键的特殊选项。
+            - button "需前置技能" [disabled] [ref=f7e206] [cursor=pointer]
+      - generic [ref=f7e207]:
+        - generic [ref=f7e208]: ▸ 催眠学派
+        - generic [ref=f7e209]:
+          - generic [ref=f7e210]:
+            - generic [ref=f7e211]:
+              - text: 催眠术·初级
+              - generic [ref=f7e212]: 150EXP
+            - generic [ref=f7e213]: 解锁催眠对话选项，可强行推进对话，但风险较高。
+            - button "经验不足" [disabled] [ref=f7e214] [cursor=pointer]
+          - generic [ref=f7e215]:
+            - generic [ref=f7e216]:
+              - text: 深度催眠
+              - generic [ref=f7e217]: 200EXP
+            - generic [ref=f7e218]: 深度催眠可一次性大幅揭示真相，但消耗医生理智 -10。
+            - button "需前置技能" [disabled] [ref=f7e219] [cursor=pointer]
+      - generic [ref=f7e220]:
+        - generic [ref=f7e221]: ▸ 药物学派
+        - generic [ref=f7e222]:
+          - generic [ref=f7e223]:
+            - generic [ref=f7e224]:
+              - text: 临床药理学
+              - generic [ref=f7e225]: 80EXP
+            - generic [ref=f7e226]: 处方药效果增强，副作用降低。开药金钱收益 +50%。
+            - button "经验不足" [disabled] [ref=f7e227] [cursor=pointer]
+          - generic [ref=f7e228]:
+            - generic [ref=f7e229]:
+              - text: 新药研发
+              - generic [ref=f7e230]: 200EXP
+            - generic [ref=f7e231]: 可开发定制药物，对顽固性症状有奇效。解锁特殊药品选项。
+            - button "需前置技能" [disabled] [ref=f7e232] [cursor=pointer]

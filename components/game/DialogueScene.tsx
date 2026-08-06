@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import { DialogueEngine } from "@/lib/engine/DialogueEngine";
-import type { DialogueNode, PatientEmotion, PatientState } from "@/lib/types";
+import type { DialogueNode, PatientEmotion, PatientState, MemoryFragment } from "@/lib/types";
 import { allSkills } from "@/lib/data/skills";
 import { TypewriterText } from "./TypewriterText";
 import { TermText } from "./PsychTermSpan";
 import { emotionColors, emotionLabels, choiceIcons } from "./constants";
+import { ChibiCharacter } from "./ChibiCharacter";
 
 export function DialogueScene() {
   const {
@@ -20,9 +21,11 @@ export function DialogueScene() {
   } = useGame();
 
   const engineRef = useRef<DialogueEngine | null>(null);
+  const flashTimer = useRef<number | null>(null);
   const [node, setNode] = useState<DialogueNode | null>(null);
   const [pState, setPState] = useState<PatientState | null>(null);
   const [emotion, setEmotion] = useState<PatientEmotion>("neutral");
+  const [flashback, setFlashback] = useState<MemoryFragment | null>(null);
 
   useEffect(() => {
     if (!currentPatient) return;
@@ -42,6 +45,12 @@ export function DialogueScene() {
         playSound("combo");
       },
       onFloatingText: (text, kind) => pushFloating(text, kind),
+      onMemoryTrigger: (frag) => {
+        setFlashback(frag);
+        playSound("memory");
+        if (flashTimer.current) window.clearTimeout(flashTimer.current);
+        flashTimer.current = window.setTimeout(() => setFlashback(null), 3400);
+      },
       onEnding: (ending, title, text, reward) => {
         const s = eng.getState();
         finishSession(ending, title, text, reward, currentPatient.id, s);
@@ -51,6 +60,18 @@ export function DialogueScene() {
     eng.start();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPatient]);
+
+  // 卸载时清理闪回计时器
+  useEffect(() => {
+    return () => {
+      if (flashTimer.current) window.clearTimeout(flashTimer.current);
+    };
+  }, []);
+
+  const dismissFlashback = () => {
+    if (flashTimer.current) window.clearTimeout(flashTimer.current);
+    setFlashback(null);
+  };
 
   if (!currentPatient || !node) return null;
 
@@ -93,8 +114,6 @@ export function DialogueScene() {
 
   const emoColor = emotionColors[emotion];
   const palette = currentPatient.palette;
-  const mood = pState?.mood ?? 50;
-  const blur = Math.max(0, (50 - mood) / 12);
 
   return (
     <div className="scene dialogue-scene">
@@ -104,41 +123,37 @@ export function DialogueScene() {
           style={
             {
               "--stage-color": palette.fog,
-              background: `radial-gradient(ellipse at center, ${emoColor}22 0%, ${palette.fog} 50%, var(--bg-deep) 85%)`,
+              background: `linear-gradient(180deg, ${palette.fog}1c 0%, var(--bg-panel) 55%, var(--bg-panel-2) 100%)`,
             } as React.CSSProperties
           }
         />
-        <div
-          className="patient-figure"
-          style={{ filter: `blur(${blur}px) brightness(${0.6 + mood / 250})` }}
-        >
-          <div
-            className={`patient-silhouette emo-${emotion}`}
-            style={
-              {
-                "--fig-color": emoColor,
-                background: `linear-gradient(180deg, ${emoColor} 0%, transparent 100%)`,
-              } as React.CSSProperties
-            }
+        <div className="patient-figure">
+          <ChibiCharacter
+            palette={palette}
+            emotion={emotion}
+            size="xl"
+            className="patient-chibi"
           />
           <div className="patient-name-label">{currentPatient.name}</div>
           <div className="patient-emotion-tag" style={{ color: emoColor }}>
             {emotionLabels[emotion]}
           </div>
         </div>
+      </div>
+      <div className="dialogue-panel">
         <div className="patient-status">
           {pState ? (
             <>
-              <StatusRow label="信任" value={pState.trust} color="#6ad4a0" />
-              <StatusRow label="防御" value={pState.defense} color="#ff7a8a" />
-              <StatusRow label="心情" value={pState.mood} color="#7c9eff" />
-              <StatusRow label="真相" value={pState.truth} color="#c8a4ff" />
+              <StatusRow label="信任" value={pState.trust} color="var(--good)" />
+              <StatusRow label="防御" value={pState.defense} color="var(--bad)" />
+              <StatusRow label="心情" value={pState.mood} color="var(--accent)" />
+              <StatusRow label="真相" value={pState.truth} color="var(--truth)" />
             </>
           ) : null}
         </div>
-      </div>
-      <div className="dialogue-panel">
-        <div className={`dialogue-speaker ${isNarration ? "narration" : ""}`}>{speakerName}</div>
+        <div className="dialogue-speaker-row">
+          <div className={`dialogue-speaker ${isNarration ? "narration" : ""}`}>{speakerName}</div>
+        </div>
         <TypewriterText key={node.id} text={node.text} />
         <div className="choices">
           {node.isEnding ? null : node.choices && node.choices.length > 0 ? (
@@ -184,6 +199,20 @@ export function DialogueScene() {
           )}
         </div>
       </div>
+      {flashback ? (
+        <div
+          className="memory-flash"
+          onClick={dismissFlashback}
+          role="dialog"
+          aria-label="记忆碎片"
+        >
+          <div className="memory-flash-card">
+            <div className="memory-flash-title">{flashback.title}</div>
+            <div className="memory-flash-text">{flashback.text}</div>
+            <div className="memory-flash-hint">—— 记忆碎片 · 点击继续 ——</div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

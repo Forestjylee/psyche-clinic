@@ -1,0 +1,23 @@
+- generic [ref=f6e1]:
+  - alert [ref=f6e2]
+  - main [ref=f6e8]:
+    - generic [ref=f6e9]:
+      - generic [ref=f6e11]: 心灵诊疗室
+      - generic [ref=f6e12]: PSYCHE CLINIC
+      - generic [ref=f6e13]: 你不必是心理学家，也能成为某个人暗夜里的那束光。
+      - generic [ref=f6e15]:
+        - button "开始新游戏" [ref=f6e16] [cursor=pointer]
+        - button "继续游戏" [ref=f6e17] [cursor=pointer]
+      - button "免责声明" [active] [ref=f6e18] [cursor=pointer]
+      - dialog "免责声明" [ref=f6e22]:
+        - heading "免责声明" [level=4] [ref=f6e23]
+        - paragraph [ref=f6e24]: 《心灵诊疗室》是一款以心理健康为主题的虚构互动叙事游戏。
+        - paragraph [ref=f6e25]: 游戏中的所有人物、故事与诊疗过程均为虚构创作，不构成任何形式的医学诊断、治疗建议或心理干预。
+        - paragraph [ref=f6e26]: 游戏中的「诊疗」只是叙事机制，不代表真实心理咨询，也不能替代专业医疗帮助。
+        - paragraph [ref=f6e27]: 若你或你关心的人正经历情绪困扰、危机或自伤想法，请向现实中的专业人士求助，并拨打下方热线。
+        - generic [ref=f6e28]:
+          - text: 全国心理援助热线 · 北京心理危机研究与干预中心
+          - generic [ref=f6e29]: 400-161-9995
+        - button "知道了" [ref=f6e30] [cursor=pointer]
+      - generic [ref=f6e19]: 「有时候，一个人需要的不是诊断，而是被认真听见。」
+      - generic [ref=f6e20]: 这不是一场考试，没有标准答案。你愿意倾听，本身就是在治愈。进度会自动保存到本地，下次打开可继续。

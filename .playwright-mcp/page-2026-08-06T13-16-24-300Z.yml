@@ -1,0 +1,65 @@
+- generic [active] [ref=f7e1]:
+  - alert [ref=f7e2]
+  - generic [ref=f7e21]:
+    - generic [ref=f7e22]:
+      - generic [ref=f7e23]: 心
+      - generic [ref=f7e24]: 心灵诊疗室
+    - generic [ref=f7e25]:
+      - generic [ref=f7e26]:
+        - generic [ref=f7e27]: 声
+        - generic [ref=f7e28]:
+          - generic [ref=f7e29]: 声望
+          - generic [ref=f7e30]: "10"
+      - generic [ref=f7e34]:
+        - generic [ref=f7e35]: 神
+        - generic [ref=f7e36]:
+          - generic [ref=f7e37]: 理智
+          - generic [ref=f7e38]: "100"
+      - generic [ref=f7e42]:
+        - generic [ref=f7e43]: 金
+        - generic [ref=f7e44]:
+          - generic [ref=f7e45]: 金钱
+          - generic [ref=f7e46]: "500"
+      - generic [ref=f7e48]:
+        - generic [ref=f7e49]: "1"
+        - generic [ref=f7e50]:
+          - generic [ref=f7e51]: 等级
+          - generic [ref=f7e52]: 0/100
+      - generic [ref=f7e54]: 第 1 天
+      - button "🔊" [ref=f7e55] [cursor=pointer]
+  - main [ref=f7e348]:
+    - generic [ref=f7e349]:
+      - button "◂ 返回诊所" [ref=f7e350] [cursor=pointer]
+      - heading "诊 所 升 级" [level=2] [ref=f7e351]
+      - paragraph [ref=f7e352]: 升级诊所设施，改善接诊体验。当前金钱：500 金
+      - generic [ref=f7e353]:
+        - generic [ref=f7e354]:
+          - generic [ref=f7e355]:
+            - text: 进口真皮沙发
+            - generic [ref=f7e356]: 300金
+          - generic [ref=f7e357]: 更舒适的沙发让患者放松，初始信任 +10。
+          - button "购置 (300 金)" [ref=f7e358] [cursor=pointer]
+        - generic [ref=f7e359]:
+          - generic [ref=f7e360]:
+            - text: 加厚隔音墙
+            - generic [ref=f7e361]: 500金
+          - generic [ref=f7e362]: 避免隐私外泄，降低恶性事件被曝光的概率。
+          - button "购置 (500 金)" [ref=f7e363] [cursor=pointer]
+        - generic [ref=f7e364]:
+          - generic [ref=f7e365]:
+            - text: 心理学藏书架
+            - generic [ref=f7e366]: 400金
+          - generic [ref=f7e367]: 彰显专业素养，结算时声望 +2。
+          - button "购置 (400 金)" [ref=f7e368] [cursor=pointer]
+        - generic [ref=f7e369]:
+          - generic [ref=f7e370]:
+            - text: 医生休息室
+            - generic [ref=f7e371]: 600金
+          - generic [ref=f7e372]: 每日理智恢复 +10，缓解长期接诊压力。
+          - button "金钱不足" [disabled] [ref=f7e373] [cursor=pointer]
+        - generic [ref=f7e374]:
+          - generic [ref=f7e375]:
+            - text: 前台助理
+            - generic [ref=f7e376]: 800金
+          - generic [ref=f7e377]: 过滤麻烦患者，提升诊所运营效率，每日额外收入 +50。
+          - button "金钱不足" [disabled] [ref=f7e378] [cursor=pointer]

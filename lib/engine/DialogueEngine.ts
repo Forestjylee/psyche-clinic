@@ -6,7 +6,8 @@ import type {
   ChoiceEffect,
   EndingType,
   GameState,
-  Letter,
+  GameMessage,
+  MemoryFragment,
 } from "../types";
 import { clamp } from "../state/GameState";
 
@@ -18,6 +19,8 @@ export interface SessionCallbacks {
   onEnding: (ending: EndingType, title: string, text: string, reward?: ChoiceEffect) => void;
   onChoiceMade?: (choice: DialogueChoice) => void;
   onComboTrigger?: (comboCount: number) => void;
+  /** 真相揭示到阈值时触发记忆碎片闪回 */
+  onMemoryTrigger?: (fragment: MemoryFragment) => void;
 }
 
 export class DialogueEngine {
@@ -29,6 +32,10 @@ export class DialogueEngine {
   /** 连击系统：记录上一回合选项类型 */
   private lastChoiceKind: string | null = null;
   private comboCount = 0;
+  /** 已触发的记忆碎片（每个仅触发一次） */
+  private triggeredMemories = new Set<string>();
+  /** 本难度要求的最低对话轮数（每完成一次选择计一轮） */
+  private readonly minRounds: number;
 
   constructor(
     scenario: PatientScenario,
@@ -45,6 +52,8 @@ export class DialogueEngine {
         scenario.initialState.trust +
         this.getInitialTrustBonus(),
     };
+    this.minRounds =
+      scenario.difficulty === "困难" ? 15 : scenario.difficulty === "普通" ? 10 : 5;
     this.currentNode = scenario.dialogues[scenario.startNode];
   }
 
@@ -64,11 +73,18 @@ export class DialogueEngine {
 
   private enterNode(node: DialogueNode): void {
     this.currentNode = node;
+    this.checkMemoryTrigger();
     this.callbacks.onNodeEnter(node);
     this.callbacks.onStateChange(this.state, node.emotion);
 
     if (node.isEnding) {
-      this.handleEnding(node);
+      // 最低轮次保护：对话过于简短时，插入过渡独白，保证每位客户至少对话
+      // 简单 5 轮 / 普通 10 轮 / 困难 15 轮
+      if (this.state.round < this.minRounds) {
+        this.enterNode(this.buildPadNode(this.state.round, node));
+      } else {
+        this.handleEnding(node);
+      }
       return;
     }
 
@@ -76,8 +92,29 @@ export class DialogueEngine {
     // UI 层会读取 node.choices 判断渲染选项还是"继续"按钮
   }
 
+  /** 检查记忆碎片触发条件（真相/信任达到阈值即闪回一次） */
+  private checkMemoryTrigger(): void {
+    if (!this.scenario.memoryFragments) return;
+    for (const frag of this.scenario.memoryFragments) {
+      if (this.triggeredMemories.has(frag.id)) continue;
+      const ok =
+        (frag.trigger.truth !== undefined && this.state.truth >= frag.trigger.truth) ||
+        (frag.trigger.trust !== undefined && this.state.trust >= frag.trigger.trust);
+      if (ok) {
+        this.triggeredMemories.add(frag.id);
+        this.callbacks.onMemoryTrigger?.(frag);
+      }
+    }
+  }
+
   /** 玩家点击对话继续（无选项节点） */
   continue(): void {
+    // 最低轮次保护产生的过渡节点：先进入内嵌的二选一医生节点
+    const pad = this.currentNode as DialogueNode & { _padChoice?: DialogueNode };
+    if (pad._padChoice) {
+      this.enterNode(pad._padChoice);
+      return;
+    }
     if (this.currentNode.autoNext) {
       const next = this.scenario.dialogues[this.currentNode.autoNext];
       if (next) this.enterNode(next);
@@ -207,6 +244,60 @@ export class DialogueEngine {
     void before;
   }
 
+  /** 当前会话要求的最低轮数（供 UI 展示进度） */
+  getMinRounds(): number {
+    return this.minRounds;
+  }
+
+  /**
+   * 最低轮次保护：生成一段过渡独白节点（患者讲一句 → 医生二选一），
+   * 二选一后继续导向真实结局节点；若轮次仍不足会在 enterNode 里再次补齐。
+   */
+  private buildPadNode(round: number, realEnding: DialogueNode): DialogueNode {
+    const lines = [
+      "……谢谢你肯听我讲这么多。有些话，连我自己都没想到会说出来。",
+      "我好像……很久没有这样把心里的话说完整过了。",
+      "其实道理我都懂，只是从来没人陪我坐下来，一件件捋清楚。",
+      "每次说完这些，我都觉得胸口那块石头轻了一点。",
+      "你问的那些问题，我以前从没认真想过。让我再想想……",
+      "原来有些结，不是要解开，只是需要被看见。",
+      "跟你说话的时候，时间好像过得特别快。",
+      "我要是早点来听你说这些，也许就不会绕那么多弯了。",
+    ];
+    const line = lines[round % lines.length];
+    const choiceId = `_pad_c_${round}`;
+    const padChoice: DialogueNode = {
+      id: choiceId,
+      speaker: "doctor",
+      text: "（让他把话说完，不急着下结论。）",
+      choices: [
+        {
+          id: `${choiceId}_a`,
+          text: "安静地听完，不打断。",
+          kind: "empathy",
+          effect: { trust: 3, mood: 2 },
+          next: realEnding.id,
+        },
+        {
+          id: `${choiceId}_b`,
+          text: "温和地回应：这些心事，值得被认真对待。",
+          kind: "logic",
+          effect: { trust: 2, defense: -2 },
+          next: realEnding.id,
+        },
+      ],
+    };
+    return {
+      id: `_pad_${round}`,
+      speaker: "patient",
+      text: line,
+      emotion: "calm",
+      autoNext: choiceId,
+      // 内嵌过渡医生节点，continue() 优先解析
+      _padChoice: padChoice,
+    } as unknown as DialogueNode;
+  }
+
   private handleEnding(node: DialogueNode): void {
     const endingType = node.endingType ?? "cure";
     this.callbacks.onEnding(
@@ -221,13 +312,13 @@ export class DialogueEngine {
     return this.currentNode;
   }
 
-  /** 生成结局信件 */
+  /** 生成结局信件（写入消息盒子） */
   static generateLetter(
     scenario: PatientScenario,
     ending: EndingType,
     day: number
-  ): Letter {
-    const toneMap: Record<EndingType, Letter["tone"]> = {
+  ): GameMessage {
+    const toneMap: Record<EndingType, GameMessage["tone"]> = {
       cure: "thanks",
       acceptance: "thanks",
       dependent: "neutral",
@@ -249,10 +340,12 @@ export class DialogueEngine {
     };
     return {
       id: `${scenario.id}-${day}`,
-      from: scenario.name,
-      date: day,
+      kind: "letter",
       title: `来自 ${scenario.name} 的信`,
-      content: contentMap[ending],
+      body: contentMap[ending],
+      day,
+      read: false,
+      patientName: scenario.name,
       tone: toneMap[ending],
     };
   }

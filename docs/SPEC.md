@@ -1,4 +1,4 @@
-# 心灵诊疗室 · 技术规格文档（Spec）
+# 暖心小诊室 · 技术规格文档（Spec）
 
 | 字段 | 内容 |
 | --- | --- |
@@ -27,13 +27,6 @@
 | 构建 | Next.js 内置 | - | `next build` 产出静态资源 |
 | 版本控制 | Git + GitHub | - | 长期迭代基线 |
 
-**不引入的依赖**（保持轻量）：
-- ❌ 状态管理库（Redux/Zustand）：React Context + useReducer 已够用
-- ❌ UI 组件库（AntD/MUI）：自定义 CSS 更贴合深夜诊室基调
-- ❌ 动画库（Framer Motion）：纯 CSS keyframes 已实现公测品质特效
-- ❌ 路由库：单页应用，scene 状态机内部切换
-
----
 
 ## 2. 目录结构
 
@@ -136,7 +129,13 @@ interface GameState {
   clinicUpgrades: string[];               // 诊所升级 id
   patientRecords: Record<string, EndingType>;  // 患者 id -> 结局
   day: number;                            // 游戏内日期
-  letters: Letter[];                      // 信件
+  slot: number;                           // 今日已接待名额（0..MAX_SLOTS）
+  todayServed: string[];                  // 今日已接诊的患者 id（当天不重复，休息日清空）
+  waitingDays: Record<string, number>;    // patientId -> 候诊等待天数（病情加重/放弃）
+  abandoned: string[];                    // 已放弃治疗离开的患者 id
+  discharged: string[];                   // 已离场患者 id（治愈/接纳/恶化/悲剧：不再复诊）
+  followUpCount: Record<string, number>;  // patientId -> 已复诊次数（依赖/隐藏/觉醒/转介复诊）
+  messages: GameMessage[];                // 消息盒子（来信/提醒/通知）
   generatedScenarios: PatientScenario[];  // 生成器产出（≤5）
 }
 ```
@@ -186,13 +185,17 @@ interface PatientScenario {
   truth: string;            // 真相（隐藏）
   palette: PatientPalette;
   initialState: PatientState;
-  dialogues: Record<string, DialogueNode>;  // 对话图
+  dialogues: Record<string, DialogueNode>;  // 初诊对话图
   startNode: string;
   requireReputation?: number;
   baseReward: number;
   difficulty: "简单" | "普通" | "困难";
   completed?: boolean;
   achievedEnding?: EndingType;
+  followUpDialogues?: Record<string, DialogueNode>;  // 复诊对话图（独立短剧情）
+  followUpStart?: string;                            // 复诊入口节点
+  maxFollowUps?: number;                             // 最多复诊次数（默认 2）
+  followUpFragments?: MemoryFragment[];              // 复诊记忆碎片（初诊碎片不重复）
 }
 ```
 
@@ -226,6 +229,57 @@ interface AchievementProgress {
 }
 ```
 
+### 3.4 患者生命周期与复诊（核心玩法）
+
+患者从预约到结案经历三层生命周期：
+
+```
+候诊（初诊候选）→ 已诊疗（有结局）→ 离场 / 复诊中
+```
+
+**① 候诊**：声望达标、从未接诊、未结案的患者出现在预约列表。等待天数 `waitingDays[id]` 每日 +1：满 `DECAY_START_DAY` 显示"病情加重"，满 `WARN_DAY` 弹窗提醒，满 `ABANDON_DAY` 放弃治疗（进 `abandoned`，扣声望，从列表移除）。
+
+**② 已诊疗**：`finishSession` 写入 `patientRecords[id] = ending`。按结局决定复诊倾向：
+
+| 结局 | 复诊倾向 | 处置 |
+| --- | --- | --- |
+| `cure` / `acceptance` | 约 5% | 直接离场（进 `discharged`） |
+| `dependent` | 约 60% | 进入复诊池 |
+| `worsen` / `tragic` | 0% | 永久离场（进 `discharged`） |
+| `hidden` / `awakening` / `transfer` | 约 25% | 进入复诊池 |
+
+**③ 复诊池与离场**：
+- `discharged` 患者从预约列表消失，追踪档案保留结案记录；
+- 复诊池患者每日结算时按结局概率 roll：命中→当日复诊（`todayFollowUps`）；未命中→`followUpIdleDays[id]`+1，满 `FOLLOW_UP_GRACE_DAYS`（6 天）触发「放弃复诊」：扣声望、离场（与候诊放弃治疗同语义，ADR-002 复诊也施压）；
+- 复诊会话使用 `followUpDialogues` 独立短剧情（3-5 节点），`followUpCount[id]` 累计，达到 `maxFollowUps`（默认 2）结案离场；
+- 复诊产出**复诊结局**（ADR-003）：治愈/接纳→立即离场；依赖→继续复诊池；恶化/悲剧→离场；
+- 复诊报酬**递减**（ADR-004）：初诊的 70%，第 2 次约 40%；
+- 复诊配置**新记忆碎片** `followUpFragments`（ADR-006，初诊碎片不重复），复诊结束产出简短回信；
+- 生成剧本套**通用复诊模板**（ADR-007），从复诊素材库抽「回访开场 + 状态文本 + 结局」。
+
+**每日结算顺序**（`advanceDayState`）：
+
+1. 清空 `slot` 与 `todayServed`；
+2. 候诊患者 `waitingDays[id] += 1`，触发加重/放弃判定；
+3. 复诊池患者按结局概率 roll：命中→`todayFollowUps`；未命中→`followUpIdleDays`+1、满宽限放弃复诊扣声望离场；
+4. 候诊人数不足 `queueTarget(day)` 时由生成器补充新人。
+
+### 3.5 金钱经济系统（诊所经营）
+
+金钱定位为**诊所经营资源**（ADR-008），形成「接诊赚钱 → 升级/采购/广告 → 提升经营效率 → 赚更多」循环。
+
+**收入**：初诊报酬（简单 150 / 普通 300 / 困难 600）；复诊报酬递减（70% / 40%）；`receptionist` 前台每日 +50。
+
+**消耗**：
+
+| 渠道 | 说明 | 数值 |
+| --- | --- | --- |
+| 多级设施升级 | 现有 5 项设施各 3 级，效果递增 | 2 级 ≈1.8× 1 级价、3 级 ≈2.5× 1 级价（沙发 300→540→750） |
+| 消耗品 | 一次性药品/道具，会话中解锁选项或提升治愈率 | 50-200 金 |
+| 广告拉新 | 提升每日新患者上限 +1 | 300 金/次，持续 3 天 |
+
+**节奏**（ADR-010）：玩家单天约赚 500-1500 金；中期以高级设施与广告为主要消耗口，避免溢出。
+
 ---
 
 ## 4. 引擎契约
@@ -239,6 +293,8 @@ interface AchievementProgress {
 - 判定防御触发：defense 超阈值时改写下一节点（如 `a_p2_def`）。
 - 判定真相揭示：trust/truth 达标时解锁隐藏分支。
 - 判定结局：到达 `isEnding` 节点返回 `EndingType`。
+- **复诊入口**：会话可指定 `followUp` 模式，对话图改用 `scenario.followUpDialogues`，起始节点为 `scenario.followUpStart`；复诊结束后按 `followUpCount` 判定是否达到 `maxFollowUps`。
+- **动态结局判定**（规划）：结局不再仅由 `isEnding` 节点写死，由「真相进度 + 关键抉择」综合判定，保证复诊/生成剧本结局多样。
 
 **约束**：不直接读写 React state，不调用 Storage。
 
@@ -448,3 +504,4 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 | --- | --- | --- |
 | v0.1.0 | 2026-08 | 初版 Spec，定义技术栈、目录、数据模型 |
 | v0.2.0 | 2026-08-06 | 新增成就特效规格、温暖回响、Storage 抽象迁移路径、D1 Schema、Cloudflare 全栈架构图 |
+| v0.3.0 | 2026-08-06 | 核心玩法重构：患者三层生命周期（候诊/已诊疗/离场）与复诊系统、GameState 新增 discharged/followUpCount、PatientScenario 新增 followUp 复诊剧情、随机事件与 500+ 素材库规划 |

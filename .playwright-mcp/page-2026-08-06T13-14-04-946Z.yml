@@ -1,0 +1,13 @@
+- generic [active] [ref=f6e1]:
+  - alert [ref=f6e2]
+  - main [ref=f6e8]:
+    - generic [ref=f6e9]:
+      - generic [ref=f6e11]: 心灵诊疗室
+      - generic [ref=f6e12]: PSYCHE CLINIC
+      - generic [ref=f6e13]: 你不必是心理学家，也能成为某个人暗夜里的那束光。
+      - generic [ref=f6e15]:
+        - button "开始新游戏" [ref=f6e16] [cursor=pointer]
+        - button "继续游戏" [ref=f6e17] [cursor=pointer]
+      - button "免责声明" [ref=f6e18] [cursor=pointer]
+      - generic [ref=f6e19]: 「有时候，一个人需要的不是诊断，而是被认真听见。」
+      - generic [ref=f6e20]: 这不是一场考试，没有标准答案。你愿意倾听，本身就是在治愈。进度会自动保存到本地，下次打开可继续。

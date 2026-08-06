@@ -12,7 +12,8 @@ import { ClinicHall } from "./ClinicHall";
 import { DialogueScene } from "./DialogueScene";
 import { SkillsTree } from "./SkillsTree";
 import { ClinicUpgrades } from "./ClinicUpgrades";
-import { Letters } from "./Letters";
+import { MessageBox } from "./MessageBox";
+import { Tracking } from "./Tracking";
 import { Generator } from "./Generator";
 import { AchievementsPage } from "./AchievementsPage";
 
@@ -53,7 +54,8 @@ export function GameApp() {
         {scene === "dialogue" ? <DialogueScene /> : null}
         {scene === "skills" ? <SkillsTree /> : null}
         {scene === "clinic_upgrades" ? <ClinicUpgrades /> : null}
-        {scene === "letters" ? <Letters /> : null}
+        {scene === "letters" ? <MessageBox /> : null}
+        {scene === "tracking" ? <Tracking /> : null}
         {scene === "generator" ? <Generator /> : null}
         {scene === "achievements" ? <AchievementsPage /> : null}
       </main>

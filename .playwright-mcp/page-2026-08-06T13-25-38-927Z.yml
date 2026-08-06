@@ -1,0 +1,123 @@
+- generic [ref=f14e1]:
+  - alert [ref=f14e2]
+  - generic [ref=f14e21]:
+    - generic [ref=f14e22]:
+      - generic [ref=f14e23]: 心
+      - generic [ref=f14e24]: 心灵诊疗室
+    - generic [ref=f14e25]:
+      - generic [ref=f14e26]:
+        - generic [ref=f14e27]: 声
+        - generic [ref=f14e28]:
+          - generic [ref=f14e29]: 声望
+          - generic [ref=f14e30]: "10"
+      - generic [ref=f14e34]:
+        - generic [ref=f14e35]: 神
+        - generic [ref=f14e36]:
+          - generic [ref=f14e37]: 理智
+          - generic [ref=f14e38]: "100"
+      - generic [ref=f14e42]:
+        - generic [ref=f14e43]: 金
+        - generic [ref=f14e44]:
+          - generic [ref=f14e45]: 金钱
+          - generic [ref=f14e46]: "500"
+      - generic [ref=f14e48]:
+        - generic [ref=f14e49]: "1"
+        - generic [ref=f14e50]:
+          - generic [ref=f14e51]: 等级
+          - generic [ref=f14e52]: 0/100
+      - generic [ref=f14e54]:
+        - generic [ref=f14e55]: ☀
+        - text: 第 2 天 · 清晨
+        - generic [ref=f14e56]: 0/8
+      - button "🔇" [ref=f14e57] [cursor=pointer]
+  - main [ref=f14e58]:
+    - generic [ref=f14e59]:
+      - generic [ref=f14e60]:
+        - generic [ref=f14e61]:
+          - heading "诊 疗 大 厅" [level=1] [ref=f14e62]
+          - paragraph [ref=f14e63]: 候诊室里有人等你。不必急着「治好」谁——先坐下来，听他说。
+        - generic [ref=f14e64]:
+          - generic [ref=f14e65]:
+            - generic [ref=f14e66]: "0"
+            - generic [ref=f14e67]: 已接诊
+          - generic [ref=f14e68]:
+            - generic [ref=f14e69]: "0"
+            - generic [ref=f14e70]: 技能
+          - generic [ref=f14e71]:
+            - generic [ref=f14e72]: "0"
+            - generic [ref=f14e73]: 设施
+      - generic [ref=f14e74]:
+        - generic [ref=f14e75]: ☀ 第 2 天 · 清晨
+        - generic [ref=f14e76]: 今日已接诊 0 / 8
+      - generic [ref=f14e77]:
+        - generic [ref=f14e78]:
+          - generic [ref=f14e79]:
+            - text: ◆ 候 诊 室
+            - generic [ref=f14e80]: 4 位患者
+          - generic [ref=f14e81]:
+            - generic [ref=f14e93] [cursor=pointer]:
+              - generic [ref=f14e94]:
+                - generic [ref=f14e95]: 陈洛
+                - generic [ref=f14e96]: 简单
+              - generic [ref=f14e97]: 28岁程序员 · 自助预约
+              - generic [ref=f14e98]: 一个戴黑框眼镜的年轻人顶着黑眼圈走进来，说自己已经两周没合过眼了。
+              - generic [ref=f14e173]: 已等待 1 天
+            - generic [ref=f14e110] [cursor=pointer]:
+              - generic [ref=f14e111]:
+                - generic [ref=f14e112]: 林晓
+                - generic [ref=f14e113]: 简单
+              - generic [ref=f14e114]: 高二女生 · 被班主任转介
+              - generic [ref=f14e115]: 班主任说她因为期中考试拿了年级第二，在教室里哭了一整节课，用指甲掐自己的手背。
+              - generic [ref=f14e174]: 已等待 1 天
+            - generic [ref=f14e127]:
+              - generic [ref=f14e128]:
+                - generic [ref=f14e129]: 周明远
+                - generic [ref=f14e130]: 困难
+              - generic [ref=f14e131]: 地产公司董事长 · 私人预约
+              - generic [ref=f14e132]: 秘书替他预约时特意叮嘱：周先生最近常说自己看见已故合伙人，公司上下都传他疯了。希望您 discreet。
+              - generic [ref=f14e133]: 🔒 需要声望 30（当前 10）
+            - generic [ref=f14e186] [cursor=pointer]:
+              - generic [ref=f14e187]:
+                - generic [ref=f14e188]: 高晓棠
+                - generic [ref=f14e189]: 简单
+                - generic [ref=f14e190]: 生成
+              - generic [ref=f14e191]: 高晓棠 · 互联网产品经理
+              - generic [ref=f14e192]: 自助预约。高晓棠说自己已经三个月没睡过整觉，做产品评审时手抖得拿不住笔。主诉：强迫症状。
+        - generic [ref=f14e134]:
+          - generic [ref=f14e135]:
+            - heading "医 生 成 长" [level=3] [ref=f14e136]
+            - button "技能树 LV.1 · 0/100" [ref=f14e137] [cursor=pointer]:
+              - generic [ref=f14e138]: 技能树
+              - generic [ref=f14e139]: LV.1 · 0/100
+            - button "诊所升级 500 金" [ref=f14e140] [cursor=pointer]:
+              - generic [ref=f14e141]: 诊所升级
+              - generic [ref=f14e142]: 500 金
+            - button "患者来信 0 封" [ref=f14e143] [cursor=pointer]:
+              - generic [ref=f14e144]: 患者来信
+              - generic [ref=f14e145]: 0 封
+            - button "成就图鉴 1 / 38" [ref=f14e146] [cursor=pointer]:
+              - generic [ref=f14e147]: 成就图鉴
+              - generic [ref=f14e148]: 1 / 38
+            - button "休息一日 理智 +15" [active] [ref=f14e149] [cursor=pointer]:
+              - generic [ref=f14e150]: 休息一日
+              - generic [ref=f14e151]: 理智 +15
+          - generic [ref=f14e152]:
+            - heading "诊 所 状 态" [level=3] [ref=f14e153]
+            - generic [ref=f14e154]:
+              - generic [ref=f14e155]:
+                - generic [ref=f14e156]: 已接诊患者
+                - generic [ref=f14e157]: 0 / 4
+              - generic [ref=f14e158]:
+                - generic [ref=f14e159]: 已解锁技能
+                - generic [ref=f14e160]: 0 / 9
+              - generic [ref=f14e161]:
+                - generic [ref=f14e162]: 诊所升级
+                - generic [ref=f14e163]: 0 / 5
+              - generic [ref=f14e164]:
+                - generic [ref=f14e165]: 游戏天数
+                - generic [ref=f14e166]: 第 2 天
+          - generic [ref=f14e167]:
+            - heading "操 作" [level=3] [ref=f14e168]
+            - button "保存游戏" [ref=f14e169] [cursor=pointer]
+            - button "返回标题" [ref=f14e171] [cursor=pointer]
+  - generic: 休息一日，进入第 2 天，理智恢复 +15

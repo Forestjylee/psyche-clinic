@@ -170,7 +170,10 @@ export class AchievementEngine {
     this.set("clinic_upgrade_3", game.clinicUpgrades.length);
     this.set("clinic_upgrade_all", game.clinicUpgrades.length);
     this.set("secret_day_1", game.day);
-    this.set("secret_bookworm", game.letters.length);
+    this.set(
+      "secret_bookworm",
+      game.messages.filter((m) => m.kind === "letter").length
+    );
     // 首次保存（已玩过即已达成；宽松判定：day>=1 即第一次保存过）
     if (game.day >= 1) this.add("secret_first_save", 1);
     // 结局类型收集

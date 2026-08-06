@@ -1,4 +1,4 @@
-# 心灵诊疗室 · Cloudflare Pages 部署指南
+# 暖心小诊室 · Cloudflare Pages 部署指南
 
 | 字段 | 内容 |
 | --- | --- |

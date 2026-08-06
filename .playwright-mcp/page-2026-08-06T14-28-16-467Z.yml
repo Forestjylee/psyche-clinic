@@ -1,0 +1,55 @@
+- generic [active] [ref=f31e1]:
+  - alert [ref=f31e2]
+  - generic [ref=f31e21]:
+    - generic [ref=f31e22]:
+      - generic [ref=f31e23]: 心
+      - generic [ref=f31e24]: 暖心小诊室
+    - generic [ref=f31e25]:
+      - generic [ref=f31e26]:
+        - generic [ref=f31e27]: 声
+        - generic [ref=f31e28]:
+          - generic [ref=f31e29]: 声望
+          - generic [ref=f31e30]: "10"
+      - generic [ref=f31e34]:
+        - generic [ref=f31e35]: 神
+        - generic [ref=f31e36]:
+          - generic [ref=f31e37]: 理智
+          - generic [ref=f31e38]: "100"
+      - generic [ref=f31e42]:
+        - generic [ref=f31e43]: 金
+        - generic [ref=f31e44]:
+          - generic [ref=f31e45]: 金钱
+          - generic [ref=f31e46]: "500"
+      - generic [ref=f31e48]:
+        - generic [ref=f31e49]: "1"
+        - generic [ref=f31e50]:
+          - generic [ref=f31e51]: 等级
+          - generic [ref=f31e52]: 0/100
+      - generic [ref=f31e54]:
+        - generic [ref=f31e55]: ☀
+        - text: 第 1 天 · 清晨
+        - generic [ref=f31e56]: 0/8
+      - button "🔇" [ref=f31e57] [cursor=pointer]
+  - main [ref=f31e184]:
+    - generic [ref=f31e185]:
+      - generic [ref=f31e188]:
+        - generic [ref=f31e203]: 林晓
+        - generic [ref=f31e204]: 平静
+      - generic [ref=f31e205]:
+        - generic [ref=f31e206]:
+          - generic [ref=f31e207]:
+            - generic [ref=f31e208]: 信任
+            - generic [ref=f31e211]: "15"
+          - generic [ref=f31e212]:
+            - generic [ref=f31e213]: 防御
+            - generic [ref=f31e216]: "70"
+          - generic [ref=f31e217]:
+            - generic [ref=f31e218]: 心情
+            - generic [ref=f31e221]: "35"
+          - generic [ref=f31e222]:
+            - generic [ref=f31e223]: 真相
+            - generic [ref=f31e225]: "0"
+        - generic [ref=f31e226]: —— 旁白 ——
+        - generic [ref=f31e228] [cursor=pointer]: 门被轻轻推开。一个扎着马尾的女孩走进来▌
+        - generic:
+          - button "继 续 ▸"

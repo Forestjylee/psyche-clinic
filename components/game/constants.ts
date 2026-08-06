@@ -95,3 +95,43 @@ export function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
+
+// ============================================================
+// 合规与安全
+// ============================================================
+/** 全国心理援助热线（北京心理危机研究与干预中心） */
+export const HELP_LINE = "400-161-9995";
+export const HELP_LINE_NAME = "全国心理援助热线 · 北京心理危机研究与干预中心";
+
+/** 结局页「寻求专业帮助」卡片 */
+export const HELP_CARD_MARK = "如果你或身边的人需要帮助";
+export const HELP_CARD_TEXT =
+  "本游戏是虚构叙事，不提供专业诊疗。若你或你关心的人正经历情绪困扰、危机或自伤想法，请务必向现实中的专业人士求助。";
+export const HELP_CARD_LINE = `${HELP_LINE}（24 小时）`;
+
+/** 标题屏免责声明 */
+export const DISCLAIMER_TITLE = "免责声明";
+export const DISCLAIMER_PARAGRAPHS: string[] = [
+  "《暖心小诊室》是一款以心理健康为主题的虚构互动叙事游戏。",
+  "游戏中的所有人物、故事与诊疗过程均为虚构创作，不构成任何形式的医学诊断、治疗建议或心理干预。",
+  "游戏中的「诊疗」只是叙事机制，不代表真实心理咨询，也不能替代专业医疗帮助。",
+  "若你或你关心的人正经历情绪困扰、危机或自伤想法，请向现实中的专业人士求助，并拨打下方热线。",
+];
+
+/** 跳过敏感结局演出 · 记忆设置 key */
+export const SKIP_SENSITIVE_KEY = "ps.skipSensitive";
+
+/** 敏感结局类型：提供「跳过演出」兜底 */
+export const SENSITIVE_ENDINGS: ReadonlySet<string> = new Set(["tragic", "worsen"]);
+
+/** 结局页 chibi 最终表情映射 */
+export const endingEmotion: Record<EndingType, PatientEmotion> = {
+  cure: "happy",
+  acceptance: "calm",
+  dependent: "anxious",
+  worsen: "sad",
+  tragic: "broken",
+  hidden: "neutral",
+  transfer: "calm",
+  awakening: "happy",
+};

@@ -9,7 +9,7 @@ export function Overlays() {
       {/* Toast */}
       <div className="toast-layer">
         {toasts.map((t) => (
-          <div key={t.id} className="toast">
+          <div key={t.id} className={`toast ${t.kind ?? "info"}`}>
             {t.msg}
           </div>
         ))}
@@ -23,9 +23,15 @@ export function Overlays() {
 }
 
 function FloatingText({ text, kind }: { text: string; kind: string }) {
-  // 随机位置在屏幕中部附近
-  const x = typeof window !== "undefined" ? window.innerWidth * 0.5 + (Math.random() - 0.5) * 120 : 600;
-  const y = typeof window !== "undefined" ? window.innerHeight * 0.5 + (Math.random() - 0.5) * 80 : 300;
+  // 锚定在对话舞台（左侧患者立绘）附近，随机小幅散开避免叠字
+  const x =
+    typeof window !== "undefined"
+      ? window.innerWidth * 0.24 + (Math.random() - 0.5) * 150
+      : 300;
+  const y =
+    typeof window !== "undefined"
+      ? window.innerHeight * 0.36 + (Math.random() - 0.5) * 100
+      : 300;
   return (
     <div
       className={`floating-text ${kind}`}

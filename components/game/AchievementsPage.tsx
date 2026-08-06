@@ -38,7 +38,7 @@ export function AchievementsPage() {
         <div className="ach-banner-inner">
           <div>
             <div className="ach-banner-title">成就图鉴</div>
-            <div className="ach-banner-sub">记录你在心灵诊疗室的每一步成长</div>
+            <div className="ach-banner-sub">记录你在暖心小诊室的每一步成长</div>
           </div>
           <div className="ach-banner-ring">
             <svg viewBox="0 0 120 120" width="140" height="140">

@@ -1,19 +1,23 @@
 "use client";
 
 import { useGame } from "@/lib/hooks/useGame";
+import { slotPhaseLabel, isNightSlot, MAX_SLOTS } from "@/lib/state/GameState";
 
 export function HUD() {
   const { game, scene, expToNext, toggleMute, muted } = useGame();
   if (scene === "title") return null;
   const d = game.doctor;
-  const sanColor = d.sanity > 60 ? "#5fd49a" : d.sanity > 30 ? "#ffc060" : "#ff6b7d";
-  const repColor = d.reputation > 60 ? "#6b8eff" : d.reputation > 30 ? "#b4a0ff" : "#9aa3c4";
+  const sanColor = d.sanity > 60 ? "var(--good)" : d.sanity > 30 ? "var(--warn)" : "var(--bad)";
+  const repColor = d.reputation > 60 ? "var(--accent)" : d.reputation > 30 ? "var(--accent-2)" : "var(--text-muted)";
+  const phase = slotPhaseLabel(game.slot);
+  const night = isNightSlot(game.slot);
+  const slotsFull = game.slot >= MAX_SLOTS;
 
   return (
     <div className="hud">
       <div className="hud-brand">
         <div className="hud-emblem">心</div>
-        <div className="hud-title">心灵诊疗室</div>
+        <div className="hud-title">暖心小诊室</div>
       </div>
       <div className="hud-stats">
         <div className="hud-stat">
@@ -68,7 +72,13 @@ export function HUD() {
             </div>
           </div>
         </div>
-        <div className="hud-day">第 {game.day} 天</div>
+        <div className={`hud-day ${night ? "night" : ""} ${slotsFull ? "full" : ""}`}>
+          <span className="hud-phase-icon">{night ? "🌙" : "☀"}</span>
+          第 {game.day} 天 · {phase}
+          <span className="hud-slot-count">
+            {game.slot}/{MAX_SLOTS}
+          </span>
+        </div>
         <button
           className="hud-mute-btn"
           onClick={toggleMute}

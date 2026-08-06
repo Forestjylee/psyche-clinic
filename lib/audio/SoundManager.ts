@@ -20,7 +20,8 @@ type SfxName =
   | "locked"
   | "page"
   | "rest"
-  | "veil";
+  | "veil"
+  | "memory";
 
 class SoundManager {
   private ctx: AudioContext | null = null;
@@ -186,6 +187,13 @@ class SoundManager {
         this.tone(440, 0, 0.8, "sine", 0.12);
         this.tone(523, 0.2, 0.9, "triangle", 0.1);
         this.tone(659, 0.4, 1.0, "sine", 0.08);
+        break;
+      case "memory":
+        // 记忆闪回：低频下坠 + 耳鸣
+        this.tone(440, 0, 0.9, "sine", 0.1);
+        this.tone(330, 0.06, 1.0, "sine", 0.09);
+        this.tone(220, 0.14, 1.3, "triangle", 0.1);
+        this.noise(0, 0.5, 0.03, 500);
         break;
     }
   }

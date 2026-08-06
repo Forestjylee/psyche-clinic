@@ -25,6 +25,29 @@ export const patientA: PatientScenario = {
   difficulty: "简单",
   requireReputation: 0,
   startNode: "a_start",
+  memoryFragments: [
+    {
+      id: "lin_m1",
+      trigger: { truth: 25 },
+      title: "奖状被撕的那个下午",
+      text: "七岁那年，我抱着刚画完的画跑回家，说以后想当画家。妈妈一把夺过去揉成一团摔在地上：「画这些有什么用？你只要考第一。」那天下午，我蹲在垃圾桶边把画纸一片片捡起来，拼了一晚上也没拼回原样。",
+      emotion: "sad",
+    },
+    {
+      id: "lin_m2",
+      trigger: { truth: 55 },
+      title: "深夜的台灯",
+      text: "那些年家里总是很安静。爸爸一喝多就吼弟弟，我每次都挡在前面说「他明天要考试」。等他们睡下，我缩在台灯底下背题到凌晨——只要我考得够好，这个家才不需要他发火。",
+      emotion: "broken",
+    },
+    {
+      id: "lin_m3",
+      trigger: { truth: 85 },
+      title: "手背上的指甲印",
+      text: "年级第二的成绩单递过去，妈妈一句话没说，把房门带上了。我站在门外，指甲掐进手背，掐到出了血也没觉得疼。我忽然明白——我不是为考第二哭，我是怕这唯一能守住弟弟的东西，也保不住了。",
+      emotion: "broken",
+    },
+  ],
   dialogues: {
     a_start: {
       id: "a_start",
@@ -297,6 +320,29 @@ export const patientB: PatientScenario = {
   difficulty: "困难",
   requireReputation: 30,
   startNode: "b_start",
+  memoryFragments: [
+    {
+      id: "zhou_m1",
+      trigger: { truth: 30 },
+      title: "杯底的白色",
+      text: "三年来，每晚睡前，小李都会给我递一杯温开水，说年纪大了要养胃。有回我手抖打翻了杯子，杯底有一圈细碎的白末。我以为是水垢，还夸他讲究。现在想起来，那水的味道，从我每天晨会第一个发言的第二天起，就慢慢变了。",
+      emotion: "anxious",
+    },
+    {
+      id: "zhou_m2",
+      trigger: { truth: 60 },
+      title: "他站在水杯旁边",
+      text: "老刘又出现了。这回他什么也没说，只是站在我办公桌对面，盯着我手边的水杯看。那目光我认得——当年他劝我撤资时，就是这副神情。我抓起电话想给他打过去，拨到一半才惊醒：老刘已经走了三年，这三年里，那杯水我再没换过人。",
+      emotion: "scared",
+    },
+    {
+      id: "zhou_m3",
+      trigger: { truth: 90 },
+      title: "电梯反光里的两个人",
+      text: "电梯门合上的一瞬，我从反光里看见自己脸上一层青灰，而站在我身后半步的小李，嘴角带着笑。老刘走前的最后一通电话，只留了一句：'老周，小心你身边的人。'我一直以为他疯了。现在疯了的人，好像换成了我。",
+      emotion: "sad",
+    },
+  ],
   dialogues: {
     b_start: {
       id: "b_start",
@@ -530,6 +576,22 @@ export const patientC: PatientScenario = {
   difficulty: "简单",
   requireReputation: 0,
   startNode: "c_start",
+  memoryFragments: [
+    {
+      id: "chen_m1",
+      trigger: { truth: 25 },
+      title: "凌晨两点的饮水机",
+      text: "连续第三十七天加班到凌晨。整层楼的灯只剩我头顶这一盏，走廊尽头的饮水机每隔一会儿「咔哒」一声，像在给留守的人报平安。我数了数工位——二十几个人，今晚只有我一个。",
+      emotion: "anxious",
+    },
+    {
+      id: "chen_m2",
+      trigger: { truth: 60 },
+      title: "抽屉最底下的体检报告",
+      text: "上周的体检报告，医生在「建议复查」四个字下面画了线。我把报告卷起来锁进抽屉最底层。我怕的不是那张纸上的指标，是有人看见它，然后说一句：'年轻人，这点苦都吃不了？'——那比心律不齐，更让我喘不过气。",
+      emotion: "sad",
+    },
+  ],
   dialogues: {
     c_start: {
       id: "c_start",

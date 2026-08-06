@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "心灵诊疗室 · Psyche Clinic",
+  title: "暖心小诊室 · Cozy Clinic",
   description:
-    "一款心理医生模拟器：通过对话诊疗影响患者结局，养成你的诊所与医者之心。",
+    "一款温馨的心理咨询模拟器：通过对话陪伴影响客户的结局，经营你的小诊室，守住每一盏心里的灯。",
 };
 
 export default function RootLayout({

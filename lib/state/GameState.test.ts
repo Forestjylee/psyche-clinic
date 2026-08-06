@@ -5,6 +5,7 @@ import {
   rollFollowUps,
   advanceDayState,
   FOLLOW_UP_CHANCE,
+  REPUTATION_LOSS_PER_ABANDON,
 } from "./GameState";
 import type { GameState, EndingType } from "../types";
 
@@ -100,9 +101,10 @@ describe("rollFollowUps 复诊 roll", () => {
     expect(r.followUpsToday).toEqual([]);
     expect(r.discharged).toEqual(["p1"]);
   });
-  it("连续未复诊达宽限天数自动离场", () => {
+  it("连续未复诊达宽限天数进入放弃复诊列表", () => {
     const r = rollFollowUps({ p1: "dependent" }, [], [], {}, { p1: 4 }, opts, () => 0.9);
-    expect(r.discharged).toContain("p1");
+    expect(r.abandonedFollowUps).toContain("p1");
+    expect(r.followUpsToday).toEqual([]);
   });
   it("命中复诊后 idle 重置", () => {
     const r = rollFollowUps({ p1: "dependent" }, [], [], {}, { p1: 3 }, opts, () => 0.5);
@@ -127,11 +129,13 @@ describe("advanceDayState 复诊集成", () => {
     advanceDayState(g, [{ id: "p1", name: "甲" }], () => 0.5);
     expect(g.waitingDays.p1).toBe(1);
   });
-  it("未命中复诊的患者进入 idle 计数，达宽限后离场", () => {
+  it("复诊池患者达宽限天数放弃复诊：离场并扣声望", () => {
     const g = createInitialState();
     g.patientRecords = { p1: "dependent" };
-    g.followUpIdleDays = { p1: 4 };
-    advanceDayState(g, [], () => 0.9);
+    g.followUpIdleDays = { p1: 5 }; // 5 + 1 = 6 达宽限
+    const events = advanceDayState(g, [], () => 0.9);
     expect(g.discharged).toContain("p1");
+    expect(g.doctor.reputation).toBe(10 - REPUTATION_LOSS_PER_ABANDON);
+    expect(events).toContainEqual({ type: "abandonFollowUp", patientId: "p1" });
   });
 });

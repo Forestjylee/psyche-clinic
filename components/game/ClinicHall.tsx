@@ -4,7 +4,14 @@ import { useGame } from "@/lib/hooks/useGame";
 import { allPatients } from "@/lib/data/patients";
 import { allSkills, allClinicUpgrades } from "@/lib/data/skills";
 import { allAchievements } from "@/lib/data/achievements";
-import { endingColor, endingLabel } from "./constants";
+import { endingColor, endingLabel, endingEmotion } from "./constants";
+import { ChibiCharacter } from "./ChibiCharacter";
+import {
+  isNightSlot,
+  DECAY_START_DAY,
+  WARN_DAY,
+  ABANDON_DAY,
+} from "@/lib/state/GameState";
 
 export function ClinicHall() {
   const {
@@ -19,7 +26,10 @@ export function ClinicHall() {
     achievementEngine,
   } = useGame();
 
-  const allAvailable = [...allPatients, ...game.generatedScenarios];
+  // 候诊列表：已放弃治疗的患者不再出现
+  const allAvailable = [...allPatients, ...game.generatedScenarios].filter(
+    (p) => !game.abandoned.includes(p.id)
+  );
   const totalPatients = allAvailable.length;
   const achCount = achievementEngine
     ? Object.values(achievementEngine.getProgressMap()).filter((p) => p.unlocked).length
@@ -33,30 +43,58 @@ export function ClinicHall() {
 
   const onCardClick = (p: (typeof allAvailable)[number]) => {
     const locked = p.requireReputation ? game.doctor.reputation < p.requireReputation : false;
-    if (locked) {
+    const servedToday = game.todayServed.includes(p.id);
+    if (locked || servedToday) {
       playSound("locked");
       return;
     }
     startSession(p);
   };
 
+  const night = isNightSlot(game.slot);
+  const abandonedCount = game.abandoned.length;
+  const unreadCount = game.messages.filter((m) => !m.read).length;
+  const trackedCount = allAvailable.filter(
+    (p) => !game.patientRecords[p.id]
+  ).length;
+
   return (
-    <div className="scene clinic">
+    <div className={`scene clinic ${night ? "clinic-night" : ""}`}>
       <div className="clinic-header">
         <div className="clinic-header-left">
-          <h1>诊 疗 大 厅</h1>
-          <p>候诊室里有人等你。不必急着「治好」谁——先坐下来，听他说。</p>
+          <h1>今 日 预 约</h1>
+          <p>心理咨询预约清单 · 每一位来访者都带着心事而来，先坐下来，听他说。</p>
         </div>
         <div className="clinic-header-right">
-          <StatChip val={Object.keys(game.patientRecords).length} label="已接诊" />
+          <StatChip val={Object.keys(game.patientRecords).length} label="已接待" />
           <StatChip val={game.skills.length} label="技能" />
           <StatChip val={game.clinicUpgrades.length} label="设施" />
+          <button
+            className="clinic-header-btn"
+            onClick={() => {
+              playSound("click");
+              saveNow();
+            }}
+            title="保存游戏进度"
+          >
+            💾 保存
+          </button>
+          <button
+            className="clinic-header-btn ghost"
+            onClick={() => {
+              playSound("page");
+              backToTitle();
+            }}
+            title="退出游戏，返回标题"
+          >
+            退出
+          </button>
         </div>
       </div>
       <div className="clinic-body">
         <div className="patient-section">
           <div className="section-title">
-            候 诊 室 <span className="count">{totalPatients} 位患者</span>
+            今 日 预 约 <span className="count">{totalPatients} 位客户</span>
           </div>
           <div className="patient-list">
             {allAvailable.map((p) => {
@@ -64,11 +102,16 @@ export function ClinicHall() {
               const locked = p.requireReputation
                 ? game.doctor.reputation < p.requireReputation
                 : false;
+              const servedToday = game.todayServed.includes(p.id);
               const isGenerated = p.id.startsWith("gen_");
+              const waitDays = game.waitingDays[p.id] ?? 0;
+              const alive = !completed && !locked;
+              const decaying = alive && waitDays >= DECAY_START_DAY;
+              const critical = alive && waitDays >= WARN_DAY;
               return (
                 <div
                   key={p.id}
-                  className={`patient-card ${locked ? "locked" : ""} ${completed ? "completed" : ""}`}
+                  className={`patient-card ${locked ? "locked" : ""} ${completed ? "completed" : ""} ${servedToday ? "served-today" : ""} ${decaying ? "decaying" : ""} ${critical ? "critical" : ""}`}
                   style={
                     {
                       "--card-accent": p.palette.primary,
@@ -77,14 +120,12 @@ export function ClinicHall() {
                   }
                   onClick={() => onCardClick(p)}
                 >
-                  <div
-                    className="patient-avatar"
-                    style={{
-                      background: `linear-gradient(135deg, ${p.palette.primary}, ${p.palette.fog})`,
-                      color: "white",
-                    }}
-                  >
-                    {p.name[0]}
+                  <div className="patient-avatar">
+                    <ChibiCharacter
+                      palette={p.palette}
+                      size="md"
+                      emotion={completed ? endingEmotion[completed] : "neutral"}
+                    />
                   </div>
                   <div className="patient-info">
                     <div className="patient-name">
@@ -114,8 +155,21 @@ export function ClinicHall() {
                         需要声望 {p.requireReputation}（当前 {game.doctor.reputation}）
                       </div>
                     ) : null}
-                    {completed ? (
+                    {servedToday ? (
+                      <div className="patient-served-tag">今日已接诊 · 明日可复诊</div>
+                    ) : completed ? (
                       <div className="patient-completed-tag">已完成 · 可重新接诊</div>
+                    ) : null}
+                    {alive && waitDays > 0 ? (
+                      <div
+                        className={`patient-wait-tag ${critical ? "critical" : ""} ${decaying ? "decaying" : ""}`}
+                      >
+                        {critical
+                          ? `⚠ 病情严重 · 已等待 ${waitDays} 天`
+                          : decaying
+                          ? `病情加重 · 已等待 ${waitDays} 天`
+                          : `已等待 ${waitDays} 天`}
+                      </div>
                     ) : null}
                   </div>
                 </div>
@@ -144,11 +198,24 @@ export function ClinicHall() {
               }}
             />
             <SideBtn
-              label="患者来信"
-              right={`${game.letters.length} 封`}
+              label="消息盒子"
+              right={
+                unreadCount > 0
+                  ? `${unreadCount} 条未读`
+                  : `${game.messages.length} 条`
+              }
+              rightClass={unreadCount > 0 ? "msg-unread-badge" : undefined}
               onClick={() => {
                 playSound("page");
                 setScene("letters");
+              }}
+            />
+            <SideBtn
+              label="客户追踪"
+              right={`${trackedCount} 人`}
+              onClick={() => {
+                playSound("page");
+                setScene("tracking");
               }}
             />
             <SideBtn
@@ -161,15 +228,6 @@ export function ClinicHall() {
               }}
             />
             <SideBtn
-              label="剧本工坊"
-              right="无限剧本"
-              rightClass="gen-side-tag"
-              onClick={() => {
-                playSound("page");
-                setScene("generator");
-              }}
-            />
-            <SideBtn
               label="休息一日"
               right={`理智 +${getRestRecovery()}`}
               rightClass="rest-side-tag"
@@ -179,16 +237,14 @@ export function ClinicHall() {
           <div className="side-card">
             <h3>诊 所 状 态</h3>
             <div className="side-stats">
-              <StatLine label="已接诊患者" value={`${Object.keys(game.patientRecords).length} / ${totalPatients}`} />
+              <StatLine label="已接待客户" value={`${Object.keys(game.patientRecords).length} / ${totalPatients}`} />
               <StatLine label="已解锁技能" value={`${game.skills.length} / ${allSkills.length}`} />
               <StatLine label="诊所升级" value={`${game.clinicUpgrades.length} / ${allClinicUpgrades.length}`} />
               <StatLine label="游戏天数" value={`第 ${game.day} 天`} />
+              {abandonedCount > 0 ? (
+                <StatLine label="流失客户" value={`${abandonedCount} 人`} />
+              ) : null}
             </div>
-          </div>
-          <div className="side-card">
-            <h3>操 作</h3>
-            <SideBtn label="保存游戏" onClick={saveNow} />
-            <SideBtn label="返回标题" onClick={backToTitle} />
           </div>
         </div>
       </div>
