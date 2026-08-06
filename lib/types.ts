@@ -149,10 +149,31 @@ export interface PatientScenario {
   baseReward: number;
   /** 难度标签 */
   difficulty: "简单" | "普通" | "困难";
+  /** 记忆碎片：真相揭示到阈值时触发的一次性闪回 */
+  memoryFragments?: MemoryFragment[];
   /** 是否已完成 */
   completed?: boolean;
   /** 已达成结局 */
   achievedEnding?: EndingType;
+  /** 复诊对话图（独立短剧情，初始无则不支持复诊） */
+  followUpDialogues?: Record<string, DialogueNode>;
+  /** 复诊起始节点 */
+  followUpStart?: string;
+  /** 最多复诊次数（达到后结案离场，默认 2） */
+  maxFollowUps?: number;
+}
+
+/** 记忆碎片：诊疗中真相揭示到阈值时触发的一次性闪回 */
+export interface MemoryFragment {
+  id: string;
+  /** 触发条件（truth / trust 任一达到即触发） */
+  trigger: { truth?: number; trust?: number };
+  /** 闪回标题 */
+  title: string;
+  /** 闪回正文（患者视角的第一人称记忆画面） */
+  text: string;
+  /** 闪回时的患者情绪覆盖 */
+  emotion?: PatientEmotion;
 }
 
 export interface PatientPalette {
@@ -213,12 +234,51 @@ export interface GameState {
   patientRecords: Record<string, EndingType>;
   /** 当前日期（游戏内） */
   day: number;
-  /** 收到的信件 */
-  letters: Letter[];
+  /** 今日已接待名额（0..MAX_SLOTS，默认 8 个/天） */
+  slot: number;
+  /** 今日已接诊的患者 id（当天不能重复接诊，休息日清空） */
+  todayServed: string[];
+  /** patientId -> 已在候诊区等待的天数（用于病情恶化） */
+  waitingDays: Record<string, number>;
+  /** 已放弃治疗离开的患者 id */
+  abandoned: string[];
+  /** 已离场（结案，不再复诊）的患者 id：治愈/接纳/恶化/悲剧等 */
+  discharged: string[];
+  /** patientId -> 已复诊次数（复诊池患者） */
+  followUpCount: Record<string, number>;
+  /** 今日命中复诊、出现在预约列表的患者 id */
+  todayFollowUps: string[];
+  /** patientId -> 连续未复诊天数（达宽限天数自动离场） */
+  followUpIdleDays: Record<string, number>;
+  /** 消息盒子：统一存放来信 / 病情提醒 / 通知（旧版 letters 会在读档时迁移） */
+  messages: GameMessage[];
   /** 生成器产出的患者剧本（最多保留 N 个） */
   generatedScenarios: PatientScenario[];
 }
 
+/** 一天内的时段 */
+export type TimePhase = "morning" | "afternoon" | "evening" | "night";
+
+/** 消息盒子条目类型 */
+export type MessageKind = "letter" | "warning" | "notice";
+
+/** 消息盒子中的一条消息（来信 / 病情提醒 / 通知 统一结构） */
+export interface GameMessage {
+  id: string;
+  kind: MessageKind;
+  title: string;
+  body: string;
+  /** 产生的游戏内日期 */
+  day: number;
+  /** 是否已读 */
+  read: boolean;
+  /** 关联的患者姓名（来信/病情提醒用） */
+  patientName?: string;
+  /** 来信的情感色调（仅 letter 有，用于 chibi 表情与配色） */
+  tone?: "thanks" | "neutral" | "sad" | "dark";
+}
+
+/** 旧版信件结构（读档迁移用，新存档不再写入） */
 export interface Letter {
   id: string;
   from: string;
