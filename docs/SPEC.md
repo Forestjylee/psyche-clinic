@@ -505,3 +505,4 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 | v0.1.0 | 2026-08 | 初版 Spec，定义技术栈、目录、数据模型 |
 | v0.2.0 | 2026-08-06 | 新增成就特效规格、温暖回响、Storage 抽象迁移路径、D1 Schema、Cloudflare 全栈架构图 |
 | v0.3.0 | 2026-08-06 | 核心玩法重构：患者三层生命周期（候诊/已诊疗/离场）与复诊系统、GameState 新增 discharged/followUpCount、PatientScenario 新增 followUp 复诊剧情、随机事件与 500+ 素材库规划 |
+| v0.3.1 | 2026-08-06 | 首页 UX 优化（难度标签图标/摘要两行悬停展开/进度条/天数徽章/退出确认/休息高亮/预约入口/奖励动画）；ClinicHall 侧栏按钮新增 `data-guide` 定位；手写剧本补正负选项对照；浮动文字改为确定性纵向堆叠防重叠（详见 [clinic-hall-ux-design](./superpowers/specs/2026-08-06-clinic-hall-ux-design.md)） |

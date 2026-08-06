@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import { allPatients } from "@/lib/data/patients";
 import { allSkills, allClinicUpgrades } from "@/lib/data/skills";
@@ -25,6 +26,8 @@ export function ClinicHall() {
     expToNext,
     achievementEngine,
   } = useGame();
+
+  const [confirmExit, setConfirmExit] = useState(false);
 
   // 候诊列表：已放弃治疗的患者不再出现
   const allAvailable = [...allPatients, ...game.generatedScenarios].filter(
@@ -82,8 +85,8 @@ export function ClinicHall() {
           <button
             className="clinic-header-btn ghost"
             onClick={() => {
-              playSound("page");
-              backToTitle();
+              playSound("click");
+              setConfirmExit(true);
             }}
             title="退出游戏，返回标题"
           >
@@ -95,6 +98,16 @@ export function ClinicHall() {
         <div className="patient-section">
           <div className="section-title">
             今 日 预 约 <span className="count">{totalPatients} 位客户</span>
+            <button
+              className="patient-add-btn"
+              onClick={() => {
+                playSound("page");
+                setScene("generator");
+              }}
+              title="生成新客户"
+            >
+              ＋ 预约客户
+            </button>
           </div>
           <div className="patient-list">
             {allAvailable.map((p) => {
@@ -130,7 +143,10 @@ export function ClinicHall() {
                   <div className="patient-info">
                     <div className="patient-name">
                       <span className="patient-name-text">{p.name}</span>
-                      <span className={`patient-difficulty ${p.difficulty}`}>{p.difficulty}</span>
+                      <span className={`patient-difficulty ${p.difficulty}`}>
+                        {p.difficulty === "简单" ? "😊" : p.difficulty === "困难" ? "⚠" : "✦"}{" "}
+                        {p.difficulty}
+                      </span>
                       {isGenerated ? (
                         <span
                           className="patient-difficulty"
@@ -179,10 +195,12 @@ export function ClinicHall() {
         </div>
         <div className="clinic-side">
           <div className="side-card">
-            <h3>医 生 成 长</h3>
+            <h3>个 人 成 长</h3>
             <SideBtn
               label="技能树"
               right={`LV.${game.doctor.level} · ${game.doctor.exp}/${expToNext(game.doctor.level)}`}
+              progress={(game.doctor.exp / expToNext(game.doctor.level)) * 100}
+              guide="skills"
               onClick={() => {
                 playSound("page");
                 setScene("skills");
@@ -230,17 +248,31 @@ export function ClinicHall() {
             <SideBtn
               label="休息一日"
               right={`理智 +${getRestRecovery()}`}
-              rightClass="rest-side-tag"
+              rightClass={`rest-side-tag ${game.doctor.sanity < 50 ? "low" : ""}`}
+              guide="rest"
+              className={game.doctor.sanity < 50 ? "rest-low" : undefined}
               onClick={restOneDay}
             />
           </div>
           <div className="side-card">
             <h3>诊 所 状 态</h3>
             <div className="side-stats">
-              <StatLine label="已接待客户" value={`${Object.keys(game.patientRecords).length} / ${totalPatients}`} />
-              <StatLine label="已解锁技能" value={`${game.skills.length} / ${allSkills.length}`} />
-              <StatLine label="诊所升级" value={`${game.clinicUpgrades.length} / ${allClinicUpgrades.length}`} />
-              <StatLine label="游戏天数" value={`第 ${game.day} 天`} />
+              <StatLine
+                label="已接待客户"
+                value={`${Object.keys(game.patientRecords).length} / ${totalPatients}`}
+                progress={(Object.keys(game.patientRecords).length / Math.max(totalPatients, 1)) * 100}
+              />
+              <StatLine
+                label="已解锁技能"
+                value={`${game.skills.length} / ${allSkills.length}`}
+                progress={(game.skills.length / Math.max(allSkills.length, 1)) * 100}
+              />
+              <StatLine
+                label="诊所升级"
+                value={`${game.clinicUpgrades.length} / ${allClinicUpgrades.length}`}
+                progress={(game.clinicUpgrades.length / Math.max(allClinicUpgrades.length, 1)) * 100}
+              />
+              <StatLine label="游戏天数" value={<span className="stat-day-badge">第 {game.day} 天</span>} />
               {abandonedCount > 0 ? (
                 <StatLine label="流失客户" value={`${abandonedCount} 人`} />
               ) : null}
@@ -248,6 +280,43 @@ export function ClinicHall() {
           </div>
         </div>
       </div>
+      {confirmExit ? (
+        <div
+          className="confirm-mask"
+          onClick={() => {
+            playSound("click");
+            setConfirmExit(false);
+          }}
+        >
+          <div className="confirm-card" onClick={(e) => e.stopPropagation()}>
+            <div className="confirm-title">返回标题屏？</div>
+            <p className="confirm-text">
+              进度会自动保存，回来可以继续经营你的诊所。
+            </p>
+            <div className="confirm-actions">
+              <button
+                className="confirm-cancel"
+                onClick={() => {
+                  playSound("click");
+                  setConfirmExit(false);
+                }}
+              >
+                继续经营
+              </button>
+              <button
+                className="confirm-ok"
+                onClick={() => {
+                  playSound("page");
+                  setConfirmExit(false);
+                  backToTitle();
+                }}
+              >
+                返回标题
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -265,26 +334,59 @@ function SideBtn({
   label,
   right,
   rightClass,
+  guide,
+  progress,
+  className,
   onClick,
 }: {
   label: string;
   right?: string;
   rightClass?: string;
+  guide?: string;
+  progress?: number;
+  className?: string;
   onClick?: () => void;
 }) {
   return (
-    <button className="side-btn" onClick={onClick}>
-      <span>{label}</span>
+    <button
+      className={`side-btn ${className ?? ""}`}
+      data-guide={guide}
+      onClick={onClick}
+    >
+      <span className="side-btn-main">
+        <span className="side-btn-label">{label}</span>
+        {progress !== undefined ? (
+          <span className="side-btn-progress">
+            <span className="side-btn-progress-fill" style={{ width: `${Math.min(Math.max(progress, 0), 100)}%` }} />
+          </span>
+        ) : null}
+      </span>
       {right ? <span className={rightClass} style={{ color: "var(--text-dim)" }}>{right}</span> : null}
     </button>
   );
 }
 
-function StatLine({ label, value }: { label: string; value: string }) {
+function StatLine({
+  label,
+  value,
+  progress,
+}: {
+  label: string;
+  value: React.ReactNode;
+  progress?: number;
+}) {
   return (
     <div className="stat-line">
-      <span>{label}</span>
-      <span>{value}</span>
+      <span className="stat-line-label">{label}</span>
+      {progress !== undefined ? (
+        <span className="stat-line-bar">
+          <span
+            className="stat-line-bar-fill"
+            style={{ width: `${Math.min(Math.max(progress, 0), 100)}%` }}
+          />
+        </span>
+      ) : null}
+      <span className="stat-line-value">{value}</span>
     </div>
   );
 }

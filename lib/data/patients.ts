@@ -142,6 +142,13 @@ export const patientA: PatientScenario = {
           next: "a_p3_open",
           hint: "需要更多信任",
         },
+        {
+          id: "c7b",
+          text: "「想开点，谁家孩子不是这么过来的。别小题大做，回去专心考试。」",
+          kind: "logic",
+          effect: { trust: -10, defense: 15, mood: -12 },
+          next: "a_p2_def",
+        },
       ],
     },
     a_p3_open: {
@@ -463,6 +470,13 @@ export const patientB: PatientScenario = {
           next: "b_p3_medical",
           hint: "需要信任≥35",
         },
+        {
+          id: "b9b",
+          text: "「老陈的事已经翻篇三年了。你放不下的是愧疚——这是典型的未完成哀悼，把它放下，才能向前走。」",
+          kind: "logic",
+          effect: { trust: -12, defense: 15, mood: -8 },
+          next: "b_p3_normal",
+        },
       ],
     },
     b_p3_medical: {
@@ -515,6 +529,13 @@ export const patientB: PatientScenario = {
           effect: { trust: 20, truth: 40, doctorReputation: 5, doctorExp: 50 },
           next: "b_end_hidden",
           hint: "需要技能：危机干预",
+        },
+        {
+          id: "b14b",
+          text: "「我建议您还是住院观察一段时间。幻觉史不算短，稳妥起见，接受系统治疗最保险。」",
+          kind: "confront",
+          effect: { trust: -18, defense: 20, mood: -12 },
+          next: "b_end_worsen",
         },
       ],
     },
@@ -613,7 +634,21 @@ export const patientC: PatientScenario = {
           effect: { mood: 10, doctorMoney: 50 },
           next: "c_p2_med",
         },
+        {
+          id: "c1b",
+          text: "「熬夜是你们行业通病，你选择了这个工作强度，就要自己担着。」",
+          kind: "logic",
+          effect: { trust: -15, defense: 15, mood: -15 },
+          next: "c_p2_def",
+        },
       ],
+    },
+    c_p2_def: {
+      id: "c_p2_def",
+      speaker: "patient",
+      text: "（他别过脸，声音闷下去）……说得对，都是我自己选的。您不用管我了，药开给我就行，我自己扛。",
+      emotion: "angry",
+      autoNext: "c_p2",
     },
     c_p2_med: {
       id: "c_p2_med",

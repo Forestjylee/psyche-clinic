@@ -16,6 +16,7 @@ import { MessageBox } from "./MessageBox";
 import { Tracking } from "./Tracking";
 import { Generator } from "./Generator";
 import { AchievementsPage } from "./AchievementsPage";
+import { Onboarding } from "./Onboarding";
 
 export function GameApp() {
   const { scene, game } = useGame();
@@ -60,6 +61,7 @@ export function GameApp() {
         {scene === "achievements" ? <AchievementsPage /> : null}
       </main>
       <div className={`sanity-vignette ${scene !== "title" && game.doctor.sanity <= 35 ? "active" : ""}`} />
+      {scene === "clinic" ? <Onboarding /> : null}
       <Overlays />
       <EndingOverlay />
       <AchievementUnlockToast />

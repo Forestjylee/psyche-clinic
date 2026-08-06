@@ -15,23 +15,38 @@ export function Overlays() {
         ))}
       </div>
       {/* 浮动文字（数值变化反馈） */}
-      {floatingTexts.map((f) => (
-        <FloatingText key={f.id} text={f.text} kind={f.kind} />
+      {floatingTexts.map((f, i) => (
+        <FloatingText
+          key={f.id}
+          text={f.text}
+          kind={f.kind}
+          index={i}
+          total={floatingTexts.length}
+        />
       ))}
     </>
   );
 }
 
-function FloatingText({ text, kind }: { text: string; kind: string }) {
-  // 锚定在对话舞台（左侧患者立绘）附近，随机小幅散开避免叠字
-  const x =
-    typeof window !== "undefined"
-      ? window.innerWidth * 0.24 + (Math.random() - 0.5) * 150
-      : 300;
-  const y =
-    typeof window !== "undefined"
-      ? window.innerHeight * 0.36 + (Math.random() - 0.5) * 100
-      : 300;
+function FloatingText({
+  text,
+  kind,
+  index,
+  total,
+}: {
+  text: string;
+  kind: string;
+  index: number;
+  total: number;
+}) {
+  // 锚定在对话舞台（左侧患者立绘）附近。
+  // 多个浮动文字按索引纵向堆叠并整体居中，避免随机散开造成叠字；
+  // 位置由 index 决定（确定性），re-render 不跳动。
+  const baseX = typeof window !== "undefined" ? window.innerWidth * 0.24 : 300;
+  const baseY = typeof window !== "undefined" ? window.innerHeight * 0.36 : 300;
+  const rowGap = 46;
+  const y = baseY + (index - (total - 1) / 2) * rowGap;
+  const x = baseX + (index % 2 === 0 ? -24 : 24);
   return (
     <div
       className={`floating-text ${kind}`}
