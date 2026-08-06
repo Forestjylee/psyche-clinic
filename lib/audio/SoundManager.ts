@@ -26,10 +26,8 @@ type SfxName =
 class SoundManager {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
-  private bgmGain: GainNode | null = null;
-  private bgmNodes: OscillatorNode[] = [];
-  private bgmLfo: OscillatorNode | null = null;
-  private bgmFilter: BiquadFilterNode | null = null;
+  /** BGM 音频元素（加载 MP3 循环播放） */
+  private bgmEl: HTMLAudioElement | null = null;
   private bgmRunning = false;
   private _muted = false;
   private _volume = 0.7;
@@ -69,6 +67,9 @@ class SoundManager {
     this._muted = m;
     if (this.master && this.ctx) {
       this.master.gain.setTargetAtTime(m ? 0 : this._volume, this.ctx.currentTime, 0.02);
+    }
+    if (this.bgmEl) {
+      this.bgmEl.volume = m ? 0 : this._bgmVolume;
     }
   }
   setVolume(v: number): void {
@@ -199,80 +200,45 @@ class SoundManager {
   }
 
   // ---------- BGM ----------
+  /** BGM 音频文件路径（免费可商用轻音乐） */
+  private bgmSrc = "/audio/bgm-relax.mp3";
+
   startBgm(): void {
-    if (!this.ctx || !this.master || this.bgmRunning) return;
-    this.bgmRunning = true;
-    this.bgmGain = this.ctx.createGain();
-    this.bgmGain.gain.value = 0;
-    this.bgmGain.gain.setTargetAtTime(this._bgmVolume, this.ctx.currentTime, 1.5);
-
-    // 低通滤波，保留温暖基底、去掉刺耳高频
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 1800;
-    filter.Q.value = 0.4;
-    this.bgmFilter = filter;
-    this.bgmGain.connect(filter);
-    filter.connect(this.master);
-
-    // 三个振荡器构成温暖的氛围 pad（A3 大和弦，避免过低轰鸣）
-    // 无失谐拍频：detune 会制造低频"嗡嗡"起伏，这里全部归零
-    const freqs = [220, 277.18, 329.63]; // A3, C#4, E4
-    this.bgmNodes = freqs.map((f, i) => {
-      const osc = this.ctx!.createOscillator();
-      osc.type = i === 0 ? "sine" : "triangle";
-      osc.frequency.value = f;
-      const g = this.ctx!.createGain();
-      g.gain.value = i === 0 ? 0.4 : 0.22;
-      osc.connect(g);
-      g.connect(this.bgmGain!);
-      osc.start();
-      return osc;
+    if (typeof window === "undefined" || this.bgmRunning) return;
+    if (this.bgmEl) {
+      this.bgmEl.play().catch(() => {
+        /* autoplay 被浏览器拦截时静默，等下次用户交互 */
+      });
+      return;
+    }
+    const el = new Audio(this.bgmSrc);
+    el.loop = true;
+    el.volume = this._bgmVolume * (this._muted ? 0 : 1);
+    el.preload = "auto";
+    el.addEventListener("loadeddata", () => {
+      if (this.bgmRunning) el.play().catch(() => {});
     });
-
-    // 慢速 LFO 调制音量做"呼吸感"，而非调制频率（频率起伏=嗡鸣感）
-    this.bgmLfo = this.ctx.createOscillator();
-    this.bgmLfo.frequency.value = 0.05;
-    const lfoGain = this.ctx.createGain();
-    lfoGain.gain.value = 0.16;
-    this.bgmLfo.connect(lfoGain);
-    lfoGain.connect(this.bgmGain.gain);
-    this.bgmLfo.start();
+    this.bgmEl = el;
+    this.bgmRunning = true;
+    el.play().catch(() => {
+      /* 等待 loadeddata 或用户交互 */
+    });
   }
 
   stopBgm(): void {
-    if (!this.ctx || !this.bgmRunning) return;
+    if (!this.bgmRunning) return;
     this.bgmRunning = false;
-    if (this.bgmGain) {
-      this.bgmGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.4);
+    if (this.bgmEl) {
+      this.bgmEl.pause();
     }
-    const nodes = this.bgmNodes;
-    const lfo = this.bgmLfo;
-    window.setTimeout(() => {
-      nodes.forEach((n) => {
-        try {
-          n.stop();
-        } catch {
-          /* noop */
-        }
-      });
-      try {
-        lfo?.stop();
-      } catch {
-        /* noop */
-      }
-    }, 800);
-    this.bgmNodes = [];
-    this.bgmLfo = null;
-    this.bgmFilter = null;
   }
 
-  /** 根据理智值动态调整 BGM 滤波（低理智更压抑） */
+  /** 根据理智值动态调整 BGM 音量（低理智更沉、音量更低，营造压抑） */
   setTension(sanity: number): void {
-    if (!this.ctx || !this.bgmFilter) return;
-    // 理智 100 → 滤波 1800Hz（通透温暖）；理智 0 → 滤波 400Hz（沉闷压抑）
-    const cutoff = 400 + (Math.max(0, Math.min(100, sanity)) / 100) * 1400;
-    this.bgmFilter.frequency.setTargetAtTime(cutoff, this.ctx.currentTime, 0.8);
+    if (!this.bgmEl) return;
+    // 理智 100 → 音量 100%；理智 0 → 音量 55%（低沉压抑）
+    const vol = (this._muted ? 0 : 1) * this._bgmVolume * (0.55 + (Math.max(0, Math.min(100, sanity)) / 100) * 0.45);
+    this.bgmEl.volume = vol;
   }
 }
 

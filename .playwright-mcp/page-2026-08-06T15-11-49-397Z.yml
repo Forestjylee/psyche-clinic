@@ -1,0 +1,109 @@
+- generic [active] [ref=f37e1]:
+  - alert [ref=f37e2]
+  - generic [ref=f37e8]:
+    - generic [ref=f37e9]: 暖心小诊室
+    - generic [ref=f37e17]:
+      - generic [ref=f37e18]:
+        - generic [ref=f37e19]: 声
+        - generic [ref=f37e20]:
+          - generic [ref=f37e21]: 声望
+          - generic [ref=f37e22]: "10"
+      - generic [ref=f37e26]:
+        - generic [ref=f37e27]: 神
+        - generic [ref=f37e28]:
+          - generic [ref=f37e29]: 理智
+          - generic [ref=f37e30]: "100"
+      - generic [ref=f37e34]:
+        - generic [ref=f37e35]: 金
+        - generic [ref=f37e36]:
+          - generic [ref=f37e37]: 金钱
+          - generic [ref=f37e38]: "500"
+      - generic [ref=f37e40]:
+        - generic [ref=f37e41]: "1"
+        - generic [ref=f37e42]:
+          - generic [ref=f37e43]: 等级
+          - generic [ref=f37e44]: 0/100
+      - generic [ref=f37e46]:
+        - generic [ref=f37e47]: ☀
+        - text: 第 1 天 · 清晨
+        - generic [ref=f37e48]: 0/8
+      - button "🔊" [ref=f37e49] [cursor=pointer]
+  - main [ref=f37e50]:
+    - generic [ref=f37e51]:
+      - generic [ref=f37e52]:
+        - generic [ref=f37e53]:
+          - heading "今 日 预 约" [level=1] [ref=f37e54]
+          - paragraph [ref=f37e55]: 心理咨询预约清单 · 每一位来访者都带着心事而来，先坐下来，听他说。
+        - generic [ref=f37e56]:
+          - generic [ref=f37e57]:
+            - generic [ref=f37e58]: "0"
+            - generic [ref=f37e59]: 已接待
+          - generic [ref=f37e60]:
+            - generic [ref=f37e61]: "0"
+            - generic [ref=f37e62]: 技能
+          - generic [ref=f37e63]:
+            - generic [ref=f37e64]: "0"
+            - generic [ref=f37e65]: 设施
+          - button "💾 保存" [ref=f37e66] [cursor=pointer]
+          - button "退出" [ref=f37e67] [cursor=pointer]
+      - generic [ref=f37e68]:
+        - generic [ref=f37e69]:
+          - generic [ref=f37e70]:
+            - text: ◆ 今 日 预 约
+            - generic [ref=f37e71]: 3 位客户
+          - generic [ref=f37e72]:
+            - generic [ref=f37e89] [cursor=pointer]:
+              - generic [ref=f37e90]:
+                - generic [ref=f37e91]: 陈洛
+                - generic [ref=f37e92]: 简单
+              - generic [ref=f37e93]: 28岁程序员 · 自助预约
+              - generic [ref=f37e94]: 一个戴黑框眼镜的年轻人顶着黑眼圈走进来，说自己已经两周没合过眼了。
+            - generic [ref=f37e111] [cursor=pointer]:
+              - generic [ref=f37e112]:
+                - generic [ref=f37e113]: 林晓
+                - generic [ref=f37e114]: 简单
+              - generic [ref=f37e115]: 高二女生 · 被班主任转介
+              - generic [ref=f37e116]: 班主任说她因为期中考试拿了年级第二，在教室里哭了一整节课，用指甲掐自己的手背。
+            - generic [ref=f37e133]:
+              - generic [ref=f37e134]:
+                - generic [ref=f37e135]: 周明远
+                - generic [ref=f37e136]: 困难
+              - generic [ref=f37e137]: 地产公司董事长 · 私人预约
+              - generic [ref=f37e138]: 秘书替他预约时特意叮嘱：周先生最近常说自己看见已故合伙人，公司上下都传他疯了。希望您 discreet。
+              - generic [ref=f37e139]: 🔒 需要声望 30（当前 10）
+        - generic [ref=f37e140]:
+          - generic [ref=f37e141]:
+            - heading "医 生 成 长" [level=3] [ref=f37e142]
+            - button "技能树 LV.1 · 0/100" [ref=f37e143] [cursor=pointer]:
+              - generic [ref=f37e144]: 技能树
+              - generic [ref=f37e145]: LV.1 · 0/100
+            - button "诊所升级 500 金" [ref=f37e146] [cursor=pointer]:
+              - generic [ref=f37e147]: 诊所升级
+              - generic [ref=f37e148]: 500 金
+            - button "消息盒子 0 条" [ref=f37e149] [cursor=pointer]:
+              - generic [ref=f37e150]: 消息盒子
+              - generic [ref=f37e151]: 0 条
+            - button "客户追踪 3 人" [ref=f37e152] [cursor=pointer]:
+              - generic [ref=f37e153]: 客户追踪
+              - generic [ref=f37e154]: 3 人
+            - button "成就图鉴 1 / 38" [ref=f37e155] [cursor=pointer]:
+              - generic [ref=f37e156]: 成就图鉴
+              - generic [ref=f37e157]: 1 / 38
+            - button "休息一日 理智 +15" [ref=f37e158] [cursor=pointer]:
+              - generic [ref=f37e159]: 休息一日
+              - generic [ref=f37e160]: 理智 +15
+          - generic [ref=f37e161]:
+            - heading "诊 所 状 态" [level=3] [ref=f37e162]
+            - generic [ref=f37e163]:
+              - generic [ref=f37e164]:
+                - generic [ref=f37e165]: 已接待客户
+                - generic [ref=f37e166]: 0 / 3
+              - generic [ref=f37e167]:
+                - generic [ref=f37e168]: 已解锁技能
+                - generic [ref=f37e169]: 0 / 9
+              - generic [ref=f37e170]:
+                - generic [ref=f37e171]: 诊所升级
+                - generic [ref=f37e172]: 0 / 5
+              - generic [ref=f37e173]:
+                - generic [ref=f37e174]: 游戏天数
+                - generic [ref=f37e175]: 第 1 天
