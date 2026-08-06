@@ -1,4 +1,10 @@
-import type { GameState, DoctorStats, TimePhase, Letter } from "../types";
+import type {
+  GameState,
+  DoctorStats,
+  TimePhase,
+  Letter,
+  EndingType,
+} from "../types";
 import { saveGameState, loadGameState, clearGameState } from "./Storage";
 
 // ============================================================
@@ -14,6 +20,87 @@ export const WARN_DAY = 4;
 export const ABANDON_DAY = 6;
 /** 放弃治疗损失的声望 */
 export const REPUTATION_LOSS_PER_ABANDON = 5;
+
+// ============================================================
+// 复诊系统：结局决定复诊倾向 + 每日 roll
+// ============================================================
+/** 每个剧本最多复诊次数（达到后结案离场） */
+export const DEFAULT_MAX_FOLLOW_UPS = 2;
+/** 复诊池患者连续未复诊的天数宽限，超过则自动离场（防无限挂起） */
+export const FOLLOW_UP_GRACE_DAYS = 5;
+
+/**
+ * 各结局的复诊倾向（0-1 概率，roll < 概率则今日复诊）：
+ * - 治愈/接纳：约 5%，基本直接离场
+ * - 依赖：约 60%，最易复诊
+ * - 恶化/悲剧：0%，永久离场
+ * - 隐藏/觉醒/转介：约 25%
+ */
+export const FOLLOW_UP_CHANCE: Record<EndingType, number> = {
+  cure: 0.05,
+  acceptance: 0.05,
+  dependent: 0.6,
+  worsen: 0,
+  tragic: 0,
+  hidden: 0.25,
+  transfer: 0.25,
+  awakening: 0.25,
+};
+
+export interface FollowUpRollResult {
+  /** 今日命中复诊、进入预约列表的患者 id */
+  followUpsToday: string[];
+  /** 更新后的离场患者 id 列表 */
+  discharged: string[];
+  /** 更新后的复诊次数表 */
+  followUpCount: Record<string, number>;
+  /** 更新后的连续未复诊天数表 */
+  followUpIdleDays: Record<string, number>;
+}
+
+/**
+ * 每日对复诊池患者 roll：命中→今日复诊（idle 归零）；未命中→idle+1，
+ * 连续达到 graceDays 或复诊次数达 maxFollowUps 则离场；概率为 0 的结局直接离场。
+ * 纯函数，不修改入参。
+ */
+export function rollFollowUps(
+  patientRecords: Record<string, EndingType>,
+  discharged: string[],
+  abandoned: string[],
+  followUpCount: Record<string, number>,
+  followUpIdleDays: Record<string, number>,
+  opts: { maxFollowUps: number; graceDays: number },
+  random: () => number
+): FollowUpRollResult {
+  const nextDischarged = [...discharged];
+  const nextIdle = { ...followUpIdleDays };
+  const followUpsToday: string[] = [];
+  for (const [pid, ending] of Object.entries(patientRecords)) {
+    if (discharged.includes(pid) || abandoned.includes(pid)) continue;
+    const count = followUpCount[pid] ?? 0;
+    if (count >= opts.maxFollowUps) {
+      nextDischarged.push(pid);
+      continue;
+    }
+    const chance = FOLLOW_UP_CHANCE[ending];
+    if (random() < chance) {
+      nextIdle[pid] = 0;
+      followUpsToday.push(pid);
+    } else if (chance === 0) {
+      nextDischarged.push(pid);
+    } else {
+      const idle = (nextIdle[pid] ?? 0) + 1;
+      nextIdle[pid] = idle;
+      if (idle >= opts.graceDays) nextDischarged.push(pid);
+    }
+  }
+  return {
+    followUpsToday,
+    discharged: nextDischarged,
+    followUpCount: { ...followUpCount },
+    followUpIdleDays: nextIdle,
+  };
+}
 
 export function createInitialState(): GameState {
   return {

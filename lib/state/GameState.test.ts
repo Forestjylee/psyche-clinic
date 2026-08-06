@@ -1,6 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { createInitialState, migrateGameState } from "./GameState";
-import type { GameState } from "../types";
+import {
+  createInitialState,
+  migrateGameState,
+  rollFollowUps,
+  FOLLOW_UP_CHANCE,
+} from "./GameState";
+import type { GameState, EndingType } from "../types";
+
+const opts = { maxFollowUps: 2, graceDays: 5 };
 
 describe("createInitialState 复诊字段默认值", () => {
   it("初始状态包含空的离场/复诊字段", () => {
@@ -45,5 +52,60 @@ describe("migrateGameState 旧存档兼容", () => {
     expect(migrated.followUpCount).toEqual({ p1: 1 });
     expect(migrated.todayFollowUps).toEqual(["p1"]);
     expect(migrated.followUpIdleDays).toEqual({ p2: 3 });
+  });
+});
+
+describe("FOLLOW_UP_CHANCE 复诊概率表", () => {
+  it("依赖结局倾向最高，恶化/悲剧永不复诊", () => {
+    expect(FOLLOW_UP_CHANCE.dependent).toBeGreaterThan(0.5);
+    expect(FOLLOW_UP_CHANCE.worsen).toBe(0);
+    expect(FOLLOW_UP_CHANCE.tragic).toBe(0);
+  });
+  it("治愈/接纳概率极低（约 5%）", () => {
+    expect(FOLLOW_UP_CHANCE.cure).toBeLessThan(0.1);
+    expect(FOLLOW_UP_CHANCE.acceptance).toBeLessThan(0.1);
+  });
+  it("隐藏/觉醒/转介约 25%", () => {
+    expect(FOLLOW_UP_CHANCE.hidden).toBeGreaterThan(0.2);
+    expect(FOLLOW_UP_CHANCE.awakening).toBeGreaterThan(0.2);
+    expect(FOLLOW_UP_CHANCE.transfer).toBeGreaterThan(0.2);
+  });
+});
+
+describe("rollFollowUps 复诊 roll", () => {
+  it("依赖结局 roll 命中进入今日复诊，idle 归零", () => {
+    const r = rollFollowUps({ p1: "dependent" }, [], [], {}, {}, opts, () => 0.5);
+    expect(r.followUpsToday).toEqual(["p1"]);
+    expect(r.followUpIdleDays.p1).toBe(0);
+  });
+  it("依赖结局 roll 未命中则 idle+1，未达宽限不离场", () => {
+    const r = rollFollowUps({ p1: "dependent" }, [], [], {}, {}, opts, () => 0.7);
+    expect(r.followUpsToday).toEqual([]);
+    expect(r.followUpIdleDays.p1).toBe(1);
+    expect(r.discharged).toEqual([]);
+  });
+  it("恶化/悲剧结局直接离场（概率 0）", () => {
+    const r = rollFollowUps({ p1: "worsen", p2: "tragic" }, [], [], {}, {}, opts, () => 0.1);
+    expect(r.discharged).toContain("p1");
+    expect(r.discharged).toContain("p2");
+    expect(r.followUpsToday).toEqual([]);
+  });
+  it("复诊次数达上限即离场", () => {
+    const r = rollFollowUps({ p1: "dependent" }, [], [], { p1: 2 }, {}, opts, () => 0.1);
+    expect(r.discharged).toContain("p1");
+  });
+  it("已离场/已放弃患者跳过", () => {
+    const r = rollFollowUps({ p1: "dependent" }, ["p1"], ["p2"], {}, {}, opts, () => 0.1);
+    expect(r.followUpsToday).toEqual([]);
+    expect(r.discharged).toEqual(["p1"]);
+  });
+  it("连续未复诊达宽限天数自动离场", () => {
+    const r = rollFollowUps({ p1: "dependent" }, [], [], {}, { p1: 4 }, opts, () => 0.9);
+    expect(r.discharged).toContain("p1");
+  });
+  it("命中复诊后 idle 重置", () => {
+    const r = rollFollowUps({ p1: "dependent" }, [], [], {}, { p1: 3 }, opts, () => 0.5);
+    expect(r.followUpsToday).toContain("p1");
+    expect(r.followUpIdleDays.p1).toBe(0);
   });
 });
