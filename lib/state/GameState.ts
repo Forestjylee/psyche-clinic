@@ -247,18 +247,25 @@ export interface ServeablePatient {
 
 /**
  * 日终推进：重置今日名额，并对「可接诊但未被接诊」的患者累计等待天数，
- * 触发病情加重提醒与放弃治疗（扣声望）。
- * 已锁定（声望不足）、已完成、已放弃的患者不参与恶化。
+ * 触发病情加重提醒与放弃治疗（扣声望）；随后对复诊池患者执行复诊 roll，
+ * 命中者进入今日预约列表，达上限/宽限/概率为 0 者离场。
+ * 已锁定（声望不足）、已完成、已放弃、已离场的患者不参与恶化。
  */
 export function advanceDayState(
   g: GameState,
-  serveable: ServeablePatient[]
+  serveable: ServeablePatient[],
+  random: () => number = Math.random
 ): DayEvent[] {
   const events: DayEvent[] = [];
   g.slot = 0;
   g.todayServed = [];
   for (const p of serveable) {
-    if (g.patientRecords[p.id] || g.abandoned.includes(p.id)) continue;
+    if (
+      g.patientRecords[p.id] ||
+      g.abandoned.includes(p.id) ||
+      g.discharged.includes(p.id)
+    )
+      continue;
     const w = (g.waitingDays[p.id] ?? 0) + 1;
     g.waitingDays[p.id] = w;
     if (w >= ABANDON_DAY) {
@@ -273,6 +280,20 @@ export function advanceDayState(
       events.push({ type: "warn", name: p.name, days: w });
     }
   }
+  // 复诊 roll：命中患者进入今日预约，达上限/宽限/概率为 0 者离场
+  const roll = rollFollowUps(
+    g.patientRecords,
+    g.discharged,
+    g.abandoned,
+    g.followUpCount,
+    g.followUpIdleDays,
+    { maxFollowUps: DEFAULT_MAX_FOLLOW_UPS, graceDays: FOLLOW_UP_GRACE_DAYS },
+    random
+  );
+  g.todayFollowUps = roll.followUpsToday;
+  g.discharged = roll.discharged;
+  g.followUpCount = roll.followUpCount;
+  g.followUpIdleDays = roll.followUpIdleDays;
   return events;
 }
 

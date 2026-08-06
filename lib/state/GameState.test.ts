@@ -3,6 +3,7 @@ import {
   createInitialState,
   migrateGameState,
   rollFollowUps,
+  advanceDayState,
   FOLLOW_UP_CHANCE,
 } from "./GameState";
 import type { GameState, EndingType } from "../types";
@@ -107,5 +108,30 @@ describe("rollFollowUps 复诊 roll", () => {
     const r = rollFollowUps({ p1: "dependent" }, [], [], {}, { p1: 3 }, opts, () => 0.5);
     expect(r.followUpsToday).toContain("p1");
     expect(r.followUpIdleDays.p1).toBe(0);
+  });
+});
+
+describe("advanceDayState 复诊集成", () => {
+  it("每日结算后 todayFollowUps 填充命中患者，slot/todayServed 重置", () => {
+    const g = createInitialState();
+    g.slot = 3;
+    g.todayServed = ["x"];
+    g.patientRecords = { p1: "dependent" };
+    advanceDayState(g, [], () => 0.5);
+    expect(g.slot).toBe(0);
+    expect(g.todayServed).toEqual([]);
+    expect(g.todayFollowUps).toContain("p1");
+  });
+  it("候诊等待天数回归：可接诊未接诊患者 waitingDays 推进", () => {
+    const g = createInitialState();
+    advanceDayState(g, [{ id: "p1", name: "甲" }], () => 0.5);
+    expect(g.waitingDays.p1).toBe(1);
+  });
+  it("未命中复诊的患者进入 idle 计数，达宽限后离场", () => {
+    const g = createInitialState();
+    g.patientRecords = { p1: "dependent" };
+    g.followUpIdleDays = { p1: 4 };
+    advanceDayState(g, [], () => 0.9);
+    expect(g.discharged).toContain("p1");
   });
 });
