@@ -1,0 +1,47 @@
+# 依赖
+node_modules/
+.pnp
+.pnp.js
+
+# 构建
+.next/
+out/
+build/
+dist/
+
+# Cloudflare / Wrangler 本地数据
+.wrangler/
+.dev.vars
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 测试覆盖率
+coverage/
+
+# 临时文件
+*.tmp
+*.bak
