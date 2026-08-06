@@ -16,7 +16,23 @@ export function HUD() {
   return (
     <div className="hud">
       <div className="hud-brand">
-        <div className="hud-emblem">心</div>
+        <div className="hud-emblem" aria-hidden="true">
+          <svg viewBox="0 0 48 48" className="hud-emblem-svg">
+            <defs>
+              <linearGradient id="hudEmblemBg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#f6a55c" />
+                <stop offset="100%" stopColor="#e86b4a" />
+              </linearGradient>
+            </defs>
+            <circle cx="24" cy="24" r="22" fill="url(#hudEmblemBg)" />
+            <circle cx="24" cy="24" r="20.5" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" />
+            <path
+              d="M24 34.5 C 13 27.5, 10.5 19.5, 15 15 c 3.5-3.5 6.5-1 9 2.5 C 26.5 14, 29.5 11.5, 33 15 c 4.5 4.5 2 12.5 -9 19.5 Z"
+              fill="#fff8ec"
+            />
+            <path d="M24 20.5 v 7.5 M20.3 24.25 H27.7" stroke="#e86b4a" strokeWidth="2.6" strokeLinecap="round" />
+          </svg>
+        </div>
         <div className="hud-title">暖心小诊室</div>
       </div>
       <div className="hud-stats">
