@@ -206,36 +206,37 @@ class SoundManager {
     this.bgmGain.gain.value = 0;
     this.bgmGain.gain.setTargetAtTime(this._bgmVolume, this.ctx.currentTime, 1.5);
 
+    // 低通滤波，保留温暖基底、去掉刺耳高频
     const filter = this.ctx.createBiquadFilter();
     filter.type = "lowpass";
-    filter.frequency.value = 700;
-    filter.Q.value = 0.6;
+    filter.frequency.value = 1800;
+    filter.Q.value = 0.4;
     this.bgmFilter = filter;
     this.bgmGain.connect(filter);
     filter.connect(this.master);
 
-    // 三个微微失谐的低频振荡器构成氛围 pad
-    const freqs = [110, 138.59, 164.81]; // A2, C#3, E3（A 大调）
+    // 三个振荡器构成温暖的氛围 pad（A3 大和弦，避免过低轰鸣）
+    // 无失谐拍频：detune 会制造低频"嗡嗡"起伏，这里全部归零
+    const freqs = [220, 277.18, 329.63]; // A3, C#4, E4
     this.bgmNodes = freqs.map((f, i) => {
       const osc = this.ctx!.createOscillator();
       osc.type = i === 0 ? "sine" : "triangle";
       osc.frequency.value = f;
-      osc.detune.value = (i - 1) * 6;
       const g = this.ctx!.createGain();
-      g.gain.value = i === 0 ? 0.5 : 0.28;
+      g.gain.value = i === 0 ? 0.4 : 0.22;
       osc.connect(g);
       g.connect(this.bgmGain!);
       osc.start();
       return osc;
     });
 
-    // 慢速 LFO 调制滤波器，营造呼吸感
+    // 慢速 LFO 调制音量做"呼吸感"，而非调制频率（频率起伏=嗡鸣感）
     this.bgmLfo = this.ctx.createOscillator();
-    this.bgmLfo.frequency.value = 0.07;
+    this.bgmLfo.frequency.value = 0.05;
     const lfoGain = this.ctx.createGain();
-    lfoGain.gain.value = 220;
+    lfoGain.gain.value = 0.16;
     this.bgmLfo.connect(lfoGain);
-    lfoGain.connect(filter.frequency);
+    lfoGain.connect(this.bgmGain.gain);
     this.bgmLfo.start();
   }
 
@@ -269,8 +270,8 @@ class SoundManager {
   /** 根据理智值动态调整 BGM 滤波（低理智更压抑） */
   setTension(sanity: number): void {
     if (!this.ctx || !this.bgmFilter) return;
-    // 理智 100 → 滤波 900Hz（相对明亮）；理智 0 → 滤波 280Hz（沉闷压抑）
-    const cutoff = 280 + (Math.max(0, Math.min(100, sanity)) / 100) * 620;
+    // 理智 100 → 滤波 1800Hz（通透温暖）；理智 0 → 滤波 400Hz（沉闷压抑）
+    const cutoff = 400 + (Math.max(0, Math.min(100, sanity)) / 100) * 1400;
     this.bgmFilter.frequency.setTargetAtTime(cutoff, this.ctx.currentTime, 0.8);
   }
 }
