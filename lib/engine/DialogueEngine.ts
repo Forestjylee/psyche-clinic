@@ -11,6 +11,21 @@ import type {
 } from "../types";
 import { clamp } from "../state/GameState";
 
+/** 维度情绪反馈词库：数值之后附加一句"人话"，弱化考试感 */
+const FLAVOR: Record<string, { up: string; down: string }> = {
+  trust: { up: "对方稍稍放松了些", down: "对方多了几分疏离" },
+  defense: { up: "对方的防备更紧了些", down: "对方的防备松动了一丝" },
+  mood: { up: "对方的情绪明朗了一些", down: "对方的心事更沉了" },
+  truth: { up: "记忆的碎片浮现", down: "话题绕了回去" },
+};
+
+function flavorText(dim: string, delta: number): string {
+  const f = FLAVOR[dim];
+  if (!f) return "";
+  const t = delta > 0 ? f.up : f.down;
+  return ` · ${t}`;
+}
+
 /** 会话事件回调 */
 export interface SessionCallbacks {
   onStateChange: (state: PatientState, emotion?: string) => void;
@@ -206,28 +221,31 @@ export class DialogueEngine {
       this.state.trust = clamp(this.state.trust + effect.trust);
       if (effect.trust !== 0)
         this.callbacks.onFloatingText(
-          `信任 ${effect.trust > 0 ? "+" : ""}${effect.trust}`,
+          `信任 ${effect.trust > 0 ? "+" : ""}${effect.trust}${flavorText("trust", effect.trust)}`,
           effect.trust > 0 ? "good" : "bad"
         );
     }
     if (effect.defense) {
       this.state.defense = clamp(this.state.defense + effect.defense);
       this.callbacks.onFloatingText(
-        `防御 ${effect.defense > 0 ? "+" : ""}${effect.defense}`,
+        `防御 ${effect.defense > 0 ? "+" : ""}${effect.defense}${flavorText("defense", effect.defense)}`,
         effect.defense > 0 ? "bad" : "good"
       );
     }
     if (effect.mood) {
       this.state.mood = clamp(this.state.mood + effect.mood);
       this.callbacks.onFloatingText(
-        `心情 ${effect.mood > 0 ? "+" : ""}${effect.mood}`,
+        `心情 ${effect.mood > 0 ? "+" : ""}${effect.mood}${flavorText("mood", effect.mood)}`,
         effect.mood > 0 ? "good" : "bad"
       );
     }
     if (effect.truth) {
       this.state.truth = clamp(this.state.truth + effect.truth);
       if (effect.truth > 0)
-        this.callbacks.onFloatingText(`真相揭示 +${effect.truth}`, "truth");
+        this.callbacks.onFloatingText(
+          `真相 +${effect.truth}${flavorText("truth", effect.truth)}`,
+          "truth"
+        );
     }
     // 医生影响存到 game，由 UI 层在结算时统一应用
     if (effect.doctorSanity)

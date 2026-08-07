@@ -151,6 +151,8 @@ export interface PatientScenario {
   difficulty: "简单" | "普通" | "困难";
   /** 记忆碎片：真相揭示到阈值时触发的一次性闪回 */
   memoryFragments?: MemoryFragment[];
+  /** 剧本种子 id（生成池去重用；手写患者无此字段） */
+  seedId?: string;
   /** 是否已完成 */
   completed?: boolean;
   /** 已达成结局 */
@@ -163,6 +165,16 @@ export interface PatientScenario {
   maxFollowUps?: number;
   /** 复诊记忆碎片：复诊剧情中触发的新碎片（初诊碎片不重复） */
   followUpFragments?: MemoryFragment[];
+  /** 治愈回访对话（探望非治疗，看完结案离场；无则用通用文案兜底） */
+  returnDialogue?: { title: string; lines: ReturnLine[] };
+}
+
+/** 回访对话中的一句 */
+export interface ReturnLine {
+  speaker: "patient" | "doctor";
+  text: string;
+  /** 说话时的患者表情（仅患者句用） */
+  emotion?: PatientEmotion;
 }
 
 /** 记忆碎片：诊疗中真相揭示到阈值时触发的一次性闪回 */
@@ -258,6 +270,13 @@ export interface GameState {
   messages: GameMessage[];
   /** 生成器产出的患者剧本（最多保留 N 个） */
   generatedScenarios: PatientScenario[];
+  /** 已用过的剧本种子 id（生成时排除，池耗尽后重置重洗） */
+  usedSeeds: string[];
+  /** 治愈回访计划：patientId -> 回访状态（治愈/接纳/觉醒结局 N 天后探望） */
+  returnVisits: Record<
+    string,
+    { ending: EndingType; dueDay: number; arrived: boolean; seen: boolean }
+  >;
 }
 
 /** 一天内的时段 */

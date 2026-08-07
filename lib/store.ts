@@ -22,6 +22,8 @@ import {
   queueTarget,
   MAX_SLOTS,
   REPUTATION_LOSS_PER_ABANDON,
+  RETURN_VISIT_DELAY,
+  resolveDueReturns,
 } from "./state/GameState";
 import { allPatients } from "./data/patients";
 import { AchievementEngine } from "./engine/AchievementEngine";
@@ -83,6 +85,19 @@ function serveablePatients(g: GameState): PatientScenario[] {
   );
 }
 
+/**
+ * 记录已用种子 id 用于去重：seedId 已存在说明上一轮池已耗尽、回退全池重洗，
+ * 此时重置本轮去重记录重新开始；否则加入已用列表。
+ */
+function markSeedUsed(g: GameState, s: PatientScenario): void {
+  if (!s.seedId) return;
+  if (g.usedSeeds.includes(s.seedId)) {
+    g.usedSeeds = [s.seedId];
+  } else {
+    g.usedSeeds.push(s.seedId);
+  }
+}
+
 export interface GameStore {
   // —— 状态 ——
   game: GameState;
@@ -96,6 +111,10 @@ export interface GameStore {
   endingData: EndingData | null;
   achievementEngine: AchievementEngine | null;
   currentPatient: PatientScenario | null;
+  /** 当前正在回访探望的患者（非治疗） */
+  currentReturnPatient: PatientScenario | null;
+  /** 新游戏进入大厅时展示序章浮层 */
+  prologueVisible: boolean;
   // —— 初始化（App 挂载时调用一次）——
   init: () => void;
   // —— 场景切换 ——
@@ -130,6 +149,10 @@ export interface GameStore {
   toggleMute: () => void;
   playSound: (name: SoundName) => void;
   expToNext: (lv: number) => number;
+  dismissPrologue: () => void;
+  // —— 治愈回访 ——
+  openReturnVisit: (patientId: string) => void;
+  finishReturnVisit: () => void;
 }
 
 export const useGameStore = create<GameStore>((set, get) => {
@@ -178,7 +201,8 @@ export const useGameStore = create<GameStore>((set, get) => {
       g.generatedScenarios.length < MAX_GENERATED
     ) {
       const { generateScenario: gen } = await import("./data/generator");
-      const s = gen({}, g.doctor.reputation);
+      const s = gen({ excludeSeeds: g.usedSeeds }, g.doctor.reputation);
+      markSeedUsed(g, s);
       g.generatedScenarios.unshift(s);
       added.push(s.name);
     }
@@ -209,6 +233,8 @@ export const useGameStore = create<GameStore>((set, get) => {
     endingData: null,
     achievementEngine: null,
     currentPatient: null,
+    currentReturnPatient: null,
+    prologueVisible: false,
 
     init: () => {
       const eng = new AchievementEngine(get().game, (a) => {
@@ -234,7 +260,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         g.clinicName = clinicName.trim();
       }
       get().achievementEngine?.onGameStateSynced(g);
-      set({ game: g, scene: "clinic" });
+      set({ game: g, scene: "clinic", prologueVisible: true });
       saveGame(g);
       playSound("page");
     },
@@ -243,7 +269,7 @@ export const useGameStore = create<GameStore>((set, get) => {
       const s = loadGame();
       if (s) {
         get().achievementEngine?.onGameStateSynced(s);
-        set({ game: s, scene: "clinic" });
+        set({ game: s, scene: "clinic", prologueVisible: false });
         playSound("page");
       }
     },
@@ -269,6 +295,8 @@ export const useGameStore = create<GameStore>((set, get) => {
         return;
       }
       if (!g.todayServed.includes(p.id)) g.todayServed.push(p.id);
+      // 病情恶化可逆：患者来就诊，等待天数归零，暂缓放弃
+      g.waitingDays[p.id] = 0;
       get().achievementEngine?.onSessionStart();
       set({ currentPatient: p, scene: "dialogue" });
       playSound("veil");
@@ -279,6 +307,21 @@ export const useGameStore = create<GameStore>((set, get) => {
       // 日终：重置名额 + 患者等待天数推进（恶化/放弃）
       const events = advanceDayState(g, serveablePatients(g));
       g.day += 1;
+      // 治愈回访到达：写入回访信（温暖闭环，非治疗）
+      for (const r of resolveDueReturns(g)) {
+        const p = scenarioById(g, r.patientId);
+        const name = p?.name ?? r.patientId;
+        g.messages.unshift({
+          id: `return-${g.day}-${r.patientId}`,
+          kind: "letter",
+          title: `${name} 的回访`,
+          body: `${name} 专程来诊所看看你，说想当面道个谢。${name} 已经走出了一段最难的日子。`,
+          day: g.day,
+          read: false,
+          patientName: name,
+          tone: "thanks",
+        });
+      }
       let base = 15;
       if (g.clinicUpgrades.includes("rest_room")) base += 10;
       g.doctor.sanity = clamp(g.doctor.sanity + base, 0, 100);
@@ -364,7 +407,11 @@ export const useGameStore = create<GameStore>((set, get) => {
       }
       // 动态导入避免循环
       import("./data/generator").then(({ generateScenario: gen }) => {
-        const scenario = gen(random ? {} : opts, g.doctor.reputation);
+        const scenario = gen(
+          random ? { excludeSeeds: g.usedSeeds } : opts,
+          g.doctor.reputation
+        );
+        markSeedUsed(g, scenario);
         g.generatedScenarios.unshift(scenario);
         commit();
         playSound("page");
@@ -413,6 +460,15 @@ export const useGameStore = create<GameStore>((set, get) => {
       }
       // 记录结局
       g.patientRecords[patientId] = ending;
+      // 治愈/接纳/觉醒结局：登记 N 天后回访探望（温暖闭环）
+      if (ending === "cure" || ending === "acceptance" || ending === "awakening") {
+        g.returnVisits[patientId] = {
+          ending,
+          dueDay: g.day + RETURN_VISIT_DELAY,
+          arrived: false,
+          seen: false,
+        };
+      }
       if (get().currentPatient) {
         const letter = DialogueEngine.generateLetter(
           get().currentPatient!,
@@ -473,5 +529,33 @@ export const useGameStore = create<GameStore>((set, get) => {
     toast,
     pushFloating,
     expToNext: expToNextLevel,
+
+    dismissPrologue: () => {
+      set({ prologueVisible: false });
+      playSound("page");
+    },
+
+    openReturnVisit: (patientId: string) => {
+      const p = scenarioById(get().game, patientId);
+      if (!p) return;
+      set({ currentReturnPatient: p });
+      playSound("veil");
+    },
+
+    finishReturnVisit: () => {
+      const g = get().game;
+      const p = get().currentReturnPatient;
+      if (p) {
+        const rv = g.returnVisits[p.id];
+        if (rv) {
+          rv.seen = true;
+          delete g.returnVisits[p.id];
+          if (!g.discharged.includes(p.id)) g.discharged.push(p.id);
+        }
+      }
+      commit();
+      playSound("page");
+      set({ currentReturnPatient: null });
+    },
   };
 });

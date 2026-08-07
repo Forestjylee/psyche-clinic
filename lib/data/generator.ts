@@ -187,10 +187,47 @@ export interface GenContext {
   difficulty: "简单" | "普通" | "困难";
 }
 
-// 真相模板库来自 truths.ts（15 种，基于真实心理学案例改编）
+// 真相模板库来自 truths.ts（手写深度模板）
 import { truthBatch1 } from "./truths";
+import { buildSeedDialogues, defaultFragments, type ScenarioSeed } from "./sceneBuilder";
+
+// 剧本种子库（sceneBuilder 生成；第 3/4 步持续扩充）
+import { bizarreSeeds } from "./seeds/bizarre";
+import { seriousSeedsA } from "./seeds/serious_a";
+import { seriousSeedsB } from "./seeds/serious_b";
 
 export const truthTemplates: TruthTemplate[] = truthBatch1;
+
+// ========== sceneBuilder 种子模板 ==========
+
+/** 由剧本种子（sceneBuilder）生成的模板，与手写模板共用生成池 */
+export const seedTemplates: TruthTemplate[] = [];
+
+/** 已注册种子：id → 种子，用于覆盖初始数值/色调 */
+const seedById = new Map<string, ScenarioSeed>();
+
+/** 注册一批剧本种子到生成池（模块加载时调用） */
+export function registerSeeds(seeds: ScenarioSeed[]): void {
+  for (const s of seeds) {
+    seedById.set(s.id, s);
+    seedTemplates.push({
+      id: s.id,
+      name: s.name,
+      truth: s.truth,
+      buildDialogues: (ctx) => buildSeedDialogues(s, ctx),
+    });
+  }
+}
+
+/** 完整的真相模板池（手写 + 种子） */
+export function getAllTemplates(): TruthTemplate[] {
+  return [...truthTemplates, ...seedTemplates];
+}
+
+// 注册剧本种子到生成池（第 3/4 步持续扩充）
+registerSeeds(bizarreSeeds);
+registerSeeds(seriousSeedsA);
+registerSeeds(seriousSeedsB);
 
 // ========== 生成器主函数 ==========
 
@@ -229,6 +266,8 @@ export interface GenerateOptions {
   difficulty?: "简单" | "普通" | "困难";
   /** 指定性别 */
   gender?: "male" | "female";
+  /** 排除已用过的种子 id（随机选择时跳过；池耗尽自动重洗全池） */
+  excludeSeeds?: string[];
 }
 
 let generatedCounter = 0;
@@ -249,28 +288,37 @@ export function generateScenario(
       ? professions[options.professionIndex % professions.length]
       : randomItem(professions);
 
+  const allTemplates = getAllTemplates();
+  // 去重：随机选择时排除已用种子；池耗尽时回退全池（重洗一轮）
+  const pool = options.excludeSeeds?.length
+    ? allTemplates.filter((t) => !options.excludeSeeds!.includes(t.id))
+    : allTemplates;
   const truth = options.truthId
-    ? truthTemplates.find((t) => t.id === options.truthId)!
-    : randomItem(truthTemplates);
+    ? allTemplates.find((t) => t.id === options.truthId)!
+    : randomItem(pool.length ? pool : allTemplates);
 
   const difficulty =
     options.difficulty ?? difficultyByReputation(doctorReputation);
 
   const ctx: GenContext = { name, gender, symptom, profession, difficulty };
 
+  // 种子可覆盖初始数值与色调，否则继承症状档案
+  const seed = seedById.get(truth.id);
+  const baseInit = seed?.initial ? { ...symptom.initialState, ...seed.initial } : symptom.initialState;
+
   // 根据难度调整初始数值
   const diffMod = { 简单: { t: 5, d: -5, m: 5 }, 普通: { t: 0, d: 0, m: 0 }, 困难: { t: -5, d: 10, m: -5 } }[difficulty];
-  const initial = symptom.initialState;
   const initialState: PatientState = {
-    trust: Math.max(5, initial.trust + diffMod.t),
-    defense: Math.max(20, initial.defense + diffMod.d),
-    mood: Math.max(15, initial.mood + diffMod.m),
+    trust: Math.max(5, baseInit.trust + diffMod.t),
+    defense: Math.max(20, baseInit.defense + diffMod.d),
+    mood: Math.max(15, baseInit.mood + diffMod.m),
     truth: 0,
     round: 0,
   };
 
   generatedCounter += 1;
   const id = `gen_${Date.now()}_${generatedCounter}`;
+  const dialogues = truth.buildDialogues(ctx);
 
   return {
     id,
@@ -279,10 +327,12 @@ export function generateScenario(
     intro: profession.intro(name, symptom.name),
     surface: symptom.surface,
     truth: truth.truth(ctx),
-    palette: symptom.palette,
+    palette: seed?.palette ?? symptom.palette,
     initialState,
-    dialogues: truth.buildDialogues(ctx),
-    startNode: Object.keys(truth.buildDialogues(ctx))[0],
+    dialogues,
+    startNode: Object.keys(dialogues)[0],
+    memoryFragments: seed ? defaultFragments(seed.id) : undefined,
+    seedId: truth.id,
     baseReward: baseRewardByDifficulty(difficulty),
     requireReputation: requireRepByDifficulty(difficulty),
     difficulty,

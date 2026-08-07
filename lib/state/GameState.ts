@@ -10,16 +10,16 @@ import { saveGameState, loadGameState, clearGameState } from "./Storage";
 // ============================================================
 // 时间系统常量
 // ============================================================
-/** 一天最多接待的患者数 */
-export const MAX_SLOTS = 8;
+/** 一天最多接待的患者数（每次会话深入，一天限 3 位，保证体验深度） */
+export const MAX_SLOTS = 3;
 /** 等待满 N 天开始「病情加重」 */
 export const DECAY_START_DAY = 2;
 /** 等待满 N 天弹窗提醒 */
 export const WARN_DAY = 4;
-/** 等待满 N 天放弃治疗离开 */
-export const ABANDON_DAY = 6;
-/** 放弃治疗损失的声望 */
-export const REPUTATION_LOSS_PER_ABANDON = 5;
+/** 等待满 N 天放弃治疗离开（多给一天缓冲，软化经营压力） */
+export const ABANDON_DAY = 7;
+/** 放弃治疗损失的声望（从 5 降到 2，软化惩罚） */
+export const REPUTATION_LOSS_PER_ABANDON = 2;
 
 // ============================================================
 // 复诊系统：结局决定复诊倾向 + 每日 roll
@@ -28,6 +28,29 @@ export const REPUTATION_LOSS_PER_ABANDON = 5;
 export const DEFAULT_MAX_FOLLOW_UPS = 2;
 /** 复诊池患者连续未复诊的天数宽限，超过则放弃复诊并离场（防无限挂起） */
 export const FOLLOW_UP_GRACE_DAYS = 6;
+
+// ============================================================
+// 治愈回访：治愈/接纳/觉醒结局患者 N 天后回访探望
+// ============================================================
+/** 治愈后经过 N 天，患者回访诊所探望（温暖闭环，非治疗） */
+export const RETURN_VISIT_DELAY = 3;
+
+/**
+ * 日终推进后结算回访到达：dueDay 到期的回访标记 arrived。
+ * 纯函数（原地修改 g.returnVisits），返回本次到达的患者列表，由调用方生成回访信。
+ */
+export function resolveDueReturns(
+  g: GameState
+): { patientId: string; ending: EndingType }[] {
+  const arrived: { patientId: string; ending: EndingType }[] = [];
+  for (const [pid, rv] of Object.entries(g.returnVisits)) {
+    if (!rv.arrived && rv.dueDay <= g.day) {
+      rv.arrived = true;
+      arrived.push({ patientId: pid, ending: rv.ending });
+    }
+  }
+  return arrived;
+}
 
 /**
  * 各结局的复诊倾向（0-1 概率，roll < 概率则今日复诊）：
@@ -131,6 +154,8 @@ export function createInitialState(): GameState {
     followUpIdleDays: {},
     messages: [],
     generatedScenarios: [],
+    usedSeeds: [],
+    returnVisits: {},
   };
 }
 
@@ -144,6 +169,8 @@ export function migrateGameState(data: GameState): GameState {
   if (!data.followUpCount) data.followUpCount = {};
   if (!Array.isArray(data.todayFollowUps)) data.todayFollowUps = [];
   if (!data.followUpIdleDays) data.followUpIdleDays = {};
+  if (!data.returnVisits) data.returnVisits = {};
+  if (!Array.isArray(data.usedSeeds)) data.usedSeeds = [];
   return data;
 }
 
@@ -224,12 +251,11 @@ const PHASE_LABEL: Record<TimePhase, string> = {
   night: "夜晚",
 };
 
-/** 根据当日已用名额换算时段 */
+/** 根据当日已用名额换算时段（一天 3 位：清晨 / 下午 / 傍晚，之后打烊） */
 export function phaseOfSlot(slot: number): TimePhase {
-  if (slot < 2) return "morning";
-  if (slot < 5) return "afternoon";
-  if (slot < 7) return "evening";
-  return "night";
+  if (slot < 1) return "morning";
+  if (slot < 2) return "afternoon";
+  return "evening";
 }
 
 export function isNightSlot(slot: number): boolean {
@@ -315,7 +341,7 @@ export function advanceDayState(
   return events;
 }
 
-/** 候诊人数目标：随时间与名声增长，封顶 MAX_SLOTS */
+/** 候诊人数目标：从 1 位起步缓慢增长，第 5 天起达到一天 3 位上限（深入优先） */
 export function queueTarget(day: number): number {
-  return Math.min(MAX_SLOTS, 3 + Math.floor((day - 1) / 2));
+  return Math.min(MAX_SLOTS, 1 + Math.floor((day - 1) / 2));
 }

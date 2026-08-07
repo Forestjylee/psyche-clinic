@@ -1,6 +1,0 @@
-- generic [active] [ref=e1]:
-  - alert [ref=e2]
-  - generic [ref=e3]:
-    - generic [ref=e4]: 心灵诊疗室
-    - generic [ref=e5]: PSYCHE CLINIC
-    - generic [ref=e7]: 载入中…

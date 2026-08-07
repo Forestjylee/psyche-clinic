@@ -17,9 +17,11 @@ import { Tracking } from "./Tracking";
 import { Generator } from "./Generator";
 import { AchievementsPage } from "./AchievementsPage";
 import { Onboarding } from "./Onboarding";
+import { Prologue } from "./Prologue";
+import { VisitOverlay } from "./VisitOverlay";
 
 export function GameApp() {
-  const { scene, game } = useGame();
+  const { scene, game, prologueVisible, currentReturnPatient } = useGame();
   const bgmStarted = useRef(false);
 
   // 首次用户交互后启动 BGM（浏览器策略要求）
@@ -61,7 +63,9 @@ export function GameApp() {
         {scene === "achievements" ? <AchievementsPage /> : null}
       </main>
       <div className={`sanity-vignette ${scene !== "title" && game.doctor.sanity <= 35 ? "active" : ""}`} />
-      {scene === "clinic" ? <Onboarding /> : null}
+      {scene === "clinic" && prologueVisible ? <Prologue /> : null}
+      {scene === "clinic" && !prologueVisible ? <Onboarding /> : null}
+      {currentReturnPatient ? <VisitOverlay /> : null}
       <Overlays />
       <EndingOverlay />
       <AchievementUnlockToast />

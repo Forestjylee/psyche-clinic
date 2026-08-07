@@ -869,6 +869,13 @@ button {
   border-radius: 12px;
   box-shadow: var(--shadow-card);
   z-index: 3;
+  /* 弱化考试感：四维条默认淡显，hover 强化 */
+  opacity: 0.52;
+  transition: opacity 0.25s ease;
+}
+.patient-status:hover,
+.dialogue-panel:hover .patient-status {
+  opacity: 1;
 }
 
 .status-row {
@@ -3020,7 +3027,7 @@ button {
   pointer-events: none;
   z-index: 0;
 }
-.scene.clinic > * { position: relative; z-index: 1; }
+.scene.clinic > *:not(.confirm-mask) { position: relative; z-index: 1; }
 
 /* ============================================================
    Kairosoft 风格润色（暖色折中）· 面板 / 按钮 / 进度条
@@ -4012,3 +4019,268 @@ button {
   transition: transform 0.15s;
 }
 .onboarding-next:hover { transform: translateY(-1px); }
+
+/* ===== 序章浮层 ===== */
+.prologue {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(240, 160, 80, 0.12), transparent 62%),
+    linear-gradient(180deg, rgba(26, 20, 12, 0.94), rgba(43, 32, 19, 0.95));
+  backdrop-filter: blur(5px);
+  animation: prologue-in 0.7s ease;
+}
+.prologue-content {
+  max-width: 560px;
+  width: 88%;
+  padding: 46px 50px;
+  text-align: center;
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(255, 250, 240, 0.09), rgba(255, 250, 240, 0.03));
+  border: 1px solid rgba(240, 160, 80, 0.22);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  animation: prologue-act-in 0.5s ease;
+}
+.prologue-act {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  letter-spacing: 6px;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+.prologue-text {
+  font-family: var(--font-serif);
+  font-size: 21px;
+  line-height: 2.05;
+  color: #f3ead9;
+  letter-spacing: 1px;
+}
+.prologue-enter {
+  margin-top: 36px;
+  padding: 14px 46px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  font-size: 17px;
+  letter-spacing: 5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 24px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: transform 0.15s;
+}
+.prologue-enter:hover { transform: translateY(-1px); }
+.prologue-hint {
+  margin-top: 36px;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: rgba(243, 234, 217, 0.5);
+  animation: prologue-blink 1.6s ease-in-out infinite;
+}
+.prologue-dots {
+  position: fixed;
+  bottom: 42px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+.prologue-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(243, 234, 217, 0.25);
+  transition: background 0.3s;
+}
+.prologue-dot.active {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+@keyframes prologue-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes prologue-act-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes prologue-blink {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.7; }
+}
+
+/* ===== 引导·对话玩法全屏速览 ===== */
+.onboarding-full {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 22, 12, 0.62);
+  backdrop-filter: blur(3px);
+}
+.onboarding-full-panel {
+  width: 460px;
+  max-width: 90vw;
+  padding: 32px 36px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  animation: onboarding-full-in 0.35s ease;
+}
+.onboarding-full-title {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: var(--text);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.onboarding-full-text {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.onboarding-full-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin-bottom: 20px;
+}
+.onboarding-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.onboarding-stat-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.onboarding-stat-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  min-width: 40px;
+}
+.onboarding-stat-desc {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.onboarding-stat-bar {
+  height: 9px;
+  border-radius: 5px;
+  background: var(--bg-darker);
+  overflow: hidden;
+}
+.onboarding-stat-fill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  box-shadow: 0 0 8px currentColor;
+  transition: width 0.5s ease;
+}
+.onboarding-full-extra {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-dim);
+  padding: 13px 16px;
+  border-radius: 10px;
+  background: rgba(240, 160, 80, 0.09);
+  border-left: 3px solid var(--accent);
+  margin-bottom: 22px;
+}
+@keyframes onboarding-full-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ===== 治愈回访 ===== */
+.patient-card.returning {
+  border-color: var(--gold);
+  animation: returning-glow 2.2s ease-in-out infinite;
+}
+.patient-return-tag {
+  margin-top: 6px;
+  color: var(--gold);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+@keyframes returning-glow {
+  0%, 100% { box-shadow: 0 0 12px rgba(201, 168, 106, 0.25), var(--shadow-card); }
+  50% { box-shadow: 0 0 24px rgba(201, 168, 106, 0.45), var(--shadow-card); }
+}
+
+/* 回访浮层 */
+.visit-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(40, 30, 18, 0.6);
+  backdrop-filter: blur(4px);
+}
+.visit-card {
+  width: 440px;
+  max-width: 92vw;
+  padding: 28px 32px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--gold);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5), 0 0 24px rgba(201, 168, 106, 0.2);
+  animation: onboarding-full-in 0.35s ease;
+}
+.visit-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.visit-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+.visit-line {
+  min-height: 84px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border-left: 3px solid var(--accent);
+  margin-bottom: 22px;
+}
+.visit-line.doctor {
+  background: rgba(240, 160, 80, 0.12);
+  border-left-color: var(--good);
+}
+.visit-line p {
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--text);
+  margin: 0;
+}
+.visit-who {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--good);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.visit-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

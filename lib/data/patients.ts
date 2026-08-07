@@ -300,6 +300,18 @@ export const patientA: PatientScenario = {
       endingReward: { doctorReputation: -15, doctorMoney: 0, doctorExp: 10, doctorSanity: -25 },
     },
   },
+  returnDialogue: {
+    title: "林晓的回访",
+    lines: [
+      { speaker: "patient", text: "医生，我来了。今天不用考试，我就是想来跟你说声谢谢。", emotion: "happy" },
+      { speaker: "patient", text: "我把弟弟送去美术班了，他画了一幅画，说画的是我们俩。", emotion: "calm" },
+      { speaker: "doctor", text: "看起来，你找到了一点属于自己的东西。" },
+      { speaker: "patient", text: "嗯。第一次觉得，活着不需要拿第一名来证明。", emotion: "happy" },
+      { speaker: "patient", text: "我爸……上个月搬走了。我和弟弟现在住外婆家，很安静。", emotion: "calm" },
+      { speaker: "doctor", text: "需要的时候，随时可以回来坐坐。" },
+      { speaker: "patient", text: "我会的。祝诊所越来越好，医生。", emotion: "happy" },
+    ],
+  },
 };
 
 // ========== 患者 B：声称能看见鬼的富商 ==========

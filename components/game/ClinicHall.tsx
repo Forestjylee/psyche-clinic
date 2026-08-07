@@ -25,6 +25,7 @@ export function ClinicHall() {
     playSound,
     expToNext,
     achievementEngine,
+    openReturnVisit,
   } = useGame();
 
   const [confirmExit, setConfirmExit] = useState(false);
@@ -45,6 +46,13 @@ export function ClinicHall() {
   };
 
   const onCardClick = (p: (typeof allAvailable)[number]) => {
+    // 治愈回访：玩家已到访，点击进入探望对话（非治疗）
+    const rv = game.returnVisits[p.id];
+    if (rv?.arrived && !rv.seen) {
+      playSound("click");
+      openReturnVisit(p.id);
+      return;
+    }
     const locked = p.requireReputation ? game.doctor.reputation < p.requireReputation : false;
     const servedToday = game.todayServed.includes(p.id);
     if (locked || servedToday) {
@@ -112,6 +120,8 @@ export function ClinicHall() {
           <div className="patient-list">
             {allAvailable.map((p) => {
               const completed = game.patientRecords[p.id];
+              const rv = game.returnVisits[p.id];
+              const returning = !!rv?.arrived && !rv.seen;
               const locked = p.requireReputation
                 ? game.doctor.reputation < p.requireReputation
                 : false;
@@ -124,7 +134,7 @@ export function ClinicHall() {
               return (
                 <div
                   key={p.id}
-                  className={`patient-card ${locked ? "locked" : ""} ${completed ? "completed" : ""} ${servedToday ? "served-today" : ""} ${decaying ? "decaying" : ""} ${critical ? "critical" : ""}`}
+                  className={`patient-card ${locked ? "locked" : ""} ${completed ? "completed" : ""} ${servedToday ? "served-today" : ""} ${decaying ? "decaying" : ""} ${critical ? "critical" : ""} ${returning ? "returning" : ""}`}
                   style={
                     {
                       "--card-accent": p.palette.primary,
@@ -171,7 +181,9 @@ export function ClinicHall() {
                         需要声望 {p.requireReputation}（当前 {game.doctor.reputation}）
                       </div>
                     ) : null}
-                    {servedToday ? (
+                    {returning ? (
+                      <div className="patient-return-tag">✿ 他来看你了 · 点击探望</div>
+                    ) : servedToday ? (
                       <div className="patient-served-tag">今日已接诊 · 明日可复诊</div>
                     ) : completed ? (
                       <div className="patient-completed-tag">已完成 · 可重新接诊</div>
