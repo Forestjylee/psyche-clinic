@@ -675,6 +675,16 @@ interface GameStats {
 
 新分类 `discover`/`aftercare` 需扩展 `Achievement["category"]` 联合类型与 `achievementCategoryLabels`。
 
+### 12.6 图鉴排序与筛选（v0.5.0）
+
+- **默认排序**：每个分类内按稀有度降序展示（legendary → epic → rare → common），`achievements.ts` 导出 `RARITY_ORDER: Record<AchievementRarity, number>`（传说 0 … 普通 3），`AchievementsPage` 分组时按 `RARITY_ORDER[a.rarity]` 排序。
+- **一键筛选**：图鉴顶部（返回按钮下方）加筛选按钮组「全部 / 已解锁 / 未解锁」，`useState<"all" | "unlocked" | "locked">` 记忆当前筛选：
+  - 全部：显示所有卡片（默认）
+  - 已解锁：仅 `pm[a.id].unlocked` 的卡片
+  - 未解锁：仅未解锁卡片
+  - 筛选作用于卡片渲染层，分类标题与计数仍展示全部数据，不影响总数圆环。
+- 未解锁且 `hidden` 的成就仍以「？？？」灰卡展示，仅被「已解锁」筛选隐藏。
+
 ---
 
 ## 13. 变更记录
@@ -686,4 +696,4 @@ interface GameStats {
 | v0.3.0 | 2026-08-06 | 核心玩法重构：患者三层生命周期（候诊/已诊疗/离场）与复诊系统、GameState 新增 discharged/followUpCount、PatientScenario 新增 followUp 复诊剧情、随机事件与 500+ 素材库规划 |
 | v0.3.1 | 2026-08-06 | 首页 UX 优化（难度标签图标/摘要两行悬停展开/进度条/天数徽章/退出确认/休息高亮/预约入口/奖励动画）；ClinicHall 侧栏按钮新增 `data-guide` 定位；手写剧本补正负选项对照；浮动文字改为确定性纵向堆叠防重叠（详见 [clinic-hall-ux-design](./superpowers/specs/2026-08-06-clinic-hall-ux-design.md)） |
 | v0.4.0 | 2026-08-07 | 新增「发现客户」主动获客系统（3.6）：首页「预约客户」改为「发现客户」，付费渠道获取候选客户、主动邀约、接受概率、到达日分布，GameState 新增 `pendingArrivals`；对话界面重构为聊天气泡布局（患者左/玩家右/旁白顶部）；首页预约清单可对话优先排序 + 今日已接诊隐藏；记忆碎片改为手动关闭；对话选项中性化 |
-| v0.5.0 | 2026-08-07 | 成就图鉴扩充 38→80：删除生成器成就 2 个，新增获客/回访/复诊/结局/成长/伦理/隐藏 44 个（见 §12）；GameState 新增 `stats` 累计统计字段；`onSessionStart` 接收 `patientId`；`restOneDay` 末尾同步成就引擎；`Achievement.category` 扩展 `discover`/`aftercare` |
+| v0.5.0 | 2026-08-07 | 成就图鉴扩充 38→80：删除生成器成就 2 个，新增获客/回访/复诊/结局/成长/伦理/隐藏 44 个（见 §12）；GameState 新增 `stats` 累计统计字段；`onSessionStart` 接收 `patientId`；`restOneDay` 末尾同步成就引擎；`Achievement.category` 扩展 `discover`/`aftercare`；图鉴卡片按稀有度降序排列 + 全部/已解锁/未解锁一键筛选（§12.6） |

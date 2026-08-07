@@ -74,6 +74,10 @@ export class AchievementEngine {
     for (const ach of allAchievements) {
       if (!data[ach.id]) data[ach.id] = createProgress();
     }
+    // 清理已删除的旧成就（如剧本生成器系列），避免幽灵计数影响图鉴解锁数
+    for (const id of Object.keys(data)) {
+      if (!getAchievement(id)) delete data[id];
+    }
     return data;
   }
 

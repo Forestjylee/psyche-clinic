@@ -3492,7 +3492,33 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 20px;
+}
+.ach-filter {
+  display: flex;
+  gap: 6px;
+}
+.ach-filter-btn {
+  padding: 7px 16px;
+  background: var(--bg-card);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ach-filter-btn:hover {
+  background: var(--bg-card-hi);
+  color: var(--text);
+  border-color: var(--border-glow);
+}
+.ach-filter-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
 }
 .back-btn {
   padding: 8px 16px;

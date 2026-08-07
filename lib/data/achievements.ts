@@ -843,6 +843,14 @@ export function getAchievement(id: string): Achievement | undefined {
   return allAchievements.find((a) => a.id === id);
 }
 
+// 稀有度排序权重（图鉴默认按传说→普通降序展示）
+export const RARITY_ORDER: Record<Achievement["rarity"], number> = {
+  legendary: 0,
+  epic: 1,
+  rare: 2,
+  common: 3,
+};
+
 // 稀有度颜色映射（与解锁特效配合）
 export const rarityColors: Record<Achievement["rarity"], { label: string; color: string; glow: string }> = {
   common: { label: "普通", color: "#9aa3c4", glow: "rgba(154,163,196,0.35)" },

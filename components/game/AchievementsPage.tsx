@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import {
   allAchievements,
   rarityColors,
   achievementCategoryLabels,
+  RARITY_ORDER,
 } from "@/lib/data/achievements";
 import type { Achievement, AchievementCategory } from "@/lib/types";
 
@@ -20,8 +21,17 @@ const order: AchievementCategory[] = [
   "aftercare",
 ];
 
+type Filter = "all" | "unlocked" | "locked";
+
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: "all", label: "全部" },
+  { key: "unlocked", label: "已解锁" },
+  { key: "locked", label: "未解锁" },
+];
+
 export function AchievementsPage() {
   const { achievementEngine, game, setScene, playSound } = useGame();
+  const [filter, setFilter] = useState<Filter>("all");
 
   useEffect(() => {
     achievementEngine?.onGameStateSynced(game);
@@ -76,11 +86,36 @@ export function AchievementsPage() {
         >
           ◂ 返回诊疗大厅
         </button>
+        <div className="ach-filter">
+          {FILTERS.map((f) => (
+            <button
+              key={f.key}
+              className={`ach-filter-btn ${filter === f.key ? "active" : ""}`}
+              onClick={() => {
+                playSound("click");
+                setFilter(f.key);
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {order.map((cat) => {
-        const items = allAchievements.filter((a) => a.category === cat);
+        // 分类内按稀有度降序（传说 → 普通）
+        const items = allAchievements
+          .filter((a) => a.category === cat)
+          .sort((x, y) => RARITY_ORDER[x.rarity] - RARITY_ORDER[y.rarity]);
         if (items.length === 0) return null;
+        // 状态筛选：已解锁 / 未解锁 / 全部
+        const visible =
+          filter === "all"
+            ? items
+            : items.filter((a) =>
+                filter === "unlocked" ? !!pm[a.id]?.unlocked : !pm[a.id]?.unlocked
+              );
+        if (visible.length === 0) return null;
         const catUnlocked = items.filter((a) => pm[a.id]?.unlocked).length;
         return (
           <div className="ach-section" key={cat}>
@@ -91,7 +126,7 @@ export function AchievementsPage() {
               </span>
             </div>
             <div className="ach-grid">
-              {items.map((a) => {
+              {visible.map((a) => {
                 const p = pm[a.id] ?? { progress: 0, unlocked: false };
                 const hidden = a.hidden && !p.unlocked;
                 const rc = rarityColors[a.rarity];
