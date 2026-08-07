@@ -65,7 +65,7 @@ export function HUD() {
             </div>
           </div>
           <div className="hud-stat-tip">
-            <span className="hud-tip-title">金钱 · {d.money} 金</span>
+            <span className="hud-tip-title">金钱 · ${d.money}</span>
             <span className="hud-tip-line">用途：通过渠道发现客户、购置诊所设施、购买部分技能。</span>
             <span className="hud-tip-line">获得：接诊收费是主要收入，前台助理每日额外进账，完成成就另有奖金。</span>
           </div>

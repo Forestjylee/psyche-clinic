@@ -206,7 +206,7 @@ export function ClinicHall() {
             />
             <SideBtn
               label="诊所升级"
-              right={`${game.doctor.money} 金`}
+              right={`$${game.doctor.money}`}
               rightClass="side-btn-cost"
               onClick={() => {
                 playSound("page");

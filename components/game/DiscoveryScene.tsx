@@ -42,7 +42,7 @@ export function DiscoveryScene() {
                 </div>
                 <div className="discover-channel-meta">
                   <span className="discover-channel-cost">
-                    {locked ? `需声望 ${ch.requireReputation}` : `${ch.cost} 金`}
+                    {locked ? `需声望 ${ch.requireReputation}` : `$${ch.cost}`}
                   </span>
                   <span className="discover-channel-out">
                     产出 {ch.minCount === ch.maxCount ? ch.minCount : `${ch.minCount}-${ch.maxCount}`} 位
