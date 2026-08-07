@@ -48,6 +48,11 @@ export function HUD() {
               </span>
             </div>
           </div>
+          <div className="hud-stat-tip">
+            <span className="hud-tip-title">等级 · Lv.{d.level}</span>
+            <span className="hud-tip-line">用途：决定可习得技能的门槛，技能树用经验换取。</span>
+            <span className="hud-tip-line">获得：接诊每位患者积累经验，完成成就另有经验奖励。</span>
+          </div>
         </div>
         <div className="hud-stat">
           <div className="hud-stat-icon gold">金</div>
@@ -58,6 +63,11 @@ export function HUD() {
                 {d.money}
               </span>
             </div>
+          </div>
+          <div className="hud-stat-tip">
+            <span className="hud-tip-title">金钱 · {d.money} 金</span>
+            <span className="hud-tip-line">用途：通过渠道发现客户、购置诊所设施、购买部分技能。</span>
+            <span className="hud-tip-line">获得：接诊收费是主要收入，前台助理每日额外进账，完成成就另有奖金。</span>
           </div>
         </div>
         <div className="hud-stat">
@@ -74,6 +84,11 @@ export function HUD() {
               <span className="hud-stat-value">{d.reputation}</span>
             </div>
           </div>
+          <div className="hud-stat-tip">
+            <span className="hud-tip-title">声望 · {d.reputation}</span>
+            <span className="hud-tip-line">用途：决定可接待的高门槛患者，以及高级获客渠道的解锁条件。</span>
+            <span className="hud-tip-line">获得：达成治愈等好结局、完成成就、购置「心理学藏书架」都会提升；流失客户会降低。</span>
+          </div>
         </div>
         <div className="hud-stat">
           <div className="hud-stat-icon san">神</div>
@@ -88,6 +103,11 @@ export function HUD() {
               </div>
               <span className="hud-stat-value">{d.sanity}</span>
             </div>
+          </div>
+          <div className="hud-stat-tip">
+            <span className="hud-tip-title">理智 · {d.sanity}</span>
+            <span className="hud-tip-line">用途：医生自身的状态，理智过低会影响接诊与结局走向。</span>
+            <span className="hud-tip-line">获得：休息一日恢复，诊所「医生休息室」提升恢复量，部分成就奖励理智。</span>
           </div>
         </div>
         <div className={`hud-day ${night ? "night" : ""} ${slotsFull ? "full" : ""}`}>
