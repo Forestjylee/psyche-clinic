@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useGame } from "@/lib/hooks/useGame";
 import { slotPhaseLabel, isNightSlot, MAX_SLOTS } from "@/lib/state/GameState";
 
@@ -145,43 +146,46 @@ export function HUD() {
           退出
         </button>
       </div>
-      {confirmExit ? (
-        <div
-          className="confirm-mask"
-          onClick={() => {
-            playSound("click");
-            setConfirmExit(false);
-          }}
-        >
-          <div className="confirm-card" onClick={(e) => e.stopPropagation()}>
-            <div className="confirm-title">返回标题屏？</div>
-            <p className="confirm-text">
-              进度会自动保存，回来可以继续经营你的诊所。
-            </p>
-            <div className="confirm-actions">
-              <button
-                className="confirm-cancel"
-                onClick={() => {
-                  playSound("click");
-                  setConfirmExit(false);
-                }}
-              >
-                继续经营
-              </button>
-              <button
-                className="confirm-ok"
-                onClick={() => {
-                  playSound("page");
-                  setConfirmExit(false);
-                  backToTitle();
-                }}
-              >
-                返回标题
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {confirmExit
+        ? createPortal(
+            <div
+              className="confirm-mask"
+              onClick={() => {
+                playSound("click");
+                setConfirmExit(false);
+              }}
+            >
+              <div className="confirm-card" onClick={(e) => e.stopPropagation()}>
+                <div className="confirm-title">返回标题屏？</div>
+                <p className="confirm-text">
+                  进度会自动保存，回来可以继续经营你的诊所。
+                </p>
+                <div className="confirm-actions">
+                  <button
+                    className="confirm-cancel"
+                    onClick={() => {
+                      playSound("click");
+                      setConfirmExit(false);
+                    }}
+                  >
+                    继续经营
+                  </button>
+                  <button
+                    className="confirm-ok"
+                    onClick={() => {
+                      playSound("page");
+                      setConfirmExit(false);
+                      backToTitle();
+                    }}
+                  >
+                    返回标题
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
     </div>
   );
 }
