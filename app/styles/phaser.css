@@ -1,0 +1,81 @@
+/* ========== Phaser 场景层（开罗重构） ========== */
+
+.clinic-scene-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.phaser-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.phaser-canvas canvas {
+  display: block;
+}
+
+.phaser-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  background: var(--bg-panel);
+  font-size: 15px;
+  letter-spacing: 2px;
+}
+
+/* 预约清单入口（M1 过渡，M2 患者场景化后移除或降级） */
+.clinic-list-toggle {
+  position: fixed;
+  right: 20px;
+  top: 96px;
+  z-index: 20;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--accent-glow);
+  transition: transform 0.15s;
+}
+.clinic-list-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.clinic-list-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(10, 8, 6, 0.62);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 16px 90px;
+}
+.clinic-list-mask .scene.clinic {
+  max-width: 1000px;
+  width: 100%;
+}
+.clinic-list-close {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 130;
+  padding: 12px 30px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 18px var(--accent-glow);
+}

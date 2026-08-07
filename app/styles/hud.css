@@ -206,3 +206,17 @@
   letter-spacing: 1px;
 }
 
+/* ========== 开罗化增强：数值变化弹跳 ========== */
+.hud-stat-value.pop {
+  display: inline-block;
+  animation: hud-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes hud-pop {
+  0% { transform: scale(0.82); }
+  55% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hud-stat-value.pop { animation: none; }
+}
+

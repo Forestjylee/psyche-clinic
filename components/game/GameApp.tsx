@@ -8,7 +8,7 @@ import { Overlays } from "./Overlays";
 import { EndingOverlay } from "./EndingOverlay";
 import { AchievementUnlockToast } from "./AchievementUnlockToast";
 import { TitleScreen } from "./TitleScreen";
-import { ClinicHall } from "./ClinicHall";
+import { ClinicHallScene } from "./ClinicHallScene";
 import { DialogueScene } from "./DialogueScene";
 import { SkillsTree } from "./SkillsTree";
 import { ClinicUpgrades } from "./ClinicUpgrades";
@@ -54,7 +54,7 @@ export function GameApp() {
       <HUD />
       <main id="app" key={scene} className="scene-root">
         {scene === "title" ? <TitleScreen /> : null}
-        {scene === "clinic" ? <ClinicHall /> : null}
+        {scene === "clinic" ? <ClinicHallScene /> : null}
         {scene === "dialogue" ? <DialogueScene /> : null}
         {scene === "skills" ? <SkillsTree /> : null}
         {scene === "clinic_upgrades" ? <ClinicUpgrades /> : null}
