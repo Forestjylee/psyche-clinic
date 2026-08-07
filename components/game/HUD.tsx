@@ -39,6 +39,28 @@ export function HUD() {
       </div>
       <div className="hud-stats">
         <div className="hud-stat">
+          <div className="hud-stat-icon lvl">{d.level}</div>
+          <div className="hud-stat-body">
+            <span className="hud-stat-label">等级</span>
+            <div className="hud-stat-row">
+              <span className="hud-stat-value" style={{ color: "var(--accent-2)" }}>
+                {d.exp}/{expToNext(d.level)}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="hud-stat">
+          <div className="hud-stat-icon gold">金</div>
+          <div className="hud-stat-body">
+            <span className="hud-stat-label">金钱</span>
+            <div className="hud-stat-row">
+              <span className="hud-stat-value" style={{ color: "var(--gold)" }}>
+                {d.money}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="hud-stat">
           <div className="hud-stat-icon rep">声</div>
           <div className="hud-stat-body">
             <span className="hud-stat-label">声望</span>
@@ -65,28 +87,6 @@ export function HUD() {
                 />
               </div>
               <span className="hud-stat-value">{d.sanity}</span>
-            </div>
-          </div>
-        </div>
-        <div className="hud-stat">
-          <div className="hud-stat-icon gold">金</div>
-          <div className="hud-stat-body">
-            <span className="hud-stat-label">金钱</span>
-            <div className="hud-stat-row">
-              <span className="hud-stat-value" style={{ color: "var(--gold)" }}>
-                {d.money}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className="hud-stat">
-          <div className="hud-stat-icon lvl">{d.level}</div>
-          <div className="hud-stat-body">
-            <span className="hud-stat-label">等级</span>
-            <div className="hud-stat-row">
-              <span className="hud-stat-value" style={{ color: "var(--accent-2)" }}>
-                {d.exp}/{expToNext(d.level)}
-              </span>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import { allSkills } from "@/lib/data/skills";
 import type { Skill, SkillSchool } from "@/lib/types";
@@ -16,6 +17,13 @@ const schoolIcons: Record<SkillSchool, string> = {
   cbt: "理",
   hypnosis: "眠",
   pharmacology: "药",
+};
+
+const schoolDescriptions: Record<SkillSchool, string> = {
+  psychoanalysis: "由梦境与潜意识入手，触及心灵深处的症结。",
+  cbt: "用理性对话重塑认知，直面非理性信念。",
+  hypnosis: "引导与暗示，深入意识的深水区。",
+  pharmacology: "以药物辅助治疗，缓解顽固症状。",
 };
 
 // —— 树状布局常量（文明科技树式：前置在左、后续在右，连线串联）——
@@ -98,6 +106,7 @@ export function SkillsTree() {
   const { game, learnSkill, setScene, playSound, expToNext } = useGame();
   const schools: SkillSchool[] = ["psychoanalysis", "cbt", "hypnosis", "pharmacology"];
   const unlockedIds = new Set(game.skills);
+  const [school, setSchool] = useState<SkillSchool>("psychoanalysis");
 
   return (
     <div className="scene panel-view">
@@ -115,16 +124,44 @@ export function SkillsTree() {
         通过接诊积累经验，习得不同流派的诊疗技艺。当前 EXP：{game.doctor.exp} /{" "}
         {expToNext(game.doctor.level)}
       </p>
-      <div className="tech-tree">
-        {schools.map((school) => {
-          const skills = allSkills.filter((s) => s.school === school);
-          const { nodes, lines, width, height } = buildTree(skills, unlockedIds);
+
+      {/* 流派单选：先选流派，再展示对应技能树 */}
+      <div className="tech-school-picker">
+        {schools.map((s) => {
+          const skills = allSkills.filter((x) => x.school === s);
+          const unlocked = skills.filter((x) => unlockedIds.has(x.id)).length;
           return (
-            <div className="tech-school" key={school}>
-              <div className="tech-school-title">
-                <span className="tech-school-ico">{schoolIcons[school]}</span>
-                {schoolNames[school]}
-              </div>
+            <button
+              key={s}
+              className={`tech-school-option ${school === s ? "active" : ""}`}
+              onClick={() => {
+                playSound("page");
+                setSchool(s);
+              }}
+            >
+              <span className="tech-school-option-ico">{schoolIcons[s]}</span>
+              <span className="tech-school-option-name">{schoolNames[s]}</span>
+              <span className="tech-school-option-count">
+                {unlocked}/{skills.length}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="tech-tree">
+        <div className="tech-school" key={school}>
+          <div className="tech-school-title">
+            <span className="tech-school-ico">{schoolIcons[school]}</span>
+            <span>
+              {schoolNames[school]}
+              <em className="tech-school-desc">{schoolDescriptions[school]}</em>
+            </span>
+          </div>
+          {(() => {
+            const skills = allSkills.filter((s) => s.school === school);
+            const { nodes, lines, width, height } = buildTree(skills, unlockedIds);
+            return (
               <div className="tech-canvas" style={{ width, height }}>
                 <svg className="tech-lines" width={width} height={height}>
                   {lines.map((l, i) => (
@@ -176,9 +213,9 @@ export function SkillsTree() {
                   );
                 })}
               </div>
-            </div>
-          );
-        })}
+            );
+          })()}
+        </div>
       </div>
     </div>
   );
