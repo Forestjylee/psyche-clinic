@@ -2,7 +2,7 @@
 
 | 字段 | 内容 |
 | --- | --- |
-| 文档版本 | v0.4.0 |
+| 文档版本 | v0.5.0 |
 | 维护人 | Psyche Clinic Team |
 | 最后更新 | 2026-08-07 |
 | 配套文档 | [PRD.md](./PRD.md) · [PLAN.md](./PLAN.md) · [DEPLOYMENT.md](./DEPLOYMENT.md) |
@@ -541,7 +541,143 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 
 ---
 
-## 12. 变更记录
+## 12. 成就图鉴扩充（v0.5.0）
+
+### 12.1 目标
+
+成就库由 **38 个扩充至 80 个**。删除 2 个不再适用的「剧本生成器」成就（入口已被发现客户取代），新增 44 个，覆盖发现客户 / 邀约 / 治愈回访 / 复诊等新系统。
+
+### 12.2 删除的成就
+
+| id | 名称 | 删除原因 |
+| --- | --- | --- |
+| `therapy_generator_first` | 剧本工坊创始人 | 首页入口已由「发现客户」取代 |
+| `secret_all_generated` | 让生成器也成为朋友 | 同上 |
+
+### 12.3 新增 44 个成就清单
+
+分类分布：获客 9 / 回访 5 / 诊疗扩展 5 / 经营扩展 7 / 结局扩展 7 / 成长 3 / 伦理 4 / 隐藏 4。
+
+**获客（新分类 `discover`，标签「获客」）**
+
+| id | 名称 | 稀有度 | 目标 | 统计源 |
+| --- | --- | --- | --- | --- |
+| discover_first | 广而告之 | common | 1 | `stats.discoverCount` |
+| discover_5 | 名声初起 | rare | 5 | `stats.discoverCount` |
+| discover_15 | 广撒渔网 | epic | 15 | `stats.discoverCount` |
+| discover_all_channels | 四面开花 | epic | 4 | `stats.channelsUsed` 去重长度 |
+| invite_first | 初次邀约 | common | 1 | `stats.inviteCount` |
+| invite_accept_first | 一拍即合 | rare | 1 | `stats.acceptCount` |
+| invite_accept_5 | 众望所归 | epic | 5 | `stats.acceptCount` |
+| invite_reject_5 | 锲而不舍 | rare | 5 | `stats.rejectCount` |
+| discover_arrive_3 | 高朋满座 | rare | 1 | 单日 `restOneDay` 到达数 ≥3（事件钩子） |
+
+**治愈回访（新分类 `aftercare`，标签「回访」）**
+
+| id | 名称 | 稀有度 | 目标 | 统计源 |
+| --- | --- | --- | --- | --- |
+| aftercare_first | 旧雨重逢 | rare | 1 | `stats.aftercareCount` |
+| aftercare_3 | 温情常在 | rare | 3 | `stats.aftercareCount` |
+| aftercare_5 | 念念不忘 | epic | 5 | `stats.aftercareCount` |
+| aftercare_8 | 心心相印 | epic | 8 | `stats.aftercareCount` |
+| aftercare_all_types | 故人重逢 | epic | 1 | `stats.aftercareEndings` 去重后含 cure/awakening/acceptance 3 种 |
+
+**诊疗扩展（`therapy`）**
+
+| id | 名称 | 稀有度 | 目标 | 统计源 |
+| --- | --- | --- | --- | --- |
+| therapy_revisit_first | 再度来访 | rare | 1 | `stats.revisitCount` |
+| therapy_revisit_5 | 常来常往 | epic | 5 | `stats.revisitCount` |
+| therapy_100_patients | 悬壶济世 | legendary | 100 | `patientRecords` 键数 |
+| therapy_10_different | 见众生 | epic | 10 | `patientRecords` 键数 |
+| therapy_deep_truth | 一针见血 | rare | 3 | 结局时 `lastState.truth ≥ 95` 累计 |
+
+**经营扩展（`clinic`）**
+
+| id | 名称 | 稀有度 | 目标 | 统计源 |
+| --- | --- | --- | --- | --- |
+| clinic_money_100k | 日进斗金 | legendary | 100000 | `doctor.money` |
+| clinic_day_7 | 七日之约 | common | 7 | `day` |
+| clinic_day_15 | 半月坚守 | rare | 15 | `day` |
+| clinic_day_50 | 五十度秋 | legendary | 50 | `day` |
+| clinic_sanity_keep | 神完气足 | rare | 5 | `stats.sanityStreak`（连续休息后理智≥60） |
+| clinic_upgrade_5 | 锦上添花 | epic | 5 | `clinicUpgrades.length` |
+| clinic_full_day | 门庭若市 | rare | 1 | `slot` 达到 `MAX_SLOTS`（事件钩子） |
+
+**结局扩展（`ending`）**
+
+| id | 名称 | 稀有度 | 目标 | 统计源 |
+| --- | --- | --- | --- | --- |
+| ending_cure_20 | 妙手回春 | legendary | 20 | 结局类型计数 |
+| ending_awakening_3 | 觉醒三昧 | rare | 3 | 结局类型计数 |
+| ending_acceptance_3 | 与痛共舞 | rare | 3 | 结局类型计数 |
+| ending_dependent_3 | 温柔枷锁 | rare | 3 | 结局类型计数 |
+| ending_worsen_3 | 力挽狂澜 | rare | 3 | 结局类型计数 |
+| ending_tragic_2 | 悲歌二重 | epic | 2 | 结局类型计数 |
+| ending_transfer_3 | 知止善任 | epic | 3 | 结局类型计数 |
+
+**成长扩展（`growth`）**
+
+| id | 名称 | 稀有度 | 目标 | 统计源 |
+| --- | --- | --- | --- | --- |
+| growth_level_30 | 医者仁心 | legendary | 30 | `doctor.level` |
+| growth_rep_95 | 万家生佛 | legendary | 95 | `doctor.reputation` |
+| growth_skill_8 | 学贯中西 | legendary | 8 | `skills.length` |
+
+**伦理扩展（`ethics`）**
+
+| id | 名称 | 稀有度 | 目标 | 统计源 |
+| --- | --- | --- | --- | --- |
+| ethics_no_quick_fix_15 | 去芜存菁 | epic | 15 | 首诊不用处方药累计 |
+| ethics_boundary_3 | 守正不阿 | epic | 3 | 边界坚守（非依赖结局且真相≥60）累计 |
+| ethics_dark_line_8 | 夜行者 | epic | 8 | 理智跌破 20 累计 |
+| ethics_help_desperate | 雪中送炭 | rare | 3 | 危机接诊（等待≥4天）并治愈累计 |
+
+**隐藏扩展（`secret`）**
+
+| id | 名称 | 稀有度 | 目标 | 统计源 |
+| --- | --- | --- | --- | --- |
+| secret_letters_30 | 锦书难托 | epic | 30 | 收到的 `letter` 消息数 |
+| secret_all_heal | 桃李满园 | legendary | 1 | 全部内置患者已治愈/接纳/觉醒 |
+| secret_no_loss_15 | 功德圆满 | epic | 15 | `stats.noLossDays` |
+| secret_sanity_zero | 神游天外 | rare | 1 | 理智归零 |
+
+### 12.4 GameState 新增 `stats` 统计字段
+
+```ts
+interface GameStats {
+  discoverCount: number;      // 渠道投放次数
+  channelsUsed: string[];     // 用过的渠道 id（去重）
+  inviteCount: number;        // 发出邀约次数
+  acceptCount: number;        // 邀约成功次数
+  rejectCount: number;        // 邀约被拒次数
+  revisitCount: number;       // 复诊接诊次数
+  aftercareCount: number;     // 完成回访探望次数
+  aftercareEndings: string[]; // 探望过的回访结局类型
+  noLossDays: number;         // 累计零流失天数
+  sanityStreak: number;       // 连续休息后理智≥60 的天数
+}
+```
+
+`createInitialState` 初始化全 0/空；`migrateGameState` 对旧存档补齐默认值。
+
+### 12.5 引擎与 Store 挂钩点
+
+| 位置 | 变更 |
+| --- | --- |
+| `discover` action | `stats.discoverCount+1`；`channelsUsed` 去重 push |
+| `invite` action | `stats.inviteCount+1`；成功 `acceptCount+1`，婉拒 `rejectCount+1` |
+| `startSession` | 传 `patientId` 给 `onSessionStart`；若 `patientRecords[pid]` 已存在则 `revisitCount+1`；记录危机接诊标记（`waitingDays≥4`） |
+| `restOneDay` | 当日无 abandon 事件 → `noLossDays+1`；理智恢复后更新 `sanityStreak`；末尾调用 `onGameStateSynced` 刷新天数/金钱成就 |
+| `finishSession` | `onSessionEnd` 内：`slot≥MAX_SLOTS` → `clinic_full_day`；危机接诊且治愈 → `ethics_help_desperate`；真相≥95 → `therapy_deep_truth` |
+| `finishReturnVisit` | `aftercareCount+1`；`aftercareEndings.push(rv.ending)` |
+| `onGameStateSynced` | 用 `set` 刷新可推导成就（获客/回访/复诊/天数/金钱/结局/成长/隐藏） |
+
+新分类 `discover`/`aftercare` 需扩展 `Achievement["category"]` 联合类型与 `achievementCategoryLabels`。
+
+---
+
+## 13. 变更记录
 
 | 版本 | 日期 | 变更摘要 |
 | --- | --- | --- |
@@ -550,3 +686,4 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 | v0.3.0 | 2026-08-06 | 核心玩法重构：患者三层生命周期（候诊/已诊疗/离场）与复诊系统、GameState 新增 discharged/followUpCount、PatientScenario 新增 followUp 复诊剧情、随机事件与 500+ 素材库规划 |
 | v0.3.1 | 2026-08-06 | 首页 UX 优化（难度标签图标/摘要两行悬停展开/进度条/天数徽章/退出确认/休息高亮/预约入口/奖励动画）；ClinicHall 侧栏按钮新增 `data-guide` 定位；手写剧本补正负选项对照；浮动文字改为确定性纵向堆叠防重叠（详见 [clinic-hall-ux-design](./superpowers/specs/2026-08-06-clinic-hall-ux-design.md)） |
 | v0.4.0 | 2026-08-07 | 新增「发现客户」主动获客系统（3.6）：首页「预约客户」改为「发现客户」，付费渠道获取候选客户、主动邀约、接受概率、到达日分布，GameState 新增 `pendingArrivals`；对话界面重构为聊天气泡布局（患者左/玩家右/旁白顶部）；首页预约清单可对话优先排序 + 今日已接诊隐藏；记忆碎片改为手动关闭；对话选项中性化 |
+| v0.5.0 | 2026-08-07 | 成就图鉴扩充 38→80：删除生成器成就 2 个，新增获客/回访/复诊/结局/成长/伦理/隐藏 44 个（见 §12）；GameState 新增 `stats` 累计统计字段；`onSessionStart` 接收 `patientId`；`restOneDay` 末尾同步成就引擎；`Achievement.category` 扩展 `discover`/`aftercare` |

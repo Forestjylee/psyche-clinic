@@ -16,6 +16,8 @@ const order: AchievementCategory[] = [
   "clinic",
   "ethics",
   "secret",
+  "discover",
+  "aftercare",
 ];
 
 export function AchievementsPage() {

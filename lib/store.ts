@@ -308,7 +308,7 @@ export const useGameStore = create<GameStore>((set, get) => {
       if (!g.todayServed.includes(p.id)) g.todayServed.push(p.id);
       // 病情恶化可逆：患者来就诊，等待天数归零，暂缓放弃
       g.waitingDays[p.id] = 0;
-      get().achievementEngine?.onSessionStart();
+      get().achievementEngine?.onSessionStart(p.id);
       set({ currentPatient: p, scene: "dialogue" });
       playSound("veil");
     },
@@ -378,6 +378,13 @@ export const useGameStore = create<GameStore>((set, get) => {
       if (g.clinicUpgrades.includes("rest_room")) base += 10;
       g.doctor.sanity = clamp(g.doctor.sanity + base, 0, 100);
       if (g.clinicUpgrades.includes("receptionist")) g.doctor.money += 50;
+      // 成就累计：零流失天数（当日无流失）/ 连续休息理智≥60 天数 / 邀约到诊 / 直接型指标同步
+      if (!events.some((e) => e.type === "abandon" || e.type === "abandonFollowUp"))
+        g.stats.noLossDays += 1;
+      g.stats.sanityStreak =
+        g.doctor.sanity >= 60 ? g.stats.sanityStreak + 1 : 0;
+      get().achievementEngine?.onInviteesArrived(arrivedNames.length);
+      get().achievementEngine?.onGameStateSynced(g);
       commit();
       playSound("rest");
       toast(`休息一日，进入第 ${g.day} 天，理智恢复 +${base}`, "ok");
@@ -488,11 +495,15 @@ export const useGameStore = create<GameStore>((set, get) => {
         return;
       }
       if (g.doctor.money < ch.cost) {
-        toast(`金钱不足：需要 ${ch.cost} 金`, "warn");
+        toast(`金钱不足：需要 $${ch.cost}`, "warn");
         playSound("locked");
         return;
       }
       g.doctor.money -= ch.cost;
+      // 成就累计：投放次数 / 用过的渠道
+      g.stats.discoverCount += 1;
+      if (!g.stats.channelsUsed.includes(channelId))
+        g.stats.channelsUsed.push(channelId);
       const { generateScenario: gen } = await import("./data/generator");
       const count =
         ch.minCount + Math.floor(Math.random() * (ch.maxCount - ch.minCount + 1));
@@ -519,7 +530,7 @@ export const useGameStore = create<GameStore>((set, get) => {
       });
       commit();
       playSound("page");
-      toast(`花费 ${ch.cost} 金，发现 ${count} 位潜在客户`, "ok");
+      toast(`花费 $${ch.cost}，发现 ${count} 位潜在客户`, "ok");
     },
 
     invite: (candidateId: string) => {
@@ -531,7 +542,10 @@ export const useGameStore = create<GameStore>((set, get) => {
       const name = cand.scenario.name;
       const rate = inviteAcceptRate(cand.channelId, g.doctor.reputation);
       const accepted = Math.random() < rate;
+      // 成就累计：发出邀约次数
+      g.stats.inviteCount += 1;
       if (accepted) {
+        g.stats.acceptCount += 1;
         let offset = arrivalDayOffset();
         // 今日名额已满则顺延至明日
         if (offset === 0 && g.slot >= MAX_SLOTS) offset = 1;
@@ -549,6 +563,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         playSound("page");
         toast(`${name} 接受了邀约`, "ok");
       } else {
+        g.stats.rejectCount += 1;
         g.messages.unshift({
           id: `invite-no-${g.day}-${cand.scenario.id}`,
           kind: "notice",
@@ -709,6 +724,10 @@ export const useGameStore = create<GameStore>((set, get) => {
           rv.seen = true;
           delete g.returnVisits[p.id];
           if (!g.discharged.includes(p.id)) g.discharged.push(p.id);
+          // 成就累计：回访探望次数 / 探望过的结局类型
+          g.stats.aftercareCount += 1;
+          if (!g.stats.aftercareEndings.includes(rv.ending))
+            g.stats.aftercareEndings.push(rv.ending);
         }
       }
       commit();

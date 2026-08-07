@@ -7,6 +7,8 @@ import type {
   EndingType,
 } from "../types";
 import { allAchievements, getAchievement, createProgress } from "../data/achievements";
+import { allPatients } from "../data/patients";
+import { MAX_SLOTS } from "../state/GameState";
 import {
   saveAchievements,
   loadAchievements,
@@ -43,6 +45,7 @@ export class AchievementEngine {
   };
   private firstChoiceMade = false;
   private noWorsenStreak = 0; // 当前未恶化连续数（仅内存，跨局）
+  private criticalSession = false; // 本次接诊是否危机（患者等待≥4天）
 
   constructor(game: GameState, onUnlock?: OnUnlock) {
     this.progress = this.loadOrCreate();
@@ -196,11 +199,70 @@ export class AchievementEngine {
     this.set("ending_worsen_1", counts.worsen);
     this.set("ending_tragic_1", counts.tragic);
     this.set("ending_hidden_1", counts.hidden);
+    // —— v0.5.0 扩充：获客 / 回访 / 复诊 / 结局 / 成长 / 经营 / 隐藏 ——
+    // 获客
+    this.set("discover_first", game.stats.discoverCount);
+    this.set("discover_5", game.stats.discoverCount);
+    this.set("discover_15", game.stats.discoverCount);
+    this.set("discover_all_channels", game.stats.channelsUsed.length);
+    this.set("invite_first", game.stats.inviteCount);
+    this.set("invite_accept_first", game.stats.acceptCount);
+    this.set("invite_accept_5", game.stats.acceptCount);
+    this.set("invite_reject_5", game.stats.rejectCount);
+    // 回访
+    this.set("aftercare_first", game.stats.aftercareCount);
+    this.set("aftercare_3", game.stats.aftercareCount);
+    this.set("aftercare_5", game.stats.aftercareCount);
+    this.set("aftercare_8", game.stats.aftercareCount);
+    {
+      const visited = new Set(game.stats.aftercareEndings);
+      if (visited.has("cure") && visited.has("awakening") && visited.has("acceptance"))
+        this.add("aftercare_all_types", 1);
+    }
+    // 复诊
+    this.set("therapy_revisit_first", game.stats.revisitCount);
+    this.set("therapy_revisit_5", game.stats.revisitCount);
+    // 接诊总量 / 不同患者
+    this.set("therapy_100_patients", Object.keys(game.patientRecords).length);
+    this.set("therapy_10_different", Object.keys(game.patientRecords).length);
+    // 经营扩展
+    this.set("clinic_money_100k", game.doctor.money);
+    this.set("clinic_day_7", game.day);
+    this.set("clinic_day_15", game.day);
+    this.set("clinic_day_50", game.day);
+    this.set("clinic_sanity_keep", game.stats.sanityStreak);
+    this.set("clinic_upgrade_5", game.clinicUpgrades.length);
+    // 结局扩展
+    this.set("ending_cure_20", counts.cure);
+    this.set("ending_awakening_3", counts.awakening);
+    this.set("ending_acceptance_3", counts.acceptance);
+    this.set("ending_dependent_3", counts.dependent);
+    this.set("ending_worsen_3", counts.worsen);
+    this.set("ending_tragic_2", counts.tragic);
+    this.set("ending_transfer_3", counts.transfer);
+    // 成长扩展
+    this.set("growth_level_30", game.doctor.level);
+    this.set("growth_rep_95", game.doctor.reputation);
+    this.set("growth_skill_8", game.skills.length);
+    // 隐藏扩展
+    this.set("secret_letters_30", game.messages.filter((m) => m.kind === "letter").length);
+    this.set("secret_no_loss_15", game.stats.noLossDays);
+    if (game.doctor.sanity <= 0) this.add("secret_sanity_zero", 1);
+    // 全部内置患者治愈/接纳/觉醒
+    {
+      const good: readonly string[] = ["cure", "awakening", "acceptance"];
+      const allHealed = allPatients.every((p) => {
+        const r = game.patientRecords[p.id];
+        return !!r && good.includes(r);
+      });
+      if (allHealed && Object.keys(game.patientRecords).length > 0)
+        this.add("secret_all_heal", 1);
+    }
     this.save();
   }
 
   /** 接诊开始：重置会话级指标 */
-  public onSessionStart(): void {
+  public onSessionStart(patientId: string): void {
     this.sessionMetrics = {
       maxDefense: 0,
       truthReached: 0,
@@ -208,6 +270,12 @@ export class AchievementEngine {
       usedPrescribeFirst: false,
     };
     this.firstChoiceMade = false;
+    // 复诊统计：该患者已记录过结局，本次为复诊
+    if (this.game.patientRecords[patientId]) {
+      this.game.stats.revisitCount += 1;
+    }
+    // 危机接诊标记：患者已等待 ≥ 4 天（病情严重）
+    this.criticalSession = (this.game.waitingDays[patientId] ?? 0) >= 4;
   }
 
   /** 每次患者状态更新时调用 */
@@ -217,7 +285,11 @@ export class AchievementEngine {
     if (state.truth > this.sessionMetrics.truthReached)
       this.sessionMetrics.truthReached = state.truth;
     // 低理智成就
-    if (this.game.doctor.sanity <= 20) this.add("ethics_dark_line", 1);
+    if (this.game.doctor.sanity <= 20) {
+      this.add("ethics_dark_line", 1);
+      this.add("ethics_dark_line_8", 1);
+    }
+    if (this.game.doctor.sanity <= 0) this.add("secret_sanity_zero", 1);
   }
 
   /** 玩家做出对话选择时调用 */
@@ -228,10 +300,16 @@ export class AchievementEngine {
         this.sessionMetrics.usedPrescribeFirst = true;
       } else {
         this.add("ethics_no_quick_fix", 1);
+        this.add("ethics_no_quick_fix_15", 1);
       }
     }
     // 当前会话是否超过 90 真相
     if (state.truth >= 90) this.add("therapy_truth_first", 1);
+  }
+
+  /** 邀约客户到诊（休息日结算时调用） */
+  public onInviteesArrived(count: number): void {
+    if (count >= 3) this.add("discover_arrive_3", 1);
   }
 
   /** 连击数更新 */
@@ -244,16 +322,18 @@ export class AchievementEngine {
   /** 接诊结束（达成结局）时调用 */
   public onSessionEnd(
     endingType: EndingType,
-    patientId: string,
+    _patientId: string,
     lastState: PatientState
   ): void {
     // 全防御未超 80 + 非恶化：优雅结案
     if (this.sessionMetrics.maxDefense < 80) {
       this.add("therapy_perfect_round", 1);
     }
-    // 剧本生成器接诊
-    if (patientId.startsWith("gen_")) this.add("therapy_generator_first", 1);
-    if (patientId.startsWith("gen_")) this.add("secret_all_generated", 1);
+    // 单日接满名额 / 危机接诊治愈 / 真相 ≥95
+    if (this.game.slot >= MAX_SLOTS) this.add("clinic_full_day", 1);
+    if (endingType === "cure" && this.criticalSession)
+      this.add("ethics_help_desperate", 1);
+    if (lastState.truth >= 95) this.add("therapy_deep_truth", 1);
 
     // 恶化 vs 连续不恶化
     if (endingType === "worsen") {
@@ -272,7 +352,10 @@ export class AchievementEngine {
       endingType === "acceptance"
     ) {
       // 仅在真相揭示 ≥ 60 时判定边界坚守
-      if (lastState.truth >= 60) this.add("ethics_boundary_keeper", 1);
+      if (lastState.truth >= 60) {
+        this.add("ethics_boundary_keeper", 1);
+        this.add("ethics_boundary_3", 1);
+      }
     }
     this.save();
   }

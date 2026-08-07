@@ -281,6 +281,32 @@ export interface GameState {
   discoveryCandidates: DiscoveryCandidate[];
   /** 已接受邀约、等待到达的客户（到期进入预约清单） */
   pendingArrivals: PendingArrival[];
+  /** 累计统计（成就系统只读，运行时各动作累加） */
+  stats: GameStats;
+}
+
+/** 成就统计字段：各动作（发现/邀约/复诊/回访/休息）运行时累加，成就引擎读取 */
+export interface GameStats {
+  /** 渠道投放次数 */
+  discoverCount: number;
+  /** 用过的渠道 id（去重） */
+  channelsUsed: string[];
+  /** 发出邀约次数 */
+  inviteCount: number;
+  /** 邀约成功次数 */
+  acceptCount: number;
+  /** 邀约被拒次数 */
+  rejectCount: number;
+  /** 复诊接诊次数 */
+  revisitCount: number;
+  /** 完成回访探望次数 */
+  aftercareCount: number;
+  /** 探望过的回访结局类型 */
+  aftercareEndings: string[];
+  /** 累计零流失天数（当日无 abandon 事件 +1） */
+  noLossDays: number;
+  /** 连续休息后理智≥60 的天数 */
+  sanityStreak: number;
 }
 
 // ============================================================
@@ -382,7 +408,9 @@ export type AchievementCategory =
   | "growth"    // 医生成长（等级/声望/技能）
   | "clinic"    // 诊所经营（金钱/设施）
   | "secret"    // 隐藏成就（灰色锁定，解锁后才显示名称）
-  | "ethics";   // 伦理抉择（特殊判断）
+  | "ethics"    // 伦理抉择（特殊判断）
+  | "discover"  // 主动获客（渠道投放/邀约）
+  | "aftercare"; // 治愈回访（探望闭环）
 
 export type AchievementRarity = "common" | "rare" | "epic" | "legendary";
 

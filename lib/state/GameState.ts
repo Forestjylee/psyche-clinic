@@ -158,6 +158,18 @@ export function createInitialState(): GameState {
     returnVisits: {},
     discoveryCandidates: [],
     pendingArrivals: [],
+    stats: {
+      discoverCount: 0,
+      channelsUsed: [],
+      inviteCount: 0,
+      acceptCount: 0,
+      rejectCount: 0,
+      revisitCount: 0,
+      aftercareCount: 0,
+      aftercareEndings: [],
+      noLossDays: 0,
+      sanityStreak: 0,
+    },
   };
 }
 
@@ -176,6 +188,21 @@ export function migrateGameState(data: GameState): GameState {
   // 发现客户：候选与待到达队列（旧存档补默认空）
   if (!Array.isArray(data.discoveryCandidates)) data.discoveryCandidates = [];
   if (!Array.isArray(data.pendingArrivals)) data.pendingArrivals = [];
+  // 成就统计（旧存档补默认）
+  if (!data.stats) {
+    data.stats = {
+      discoverCount: 0,
+      channelsUsed: [],
+      inviteCount: 0,
+      acceptCount: 0,
+      rejectCount: 0,
+      revisitCount: 0,
+      aftercareCount: 0,
+      aftercareEndings: [],
+      noLossDays: 0,
+      sanityStreak: 0,
+    };
+  }
   return data;
 }
 
