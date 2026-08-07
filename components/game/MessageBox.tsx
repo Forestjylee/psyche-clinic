@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import { allPatients } from "@/lib/data/patients";
-import type { PatientPalette, PatientEmotion, MessageKind } from "@/lib/types";
+import type { PatientPalette, PatientEmotion, MessageKind, GameMessage } from "@/lib/types";
 import { ChibiCharacter } from "./ChibiCharacter";
+import { LetterModal } from "./LetterModal";
 
 const toneEmotion: Record<"thanks" | "neutral" | "sad" | "dark", PatientEmotion> = {
   thanks: "happy",
@@ -23,6 +24,7 @@ const KIND_LABEL: Record<MessageKind | "all", string> = {
 export function MessageBox() {
   const { game, setScene, playSound, markAllMessagesRead } = useGame();
   const [filter, setFilter] = useState<MessageKind | "all">("all");
+  const [selected, setSelected] = useState<GameMessage | null>(null);
 
   // 打开消息盒子即全部标记已读
   useEffect(() => {
@@ -88,10 +90,19 @@ export function MessageBox() {
         ) : (
           list.map((m) => {
             const pal = m.patientName ? palettes.get(m.patientName) : undefined;
+            const isLetter = m.kind === "letter";
             return (
               <div
-                className={`letter-card msg-card ${m.kind} ${m.tone ?? ""} ${m.read ? "" : "unread"}`}
+                className={`letter-card msg-card ${m.kind} ${m.tone ?? ""} ${m.read ? "" : "unread"} ${isLetter ? "clickable" : ""}`}
                 key={m.id}
+                onClick={
+                  isLetter
+                    ? () => {
+                        playSound("click");
+                        setSelected(m);
+                      }
+                    : undefined
+                }
               >
                 <div className="letter-header">
                   <div className="letter-from-block">
@@ -115,12 +126,14 @@ export function MessageBox() {
                   <span className="letter-date">第 {m.day} 天</span>
                 </div>
                 {m.kind === "letter" ? <div className="letter-title">{m.title}</div> : null}
-                <div className="letter-content">{m.body}</div>
+                <div className={`letter-content ${isLetter ? "clamp" : ""}`}>{m.body}</div>
+                {isLetter ? <div className="letter-open-hint">点击展开信笺</div> : null}
               </div>
             );
           })
         )}
       </div>
+      {selected ? <LetterModal message={selected} onClose={() => setSelected(null)} /> : null}
     </div>
   );
 }
