@@ -3567,7 +3567,7 @@ button {
    合规：结局页「寻求专业帮助」卡片
    ============================================================ */
 .ending-help {
-  margin: 0 auto 22px;
+  margin: 22px auto 0;
   max-width: 460px;
   background: linear-gradient(180deg, rgba(232, 139, 106, 0.10), rgba(232, 139, 106, 0.04));
   border: 1px solid rgba(232, 139, 106, 0.38);

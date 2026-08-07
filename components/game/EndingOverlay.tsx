@@ -104,6 +104,10 @@ export function EndingOverlay() {
 
         {reward && !showSkipped ? <Rewards r={reward} /> : null}
 
+        <button className="ending-btn" onClick={dismissEnding}>
+          回到诊所
+        </button>
+
         <div className="ending-help">
           <div className="ending-help-line">{HELP_CARD_MARK}</div>
           <p>{HELP_CARD_TEXT}</p>
@@ -112,10 +116,6 @@ export function EndingOverlay() {
             <b>{HELP_CARD_LINE}</b>
           </div>
         </div>
-
-        <button className="ending-btn" onClick={dismissEnding}>
-          回到诊所
-        </button>
       </div>
     </div>
   );
