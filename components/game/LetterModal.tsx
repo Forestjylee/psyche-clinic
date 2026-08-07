@@ -39,6 +39,13 @@ export function LetterModal({
 
   return (
     <div className="letter-modal-mask" onClick={onClose}>
+      {/* 打开信封动画：信封 flap 翻开 → 淡出，信纸随之展开 */}
+      <div className="letter-envelope" aria-hidden="true">
+        <div className="envelope-body" />
+        <div className="envelope-flap">
+          <span className="envelope-seal">{TONE_SEAL[tone]}</span>
+        </div>
+      </div>
       <div
         className="letter-modal"
         role="dialog"

@@ -1840,19 +1840,18 @@ button {
   width: min(560px, 100%);
   max-height: 84vh;
   overflow-y: auto;
-  /* 纸色：左上高光 + 横线 + 左侧红边 + 暖米黄 */
+  /* 纸色：统一暖米黄 + 细横线 + 左上高光（业界常见信纸底） */
   background:
-    radial-gradient(130% 70% at 0% 0%, rgba(255, 255, 255, 0.55), transparent 52%),
+    radial-gradient(130% 70% at 0% 0%, rgba(255, 255, 255, 0.5), transparent 50%),
     repeating-linear-gradient(
       to bottom,
       transparent 0,
       transparent 30px,
-      rgba(150, 112, 60, 0.16) 30px,
-      rgba(150, 112, 60, 0.16) 31px
+      rgba(150, 112, 60, 0.12) 30px,
+      rgba(150, 112, 60, 0.12) 31px
     ),
-    linear-gradient(90deg, rgba(196, 82, 62, 0.22) 0, rgba(196, 82, 62, 0.22) 40px, transparent 40px),
-    linear-gradient(180deg, #fbf1dc, #f0e1c2);
-  border: 1px solid #d8c8a6;
+    linear-gradient(180deg, #faf0da, #efdfbe);
+  border: 1px solid #d9c9a4;
   border-radius: 10px;
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.5),
@@ -1860,17 +1859,100 @@ button {
     inset 0 0 0 1px rgba(255, 255, 255, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
   padding: 56px 48px 34px;
-  animation: letter-pop 0.34s cubic-bezier(0.18, 1.15, 0.3, 1);
+  /* 从信封位置放大展开：delay 等信封 flap 翻开 */
+  animation: letter-open 0.55s cubic-bezier(0.2, 1.12, 0.3, 1) 0.45s backwards;
 }
-@keyframes letter-pop {
+@keyframes letter-open {
   0% {
     opacity: 0;
-    transform: translateY(18px) scale(0.95);
+    transform: translateY(40px) scale(0.72);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+/* ========== 打开信封动画 ========== */
+.letter-envelope {
+  position: absolute;
+  width: 300px;
+  height: 200px;
+  perspective: 900px;
+  pointer-events: none;
+  animation: envelope-fade 0.35s ease 0.95s forwards;
+}
+@keyframes envelope-fade {
+  to {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+.envelope-body {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, #f3e7c9, #e6d4ac);
+  border: 1px solid #cdb98d;
+  border-radius: 8px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
+}
+/* 信封正面下缘的 V 形折线 */
+.envelope-body::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 46%;
+  background: linear-gradient(180deg, #e8d6ad, #ddc79a);
+  clip-path: polygon(0 100%, 100% 100%, 50% 0);
+  border-radius: 0 0 8px 8px;
+}
+
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 54%;
+  transform-origin: top center;
+  background: linear-gradient(180deg, #f6ebcf, #e7d5ac);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  z-index: 2;
+  animation: flap-open 0.45s ease 0.2s forwards;
+}
+@keyframes flap-open {
+  from { transform: rotateX(0); }
+  to { transform: rotateX(-180deg); }
+}
+
+.envelope-seal {
+  position: absolute;
+  bottom: -24px;
+  left: 50%;
+  margin-left: -23px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff7e6;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-indent: 3px;
+  text-shadow: 0 1px 2px rgba(60, 10, 0, 0.5);
+  border: 2px solid rgba(255, 214, 170, 0.6);
+  box-shadow:
+    0 3px 8px rgba(90, 20, 5, 0.45),
+    inset 0 0 0 3px rgba(255, 200, 150, 0.16),
+    inset 0 4px 8px rgba(255, 220, 180, 0.25);
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 205, 160, 0.6), transparent 42%),
+    linear-gradient(155deg, #e0563f, #b02a16 60%, #8f1e0e);
 }
 
 /* 关闭按钮：左上角，避开右侧封蜡 */
@@ -2037,6 +2119,10 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .letter-modal-mask { animation: none; }
   .letter-modal { animation: none; }
+  .letter-envelope,
+  .letter-envelope .envelope-flap,
+  .letter-envelope .envelope-body { animation: none; }
+  .letter-envelope { display: none; }
 }
 
 /* 消息盒子 */
