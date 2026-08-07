@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import { allPatients } from "@/lib/data/patients";
 import { allSkills, allClinicUpgrades } from "@/lib/data/skills";
@@ -20,15 +19,11 @@ export function ClinicHall() {
     startSession,
     setScene,
     restOneDay,
-    saveNow,
-    backToTitle,
     playSound,
     expToNext,
     achievementEngine,
     openReturnVisit,
   } = useGame();
-
-  const [confirmExit, setConfirmExit] = useState(false);
 
   // 候诊列表：已放弃治疗的患者不再出现
   const allAvailable = [...allPatients, ...game.generatedScenarios].filter(
@@ -93,26 +88,6 @@ export function ClinicHall() {
           <StatChip val={Object.keys(game.patientRecords).length} label="已接待" />
           <StatChip val={game.skills.length} label="技能" />
           <StatChip val={game.clinicUpgrades.length} label="设施" />
-          <button
-            className="clinic-header-btn"
-            onClick={() => {
-              playSound("click");
-              saveNow();
-            }}
-            title="保存游戏进度"
-          >
-            💾 保存
-          </button>
-          <button
-            className="clinic-header-btn ghost"
-            onClick={() => {
-              playSound("click");
-              setConfirmExit(true);
-            }}
-            title="退出游戏，返回标题"
-          >
-            退出
-          </button>
         </div>
       </div>
       <div className="clinic-body">
@@ -303,43 +278,6 @@ export function ClinicHall() {
           </div>
         </div>
       </div>
-      {confirmExit ? (
-        <div
-          className="confirm-mask"
-          onClick={() => {
-            playSound("click");
-            setConfirmExit(false);
-          }}
-        >
-          <div className="confirm-card" onClick={(e) => e.stopPropagation()}>
-            <div className="confirm-title">返回标题屏？</div>
-            <p className="confirm-text">
-              进度会自动保存，回来可以继续经营你的诊所。
-            </p>
-            <div className="confirm-actions">
-              <button
-                className="confirm-cancel"
-                onClick={() => {
-                  playSound("click");
-                  setConfirmExit(false);
-                }}
-              >
-                继续经营
-              </button>
-              <button
-                className="confirm-ok"
-                onClick={() => {
-                  playSound("page");
-                  setConfirmExit(false);
-                  backToTitle();
-                }}
-              >
-                返回标题
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

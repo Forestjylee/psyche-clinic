@@ -309,33 +309,6 @@ button {
 }
 
 /* 首页右上角：保存 / 退出按钮 */
-.clinic-header-btn {
-  align-self: stretch;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-width: 84px;
-  padding: 0 16px;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--text);
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  transition: all 0.2s;
-}
-.clinic-header-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateY(-1px);
-}
-.clinic-header-btn.ghost {
-  background: transparent;
-  color: var(--text-dim);
-}
-
 .clinic-stat-chip {
   background: var(--bg-panel);
   border: 1px solid var(--border);
@@ -3569,6 +3542,29 @@ button {
   background: var(--bg-card-hi);
   border-color: var(--border-glow);
   color: var(--text);
+}
+
+/* HUD 顶部保存 / 退出按钮 */
+.hud-action-btn {
+  margin-left: 6px;
+  padding: 6px 13px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 13px;
+  letter-spacing: 1px;
+  transition: all 0.18s;
+}
+.hud-action-btn:hover {
+  background: var(--bg-card-hi);
+  border-color: var(--border-glow);
+  color: var(--text);
+}
+.hud-action-btn.ghost:hover {
+  border-color: var(--bad);
+  color: var(--bad);
 }
 
 /* Toast 层（多 toast 堆叠） */
