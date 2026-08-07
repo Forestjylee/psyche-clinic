@@ -156,6 +156,8 @@ export function createInitialState(): GameState {
     generatedScenarios: [],
     usedSeeds: [],
     returnVisits: {},
+    discoveryCandidates: [],
+    pendingArrivals: [],
   };
 }
 
@@ -171,6 +173,9 @@ export function migrateGameState(data: GameState): GameState {
   if (!data.followUpIdleDays) data.followUpIdleDays = {};
   if (!data.returnVisits) data.returnVisits = {};
   if (!Array.isArray(data.usedSeeds)) data.usedSeeds = [];
+  // 发现客户：候选与待到达队列（旧存档补默认空）
+  if (!Array.isArray(data.discoveryCandidates)) data.discoveryCandidates = [];
+  if (!Array.isArray(data.pendingArrivals)) data.pendingArrivals = [];
   return data;
 }
 

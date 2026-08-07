@@ -277,6 +277,47 @@ export interface GameState {
     string,
     { ending: EndingType; dueDay: number; arrived: boolean; seen: boolean }
   >;
+  /** 已发现、待决定是否邀约的候选客户 */
+  discoveryCandidates: DiscoveryCandidate[];
+  /** 已接受邀约、等待到达的客户（到期进入预约清单） */
+  pendingArrivals: PendingArrival[];
+}
+
+// ============================================================
+// 发现客户（主动获客）
+// ============================================================
+
+/** 获客渠道配置（lib/data/discovery.ts 数据表） */
+export interface DiscoveryChannel {
+  id: string;
+  name: string;
+  cost: number;
+  desc: string;
+  /** 产出候选客户数量范围（含） */
+  minCount: number;
+  maxCount: number;
+  /** 邀约基础接受率 0-1（每 10 点声望 +2%，上限 +20%） */
+  acceptRate: number;
+  /** 声望门槛（如老客户转介） */
+  requireReputation?: number;
+}
+
+/** 发现但未决定是否邀约的候选客户 */
+export interface DiscoveryCandidate {
+  id: string;
+  /** 预生成的剧本（接受邀约后随到达日进入预约清单） */
+  scenario: PatientScenario;
+  /** 来源渠道 id */
+  channelId: string;
+  /** 过期日：休息日过后仍未邀约则自动清除 */
+  expireDay: number;
+}
+
+/** 已接受邀约、等待到达的客户 */
+export interface PendingArrival {
+  scenario: PatientScenario;
+  /** 计划到达日 */
+  arriveDay: number;
 }
 
 /** 一天内的时段 */

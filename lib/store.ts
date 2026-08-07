@@ -9,6 +9,7 @@ import type {
   ChoiceEffect,
   Achievement,
   PatientPalette,
+  PendingArrival,
 } from "./types";
 import {
   createInitialState,
@@ -29,6 +30,11 @@ import { allPatients } from "./data/patients";
 import { AchievementEngine } from "./engine/AchievementEngine";
 import { DialogueEngine } from "./engine/DialogueEngine";
 import { allSkills, allClinicUpgrades } from "./data/skills";
+import {
+  discoveryChannels,
+  inviteAcceptRate,
+  arrivalDayOffset,
+} from "./data/discovery";
 import { getSound } from "./audio/SoundManager";
 
 export type Scene =
@@ -40,7 +46,8 @@ export type Scene =
   | "letters"
   | "tracking"
   | "generator"
-  | "achievements";
+  | "achievements"
+  | "discover";
 
 export interface ToastItem {
   id: number;
@@ -130,6 +137,10 @@ export interface GameStore {
   buyUpgrade: (id: string) => void;
   generateScenario: (opts: Record<string, unknown>, random: boolean) => void;
   deleteScenario: (id: string) => void;
+  // —— 发现客户 ——
+  discover: (channelId: string) => Promise<void>;
+  invite: (candidateId: string) => void;
+  discardCandidate: (candidateId: string) => void;
   saveNow: () => void;
   // —— 会话结算（DialogueScene 调用）——
   finishSession: (
@@ -322,6 +333,47 @@ export const useGameStore = create<GameStore>((set, get) => {
           tone: "thanks",
         });
       }
+      // 发现客户：到期的已邀约客户入预约清单（满额顺延）；未邀约候选过期清除
+      const arrivedNames: string[] = [];
+      const keepArrivals: PendingArrival[] = [];
+      for (const a of g.pendingArrivals) {
+        if (a.arriveDay <= g.day) {
+          if (g.generatedScenarios.length < MAX_GENERATED) {
+            g.generatedScenarios.unshift(a.scenario);
+            arrivedNames.push(a.scenario.name);
+          } else {
+            keepArrivals.push({ ...a, arriveDay: g.day + 1 });
+          }
+        } else {
+          keepArrivals.push(a);
+        }
+      }
+      g.pendingArrivals = keepArrivals;
+      const candidatesBefore = g.discoveryCandidates.length;
+      g.discoveryCandidates = g.discoveryCandidates.filter(
+        (c) => c.expireDay > g.day
+      );
+      for (const name of arrivedNames) {
+        g.messages.unshift({
+          id: `arrive-${g.day}-${name}`,
+          kind: "notice",
+          title: "新客户到访",
+          body: `${name} 接受了你的邀约，今日到诊，已加入预约清单。`,
+          day: g.day,
+          read: false,
+          patientName: name,
+        });
+      }
+      if (g.discoveryCandidates.length < candidatesBefore) {
+        g.messages.unshift({
+          id: `expire-${g.day}`,
+          kind: "notice",
+          title: "邀约过期",
+          body: "部分潜在客户等你太久，已另寻其他咨询师。",
+          day: g.day,
+          read: false,
+        });
+      }
       let base = 15;
       if (g.clinicUpgrades.includes("rest_room")) base += 10;
       g.doctor.sanity = clamp(g.doctor.sanity + base, 0, 100);
@@ -424,6 +476,112 @@ export const useGameStore = create<GameStore>((set, get) => {
       g.generatedScenarios = g.generatedScenarios.filter((x) => x.id !== id);
       commit();
       toast("已移除该剧本");
+    },
+
+    discover: async (channelId: string) => {
+      const g = get().game;
+      const ch = discoveryChannels.find((c) => c.id === channelId);
+      if (!ch) return;
+      if (ch.requireReputation && g.doctor.reputation < ch.requireReputation) {
+        toast(`声望不足：需要 ${ch.requireReputation}`, "warn");
+        playSound("locked");
+        return;
+      }
+      if (g.doctor.money < ch.cost) {
+        toast(`金钱不足：需要 ${ch.cost} 金`, "warn");
+        playSound("locked");
+        return;
+      }
+      g.doctor.money -= ch.cost;
+      const { generateScenario: gen } = await import("./data/generator");
+      const count =
+        ch.minCount + Math.floor(Math.random() * (ch.maxCount - ch.minCount + 1));
+      const names: string[] = [];
+      for (let i = 0; i < count; i++) {
+        const s = gen({ excludeSeeds: g.usedSeeds }, g.doctor.reputation);
+        markSeedUsed(g, s);
+        g.discoveryCandidates.unshift({
+          id: `disc-${Date.now()}-${i}`,
+          scenario: s,
+          channelId,
+          expireDay: g.day + 1,
+        });
+        names.push(s.name);
+      }
+      g.messages.unshift({
+        id: `disc-${g.day}-${channelId}-${Date.now()}`,
+        kind: "notice",
+        title: "发现新客户",
+        body: `通过「${ch.name}」发现 ${count} 位潜在客户：${names.join("、")}。请决定是否发送邀约。`,
+        day: g.day,
+        read: false,
+        patientName: names[0],
+      });
+      commit();
+      playSound("page");
+      toast(`花费 ${ch.cost} 金，发现 ${count} 位潜在客户`, "ok");
+    },
+
+    invite: (candidateId: string) => {
+      const g = get().game;
+      const idx = g.discoveryCandidates.findIndex((c) => c.id === candidateId);
+      if (idx < 0) return;
+      const cand = g.discoveryCandidates[idx];
+      g.discoveryCandidates.splice(idx, 1);
+      const name = cand.scenario.name;
+      const rate = inviteAcceptRate(cand.channelId, g.doctor.reputation);
+      const accepted = Math.random() < rate;
+      if (accepted) {
+        let offset = arrivalDayOffset();
+        // 今日名额已满则顺延至明日
+        if (offset === 0 && g.slot >= MAX_SLOTS) offset = 1;
+        g.pendingArrivals.push({ scenario: cand.scenario, arriveDay: g.day + offset });
+        g.messages.unshift({
+          id: `invite-ok-${g.day}-${cand.scenario.id}`,
+          kind: "notice",
+          title: "邀约成功",
+          body: `${name} 接受了你的邀约，${offset === 0 ? "今日" : offset === 1 ? "明日" : "后日"}到诊。`,
+          day: g.day,
+          read: false,
+          patientName: name,
+        });
+        commit();
+        playSound("page");
+        toast(`${name} 接受了邀约`, "ok");
+      } else {
+        g.messages.unshift({
+          id: `invite-no-${g.day}-${cand.scenario.id}`,
+          kind: "notice",
+          title: "邀约被婉拒",
+          body: `${name} 婉拒了你的邀约，表示暂时不需要。`,
+          day: g.day,
+          read: false,
+          patientName: name,
+        });
+        commit();
+        playSound("locked");
+        toast(`${name} 婉拒了邀约`);
+      }
+    },
+
+    discardCandidate: (candidateId: string) => {
+      const g = get().game;
+      const idx = g.discoveryCandidates.findIndex((c) => c.id === candidateId);
+      if (idx < 0) return;
+      const cand = g.discoveryCandidates[idx];
+      g.discoveryCandidates.splice(idx, 1);
+      g.messages.unshift({
+        id: `discard-${g.day}-${cand.scenario.id}`,
+        kind: "notice",
+        title: "暂不考虑",
+        body: `${cand.scenario.name} 的邀约未发送，对方已另寻帮助。`,
+        day: g.day,
+        read: false,
+        patientName: cand.scenario.name,
+      });
+      commit();
+      playSound("click");
+      toast("已暂不考虑该候选");
     },
 
     saveNow: () => {

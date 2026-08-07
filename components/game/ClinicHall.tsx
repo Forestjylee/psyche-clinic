@@ -34,6 +34,19 @@ export function ClinicHall() {
   const allAvailable = [...allPatients, ...game.generatedScenarios].filter(
     (p) => !game.abandoned.includes(p.id)
   );
+  // 可对话：未完成且声望已解锁，或治愈回访已到访（探望非治疗）
+  const canTalk = (p: (typeof allAvailable)[number]) => {
+    if (!game.patientRecords[p.id]) {
+      if (p.requireReputation && game.doctor.reputation < p.requireReputation)
+        return false;
+      return true;
+    }
+    return !!game.returnVisits[p.id]?.arrived && !game.returnVisits[p.id]?.seen;
+  };
+  // 首页清单：今日已接诊的客户隐藏（次日恢复）；可对话的客户优先排顶部
+  const sortedAvailable = allAvailable
+    .filter((p) => !game.todayServed.includes(p.id))
+    .sort((a, b) => Number(canTalk(b)) - Number(canTalk(a)));
   const totalPatients = allAvailable.length;
   const achCount = achievementEngine
     ? Object.values(achievementEngine.getProgressMap()).filter((p) => p.unlocked).length
@@ -105,20 +118,27 @@ export function ClinicHall() {
       <div className="clinic-body">
         <div className="patient-section">
           <div className="section-title">
-            今 日 预 约 <span className="count">{totalPatients} 位客户</span>
+            今 日 预 约 <span className="count">{sortedAvailable.length} 位客户</span>
             <button
               className="patient-add-btn"
               onClick={() => {
                 playSound("page");
-                setScene("generator");
+                setScene("discover");
               }}
-              title="生成新客户"
+              title="花钱通过渠道触达潜在客户，主动邀约"
             >
-              ＋ 预约客户
+              ＋ 发现客户
             </button>
           </div>
           <div className="patient-list">
-            {allAvailable.map((p) => {
+            {sortedAvailable.length === 0 ? (
+              <div className="empty-state">
+                今日名额已用完。
+                <br />
+                点击「休息一日」进入下一天。
+              </div>
+            ) : null}
+            {sortedAvailable.map((p) => {
               const completed = game.patientRecords[p.id];
               const rv = game.returnVisits[p.id];
               const returning = !!rv?.arrived && !rv.seen;
@@ -126,7 +146,6 @@ export function ClinicHall() {
                 ? game.doctor.reputation < p.requireReputation
                 : false;
               const servedToday = game.todayServed.includes(p.id);
-              const isGenerated = p.id.startsWith("gen_");
               const waitDays = game.waitingDays[p.id] ?? 0;
               const alive = !completed && !locked;
               const decaying = alive && waitDays >= DECAY_START_DAY;
@@ -157,14 +176,6 @@ export function ClinicHall() {
                         {p.difficulty === "简单" ? "😊" : p.difficulty === "困难" ? "⚠" : "✦"}{" "}
                         {p.difficulty}
                       </span>
-                      {isGenerated ? (
-                        <span
-                          className="patient-difficulty"
-                          style={{ color: "var(--accent-2)", borderColor: "var(--accent-2)" }}
-                        >
-                          生成
-                        </span>
-                      ) : null}
                       {completed ? (
                         <span
                           className="patient-difficulty"

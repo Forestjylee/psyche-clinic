@@ -15,6 +15,7 @@ import { ClinicUpgrades } from "./ClinicUpgrades";
 import { MessageBox } from "./MessageBox";
 import { Tracking } from "./Tracking";
 import { Generator } from "./Generator";
+import { DiscoveryScene } from "./DiscoveryScene";
 import { AchievementsPage } from "./AchievementsPage";
 import { Onboarding } from "./Onboarding";
 import { Prologue } from "./Prologue";
@@ -60,6 +61,7 @@ export function GameApp() {
         {scene === "letters" ? <MessageBox /> : null}
         {scene === "tracking" ? <Tracking /> : null}
         {scene === "generator" ? <Generator /> : null}
+        {scene === "discover" ? <DiscoveryScene /> : null}
         {scene === "achievements" ? <AchievementsPage /> : null}
       </main>
       <div className={`sanity-vignette ${scene !== "title" && game.doctor.sanity <= 35 ? "active" : ""}`} />
