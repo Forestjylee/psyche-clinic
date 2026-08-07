@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import { allSkills } from "@/lib/data/skills";
 import type { Skill, SkillSchool } from "@/lib/types";
@@ -12,18 +13,108 @@ const schoolNames: Record<SkillSchool, string> = {
   pharmacology: "药物学派",
 };
 
-const schoolIcons: Record<SkillSchool, string> = {
-  psychoanalysis: "梦",
-  cbt: "理",
-  hypnosis: "眠",
-  pharmacology: "药",
-};
-
 const schoolDescriptions: Record<SkillSchool, string> = {
   psychoanalysis: "由梦境与潜意识入手，触及心灵深处的症结。",
   cbt: "用理性对话重塑认知，直面非理性信念。",
   hypnosis: "引导与暗示，深入意识的深水区。",
   pharmacology: "以药物辅助治疗，缓解顽固症状。",
+};
+
+/* —— 线描图标（SVG 手绘，统一 stroke 风格）—— */
+const ico = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.8,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
+
+// 学派图标（流派单选胶囊）
+const schoolIcons: Record<SkillSchool, ReactNode> = {
+  psychoanalysis: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <path d="M7.5 10a4.5 4.5 0 0 1 4.5-4.5c2 0 3.7 1.4 4.2 3.3a3.8 3.8 0 0 1 .3 5.2H8.2A3.5 3.5 0 0 1 7.5 10Z" />
+      <path d="M12 3.5 12.7 5l1.5.7-1.5.7L12 7.9l-.7-1.5-1.5-.7 1.5-.7Z" />
+    </svg>
+  ),
+  cbt: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M12 4.5v2.2M12 17.3v2.2M4.5 12h2.2M17.3 12h2.2M6.5 6.5l1.6 1.6M15.9 15.9l1.6 1.6M17.5 6.5l-1.6 1.6M8.1 15.9l-1.6 1.6" />
+    </svg>
+  ),
+  hypnosis: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <path d="M13 5a7 7 0 1 1-7 7 7 7 0 0 1 7-7Z" />
+      <path d="M13 9a3 3 0 1 0 3 3 3 3 0 0 0-3-3Z" />
+    </svg>
+  ),
+  pharmacology: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <rect x="7" y="3" width="10" height="18" rx="5" />
+      <path d="M7 9.5h10" />
+    </svg>
+  ),
+};
+
+// 技能专属图标（技能树节点）
+const skillIcons: Record<string, ReactNode> = {
+  freud_dream: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <path d="M7.5 10a4.5 4.5 0 0 1 4.5-4.5c2 0 3.7 1.4 4.2 3.3a3.8 3.8 0 0 1 .3 5.2H8.2A3.5 3.5 0 0 1 7.5 10Z" />
+      <path d="M12 3.5 12.7 5l1.5.7-1.5.7L12 7.9l-.7-1.5-1.5-.7 1.5-.7Z" />
+    </svg>
+  ),
+  free_association: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <circle cx="6" cy="6" r="2" />
+      <circle cx="18" cy="6" r="2" />
+      <circle cx="12" cy="18" r="2" />
+      <path d="M7.4 7.4l3.2 9.2M16.6 7.4l-3.2 9.2" />
+    </svg>
+  ),
+  cbt_basic: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M12 4.5v2.2M12 17.3v2.2M4.5 12h2.2M17.3 12h2.2M6.5 6.5l1.6 1.6M15.9 15.9l1.6 1.6M17.5 6.5l-1.6 1.6M8.1 15.9l-1.6 1.6" />
+    </svg>
+  ),
+  exposure_therapy: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6" />
+    </svg>
+  ),
+  hypnosis_basic: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <path d="M13 5a7 7 0 1 1-7 7 7 7 0 0 1 7-7Z" />
+      <path d="M13 9a3 3 0 1 0 3 3 3 3 0 0 0-3-3Z" />
+    </svg>
+  ),
+  hypnosis_deep: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <path d="M3.5 12c2-4 5-6 8.5-6s6.5 2 8.5 6c-2 4-5 6-8.5 6s-6.5-2-8.5-6Z" />
+      <circle cx="12" cy="12" r="2.5" />
+    </svg>
+  ),
+  pharma_basic: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <rect x="7" y="3" width="10" height="18" rx="5" />
+      <path d="M7 9.5h10" />
+    </svg>
+  ),
+  new_drug: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <path d="M9.5 3h5M10.5 3v5l-4.2 9.2a2 2 0 0 0 1.8 2.8h7.8a2 2 0 0 0 1.8-2.8L13.5 8V3" />
+      <path d="M8.6 15h6.8M12 11.5v3" />
+    </svg>
+  ),
+  crisis_intervention: (
+    <svg viewBox="0 0 24 24" {...ico}>
+      <path d="M12 3l6.5 2.8v5.2c0 4.3-2.8 7.4-6.5 9-3.7-1.6-6.5-4.7-6.5-9V5.8Z" />
+      <path d="M9.5 12h5M12 9.5v5" />
+    </svg>
+  ),
 };
 
 // —— 树状布局常量（文明科技树式：前置在左、后续在右，连线串联）——
@@ -199,7 +290,12 @@ export function SkillsTree() {
                       onClick={onClick}
                     >
                       <div className="tech-node-ico">
-                        {unlocked ? "✓" : schoolIcons[school]}
+                        {skillIcons[skill.id] ?? schoolIcons[skill.school]}
+                        {unlocked ? (
+                          <span className="tech-node-check" aria-hidden="true">
+                            ✓
+                          </span>
+                        ) : null}
                       </div>
                       <div className="tech-node-name">{skill.name}</div>
                       <div className="tech-node-cost">{skill.cost} EXP</div>
