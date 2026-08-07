@@ -1,0 +1,114 @@
+/* ============================================================
+   心理学词汇浮窗
+   ============================================================ */
+.psych-term {
+  display: inline-block;
+  padding: 0 2px;
+  border-bottom: 1px dashed var(--accent-2);
+  color: var(--accent-2);
+  font-weight: 600;
+  cursor: help;
+  transition: all 0.18s ease;
+  border-radius: 2px;
+}
+.psych-term:hover,
+.psych-term:focus {
+  background: rgba(232, 139, 106, 0.16);
+  border-bottom-color: var(--accent-2);
+  color: var(--text);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(232, 139, 106, 0.25);
+}
+.psych-term-tip {
+  position: fixed;
+  z-index: 9999;
+  width: 340px;
+  max-width: calc(100vw - 16px);
+  background: linear-gradient(160deg, #fffaf0, #f3ead9 80%);
+  border: 1px solid var(--border-glow);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 14px 16px 14px;
+  box-shadow: 0 14px 50px rgba(90,70,40,0.3), 0 0 0 1px rgba(201,168,106,0.2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: tip-in 180ms cubic-bezier(.2,.8,.2,1);
+}
+@keyframes tip-in {
+  from { opacity: 0; transform: translateY(-6px) scale(.98); }
+  to   { opacity: 1; transform: none; }
+}
+.psych-term-tip .tip-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.psych-term-tip .tip-title {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sev-dot {
+  display: inline-block;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.06);
+}
+.sev-dot.s1 { background: #7aa96f; }
+.sev-dot.s2 { background: #c5c359; }
+.sev-dot.s3 { background: #e0a85a; }
+.sev-dot.s4 { background: #d3795e; }
+.sev-dot.s5 { background: #d8536c; box-shadow: 0 0 8px #ff6b7d88; }
+
+.cat-tag {
+  font-size: 12px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  border: 1px solid;
+  margin-left: auto;
+  font-weight: 500;
+}
+.cat-tag.cat-symptom { color:#ff9ab0; border-color:#ff6b7d55; background:#ff6b7d18; }
+.cat-tag.cat-therapy { color:#8ad0b4; border-color:#5fd49a55; background:#5fd49a18; }
+.cat-tag.cat-theory  { color:#a7b8ff; border-color:#6b8eff55; background:#6b8eff18; }
+.cat-tag.cat-drug    { color:#ffc68a; border-color:#ffc06055; background:#ffc06018; }
+.cat-tag.cat-ethics  { color:#d8c0ff; border-color:#b4a0ff55; background:#b4a0ff18; }
+
+.tip-brief {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.tip-detail {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(201, 168, 106, 0.10);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+.tip-more-btn {
+  margin-top: 8px;
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 2px;
+}
+.tip-more-btn:hover { color: var(--accent-2); }
+.psych-term-tip .src {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  border-top: 1px dashed var(--border-soft);
+  padding-top: 6px;
+}
+

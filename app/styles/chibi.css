@@ -1,0 +1,323 @@
+/* ============================================================
+   Chibi 角色（CSS 手绘 · 大头圆身）
+   ============================================================ */
+.chibi {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  --chibi-head: var(--fig-color, #7c9eff);
+  --chibi-body: var(--fig-body, #5a6fa0);
+  filter: drop-shadow(0 6px 10px rgba(90, 70, 40, 0.2));
+  animation: chibi-breathe 4.5s ease-in-out infinite;
+}
+.chibi.size-sm { width: 46px; }
+.chibi.size-md { width: 72px; }
+.chibi.size-lg { width: 120px; }
+.chibi.size-xl { width: 216px; }
+
+.chibi-head {
+  position: relative;
+  width: 62%;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(180deg, var(--chibi-head), rgba(0, 0, 0, 0.16) 140%);
+  border-radius: 50% 50% 44% 44%;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.4), inset 0 -5px 10px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+.chibi-head::after {
+  content: "";
+  position: absolute;
+  top: 6%;
+  left: 18%;
+  width: 36%;
+  height: 30%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.65), transparent 70%);
+  border-radius: 50%;
+  opacity: 0.8;
+}
+.chibi-body {
+  position: relative;
+  width: 76%;
+  aspect-ratio: 1 / 0.82;
+  background: linear-gradient(180deg, var(--chibi-body), rgba(0, 0, 0, 0.16) 130%);
+  border-radius: 46% 46% 36% 36%;
+  margin-top: -8%;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 3px 6px rgba(255, 255, 255, 0.35), inset 0 -6px 12px rgba(0, 0, 0, 0.22);
+  z-index: 1;
+}
+.chibi-body::before {
+  content: "";
+  position: absolute;
+  top: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 34%;
+  height: 24%;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+}
+.chibi-face {
+  position: absolute;
+  inset: 0;
+}
+.chibi-eye {
+  position: absolute;
+  top: 42%;
+  width: 13%;
+  height: 17%;
+  border-radius: 50%;
+  background: rgba(30, 20, 10, 0.88);
+  box-shadow: inset 0 -1px 2px rgba(255, 255, 255, 0.4);
+}
+.chibi-eye.left { left: 24%; }
+.chibi-eye.right { right: 24%; }
+.chibi-mouth {
+  position: absolute;
+  bottom: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18%;
+  height: 10%;
+  border: 2px solid rgba(30, 20, 10, 0.82);
+  border-top: none;
+  border-radius: 0 0 50% 50%;
+}
+.chibi-cheek {
+  position: absolute;
+  top: 56%;
+  width: 12%;
+  height: 7%;
+  border-radius: 50%;
+  background: rgba(232, 106, 120, 0.35);
+}
+.chibi-cheek.left { left: 16%; }
+.chibi-cheek.right { right: 16%; }
+
+/* 情绪表情 */
+.chibi.emo-neutral .chibi-eye { height: 11%; }
+.chibi.emo-neutral .chibi-mouth { width: 13%; height: 6%; }
+.chibi.emo-anxious .chibi-eye {
+  width: 16%; height: 20%;
+  background: transparent;
+  border: 2px solid rgba(30, 20, 10, 0.85);
+}
+.chibi.emo-anxious .chibi-mouth { width: 22%; height: 8%; }
+.chibi.emo-angry .chibi-eye { width: 11%; height: 11%; }
+.chibi.emo-angry .chibi-mouth {
+  width: 20%; height: 6%;
+  border: 2px solid rgba(30, 20, 10, 0.85);
+  border-top: 2px solid rgba(30, 20, 10, 0.85);
+  border-radius: 0;
+}
+.chibi.emo-sad .chibi-eye { width: 11%; height: 9%; background: rgba(30, 20, 10, 0.7); }
+.chibi.emo-sad .chibi-eye.left::after {
+  content: "";
+  position: absolute;
+  right: -80%;
+  top: 50%;
+  width: 45%;
+  height: 70%;
+  border: 2px solid rgba(90, 150, 230, 0.9);
+  border-top: none;
+  border-radius: 0 0 50% 50%;
+}
+.chibi.emo-sad .chibi-mouth { width: 13%; height: 7%; border-bottom: none; border-radius: 50% 50% 0 0; }
+.chibi.emo-scared .chibi-eye {
+  width: 20%; height: 24%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(30, 20, 10, 0.8);
+}
+.chibi.emo-scared .chibi-eye::after {
+  content: "";
+  position: absolute;
+  top: 22%;
+  left: 22%;
+  width: 42%;
+  height: 42%;
+  border-radius: 50%;
+  background: rgba(30, 20, 10, 0.9);
+}
+.chibi.emo-scared .chibi-mouth {
+  width: 26%; height: 16%;
+  border: 2px solid rgba(30, 20, 10, 0.85);
+  border-radius: 50%;
+  background: rgba(30, 20, 10, 0.12);
+}
+.chibi.emo-calm .chibi-eye,
+.chibi.emo-happy .chibi-eye {
+  width: 16%; height: 8%;
+  background: transparent;
+  border: 2px solid rgba(30, 20, 10, 0.9);
+  border-top: none;
+  border-radius: 0 0 50% 50%;
+}
+.chibi.emo-happy .chibi-mouth {
+  width: 26%; height: 15%;
+  border: 2px solid rgba(30, 20, 10, 0.9);
+  border-top: none;
+  border-radius: 0 0 50% 50%;
+}
+.chibi.emo-broken .chibi-eye {
+  width: 13%; height: 3px;
+  background: rgba(30, 20, 10, 0.45);
+  border-radius: 0;
+  top: 50%;
+}
+.chibi.emo-broken .chibi-mouth {
+  width: 16%; height: 3px;
+  background: rgba(30, 20, 10, 0.45);
+  border: none;
+  border-radius: 0;
+}
+
+/* chibi 情绪动画 */
+.chibi.emo-anxious { animation: chibi-tremble 0.9s ease-in-out infinite; }
+.chibi.emo-angry { animation: chibi-shake 0.45s ease-in-out infinite; }
+.chibi.emo-scared { animation: chibi-tremble 0.6s ease-in-out infinite; }
+.chibi.emo-sad { animation: chibi-slump 5.5s ease-in-out infinite; }
+.chibi.emo-broken { animation: chibi-slump 7s ease-in-out infinite; }
+.chibi.emo-calm { animation: chibi-breathe 5.5s ease-in-out infinite; }
+.chibi.emo-happy { animation: chibi-breathe 3.6s ease-in-out infinite; }
+
+/* 眉毛：随情绪变化眉形（默认隐藏，按情绪显示） */
+.chibi-brow {
+  position: absolute;
+  top: 30%;
+  width: 20%;
+  height: 9%;
+  border-radius: 3px;
+  background: rgba(30, 20, 10, 0.82);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.35s ease, top 0.35s ease, background 0.35s ease;
+}
+.chibi-brow.left { left: 21%; }
+.chibi-brow.right { right: 21%; }
+
+.chibi.emo-neutral .chibi-brow,
+.chibi.emo-calm .chibi-brow { opacity: 1; transform: rotate(0deg); }
+.chibi.emo-happy .chibi-brow { opacity: 1; transform: rotate(-6deg); }
+.chibi.emo-happy .chibi-brow.right { transform: rotate(6deg); }
+.chibi.emo-angry .chibi-brow {
+  opacity: 1; top: 35%;
+  transform: rotate(22deg) translateY(2px);
+}
+.chibi.emo-angry .chibi-brow.right { transform: rotate(-22deg) translateY(2px); }
+.chibi.emo-sad .chibi-brow {
+  opacity: 1; top: 35%;
+  transform: rotate(-14deg) translateY(5px);
+}
+.chibi.emo-sad .chibi-brow.right { transform: rotate(14deg) translateY(5px); }
+.chibi.emo-scared .chibi-brow {
+  opacity: 1; top: 22%;
+  transform: rotate(-10deg);
+}
+.chibi.emo-scared .chibi-brow.right { transform: rotate(10deg); }
+.chibi.emo-anxious .chibi-brow {
+  opacity: 1; top: 27%;
+  transform: rotate(9deg);
+}
+.chibi.emo-anxious .chibi-brow.right { transform: rotate(-9deg); }
+.chibi.emo-broken .chibi-brow {
+  opacity: 1; top: 36%;
+  background: rgba(30, 20, 10, 0.4);
+}
+
+/* 泪滴：悲伤/崩溃时从眼角滑落 */
+.chibi-tear {
+  position: absolute;
+  top: 50%;
+  width: 6%;
+  height: 10%;
+  background: linear-gradient(180deg, rgba(150, 190, 255, 0.95), rgba(120, 170, 240, 0.75));
+  border-radius: 60% 60% 50% 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.chibi-tear.left { left: 33%; }
+.chibi-tear.right { right: 33%; }
+.chibi.emo-sad .chibi-tear,
+.chibi.emo-broken .chibi-tear {
+  opacity: 1;
+  animation: chibi-tear-fall 1.7s ease-in infinite;
+}
+@keyframes chibi-tear-fall {
+  0%   { transform: translateY(0) scaleY(0.6); opacity: 0; }
+  12%  { opacity: 0.95; }
+  100% { transform: translateY(340%) scaleY(1.2); opacity: 0; }
+}
+
+/* 汗滴：紧张/害怕时额头冒汗滑落 */
+.chibi-sweat {
+  position: absolute;
+  top: 15%;
+  right: 5%;
+  width: 8%;
+  height: 12%;
+  background: linear-gradient(180deg, rgba(150, 205, 255, 0.95), rgba(120, 180, 255, 0.7));
+  border-radius: 60% 60% 50% 50%;
+  opacity: 0;
+  transform: rotate(-8deg);
+  transition: opacity 0.3s ease;
+}
+.chibi.emo-anxious .chibi-sweat,
+.chibi.emo-scared .chibi-sweat {
+  opacity: 1;
+  animation: chibi-sweat-fall 1.9s ease-in infinite;
+}
+@keyframes chibi-sweat-fall {
+  0%   { transform: rotate(-8deg) translateY(0); opacity: 0; }
+  12%  { opacity: 0.95; }
+  100% { transform: rotate(-8deg) translateY(430%); opacity: 0; }
+}
+
+/* 柔和情绪周期性眨眼 */
+.chibi.emo-neutral .chibi-eye,
+.chibi.emo-calm .chibi-eye,
+.chibi.emo-happy .chibi-eye {
+  animation: chibi-blink 4.8s ease-in-out infinite;
+}
+@keyframes chibi-blink {
+  0%, 44%, 50%, 100% { transform: scaleY(1); }
+  46%, 48%           { transform: scaleY(0.12); }
+}
+
+/* 情绪切换时眼/嘴/腮红平滑过渡 */
+.chibi-face .chibi-eye,
+.chibi-face .chibi-mouth,
+.chibi-face .chibi-cheek {
+  transition: width 0.35s ease, height 0.35s ease, top 0.35s ease,
+    border-radius 0.35s ease, transform 0.35s ease, background 0.35s ease,
+    border-width 0.35s ease, border-color 0.35s ease;
+}
+
+@keyframes chibi-breathe {
+  0%, 100% { transform: scaleY(1) translateY(0); }
+  50%      { transform: scaleY(1.015) translateY(-3px); }
+}
+@keyframes chibi-tremble {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-1.5px) rotate(-0.4deg); }
+  75% { transform: translateX(1.5px) rotate(0.4deg); }
+}
+@keyframes chibi-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px) rotate(-0.6deg); }
+  40% { transform: translateX(3px) rotate(0.6deg); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+@keyframes chibi-slump {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(6px) scaleY(0.97); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chibi, .chibi.emo-anxious, .chibi.emo-angry, .chibi.emo-scared,
+  .chibi.emo-sad, .chibi.emo-broken, .chibi.emo-calm, .chibi.emo-happy {
+    animation: none;
+  }
+}
+

@@ -1,0 +1,200 @@
+/* ========== 发现客户（主动获客 v0.4.0） ========== */
+.discover-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.discover-section {
+  margin-bottom: 26px;
+}
+
+.discover-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.discover-channels {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.discover-channel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.15s;
+}
+
+.discover-channel:hover {
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent);
+}
+
+.discover-channel.locked {
+  opacity: 0.55;
+}
+
+.discover-channel.locked:hover {
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.discover-channel-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.discover-channel-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.discover-channel-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.discover-channel-cost {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.discover-channel-out {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.discover-channel-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 1px;
+}
+
+.discover-channel-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+}
+
+.discover-channel-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.discover-candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.discover-candidate {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  transition: all 0.15s;
+}
+
+.discover-candidate:hover {
+  border-color: var(--accent);
+}
+
+.discover-candidate-avatar {
+  flex-shrink: 0;
+}
+
+.discover-candidate-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.discover-candidate-name {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.discover-candidate-intro {
+  font-size: 12px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.discover-candidate-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.discover-invite-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.discover-invite-btn:hover {
+  filter: brightness(1.1);
+}
+
+.discover-discard-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.discover-discard-btn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.discover-note {
+  margin-top: auto;
+  padding-top: 18px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.8;
+  text-align: center;
+}
+

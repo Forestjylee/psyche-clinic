@@ -1,0 +1,464 @@
+/* ========== 通用面板视图（技能/升级/信件/工坊）========== */
+.panel-view {
+  overflow-y: auto;
+  padding: 28px 40px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 240, 0.5), transparent 300px),
+    var(--bg-deep);
+}
+
+.panel-view h2 {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  margin-bottom: 6px;
+  letter-spacing: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.panel-view h2::before {
+  content: "";
+  width: 4px;
+  height: 26px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border-radius: 2px;
+  box-shadow: var(--glow-accent);
+}
+
+.panel-view .subtitle {
+  color: var(--text-dim);
+  margin-bottom: 24px;
+  font-size: 14px;
+  padding-left: 16px;
+}
+
+/* 技能树 */
+.skill-school {
+  margin-bottom: 28px;
+}
+
+.skill-school-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.skill-school-title::before {
+  content: "▸";
+  color: var(--accent);
+}
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.skill-card {
+  background: linear-gradient(135deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-card);
+}
+
+.skill-card.unlocked {
+  border-color: var(--good);
+  background: linear-gradient(135deg, var(--bg-panel), rgba(95, 212, 154, 0.06));
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 16px rgba(95, 212, 154, 0.15);
+}
+
+.skill-card.can-learn {
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 16px var(--accent-glow);
+}
+
+.skill-card.locked { opacity: 0.5; }
+
+.skill-name {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skill-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.skill-action {
+  width: 100%;
+  padding: 9px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+}
+
+.skill-action.learn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  box-shadow: 0 3px 12px var(--accent-glow);
+}
+.skill-action.learn:hover { transform: translateY(-1px); }
+.skill-action.learned {
+  background: linear-gradient(135deg, var(--good), #3aa878);
+  color: white;
+}
+.skill-action.cant {
+  background: var(--bg-card);
+  color: var(--text-muted);
+}
+
+/* —— 技能树 · 文明科技树式树状布局 —— */
+/* 流派单选胶囊 */
+.tech-school-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.tech-school-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 16px 9px 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-dim);
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.tech-school-option:hover {
+  border-color: var(--border-glow);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+.tech-school-option.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--glow-accent);
+}
+.tech-school-option-ico {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  background: rgba(122, 174, 255, 0.14);
+  border: 1px solid rgba(122, 174, 255, 0.3);
+  color: inherit;
+}
+.tech-school-option.active .tech-school-option-ico {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.tech-school-option-count {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+  margin-left: 2px;
+}
+.tech-school-option-ico svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+.tech-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.tech-school-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 14px;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tech-school-desc {
+  display: block;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+.tech-school-ico {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(122, 174, 255, 0.12);
+  border: 1px solid rgba(122, 174, 255, 0.35);
+}
+.tech-school-ico svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  color: var(--accent);
+}
+.tech-canvas {
+  position: relative;
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+}
+.tech-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.tech-line {
+  fill: none;
+  stroke: rgba(224, 192, 112, 0.65);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 6 5; /* 虚线增强科技树连线感 */
+  filter: drop-shadow(0 0 2px rgba(224, 192, 112, 0.25));
+}
+.tech-line.done {
+  stroke: var(--good);
+  stroke-dasharray: none;
+  opacity: 0.95;
+}
+
+.tech-node {
+  position: absolute;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.15s;
+  z-index: 1;
+}
+.tech-node:hover { transform: translateY(-3px); z-index: 10; }
+.tech-node-ico {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 2px solid var(--border-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition: all 0.2s;
+}
+.tech-node-ico svg {
+  width: 30px;
+  height: 30px;
+  display: block;
+  color: var(--text-dim);
+}
+.tech-node.unlocked .tech-node-ico {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(224, 192, 112, 0.2), rgba(224, 192, 112, 0.06));
+  box-shadow: 0 0 18px rgba(224, 192, 112, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.tech-node.unlocked .tech-node-ico svg {
+  color: var(--gold);
+}
+.tech-node.can-learn .tech-node-ico {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  animation: tech-pulse 2.2s ease-in-out infinite;
+}
+.tech-node.locked .tech-node-ico {
+  opacity: 0.5;
+  filter: grayscale(0.6);
+}
+/* 习得标记：右下角小勾，不覆盖图标本体 */
+.tech-node-check {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: var(--good);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  line-height: 1;
+}
+@keyframes tech-pulse {
+  0%, 100% { box-shadow: 0 0 12px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.7); }
+  50% { box-shadow: 0 0 26px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.7); }
+}
+.tech-node-name {
+  margin-top: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.3;
+  color: var(--text);
+}
+.tech-node-cost {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.tech-node-action {
+  font-size: 11.5px;
+  color: var(--accent);
+  margin-top: 5px;
+  font-weight: 700;
+}
+.tech-node.locked .tech-node-action { color: var(--text-muted); }
+
+/* 技能悬停描述浮层 */
+.tech-tip {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  width: 230px;
+  background: var(--bg-panel-2);
+  border: 1px solid var(--border);
+  padding: 10px 13px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.65;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 30;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+}
+.tech-node:hover .tech-tip { opacity: 1; }
+
+/* 信件 */
+.letters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.letter-card {
+  background: linear-gradient(135deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 18px 22px;
+  box-shadow: var(--shadow-card);
+}
+
+.letter-card.thanks { border-left-color: var(--good); }
+.letter-card.neutral { border-left-color: var(--warn); }
+.letter-card.sad { border-left-color: var(--accent); }
+.letter-card.dark { border-left-color: var(--bad); }
+
+.letter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.letter-from-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.letter-avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(150deg, var(--bg-card-hi), var(--bg-panel-2));
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.letter-avatar .chibi {
+  filter: none;
+  animation-duration: 3.5s;
+}
+.letter-from { font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.letter-date { color: var(--text-muted); flex-shrink: 0; }
+
+.letter-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.letter-content {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 2;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* 来信卡片可点击 → 弹信纸 */
+.letter-card.clickable {
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.letter-card.clickable:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow-card);
+  transform: translateY(-1px);
+}
+.letter-content.clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.letter-open-hint {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--accent);
+  opacity: 0.8;
+  letter-spacing: 1px;
+}
+

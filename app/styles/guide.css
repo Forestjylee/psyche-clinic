@@ -1,0 +1,188 @@
+/* ============================================================
+   新手引导（首次游玩分步高亮）
+   ============================================================ */
+.onboarding {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  pointer-events: none;
+}
+.onboarding-mask {
+  position: fixed;
+  background: rgba(30, 22, 12, 0.55);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+.onboarding-hole {
+  position: fixed;
+  border-radius: 14px;
+  border: 2px solid rgba(246, 165, 92, 0.9);
+  box-shadow: 0 0 0 4px rgba(246, 165, 92, 0.25), 0 0 40px rgba(246, 165, 92, 0.45);
+  pointer-events: auto;
+  animation: onboarding-pulse 1.8s ease-in-out infinite;
+}
+.onboarding-hole-shadow {
+  position: fixed;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: 0 0 0 9999px rgba(30, 22, 12, 0.55);
+  pointer-events: none;
+}
+@keyframes onboarding-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(246, 165, 92, 0.25), 0 0 40px rgba(246, 165, 92, 0.45); }
+  50%      { box-shadow: 0 0 0 8px rgba(246, 165, 92, 0.12), 0 0 60px rgba(246, 165, 92, 0.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-hole { animation: none; }
+}
+.onboarding-tooltip {
+  position: fixed;
+  left: 50%;
+  bottom: 60px;
+  transform: translateX(-50%);
+  width: min(440px, calc(100vw - 48px));
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  padding: 20px 24px 18px;
+  box-shadow: var(--shadow-deep), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  pointer-events: auto;
+  text-align: left;
+  animation: fadeInUp 0.35s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translate(-50%, 16px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+.onboarding-tooltip-title {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.onboarding-tooltip-text {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+.onboarding-tooltip-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.onboarding-skip {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: color 0.2s;
+}
+.onboarding-skip:hover { color: var(--text); background: var(--bg-panel-2); }
+.onboarding-next {
+  padding: 10px 28px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: 14px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35), 0 4px 12px rgba(90, 70, 40, 0.2);
+  transition: transform 0.15s;
+}
+.onboarding-next:hover { transform: translateY(-1px); }
+
+/* ===== 引导·对话玩法全屏速览 ===== */
+.onboarding-full {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 22, 12, 0.62);
+  backdrop-filter: blur(3px);
+}
+.onboarding-full-panel {
+  width: 460px;
+  max-width: 90vw;
+  padding: 32px 36px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  animation: onboarding-full-in 0.35s ease;
+}
+.onboarding-full-title {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: var(--text);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.onboarding-full-text {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.onboarding-full-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin-bottom: 20px;
+}
+.onboarding-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.onboarding-stat-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.onboarding-stat-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  min-width: 40px;
+}
+.onboarding-stat-desc {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.onboarding-stat-bar {
+  height: 9px;
+  border-radius: 5px;
+  background: var(--bg-darker);
+  overflow: hidden;
+}
+.onboarding-stat-fill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  box-shadow: 0 0 8px currentColor;
+  transition: width 0.5s ease;
+}
+.onboarding-full-extra {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-dim);
+  padding: 13px 16px;
+  border-radius: 10px;
+  background: rgba(240, 160, 80, 0.09);
+  border-left: 3px solid var(--accent);
+  margin-bottom: 22px;
+}
+@keyframes onboarding-full-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+

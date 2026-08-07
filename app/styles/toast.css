@@ -1,0 +1,22 @@
+/* ========== Toast ========== */
+.toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 14px;
+  z-index: 400;
+  box-shadow: var(--shadow-deep), 0 0 24px var(--accent-glow);
+  animation: toastIn 0.3s ease;
+  letter-spacing: 1px;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+

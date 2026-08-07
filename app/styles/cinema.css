@@ -1,0 +1,127 @@
+/* ========== 电影感增强层 ========== */
+
+/* —— 患者剪影：情绪驱动呼吸 / 颤抖 / 摇晃 / 垂落 —— */
+.patient-silhouette {
+  animation: fig-breathe 4.5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.patient-silhouette.emo-anxious { animation: fig-tremble 0.9s ease-in-out infinite; }
+.patient-silhouette.emo-angry   { animation: fig-shake 0.45s ease-in-out infinite; }
+.patient-silhouette.emo-scared  { animation: fig-tremble 0.6s ease-in-out infinite; }
+.patient-silhouette.emo-sad     { animation: fig-slump 5.5s ease-in-out infinite; }
+.patient-silhouette.emo-broken  { animation: fig-slump 7s ease-in-out infinite; filter: blur(3px) saturate(0.6); opacity: 0.6; }
+.patient-silhouette.emo-calm    { animation: fig-breathe 5.5s ease-in-out infinite; }
+.patient-silhouette.emo-happy   { animation: fig-breathe 3.6s ease-in-out infinite; }
+
+@keyframes fig-breathe {
+  0%, 100% { transform: scaleY(1) translateY(0); }
+  50%      { transform: scaleY(1.015) translateY(-3px); }
+}
+@keyframes fig-tremble {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-1.5px) rotate(-0.4deg); }
+  75% { transform: translateX(1.5px) rotate(0.4deg); }
+}
+@keyframes fig-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px) rotate(-0.6deg); }
+  40% { transform: translateX(3px) rotate(0.6deg); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+@keyframes fig-slump {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(6px) scaleY(0.97); }
+}
+
+/* —— 打字机光标 —— */
+.dialogue-text.typing::after {
+  content: "▌";
+  color: var(--accent);
+  margin-left: 2px;
+  animation: caret-blink 0.8s steps(1) infinite;
+  opacity: 0.7;
+}
+@keyframes caret-blink { 50% { opacity: 0; } }
+
+/* 选项入场：文本打完后逐条浮现 */
+.choices .choice,
+.choices .continue-btn {
+  animation: choice-in 0.35s ease both;
+}
+.choices .choice:nth-child(2) { animation-delay: 0.06s; }
+.choices .choice:nth-child(3) { animation-delay: 0.12s; }
+.choices .choice:nth-child(4) { animation-delay: 0.18s; }
+.choices .choice:nth-child(5) { animation-delay: 0.24s; }
+@keyframes choice-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* 打字过程中隐藏选项，避免误触 */
+.dialogue-text.typing ~ .choices { opacity: 0.35; pointer-events: none; transition: opacity 0.3s; }
+
+/* —— 低理智暗角 + 心跳 —— */
+.sanity-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0;
+  box-shadow: inset 0 0 200px 40px rgba(255, 60, 80, 0);
+  transition: box-shadow 1.2s ease, opacity 0.6s ease;
+}
+.sanity-vignette.active {
+  opacity: 1;
+  animation: heartbeat 1.1s ease-in-out infinite;
+}
+@keyframes heartbeat {
+  0%, 100% { box-shadow: inset 0 0 180px 30px rgba(255, 60, 80, 0.18); }
+  50%      { box-shadow: inset 0 0 220px 60px rgba(255, 60, 80, 0.34); }
+}
+
+/* —— 场景转场遮罩 —— */
+.scene-veil {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-darker);
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.32s ease;
+}
+.scene-veil.show { opacity: 1; }
+
+/* 患者立绘舞台微微浮动光斑，增加「活着」的感觉 */
+.patient-stage-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.04), transparent 40%);
+  animation: stage-drift 14s ease-in-out infinite alternate;
+}
+@keyframes stage-drift {
+  from { transform: translate(-6%, -4%); }
+  to   { transform: translate(6%, 4%); }
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 900px) {
+  .dialogue-scene {
+    grid-template-columns: 1fr;
+    grid-template-rows: 38% 62%;
+  }
+  .patient-stage {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .clinic-body { grid-template-columns: 1fr; }
+  .clinic-header { flex-direction: column; align-items: flex-start; }
+  .title-main { font-size: 42px; letter-spacing: 8px; }
+  .hud-stats { gap: 4px; }
+  .hud-stat { padding: 4px 8px; }
+  .hud-stat-bar { width: 36px; }
+  .ach-banner-inner { flex-direction: column; align-items: flex-start !important; }
+  .ach-banner-ring { align-self: center; }
+  .ach-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important; }
+}
+

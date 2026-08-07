@@ -1,0 +1,85 @@
+/* ============================================================
+   记忆碎片闪回（扎心瞬间）
+   ============================================================ */
+.memory-flash {
+  position: fixed;
+  left: 0; right: 0; top: 64px; bottom: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(8, 10, 16, 0.84);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  animation: memory-flash-in 0.28s ease-out;
+}
+.memory-flash-card {
+  max-width: 560px;
+  width: 92%;
+  background:
+    linear-gradient(160deg, rgba(28, 33, 48, 0.98), rgba(15, 18, 28, 0.98));
+  border: 1px solid rgba(140, 170, 220, 0.35);
+  border-radius: 18px;
+  padding: 30px 34px;
+  color: #dbe3f2;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 28px 70px rgba(0, 0, 0, 0.65);
+  animation: memory-card-in 0.38s ease-out;
+}
+.memory-flash-title {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #9db6e0;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.memory-flash-title::before {
+  content: "◇";
+  color: rgba(150, 180, 230, 0.6);
+  font-size: 13px;
+}
+.memory-flash-text {
+  font-size: 15.5px;
+  line-height: 2.05;
+  color: #c6d0e2;
+  white-space: pre-line;
+}
+.memory-flash-close {
+  margin: 20px auto 0;
+  display: block;
+  padding: 10px 30px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+.memory-flash-close:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+@keyframes memory-flash-in {
+  from { background: rgba(8, 10, 16, 0); }
+  to   { background: rgba(8, 10, 16, 0.84); }
+}
+@keyframes memory-card-in {
+  from { transform: translateY(16px) scale(0.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* 闪回浮层在极矮屏下的压缩 */
+@media (max-height: 600px) {
+  .memory-flash-card { padding: 22px 24px; }
+  .memory-flash-title { font-size: 14px; margin-bottom: 12px; }
+  .memory-flash-text { font-size: 13.5px; line-height: 1.9; }
+}
+

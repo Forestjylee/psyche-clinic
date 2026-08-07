@@ -1,0 +1,208 @@
+/* ========== 顶部游戏化 HUD ========== */
+.hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: linear-gradient(180deg, rgba(255, 250, 240, 0.98), rgba(243, 234, 217, 0.92));
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 100;
+  gap: 16px;
+  box-shadow: 0 3px 16px rgba(90, 70, 40, 0.22);
+}
+
+/* HUD 底部装饰金线 */
+.hud::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--accent) 50%, var(--gold) 80%, transparent);
+  opacity: 0.5;
+}
+
+.hud-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 20px;
+  border-right: 1px solid var(--border);
+  height: 40px;
+}
+
+.hud-emblem {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--bg-panel), var(--bg-panel-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--glow-accent), inset 0 1px 0 rgba(255,255,255,0.5);
+  flex-shrink: 0;
+  padding: 2px;
+}
+.hud-emblem-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hud-title {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+}
+
+.hud-stats {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 资源胶囊 */
+.hud-stat {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13.5px;
+  transition: all 0.2s;
+}
+.hud-stat:hover {
+  border-color: var(--border-glow);
+  background: var(--bg-panel-2);
+}
+
+/* 资源用途浮窗（悬停显示） */
+.hud-stat-tip {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  width: 250px;
+  background: var(--bg-panel-2);
+  border: 1px solid var(--border-glow);
+  border-radius: 12px;
+  padding: 11px 14px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.16s, transform 0.16s;
+  z-index: 130;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+.hud-stat:hover .hud-stat-tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.hud-tip-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 1px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--border);
+}
+.hud-tip-line {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+.hud-stat-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.hud-stat-icon.rep { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; }
+.hud-stat-icon.san { background: linear-gradient(135deg, var(--good), #3aa878); color: white; }
+.hud-stat-icon.gold { background: linear-gradient(135deg, var(--gold), var(--gold-deep)); color: #2a2010; }
+.hud-stat-icon.lvl { background: linear-gradient(135deg, var(--accent-2), #7a5ad0); color: white; }
+
+.hud-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.hud-stat-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.hud-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hud-stat-bar {
+  width: 54px;
+  height: 6px;
+  background: var(--bg-darker);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+
+.hud-stat-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.hud-stat-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.hud-day {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 7px 14px;
+  background: linear-gradient(135deg, rgba(224, 192, 112, 0.12), rgba(224, 192, 112, 0.04));
+  border: 1px solid rgba(224, 192, 112, 0.3);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+

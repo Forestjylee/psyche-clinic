@@ -1,0 +1,96 @@
+/* ========== 全局变量 · 暖色开罗风格主题 ========== */
+:root {
+  --bg-deep: #f7f2e8;
+  --bg-darker: #efe7d8;
+  --bg-panel: #fffaf0;
+  --bg-panel-2: #f3ead9;
+  --bg-card: #fff6e6;
+  --bg-card-hi: #ffe9c4;
+  --border: #d9c9a8;
+  --border-soft: #e6d9c0;
+  --border-glow: #c9a86a;
+  --text: #3d3427;
+  --text-dim: #6b5f4c;
+  --text-muted: #9a8c74;
+  --accent: #f0a050;
+  --accent-2: #e88b6a;
+  --accent-3: #8a9a5b;
+  --accent-glow: rgba(240, 160, 80, 0.35);
+  --good: #5fb98a;
+  --bad: #e06b6b;
+  --warn: #e8a84c;
+  --truth: #9a7dd0;
+  --gold: #c9a86a;
+  --gold-deep: #a88750;
+  --shadow-card: 0 4px 12px rgba(90, 70, 40, 0.16), 0 1px 3px rgba(90, 70, 40, 0.12);
+  --shadow-deep: 0 12px 32px rgba(90, 70, 40, 0.22);
+  --glow-accent: 0 0 20px rgba(240, 160, 80, 0.25);
+  --font-serif: "Noto Serif SC", "Songti SC", serif;
+  --font-sans: "Noto Sans SC", system-ui, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-darker);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(240, 160, 80, 0.12), transparent 55%),
+    radial-gradient(ellipse at 85% 80%, rgba(232, 139, 106, 0.10), transparent 55%),
+    var(--bg-darker);
+}
+
+/* 全局噪点纹理，增加质感 */
+#app::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* ========== 场景容器 ========== */
+.scene {
+  position: absolute;
+  inset: 64px 0 0 0;
+  overflow: hidden;
+  z-index: 2;
+}
+
