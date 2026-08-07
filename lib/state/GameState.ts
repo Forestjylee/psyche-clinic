@@ -158,6 +158,7 @@ export function createInitialState(): GameState {
     returnVisits: {},
     discoveryCandidates: [],
     pendingArrivals: [],
+    facilityPositions: {},
     stats: {
       discoverCount: 0,
       channelsUsed: [],
@@ -188,6 +189,8 @@ export function migrateGameState(data: GameState): GameState {
   // 发现客户：候选与待到达队列（旧存档补默认空）
   if (!Array.isArray(data.discoveryCandidates)) data.discoveryCandidates = [];
   if (!Array.isArray(data.pendingArrivals)) data.pendingArrivals = [];
+  // 装修模式：设施位置（旧存档补默认空）
+  if (!data.facilityPositions) data.facilityPositions = {};
   // 成就统计（旧存档补默认）
   if (!data.stats) {
     data.stats = {

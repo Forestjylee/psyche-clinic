@@ -30,6 +30,18 @@ export interface FacilityClickedEvent {
   id: string;
 }
 
+/** 装修模式落格：设施 id + 新位置（逻辑坐标） */
+export interface FacilityDroppedEvent {
+  id: string;
+  x: number;
+  y: number;
+}
+
+/** 候诊患者变更：通知 Phaser 刷新候诊小人 */
+export interface RefreshPatientsEvent {
+  ids: string[];
+}
+
 export interface DoctorArrivedEvent {
   x: number;
   y: number;

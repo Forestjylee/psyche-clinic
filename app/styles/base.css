@@ -9,9 +9,9 @@
   --border: #d9c9a8;
   --border-soft: #e6d9c0;
   --border-glow: #c9a86a;
-  --text: #3d3427;
-  --text-dim: #6b5f4c;
-  --text-muted: #9a8c74;
+  --text: #33291f;
+  --text-dim: #574a36;
+  --text-muted: #8a7a61;
   --accent: #f0a050;
   --accent-2: #e88b6a;
   --accent-3: #8a9a5b;
@@ -27,6 +27,26 @@
   --glow-accent: 0 0 20px rgba(240, 160, 80, 0.25);
   --font-serif: "Noto Serif SC", "Songti SC", serif;
   --font-sans: "Noto Sans SC", system-ui, sans-serif;
+
+  /* ===== 纸木质质感（治愈系手绘，非开罗像素） ===== */
+  --paper: #fffaf0;              /* 纸感底色（米白） */
+  --paper-hi: #fffdf6;           /* 纸面高光 */
+  --paper-border: #d8c7a3;       /* 手绘感细描边（暖米线） */
+  --wood: #e6d2ae;               /* 浅木色底 */
+  --wood-deep: #c9a86a;          /* 木纹深色描边 */
+  --ink: #2e2418;                /* 墨色文字：高对比正文 */
+  --ink-dim: #574a36;            /* 次要墨色 */
+  --shadow-paper: 0 2px 10px rgba(90, 70, 40, 0.10), 0 1px 2px rgba(90, 70, 40, 0.08);
+
+  /* ===== 可读性：字号 / 图标基准（偏大、清晰、高对比） ===== */
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 15px;                 /* 正文基准 */
+  --fs-lg: 18px;
+  --fs-xl: 24px;
+  --icon-sm: 18px;               /* 小图标（HUD 胶囊/徽标） */
+  --icon-md: 22px;               /* 图标基准（底部栏） */
+  --icon-lg: 26px;               /* 大图标（面板入口） */
 }
 
 * {
@@ -44,10 +64,34 @@ body {
 body {
   font-family: var(--font-sans);
   background: var(--bg-darker);
-  color: var(--text);
-  font-size: 14px;
+  color: var(--ink);
+  font-size: var(--fs-md);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 纸木质通用：面板 / 卡片统一质感（治愈手绘，非开罗像素） ===== */
+.paper-surface {
+  background: linear-gradient(150deg, var(--paper-hi), var(--paper));
+  border: 1px solid var(--paper-border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-paper), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+/* 手绘感描边：外圈 2px 浅木色，模拟纸张/木板边缘 */
+.paper-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(201, 168, 106, 0.28);
+  pointer-events: none;
+}
+/* 木纹底（深色木牌，用于底栏/关键按钮） */
+.wood-surface {
+  background: linear-gradient(160deg, var(--wood), var(--wood-deep));
+  border: 1px solid var(--wood-deep);
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(90, 70, 40, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 #app {
@@ -55,11 +99,27 @@ body {
   width: 100vw;
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse at 15% 20%, rgba(240, 160, 80, 0.12), transparent 55%),
-    radial-gradient(ellipse at 85% 80%, rgba(232, 139, 106, 0.10), transparent 55%),
-    var(--bg-darker);
+  /* 场景背景：按 data-scene 切换（AI 治愈系插画，全屏 cover），暖色光晕叠加其上 */
+  --scene-bg: url("/images/clinic-bg.jpg");
+  background-image:
+    radial-gradient(ellipse at 15% 20%, rgba(240, 160, 80, 0.10), transparent 55%),
+    radial-gradient(ellipse at 85% 80%, rgba(232, 139, 106, 0.08), transparent 55%),
+    var(--scene-bg);
+  background-size: auto, auto, cover;
+  background-position: center;
 }
+/* 各场景背景图（用户用 AI 工具生成后替换 URL）
+   待生成：clinic-hall.jpg（大厅，现用 clinic-bg.jpg 顶）、consult-room.jpg（诊室）、
+           desk-corner.jpg（功能面板共用）、garden.jpg（休息日，可选） */
+#app[data-scene="title"] { --scene-bg: url("/images/title-bg.jpg"); }
+#app[data-scene="clinic"] { --scene-bg: url("/images/clinic-bg.jpg"); }
+#app[data-scene="dialogue"] { --scene-bg: url("/images/clinic-bg.jpg"); }
+#app[data-scene="skills"],
+#app[data-scene="letters"],
+#app[data-scene="tracking"],
+#app[data-scene="discover"],
+#app[data-scene="achievements"],
+#app[data-scene="generator"] { --scene-bg: url("/images/clinic-bg.jpg"); }
 
 /* 全局噪点纹理，增加质感 */
 #app::before {

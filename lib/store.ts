@@ -135,6 +135,8 @@ export interface GameStore {
   restOneDay: () => void;
   learnSkill: (id: string) => void;
   buyUpgrade: (id: string) => void;
+  /** 装修模式：保存设施摆放位置（仅视觉） */
+  setFacilityPosition: (id: string, x: number, y: number) => void;
   generateScenario: (opts: Record<string, unknown>, random: boolean) => void;
   deleteScenario: (id: string) => void;
   // —— 发现客户 ——
@@ -455,6 +457,13 @@ export const useGameStore = create<GameStore>((set, get) => {
         playSound("click");
         toast(`已购置：${up.name}`);
       }
+    },
+
+    setFacilityPosition: (id: string, x: number, y: number) => {
+      const g = get().game;
+      if (!g.facilityPositions) g.facilityPositions = {};
+      g.facilityPositions[id] = { x, y };
+      commit();
     },
 
     generateScenario: (opts: Record<string, unknown>, random: boolean) => {

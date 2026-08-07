@@ -12,10 +12,12 @@ export const EVENTS = {
   backToHall: "backToHall",
   decorateMode: "decorateMode",
   syncFacilities: "syncFacilities",
+  refreshPatients: "refreshPatients",
   // Phaser → React 交互
   sceneReady: "sceneReady",
   patientClicked: "patientClicked",
   facilityClicked: "facilityClicked",
+  facilityDropped: "facilityDropped",
   doctorArrived: "doctorArrived",
   doorClicked: "doorClicked",
   patientMoveDone: "patientMoveDone",

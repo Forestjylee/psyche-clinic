@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import { getSound } from "@/lib/audio/SoundManager";
 import { HUD } from "./HUD";
+import { BottomBar } from "./BottomBar";
 import { Overlays } from "./Overlays";
 import { EndingOverlay } from "./EndingOverlay";
 import { AchievementUnlockToast } from "./AchievementUnlockToast";
@@ -52,7 +53,8 @@ export function GameApp() {
   return (
     <>
       <HUD />
-      <main id="app" key={scene} className="scene-root">
+      <BottomBar />
+      <main id="app" key={scene} className="scene-root" data-scene={scene}>
         {scene === "title" ? <TitleScreen /> : null}
         {scene === "clinic" ? <ClinicHallScene /> : null}
         {scene === "dialogue" ? <DialogueScene /> : null}

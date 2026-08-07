@@ -237,6 +237,12 @@ export interface ClinicUpgrade {
   unlocked?: boolean;
 }
 
+/** 设施在场景中的摆放位置（逻辑坐标，仅视觉不影响数值） */
+export interface FacilityPosition {
+  x: number;
+  y: number;
+}
+
 /** 游戏全局状态 */
 export interface GameState {
   /** 诊所名称（玩家自定义，默认"森林诊所"） */
@@ -281,6 +287,8 @@ export interface GameState {
   discoveryCandidates: DiscoveryCandidate[];
   /** 已接受邀约、等待到达的客户（到期进入预约清单） */
   pendingArrivals: PendingArrival[];
+  /** 装修模式：设施摆放位置 upgradeId -> 场景坐标（仅视觉，不影响数值） */
+  facilityPositions: Record<string, FacilityPosition>;
   /** 累计统计（成就系统只读，运行时各动作累加） */
   stats: GameStats;
 }

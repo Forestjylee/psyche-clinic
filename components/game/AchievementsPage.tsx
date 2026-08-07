@@ -45,7 +45,16 @@ export function AchievementsPage() {
   const C = 2 * Math.PI * R;
 
   return (
-    <div className="scene achievements-scene">
+    <div className="scene panel-view">
+      <button
+        className="nav-back"
+        onClick={() => {
+          playSound("page");
+          setScene("clinic");
+        }}
+      >
+        ◂ 返回诊所
+      </button>
       <div className="ach-banner">
         <div className="ach-banner-inner">
           <div>
@@ -77,15 +86,6 @@ export function AchievementsPage() {
       </div>
 
       <div className="ach-toolbar">
-        <button
-          className="back-btn"
-          onClick={() => {
-            playSound("page");
-            setScene("clinic");
-          }}
-        >
-          ◂ 返回诊疗大厅
-        </button>
         <div className="ach-filter">
           {FILTERS.map((f) => (
             <button

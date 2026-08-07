@@ -1,9 +1,9 @@
-# 《森林心理诊所》开罗式全量界面重构 · 技术规格（SPEC）
+# 《森林心理诊所》界面场景化重构 · 技术规格（SPEC）
 
 | 项 | 值 |
 | --- | --- |
-| 版本 | v1.0（2026-08-07） |
-| 状态 | 规划完成，随 M1 启动动工 |
+| 版本 | v1.3（2026-08-08） |
+| 状态 | M1/M2 主体完成；v1.3 决策：场景不绘制小人 |
 | 关联 | docs/kairosoft/PRD.md（产品需求）、docs/kairosoft/PLAN.md（实施计划） |
 | 目标版本 | v1.0.0 |
 
@@ -14,12 +14,12 @@
 | 项 | 选择 | 版本 | 理由 |
 | --- | --- | --- | --- |
 | 2D 渲染引擎 | Phaser 3 | ^3.87 | 原生 2D sprite/animation/scene，包体小，开罗俯视范式匹配 |
-| 渲染形态 | Phaser WebGL/Canvas | - | 程序绘制 Graphics + 文本 |
+| 渲染形态 | Phaser WebGL/Canvas | - | 背景图像 + 程序绘制 Graphics + 文本 |
 | 状态 | zustand（复用） | 5.x | 单数据源不变 |
 | UI | React（复用） | 18 | 覆盖层组件复用现有代码 |
 | 桥接 | 自定义 EventEmitter | - | React ↔ Phaser 事件总线 |
 
-**不引入**：Three.js（3D 过重）、pixi（场景管理弱）、外部美术资产（全程序绘制）。
+**不引入**：Three.js（3D 过重）、pixi（场景管理弱）。外部美术仅引入 AI 生成的场景背景图（`public/images/`），交互元素仍程序绘制。**视觉方向**：治愈系手绘纸木质，非开罗像素面板。
 
 ---
 
@@ -39,7 +39,7 @@
 ├─────────────────────────────────────────────────────────┤
 │  Phaser 层（components/game/phaser/）                     │
 │   Game.ts(实例) · HallScene(大厅) · ClinicScene(诊室)     │
-│   程序绘制模块：SmallCharacter / Furniture / Decor / Floor │
+│   背景图像层（AI 插画铺底） + 程序绘制模块：SmallCharacter/Furniture │
 ├─────────────────────────────────────────────────────────┤
 │  数据层（zustand store + engine + data，零改动）           │
 │  store.getState() 供 Phaser 只读 · store 动作供 UI 调用    │
@@ -70,10 +70,8 @@ components/game/phaser/          # Phaser 层
   hall/HallScene.ts              # 大厅场景
   hall/hallLayout.ts             # 大厅布局数据（网格/设施位/装饰位）
   clinic/ClinicScene.ts          # 诊室场景
-  draw/SmallCharacter.ts         # 程序绘制小人（医生/患者共用）
   draw/Furniture.ts              # 设施/家具程序绘制
-  draw/Decor.ts                  # 装饰（植物/地毯/挂画等）
-  draw/floor.ts                  # 地板绘制（木色/暖色 tile）
+  assets/bg.ts                   # 场景背景图清单（AI 生成，引用 public/images/）
 lib/bridge/
   EventBridge.ts                 # 事件总线（单例）
   types.ts                       # 桥接事件类型
@@ -86,42 +84,43 @@ components/game/                 # 改造
 
 ---
 
-## 4. 程序绘制规范（温暖手绘风）
+## 4. 美术资产与绘制规范（AI 治愈插画背景 + 程序绘制交互）
 
-### 4.1 色板
+### 4.0 背景图像资产（AI 生成）
 
-沿用现有 CSS 变量与患者 palette：
+- **来源**：用户用 AI 绘图工具按风格 prompt 生成，放置 `public/images/`
+- **清单**：`clinic-hall.jpg`（大厅，现 clinic-bg.jpg 待换）、`consult-room.jpg`（诊室）、`desk-corner.jpg`（功能面板浮层共用）、`garden.jpg`（休息日，可选）
+- **规格**：横版 16:9（≥1280 宽），治愈系手绘插画（水彩/厚涂、低饱和暖色、木质暖棕+灰蓝墙+金色细线、柔和暖光）、无人物、画面下方留开阔地面活动区
+- **用法**：Phaser 场景 `preload` 加载后铺满 960×540 画布（fill），设施/候诊名牌/装饰按深度叠加；画布外区域由 body 同图 cover 延伸（视觉全屏无黑边）
+- **标定**：生成图与交互坐标对齐，用 vision 识别前台/门/候诊区位置，换算成逻辑坐标写入 `hallLayout.ts`
+
+### 4.1 色板与纸木质 token
+
+沿用现有 CSS 变量与患者 palette，**新增纸木质 token**（`app/styles/base.css` :root）：
 
 - 全局色：`--bg-panel`、`--bg-card`、`--accent`、`--accent-2`、`--gold`、`--good`、`--warn`、`--bad`、`--text`、`--text-dim`、`--border`、`--border-soft`
-- 医生小人：固定色板（白大褂 + 暖棕发）——在 SPEC 常量定义 `DOCTOR_PALETTE`
-- 患者小人：取 `patient.palette`（primary 头发/衣服、secondary 身体、fog 环境色）
+- **纸木质新增**：
+  - `--paper` 纸感底色（米白，带细微纸纹噪点可复用现有 `#app::before` 噪点方案）
+  - `--paper-border` 手绘感细描边（略深的暖米线，`border-radius` 偏大，模拟纸张圆角）
+  - `--wood` 木纹边框/底（浅木色，面板边缘 1px 木色渐变描边）
+  - `--ink` 墨色文字（比 `--text` 更深更稳，保证高对比可读）
+  - 阴影 `--shadow-paper`（比现 `--shadow-card` 更柔和、更扁平，模拟纸片投影）
+- **可读性约束**：主字号 ≥14px、面板标题 ≥20px、图标 ≥20px；前景文字对比度 ≥ 4.5:1（WCAG AA），`--ink` 与纸底实测通过。
+- ~~医生/患者小人色板~~：**已废弃**（v1.3 决策：场景不绘制小人）；对话静态立绘仍用现有 DOM `ChibiCharacter`（CSS 版，取 `patient.palette`）
 
-### 4.2 SmallCharacter（程序小人）
+### 4.2 ~~SmallCharacter（程序小人）~~ → 候诊名牌卡片（v1.3）
 
-用 Phaser Graphics 绘制简化 Chibi，接口：
+**已废弃**：程序绘制小人在 v1.3 起不再使用（用户决策：治愈系插画背景 + 名牌卡片承载开诊交互，不画小人）。
 
-```ts
-interface CharacterOptions {
-  palette: { primary: string; secondary: string };  // 头发/衣服色
-  faceColor: string;   // 肤色（默认暖肤色）
-  scale?: number;      // 放大倍数
-}
-function drawCharacter(scene, x, y, opts): Phaser.GameObjects.Container
-```
+**候诊名牌**（HallScene 内联 `drawBadge`）：暖色纸卡（`--paper` 底 + `--paper-border` 描边）+ 姓名（`patient.palette.primary` 色 + 白描边保证可读）+ 情绪点 + 「点击开诊」小字；容器存 `patientId` data，点击 emit `patientClicked` → React `startSession`；进场淡入上浮动画。
 
-绘制元素（相对坐标，scale 归一化 1.0 ≈ 高 48px）：
-- 身体：圆角矩形/椭圆（secondary），下方两小脚（走路交替）
-- 头：圆（肤色），上方半圆头发（primary）
-- 表情：两点眼 + 弧形嘴（用 Graphics 线条），随情绪变化（微笑/平静/难过）
-- 走动画：Phaser tween 左右脚交替 + 上下轻微浮动 + 面向方向（scaleX 翻转）
-
-静态立绘（对话中的大号）复用现有 DOM `ChibiCharacter`（CSS 版），由 React 覆盖层渲染，保证表情细节不降级。
+对话静态立绘仍复用现有 DOM `ChibiCharacter`（CSS 版），由 React 覆盖层渲染，保证表情细节不降级。
 
 ### 4.3 地板与房间（HallScene）
 
 俯视网格地板：Graphics 按 tile 尺寸画木色/暖色方块，轻微深浅交错。房间分区：
 - 候诊区（椅子若干 + 茶几 + 植物）
-- 前台（接待台 + 助理小人）
+- 前台（接待台）
 - 诊室入口（门，点它进入诊室场景）
 - 休息室（沙发 + 门）
 - 花园（落地窗 + 绿植，装饰性）
@@ -138,7 +137,7 @@ function drawCharacter(scene, x, y, opts): Phaser.GameObjects.Container
 
 | 方向 | 事件 | 载荷 | 说明 |
 | --- | --- | --- | --- |
-| React→Phaser | `moveTo` | `{ x, y }` | 医生小人移动到坐标 |
+| React→Phaser | `moveTo` | `{ x, y }` | ~~医生移动到坐标~~（v1.3 医生小人已移除，监听保留为占位忽略） |
 | React→Phaser | `patientEnter` | `{ id, seat }` | 患者进入候诊/诊室 |
 | React→Phaser | `openClinicScene` | `{ patientId }` | 切诊室场景 |
 | React→Phaser | `backToHall` | - | 返回大厅 |
@@ -147,26 +146,27 @@ function drawCharacter(scene, x, y, opts): Phaser.GameObjects.Container
 | Phaser→React | `sceneReady` | `{ scene }` | 场景就绪 |
 | Phaser→React | `patientClicked` | `{ id }` | 玩家点了患者 |
 | Phaser→React | `facilityClicked` | `{ id }` | 玩家点了设施 |
-| Phaser→React | `doctorArrived` | `{ x, y }` | 导航完成 |
+| Phaser→React | `doctorArrived` | `{ x, y }` | ~~导航完成~~（不再 emit，事件定义保留） |
 | Phaser→React | `doorClicked` | `{ to }` | 点了门（诊室/休息室） |
 | Phaser→React | `patientMoveDone` | `{ id }` | 患者动画完成 |
 
 ---
 
-## 6. 顶栏 HUD（开罗化）
+## 6. 顶栏 HUD（纸木质悬浮）
 
-改造 `components/game/HUD.tsx`，保持 React DOM，视觉开罗化：
+改造 `components/game/HUD.tsx`，保持 React DOM，视觉纸木质：
 
-- 常驻段：等级(带 exp 条) · 金钱 · 声望 · 理智 · 日期(第 N 天 · 时段) · 时段图标(☀/🌙)
+- 常驻段：等级(带 exp 条) · 金钱 · 声望 · 理智 · 日期(第 N 天 · 时段) · 时段图标(☀/🌙)——**数值信息量保留**，只换材质
 - 右侧按钮：静音 · 保存 · 退出（退出确认弹窗沿用 createPortal 修复）
-- 开罗风：顶部高亮条 + 数字 `font-variant-numeric: tabular-nums` + 数值变化时轻微弹跳动画（CSS 类，`prefers-reduced-motion` 降级）
+- 纸木质：半透纸感底板 + 手绘细描边 + 木纹边；数字 `font-variant-numeric: tabular-nums` + 数值变化时轻微弹跳动画（CSS 类，`prefers-reduced-motion` 降级）
+- 可读性：数值与图标**字号偏大**、`--ink` 深墨色，与纸底高对比
 - 与底部菜单栏并存：顶栏只放常驻数值与全局操作，功能入口全部下沉到底部栏
 
 ---
 
-## 7. 底部菜单栏（新增）
+## 7. 底部菜单栏（精简纸木质）
 
-`components/game/BottomBar.tsx`，固定底部居中图标菜单（开罗式），每项 = 图标 + 短标签：
+`components/game/BottomBar.tsx`，固定底部居中菜单（精简换肤），每项 = 图标 + 短标签：
 
 | 项 | 图标 | 打开面板 | 备注 |
 | --- | --- | --- | --- |
@@ -178,7 +178,7 @@ function drawCharacter(scene, x, y, opts): Phaser.GameObjects.Container
 | 成就 | 🏅 | 成就图鉴 | 带解锁数 |
 | 休息 | 😴 | （直接休息） | 带理智恢复提示 |
 
-布局：`position:fixed; bottom; left:50%; translateX(-50%)`，暖色半透明底 + `backdrop-filter`（注意：`backdrop-filter` 会创建 containing block，底部栏内的 fixed 弹层需 portal——沿用 HUD 退出弹窗教训）。
+布局：`position:fixed; bottom; left:50%; translateX(-50%)`，**半透纸感底** + `backdrop-filter`；图标**手绘化、偏大**（≥20px），标签字号偏大清晰；缩小栏体高度、减少视觉噪音，让背景插画透出。注意：`backdrop-filter` 会创建 containing block，底部栏内的 fixed 弹层需 portal——沿用 HUD 退出弹窗教训。
 
 ---
 
@@ -210,9 +210,9 @@ function drawCharacter(scene, x, y, opts): Phaser.GameObjects.Container
 ## 10. 性能与响应式
 
 - **单 canvas**：一个 Phaser.Game 实例，场景 switch 复用
-- **sprite 数量控制**：患者小人池化（同一时刻候诊人数有限）；装饰静态化（不逐帧动画）
+- **对象数量控制**：候诊名牌数量受限（候诊区 3 席）；装饰静态化（不逐帧动画）
 - **不每帧同步**：见 §2.1 铁律 4
-- **尺寸**：canvas 逻辑分辨率 960×540（4:3 开罗比），Scale.FIT 适配视口；React 覆盖层用 vw/vh 对齐场景关键区（对齐坐标常量共享）
+- **尺寸**：canvas 逻辑分辨率 960×540（16:9），Scale.FIT 适配视口；场景背景图在 Phaser 内铺满画布，画布外区域由 body 背景图 cover 延伸（视觉全屏无黑边）；React 覆盖层用 vw/vh 对齐场景关键区（对齐坐标常量共享）
 - **小屏**：底部菜单项压缩为纯图标，顶栏数字缩写（如 12.3k）
 - **reduced-motion**：所有 CSS 动画沿用现有降级；Phaser tween 走「移动」而非「闪烁」
 
@@ -222,10 +222,10 @@ function drawCharacter(scene, x, y, opts): Phaser.GameObjects.Container
 
 | 期 | 技术要点 |
 | --- | --- |
-| M1 | 装 Phaser；GameCanvas 挂载/销毁；HallScene 程序绘制地板/分区/装饰；医生小人绘制+点选导航（直线 tween）；EventBridge 建好；顶栏开罗化 CSS |
-| M2 | 设施可视位+点击弹升级面板；装修模式拖动+落格+存档字段；患者候诊小人（站立/坐姿）进入/离开；底部菜单栏；休息/发现等入口接入 |
-| M3 | ClinicScene 诊室；对话覆盖层（气泡/选项/状态条/回顾窗）；开诊→切诊室→对话→结算→回大厅全链路；结局/信件/记忆碎片开罗化 |
-| M4 | 各面板（技能/消息/追踪/成就/发现客户）视觉开罗化；移除旧 DOM ClinicHall/DialogueScene；全量无残留 |
+| M1 | 装 Phaser；GameCanvas 挂载/销毁；HallScene 背景图铺底 + 设施 + 候诊名牌卡片（无医生导航）；EventBridge 建好；顶栏纸木质 CSS |
+| M2 | 设施可视位+点击弹升级面板；装修模式拖动+落格+存档字段；候诊名牌卡片（取代患者小人）；底部菜单栏精简换肤；背景图坐标标定（vision）；功能面板浮层化 |
+| M3 | ClinicScene 诊室；对话覆盖层（气泡/选项/状态条/回顾窗）；开诊→切诊室→对话→结算→回大厅全链路；结局/信件/记忆碎片纸木质 |
+| M4 | 各面板（技能/消息/追踪/成就/发现客户）统一纸木质；移除旧 DOM ClinicHall/DialogueScene；全量无残留 |
 | M5 | 动画打磨（开罗数字跳动/进入退出/收获反馈）；响应式；性能 profile；全量验收（PRD §7） |
 
 ---
@@ -239,3 +239,4 @@ function drawCharacter(scene, x, y, opts): Phaser.GameObjects.Container
 - [ ] 顶栏 + 底部栏共存无遮挡、无 containing-block 弹窗 bug
 - [ ] 装修模式位置保存/载入正确
 - [ ] 玩法等价：获客/升级/回访/结局/成就行为一致
+- [ ] 纸木质 token 落地：面板/卡片纸感描边统一；图标/字号偏大清晰；文字对比度 ≥4.5:1；背景插画在面板后透出

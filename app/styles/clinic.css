@@ -143,10 +143,10 @@
 /* 患者病历卡 */
 .patient-card {
   flex-shrink: 0;
-  background: linear-gradient(135deg, var(--bg-panel), var(--bg-panel-2));
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px 18px;
+  background: linear-gradient(135deg, var(--paper-hi), var(--paper));
+  border: 1px solid var(--paper-border);
+  border-radius: 16px;
+  padding: 18px 20px;
   display: flex;
   gap: 16px;
   align-items: flex-start;
@@ -154,7 +154,7 @@
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-paper), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .patient-card::before {
@@ -239,9 +239,10 @@
 }
 
 .patient-name-text {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: var(--fs-lg);
+  font-weight: 800;
   letter-spacing: 1px;
+  color: var(--ink);
 }
 
 .patient-difficulty {
@@ -265,8 +266,8 @@
 }
 
 .patient-intro {
-  font-size: 13.5px;
-  color: #4a453a;
+  font-size: var(--fs-md);
+  color: var(--ink-dim);
   line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -277,7 +278,7 @@
 /* 悬停卡片时展开完整描述，避免点击进接诊前多一步操作 */
 .patient-card:hover .patient-intro {
   -webkit-line-clamp: unset;
-  color: #333;
+  color: var(--ink);
 }
 
 .patient-locked-tag {
@@ -307,11 +308,11 @@
 }
 
 .side-card {
-  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: var(--shadow-card);
+  background: linear-gradient(160deg, var(--paper-hi), var(--paper));
+  border: 1px solid var(--paper-border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow-paper), inset 0 1px 0 rgba(255, 255, 255, 0.85);
   position: relative;
 }
 .side-card:last-child {
