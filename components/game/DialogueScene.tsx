@@ -5,12 +5,20 @@ import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import { useGameStore } from "@/lib/store";
 import { DialogueEngine } from "@/lib/engine/DialogueEngine";
-import type { DialogueNode, PatientEmotion, PatientState, MemoryFragment, ActiveSession } from "@/lib/types";
+import type {
+  DialogueNode,
+  DialogueChoice,
+  PatientEmotion,
+  PatientState,
+  MemoryFragment,
+  ActiveSession,
+} from "@/lib/types";
 import { allSkills } from "@/lib/data/skills";
 import { TypewriterText } from "./TypewriterText";
 import { TermText } from "./PsychTermSpan";
 import { emotionColors, emotionLabels } from "./constants";
 import { ChibiCharacter } from "./ChibiCharacter";
+import { DialogueQuickview, TAUGHT_EMPATHY_KEY, TAUGHT_LOCKED_KEY } from "./Onboarding";
 import { CLINIC_LAYOUT } from "./phaser/clinic/clinicLayout";
 import { toEmotionalFloating } from "./floatingEmotion";
 
@@ -63,6 +71,11 @@ export function DialogueScene() {
   // 右上角回顾窗开关（P2-6，非阻塞，可边看边推进剧情）
   const [historyOpen, setHistoryOpen] = useState(false);
   const historyRef = useRef<HTMLDivElement>(null);
+  // P4-4 边做边学：共情/锁定教学浮层状态 + 「帮助」速览开关（只走渲染层，不改引擎）
+  const [empathyHintId, setEmpathyHintId] = useState<string | null>(null);
+  const [lockedHintOn, setLockedHintOn] = useState<string | null>(null);
+  const lockedHintNodeRef = useRef<string | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     if (!currentPatient) return;
@@ -186,6 +199,89 @@ export function DialogueScene() {
 
   const dismissFlashback = () => setFlashback(null);
 
+  /** P4-4：选项是否锁定（前置要求不足或技能缺失），教学浮层与渲染共用同一判定 */
+  const isChoiceLocked = (c: DialogueChoice): boolean => {
+    const s = engineRef.current?.getState();
+    let meets = true;
+    if (c.require && s) {
+      if (c.require.trust !== undefined && s.trust < c.require.trust) meets = false;
+      else if (c.require.defense !== undefined && s.defense > c.require.defense) meets = false;
+      else if (c.require.mood !== undefined && s.mood < c.require.mood) meets = false;
+      else if (c.require.truth !== undefined && s.truth < c.require.truth) meets = false;
+    }
+    const hasSkill = !c.requireSkill || game.skills.includes(c.requireSkill);
+    return !meets || !hasSkill;
+  };
+
+  // 共情教学：node 换了重算——未教过且本节点含「未锁定」共情选项时，提示第一个共情选项。
+  // 点击落标记在 onChoose（点共情→学成；点别的→仅清提示，下个共情节点再弹）。
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!node) return;
+    let taught = false;
+    try {
+      taught = !!localStorage.getItem(TAUGHT_EMPATHY_KEY);
+    } catch {
+      /* 隐私模式/SSR 兜底：当作未教过，正常引导 */
+    }
+    if (taught) {
+      setEmpathyHintId(null);
+      return;
+    }
+    const target = node.choices?.find((c) => c.kind === "empathy" && !isChoiceLocked(c));
+    setEmpathyHintId(target ? target.id : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node]);
+
+  // 锁定教学：node 换了重算——首次从「显示过锁定提示」的节点推进走即落标记（教一次即可）
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!node) return;
+    let taught = false;
+    try {
+      taught = !!localStorage.getItem(TAUGHT_LOCKED_KEY);
+    } catch {
+      /* noop */
+    }
+    if (taught) {
+      lockedHintNodeRef.current = null;
+      setLockedHintOn(null);
+      return;
+    }
+    const shownOn = lockedHintNodeRef.current;
+    if (shownOn != null && shownOn !== node.id) {
+      // 从显示过锁定提示的节点推进 → 视为首次关闭，落标记
+      lockedHintNodeRef.current = null;
+      try {
+        localStorage.setItem(TAUGHT_LOCKED_KEY, "1");
+      } catch {
+        /* noop */
+      }
+      setLockedHintOn(null);
+      return;
+    }
+    const lockedChoice = node.choices?.find((c) => isChoiceLocked(c));
+    if (lockedChoice) {
+      lockedHintNodeRef.current = node.id;
+      setLockedHintOn(lockedChoice.id);
+    } else {
+      setLockedHintOn(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node]);
+
+  /** 锁定提示「知道了」：首次关闭即落标记，之后不再教 */
+  const dismissLockedHint = () => {
+    playSound("click");
+    try {
+      localStorage.setItem(TAUGHT_LOCKED_KEY, "1");
+    } catch {
+      /* noop */
+    }
+    lockedHintNodeRef.current = null;
+    setLockedHintOn(null);
+  };
+
   if (!currentPatient || !node) return null;
 
   const meetsRequirement = (require?: {
@@ -212,6 +308,18 @@ export function DialogueScene() {
     if (!meets || !hasSkill) {
       playSound("locked");
       return;
+    }
+    // P4-4 边做边学：共情教学——点了共情选项即落标记（学成永不再弹）；
+    // 点了非共情选项仅清提示不落标记（下个共情节点再弹一次）
+    if (empathyHintId) {
+      if (c.kind === "empathy") {
+        try {
+          localStorage.setItem(TAUGHT_EMPATHY_KEY, "1");
+        } catch {
+          /* noop */
+        }
+      }
+      setEmpathyHintId(null);
     }
     playSound("click");
     // 玩家选择的发言进入历史（P2-6 回顾窗用），然后推进剧情
@@ -333,6 +441,17 @@ export function DialogueScene() {
         >
           <span aria-hidden="true">⏸</span> 暂停
         </button>
+        <button
+          className="dialogue-help-btn"
+          onClick={() => {
+            playSound("click");
+            setHelpOpen(true);
+          }}
+          aria-label="打开对话玩法速览"
+          title="对话玩法速览回看"
+        >
+          <span aria-hidden="true">❓</span> 帮助
+        </button>
       </div>
 
       {/* 本场对话回顾窗：history 逐行渲染，患者/医生左右镜像 + 配色区分 */}
@@ -367,13 +486,22 @@ export function DialogueScene() {
         </div>
       ) : null}
 
+      {/* 对话玩法速览回看（P4-4 帮助入口）：模态面板，关闭后会话零改动、对话原样继续 */}
+      {helpOpen ? (
+        <DialogueQuickview
+          onClose={() => {
+            playSound("click");
+            setHelpOpen(false);
+          }}
+        />
+      ) : null}
+
       {/* 底部：候选对话 / 继续 */}
       <div className="dialogue-options">
         {node.isEnding ? null : node.choices && node.choices.length > 0 ? (
           node.choices.map((c) => {
-            const meets = meetsRequirement(c.require);
+            const locked = isChoiceLocked(c);
             const hasSkill = !c.requireSkill || game.skills.includes(c.requireSkill);
-            const locked = !meets || !hasSkill;
             const skillName = c.requireSkill
               ? allSkills.find((s) => s.id === c.requireSkill)?.name
               : null;
@@ -383,18 +511,34 @@ export function DialogueScene() {
               ? `需要技能：${skillName}`
               : "";
             return (
-              <button
-                key={c.id}
-                className={`choice ${locked ? "choice-locked" : ""}`}
-                disabled={locked}
-                onClick={() => onChoose(c.id)}
-                onMouseEnter={() => !locked && playSound("hover")}
-              >
-                <span className="choice-text">
-                  <TermText text={c.text} />
-                  {hint ? <div className="choice-hint">{hint}</div> : null}
-                </span>
-              </button>
+              <div key={c.id} className="choice-wrap">
+                <button
+                  className={`choice ${locked ? "choice-locked" : ""}`}
+                  disabled={locked}
+                  onClick={() => onChoose(c.id)}
+                  onMouseEnter={() => !locked && playSound("hover")}
+                >
+                  <span className="choice-text">
+                    <TermText text={c.text} />
+                    {hint ? <div className="choice-hint">{hint}</div> : null}
+                  </span>
+                </button>
+                {empathyHintId === c.id ? (
+                  <div className="teach-bubble teach-empathy" role="note">
+                    这是共情——一句温和的话，让对方放松，愿意多说一点。
+                  </div>
+                ) : null}
+                {locked && lockedHintOn === c.id ? (
+                  <div className="teach-bubble teach-locked" role="note">
+                    <span className="teach-locked-text">
+                      这个选项还锁着——要么满足前置条件，要么学会对应的话术。
+                    </span>
+                    <button className="teach-gotit" onClick={dismissLockedHint}>
+                      知道了
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             );
           })
         ) : (

@@ -397,6 +397,82 @@
 }
 .choice-locked:hover { transform: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
 
+/* —— P4-4 边做边学：共情/锁定教学浮层（纸木气泡，非阻塞：不遮罩、不改选项行为，
+   只在选项旁提示 + 点击/关闭时落 localStorage 标记） —— */
+.choice-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+.teach-bubble {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 186px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: linear-gradient(165deg, #fffdf6, #fcf4e3);
+  border: 1.5px solid var(--paper-border);
+  box-shadow: var(--shadow-paper), 0 4px 14px rgba(90, 70, 40, 0.16);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  animation: teach-in 0.25s ease-out;
+}
+@keyframes teach-in {
+  from { opacity: 0; transform: translateY(-44%); }
+  to   { opacity: 1; transform: translateY(-50%); }
+}
+/* 共情提示：选项左侧，纯视觉（pointer-events:none 绝不拦截任何选项点击） */
+.teach-empathy {
+  right: calc(100% + 20px);
+  pointer-events: none;
+}
+/* 锁定提示：选项右侧，仅「知道了」按钮可点，其余区域透传不挡点击 */
+.teach-locked {
+  left: calc(100% + 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.teach-locked::before,
+.teach-locked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 0.55em solid transparent;
+  border-bottom: 0.55em solid transparent;
+}
+.teach-locked::before {
+  left: -1.05em;
+  border-right: 0.8em solid var(--paper-border);
+}
+.teach-locked::after {
+  left: -0.8em;
+  border-right: 0.6em solid #fcf4e3;
+}
+.teach-locked-text {
+  display: block;
+}
+.teach-gotit {
+  align-self: flex-end;
+  padding: 4px 14px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.15s;
+}
+.teach-gotit:hover { transform: translateY(-1px); }
+
 /* 继续按钮：仅此一步时放大居中，视觉引导明确 */
 .continue-btn {
   align-self: center;
@@ -436,7 +512,8 @@
   gap: 8px;
 }
 .dialogue-history-toggle,
-.dialogue-pause-btn {
+.dialogue-pause-btn,
+.dialogue-help-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -453,7 +530,8 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .dialogue-history-toggle:hover,
-.dialogue-pause-btn:hover {
+.dialogue-pause-btn:hover,
+.dialogue-help-btn:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-paper), 0 4px 14px rgba(90, 70, 40, 0.18);
 }
@@ -572,10 +650,11 @@
   background: linear-gradient(135deg, rgba(255, 250, 238, 0.92), rgba(247, 238, 220, 0.92));
 }
 
-/* 窄视口：回顾窗更宽更接近全屏小窗，按钮收窄 */
+/* 窄视口：回顾窗更宽更接近全屏小窗，按钮收窄；教学浮层（侧挂气泡）收起，避免挤压/遮挡 */
 @media (max-width: 720px), (max-height: 520px) {
   .dialogue-history-toggle,
-  .dialogue-pause-btn { padding: 7px 11px; font-size: 12px; }
+  .dialogue-pause-btn,
+  .dialogue-help-btn { padding: 7px 11px; font-size: 12px; }
   .dialogue-history {
     top: 50px;
     right: 8px;
@@ -583,11 +662,13 @@
     width: auto;
     max-height: 66vh;
   }
+  .teach-bubble { display: none; }
 }
 
-/* 尊重系统减弱动效：回顾窗弹出立即完成 */
+/* 尊重系统减弱动效：回顾窗/教学浮层弹出立即完成 */
 @media (prefers-reduced-motion: reduce) {
   .dialogue-history { animation: none; }
+  .teach-bubble { animation: none; }
 }
 
 /* 浮动文字（P2-5 情绪化：浅色纸底/暖字、柔和渐隐；由 Overlays 渲染）。
