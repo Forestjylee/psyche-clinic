@@ -4,6 +4,9 @@ import { useMemo, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import type { GameMessage, PrologueChoice } from "@/lib/types";
 
+/** 序章动作步骤种类（P4-2）：挂门牌 / 整理诊室 / 泡茶。纯叙事代入，无数值变化。 */
+type ActionKind = "sign" | "tidy" | "tea";
+
 /** 序章四幕：点击逐段推进，末幕「走进诊所」接新手引导 */
 const ACTS = [
   {
@@ -20,7 +23,7 @@ const ACTS = [
   },
   {
     label: "幕四 · 第一束光",
-    text: "挂钟还没修好，门牌已经挂上你的名字。第一位患者，正走在来的路上。",
+    text: "挂钟滴答地走起来，门牌在风里晃了晃，诊室里还飘着淡淡的茶香。第一位患者，正走在来的路上。",
   },
 ] as const;
 
@@ -105,15 +108,49 @@ const PROLOGUE_CHOICES: PrologueChoiceConfig[] = [
   },
 ];
 
+/** 动作 step 小标题（承接「幕三 · 森林边上」之后、「幕四 · 第一束光」之前） */
+const ACTION_LABELS: Record<ActionKind, string> = {
+  sign: "第一件事 · 挂上门牌",
+  tidy: "第二件事 · 收拾诊室",
+  tea: "第三件事 · 泡一杯茶",
+};
+
+/** 动作 step 引导语（sign 的名字在渲染时拼入诊所名） */
+const ACTION_LEADS: Record<ActionKind, string> = {
+  sign: "手里握着门牌，「{clinicName}」几个字刻得整整齐齐。",
+  tidy: "诊室还乱着——旧书、绿植、挂钟都不在原处。你挽起袖子，一样一样来。",
+  tea: "候诊室空着。先烧上水，给自己沏杯茶，等第一位患者推门进来。",
+};
+
+/** 整理诊室的三件待归位物品（逐个点击归位，纯 CSS 色块呈现） */
+const TIDY_ITEMS = [
+  { id: "books", label: "摞起桌角的旧书" },
+  { id: "plant", label: "摆正窗台的绿植" },
+  { id: "clock", label: "校准墙上的挂钟" },
+] as const;
+
 type PrologueStep =
   | { kind: "act"; act: (typeof ACTS)[number] }
   | { kind: "choice" }
-  | { kind: "monologue"; cfg: PrologueChoiceConfig };
+  | { kind: "monologue"; cfg: PrologueChoiceConfig }
+  | { kind: "action"; action: ActionKind };
 
 export function Prologue() {
-  const { dismissPrologue, choosePrologue, playSound } = useGame();
+  const { game, dismissPrologue, choosePrologue, playSound } = useGame();
   const [idx, setIdx] = useState(0);
   const [choice, setChoice] = useState<PrologueChoice | null>(null);
+  /** 三个动作的完成态：动作未完成前 advance() 被守卫拦截 */
+  const [done, setDone] = useState<Record<ActionKind, boolean>>({
+    sign: false,
+    tidy: false,
+    tea: false,
+  });
+  /** tidy：三件物品各自的归位状态 */
+  const [tidyDone, setTidyDone] = useState<boolean[]>(() => TIDY_ITEMS.map(() => false));
+  /** tea：0 未烧水 → 1 水开 → 2 已沏茶 */
+  const [teaPhase, setTeaPhase] = useState<0 | 1 | 2>(0);
+
+  const clinicName = game.clinicName.trim() || "森林诊所";
 
   const steps = useMemo<PrologueStep[]>(() => {
     const s: PrologueStep[] = [
@@ -126,6 +163,10 @@ export function Prologue() {
     }
     s.push({ kind: "act", act: ACTS[1] });
     s.push({ kind: "act", act: ACTS[2] });
+    // P4-2：动作 step 固定插在幕三之后、幕四之前，迎第一位患者的过渡
+    s.push({ kind: "action", action: "sign" });
+    s.push({ kind: "action", action: "tidy" });
+    s.push({ kind: "action", action: "tea" });
     s.push({ kind: "act", act: ACTS[3] });
     return s;
   }, [choice]);
@@ -139,6 +180,8 @@ export function Prologue() {
   const advance = () => {
     // 选择屏不能整块点击推进，须点具体选项（避免误触发）
     if (step.kind === "choice") return;
+    // P4-2：动作步守卫——动作未完成不能推进
+    if (step.kind === "action" && !done[step.action]) return;
     if (last) {
       dismissPrologue(prologueLetter);
       return;
@@ -173,6 +216,132 @@ export function Prologue() {
               ))}
             </div>
             <div className="prologue-choice-hint">选一个最贴近你的理由，它会化作一段独白，还有一封来信。</div>
+          </div>
+        ) : step.kind === "action" ? (
+          <div className="prologue-action">
+            <div className="prologue-act">{ACTION_LABELS[step.action]}</div>
+            <p className="prologue-action-lead">
+              {step.action === "sign"
+                ? ACTION_LEADS.sign.replace("{clinicName}", clinicName)
+                : ACTION_LEADS[step.action]}
+            </p>
+
+            {step.action === "sign" && (
+              <div className={`prologue-sign ${done.sign ? "is-hung" : ""}`}>
+                <div className="prologue-sign-plate">
+                  <span className="prologue-sign-plate-text">{clinicName}</span>
+                </div>
+                {done.sign ? (
+                  <p className="prologue-action-done">「{clinicName}」被晨风轻轻吹得晃了晃。</p>
+                ) : (
+                  <button
+                    className="prologue-action-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      playSound("click");
+                      setDone((d) => ({ ...d, sign: true }));
+                    }}
+                  >
+                    把门牌挂上去
+                  </button>
+                )}
+              </div>
+            )}
+
+            {step.action === "tidy" && (
+              <div className="prologue-tidy">
+                <div className="prologue-tidy-items">
+                  {TIDY_ITEMS.map((item, i) => (
+                    <button
+                      key={item.id}
+                      className={`prologue-tidy-item ${tidyDone[i] ? "is-tidy" : ""}`}
+                      onClick={(e) => {
+                        // 三件全归位后，点击交给外层推进（advance 守卫已放行）
+                        if (done.tidy) return;
+                        e.stopPropagation();
+                        if (tidyDone[i]) return;
+                        playSound("click");
+                        const next = [...tidyDone];
+                        next[i] = true;
+                        setTidyDone(next);
+                        if (next.every(Boolean)) setDone((d) => ({ ...d, tidy: true }));
+                      }}
+                    >
+                      <span className={`ptv ptv-${item.id}`} aria-hidden="true">
+                        {item.id === "books" && (
+                          <>
+                            <i className="ptv-book" />
+                            <i className="ptv-book" />
+                            <i className="ptv-book" />
+                          </>
+                        )}
+                        {item.id === "plant" && (
+                          <>
+                            <i className="ptv-stem" />
+                            <i className="ptv-pot" />
+                          </>
+                        )}
+                      </span>
+                      <span className="prologue-tidy-label">{item.label}</span>
+                      <span className="prologue-tidy-check" aria-hidden="true">
+                        ✓
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {done.tidy && <p className="prologue-action-done">诊室终于像个能坐下好好说话的地方了。</p>}
+              </div>
+            )}
+
+            {step.action === "tea" && (
+              <div className="prologue-tea">
+                <div className="prologue-tea-stage">
+                  <div className={`prologue-kettle ${teaPhase >= 1 ? "is-boiling" : ""}`} aria-hidden="true">
+                    <span className="prologue-kettle-lid" />
+                    <span className="prologue-kettle-body" />
+                    {teaPhase >= 1 && (
+                      <>
+                        <span className="prologue-steam prologue-steam-1" />
+                        <span className="prologue-steam prologue-steam-2" />
+                      </>
+                    )}
+                  </div>
+                  <div className={`prologue-cup ${teaPhase >= 2 ? "is-full" : ""}`} aria-hidden="true">
+                    {teaPhase >= 2 && <span className="prologue-tea-steam" />}
+                  </div>
+                </div>
+                {teaPhase === 0 && (
+                  <button
+                    className="prologue-action-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      playSound("click");
+                      setTeaPhase(1);
+                    }}
+                  >
+                    烧水
+                  </button>
+                )}
+                {teaPhase === 1 && (
+                  <button
+                    className="prologue-action-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      playSound("click");
+                      setTeaPhase(2);
+                      setDone((d) => ({ ...d, tea: true }));
+                    }}
+                  >
+                    沏茶
+                  </button>
+                )}
+                {teaPhase === 2 && (
+                  <p className="prologue-action-done">茶还烫着，蒸汽在杯口打着转。该准备的，都备好了。</p>
+                )}
+              </div>
+            )}
+
+            {done[step.action] && <div className="prologue-hint">点击继续 ▸</div>}
           </div>
         ) : (
           <>
