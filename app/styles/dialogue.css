@@ -1,159 +1,293 @@
-/* ========== 对话场景 ========== */
+/* ========== 对话场景（P2-3 面对面逐句气泡） ========== */
 .dialogue-scene {
-  display: flex;
-  flex-direction: column;
-  /* 行高锁定为场景高度，子项在内部滚动，避免长文本把选项挤出视口 */
-  background: var(--bg-deep);
+  /* 继承 .scene 的 absolute（inset:64px 0 0 0），不要改回 relative 以免盒子塌缩 */
+  position: absolute;
+  /* 房间由底层 ClinicScene 自画，外层透明透出 #app 背景（移除旧雾色双栏） */
+  background: transparent;
 }
 
-/* 顶部旁白条：页面正上方，横跨全宽 */
-.dialogue-narration {
-  flex-shrink: 0;
-  min-height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 24px;
-  background: linear-gradient(180deg, rgba(20, 24, 34, 0.85), rgba(20, 24, 34, 0.55));
-  border-bottom: 1px solid var(--border);
-  position: relative;
+/* —— 灯光呼吸层（P2-4）：半透明渐变叠在 Phaser 画布上（z1），
+   气泡/选项在 z2+ 保持可读；两层平面用 opacity 互叠实现真正的渐变交叉淡入淡出
+   （background-image 渐变不可插值，直接换 class 会瞬切）。 —— */
+.dialogue-light {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.light-plane,
+.light-beam {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.light-plane.on,
+.light-beam.on {
+  opacity: 1;
+}
+/* 共情/平静：暖橙光晕（低对比，不抢对话焦点） */
+.light-plane.light-warm {
+  background:
+    radial-gradient(120% 90% at 72% 18%, rgba(255, 190, 120, 0.16), transparent 58%),
+    linear-gradient(165deg, rgba(255, 176, 102, 0.10), rgba(255, 220, 170, 0.04));
+}
+/* 触及痛点：天色微沉，冷灰蓝降饱和 */
+.light-plane.light-dim {
+  background:
+    radial-gradient(130% 100% at 50% 68%, rgba(46, 58, 84, 0.20), transparent 62%),
+    linear-gradient(180deg, rgba(66, 80, 110, 0.14), rgba(34, 42, 64, 0.22));
+}
+/* 真相揭开：一束光从窗侧（左上）斜透入，柔光柱 + 轻微呼吸 */
+.light-beam::after {
+  content: "";
+  position: absolute;
+  top: -25%;
+  left: -12%;
+  width: 46%;
+  height: 170%;
+  transform: rotate(24deg);
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 238, 196, 0.10) 38%,
+    rgba(255, 250, 228, 0.22) 50%,
+    rgba(255, 238, 196, 0.10) 62%,
+    transparent 100%
+  );
+  filter: blur(7px);
+  animation: beam-breathe 4s ease-in-out infinite;
+}
+@keyframes beam-breathe {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.95; }
+}
+/* 尊重系统减弱动效（对齐 P1）：灯光切换立即完成，光束不再呼吸 */
+@media (prefers-reduced-motion: reduce) {
+  .light-plane,
+  .light-beam { transition: none; }
+  .light-beam::after { animation: none; opacity: 0.65; }
+}
+
+/* FIT 对齐覆盖层：与 Phaser 画布显示区域精确同框。
+   场景盒 = .scene 的 inset:64px 0 0 0（宽 100vw、高 100vh-64px），
+   取其中最大 16:9 居中矩形（等价 Phaser FIT 的 scale=min(w/960,h/540)）。
+   窗口 resize 时 Phaser FIT 自跟随，本 CSS 亦自跟随，无需 JS 测量。
+   注意：不用 container-type 于 .dialogue-scene，避免 layout 包含把
+   .memory-flash（position:fixed）困在场景内；容器查询仅设在 .clinic-stage。 */
+.clinic-stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(100vw, calc((100vh - 64px) * 16 / 9));
+  height: min(calc(100vh - 64px), calc(100vw * 9 / 16));
+  container-type: size;
   z-index: 2;
+  /* 覆盖层本身不吞点击，透传给底层 Phaser 画布；子元素再恢复 */
+  pointer-events: none;
+}
+.clinic-stage .speak-bubble,
+.clinic-stage .dialogue-narration,
+.clinic-stage .patient-figure {
+  pointer-events: auto;
+}
+
+/* —— 患者立绘（定位 CLINIC_LAYOUT.patientPos，emotion 只走 React） —— */
+.patient-figure {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.patient-figure .patient-chibi.size-lg {
+  width: 12.5cqw; /* = 120 逻辑 px（chibi.size-lg 基准，覆盖层等比缩放） */
+}
+.patient-figure .patient-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9cqw;
+  margin-top: 1.2cqh;
+  padding: 0.7cqw 1.7cqw;
+  background: rgba(255, 251, 240, 0.94);
+  border: 1px solid var(--paper-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-paper);
+  font-size: 1.6cqw;
+  line-height: 1.2;
+}
+.patient-figure .patient-chip-name {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--ink);
+}
+.patient-figure .patient-chip-emo {
+  font-weight: 600;
+}
+
+/* —— 当前句气泡（锚 CLINIC_LAYOUT.bubbleAnchor.*，纸木质 + 指向说话者的小尾巴） —— */
+.speak-bubble {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5cqh;
+  max-width: 32cqw;
+  padding: 1.3cqw 2cqw;
+  background: linear-gradient(165deg, #fffdf6, #fcf4e3);
+  border: 2px solid var(--paper-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-paper), 0 6px 18px rgba(90, 70, 40, 0.12);
+  animation: bubble-in 0.18s ease-out;
+}
+@keyframes bubble-in {
+  from { opacity: 0; transform: translate(-50%, -46%) scale(0.94); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.speak-bubble .bubble-name {
+  font-size: 1.35cqw;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #8a6a3f;
+}
+.speak-bubble .bubble-name::before {
+  content: "";
+  display: inline-block;
+  width: 0.85cqw;
+  height: 0.85cqw;
+  margin-right: 0.7cqw;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: -0.1cqw;
+}
+.speak-bubble .dialogue-text {
+  font-size: 1.9cqw;
+  line-height: 1.75;
+  color: var(--ink);
+  text-shadow: none;
+  margin: 0;
+  flex: none;
+  min-height: 0;
+  overflow: visible;
+  padding: 0;
+}
+/* 小尾巴：两层三角（外描边 + 内纸面），patient 指向右侧立绘，doctor 指向左侧医生 */
+.speak-bubble::before,
+.speak-bubble::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 1.3cqw solid transparent;
+  border-bottom: 1.3cqw solid transparent;
+}
+.speak-bubble.patient::before { right: -1.5cqw; border-left: 1.8cqw solid var(--paper-border); }
+.speak-bubble.patient::after  { right: -1.15cqw; border-left: 1.35cqw solid #fcf4e3; }
+.speak-bubble.doctor::before { left: -1.5cqw; border-right: 1.8cqw solid var(--paper-border); }
+.speak-bubble.doctor::after  { left: -1.15cqw; border-right: 1.35cqw solid #fcf4e3; }
+
+/* —— 顶部旁白：软气泡横条，居中于阶段上方 —— */
+.dialogue-narration {
+  position: absolute;
+  top: 2.5cqh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  max-width: 86cqw;
+  padding: 1cqh 3cqw;
+  background: rgba(255, 251, 240, 0.9);
+  border: 1px solid var(--paper-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-paper);
 }
 .dialogue-narration .dialogue-text {
   font-family: var(--font-sans);
   font-style: italic;
-  font-size: 14px;
+  font-size: 1.7cqw;
   letter-spacing: 2px;
-  color: var(--text-dim);
+  color: #6b5a3e;
   margin: 0;
   flex: none;
   min-height: 0;
   overflow: visible;
   text-align: center;
   cursor: default;
-}
-.dialogue-narration-deco {
-  color: var(--accent);
-  font-size: 18px;
-  letter-spacing: 12px;
-  opacity: 0.7;
+  line-height: 1.5;
 }
 
-/* 主体：左栏患者立绘 + 聊天区 */
-.dialogue-main {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-}
-
-/* 左栏：患者立绘舞台 + 状态 */
-.patient-stage {
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  border-right: 1px solid var(--border);
-  min-height: 0;
-}
-
-.patient-stage-bg {
-  position: absolute;
-  inset: 0;
-  transition: background 1.5s ease;
-}
-
-/* 舞台地板光晕 */
-.patient-stage::after {
-  content: "";
-  position: absolute;
-  bottom: 0; left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 120px;
-  background: radial-gradient(ellipse at center bottom, var(--stage-color, rgba(124,158,255,0.15)), transparent 70%);
-  pointer-events: none;
-}
-
-.patient-figure {
-  position: relative;
-  width: 260px;
-  height: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  z-index: 2;
-  transition: filter 0.6s ease;
-}
-
-.patient-silhouette {
-  width: 180px;
-  height: 300px;
-  background: linear-gradient(180deg, var(--fig-color, #7c9eff) 0%, transparent 100%);
-  border-radius: 90px 90px 16px 16px;
-  position: relative;
-  filter: blur(2px);
-  opacity: 0.85;
-  transition: all 1s ease;
-  box-shadow: 0 0 60px var(--fig-color, #7c9eff);
-}
-
-.patient-silhouette::before {
-  content: "";
-  position: absolute;
-  top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--fig-color, #7c9eff);
-  filter: blur(1px);
-}
-
-.patient-name-label {
-  margin-top: 18px;
+/* 打字机文本基类（气泡/旁白内由上下文覆盖字号） */
+.dialogue-text {
   font-family: var(--font-serif);
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: 4px;
-  color: var(--text);
-  text-shadow: 0 0 20px var(--fig-color, #7c9eff);
-  z-index: 3;
-}
-
-.patient-emotion-tag {
-  font-size: 15px;
-  color: var(--text-dim);
-  margin-top: 6px;
-  letter-spacing: 2px;
-  z-index: 3;
-}
-
-/* 患者状态面板（左栏底部紧凑竖排，默认淡显、hover 强化） */
-.patient-status {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 5px;
   margin: 0;
-  padding: 10px 14px;
-  background: linear-gradient(160deg, rgba(255, 250, 240, 0.92), rgba(243, 234, 217, 0.92));
-  border-top: 1px solid var(--border);
-  z-index: 3;
-  /* 弱化考试感：四维条默认淡显，hover 强化 */
-  opacity: 0.6;
-  transition: opacity 0.25s ease;
+  flex: none;
+  min-height: 0;
+  overflow: visible;
+  cursor: pointer;
 }
-.patient-stage:hover .patient-status {
+
+/* —— 角落四维（紧凑小卡，P2-5 淡显强化：默认低对比不抢焦点，
+   hover/长按 强化显示；指针 hover 的设备上 才整体提亮，触摸端 :active 等效长按） —— */
+.corner-stats {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 9;
+  width: 158px;
+  padding: 9px 12px;
+  background: rgba(255, 251, 240, 0.72);
+  border: 1px solid rgba(180, 160, 120, 0.4);
+  border-radius: 12px;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  /* 默认淡显：半透明卡 + 低透明度内容（弱色），让玩家关注患者而非数值 */
+  opacity: 0.6;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+/* 弱色：条与标签/数值在默认态降透明，形成"低对比"层次 */
+.corner-stats .status-bar { opacity: 0.65; }
+.corner-stats .status-bar-fill { opacity: 0.55; }
+.corner-stats .status-label,
+.corner-stats .status-value { opacity: 0.72; }
+/* 强化：hover 或触摸长按（:active）时更亮、放大、不透明 */
+.corner-stats:hover,
+.corner-stats:active {
   opacity: 1;
+  transform: scale(1.06);
+  background: rgba(255, 251, 240, 0.97);
+  border-color: var(--paper-border);
+  box-shadow: var(--shadow-paper);
+}
+.corner-stats:hover .status-bar,
+.corner-stats:active .status-bar,
+.corner-stats:hover .status-bar-fill,
+.corner-stats:active .status-bar-fill,
+.corner-stats:hover .status-label,
+.corner-stats:active .status-label,
+.corner-stats:hover .status-value,
+.corner-stats:active .status-value {
+  opacity: 1;
+}
+.corner-stats .status-row {
+  font-size: 12px;
+  gap: 6px;
+}
+.corner-stats .status-label { font-size: 11px; }
+.corner-stats .status-bar { height: 8px; }
+.corner-stats .status-value { font-size: 12px; }
+/* 尊重系统减弱动效：淡化/强化切换立即完成 */
+@media (prefers-reduced-motion: reduce) {
+  .corner-stats { transition: none; }
 }
 
 .status-row {
@@ -163,7 +297,6 @@
   font-size: 14px;
   min-width: 0;
 }
-
 .status-label {
   width: auto;
   flex-shrink: 0;
@@ -172,7 +305,6 @@
   color: var(--text);
   letter-spacing: 0;
 }
-
 .status-bar {
   flex: 1;
   height: 10px;
@@ -180,16 +312,14 @@
   background: var(--bg-darker);
   border-radius: 5px;
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.4);
+  border: 1px solid rgba(0, 0, 0, 0.4);
 }
-
 .status-bar-fill {
   height: 100%;
   border-radius: 5px;
   transition: width 0.5s ease, background 0.5s ease;
   box-shadow: 0 0 8px currentColor;
 }
-
 .status-value {
   width: auto;
   flex-shrink: 0;
@@ -199,124 +329,29 @@
   font-size: 15px;
 }
 
-/* 聊天区：患者消息靠左、玩家消息靠右，纵向滚动 */
-.chat-area {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow-y: auto;
-  padding: 22px 28px;
-  background: linear-gradient(180deg, rgba(255, 250, 240, 0.94), rgba(255, 250, 240, 0.98));
-}
-.chat-empty {
-  margin: auto;
-  color: var(--text-muted);
-  letter-spacing: 4px;
-}
-.chat-line {
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  max-width: 100%;
-}
-.chat-line.chat-patient { justify-content: flex-start; }
-.chat-line.chat-doctor { justify-content: flex-end; }
-.chat-avatar {
-  flex-shrink: 0;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-weight: 800;
-  color: #fff;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-card);
-}
-.chat-avatar.doctor {
-  background: linear-gradient(150deg, var(--accent), var(--accent-2));
-}
-.chat-bubble {
-  max-width: 68%;
-  padding: 12px 16px;
-  border-radius: 14px;
-  font-size: 14.5px;
-  line-height: 1.8;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-}
-.chat-bubble.patient {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-bottom-left-radius: 4px;
-  color: var(--text);
-}
-.chat-bubble.doctor {
-  background: linear-gradient(160deg, var(--accent), var(--accent-2));
-  color: #fff;
-  border-bottom-right-radius: 4px;
-}
-.chat-bubble .dialogue-text {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-size: inherit;
-  line-height: inherit;
-  min-height: 0;
-  flex: none;
-  overflow: visible;
-  padding: 0;
-  text-shadow: none;
-  cursor: pointer;
-}
-.chat-bubble.doctor .dialogue-text {
-  color: #fff;
-}
-
-.dialogue-text {
-  font-family: var(--font-serif);
-  font-size: 17px;
-  line-height: 2;
-  color: var(--text);
-  margin-bottom: 14px;
-  /* 弹性：文本区占满剩余空间，超高时内部滚动，选项区吸底始终可见 */
-  flex: 1;
-  min-height: 90px;
-  text-shadow: 0 0 16px rgba(107, 142, 255, 0.08);
-  overflow-y: auto;
-  padding-right: 6px;
-  cursor: pointer;
-}
-
-.dialogue-text.narration {
-  font-style: italic;
-  color: var(--text-dim);
-  font-family: var(--font-sans);
-  font-size: 15px;
-  border-left: 2px solid var(--border-soft);
-  padding-left: 14px;
-  cursor: default;
-}
-
-/* 底部候选对话区：深色底与聊天区分隔，选项横向居中 */
+/* —— 底部候选对话区：居中纸卡浮层（覆盖地毯前端，不遮挡两侧医患椅） —— */
 .dialogue-options {
-  flex-shrink: 0;
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  z-index: 10;
   display: flex;
   flex-direction: column;
-  gap: 9px;
-  max-height: 42%;
+  gap: 8px;
+  width: min(520px, 90%);
+  max-height: 46%;
   overflow-y: auto;
-  padding: 14px 24px 18px;
-  background: linear-gradient(180deg, rgba(20, 24, 34, 0.72), var(--bg-deep));
-  border-top: 1px solid var(--border);
+  padding: 12px 16px 14px;
+  background: rgba(255, 251, 240, 0.94);
+  border: 1px solid var(--paper-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-paper), 0 8px 24px rgba(90, 70, 40, 0.18);
 }
 .dialogue-options .choice {
   max-width: 760px;
   width: 100%;
   margin: 0 auto;
-  background: linear-gradient(135deg, rgba(255, 250, 240, 0.97), rgba(250, 244, 232, 0.97));
 }
 .dialogue-options .continue-btn {
   margin: 0 auto;
@@ -384,52 +419,229 @@
   box-shadow: 0 10px 32px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
-/* 浮动数值文字（对话反馈：清晰、停留足够久） */
+/* 窄视口：角落四维收起，给气泡与选项更多空间（P2 验收标准 1 基础不遮挡） */
+@media (max-width: 720px), (max-height: 520px) {
+  .corner-stats { display: none; }
+  .patient-figure .patient-chip { font-size: 1.4cqw; padding: 0.5cqw 1.3cqw; }
+}
+
+/* —— 右上角「回顾」+「暂停」按钮 + 本场对话回顾窗（P2-6 回顾 / P2-8 断点，纸木质浮层） —— */
+.dialogue-corner {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dialogue-history-toggle,
+.dialogue-pause-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: linear-gradient(165deg, rgba(255, 253, 246, 0.94), rgba(247, 242, 232, 0.92));
+  border: 1px solid var(--paper-border);
+  box-shadow: var(--shadow-paper);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.dialogue-history-toggle:hover,
+.dialogue-pause-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-paper), 0 4px 14px rgba(90, 70, 40, 0.18);
+}
+/* 暂停按钮语义色：偏暖强调（保存进度、稍后继续） */
+.dialogue-pause-btn {
+  color: var(--accent);
+}
+.dialogue-pause-btn:hover {
+  color: var(--accent);
+  background: linear-gradient(165deg, rgba(255, 249, 238, 0.97), rgba(250, 242, 228, 0.95));
+}
+
+/* 回顾窗：普通定位的 .dialogue-scene 直接子级（同 .dialogue-light 做法），
+   不受 .clinic-stage 容器查询影响；右上角挂出，不遮当前气泡（中）与选项（底）。 */
+.dialogue-history {
+  position: absolute;
+  top: 52px;
+  right: 12px;
+  z-index: 14;
+  width: min(420px, calc(100vw - 24px));
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(165deg, rgba(255, 253, 246, 0.97), rgba(247, 242, 232, 0.95));
+  border: 1px solid var(--paper-border);
+  border-radius: 16px;
+  box-shadow:
+    var(--shadow-paper),
+    0 10px 30px rgba(90, 70, 40, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  overflow: hidden;
+  animation: history-in 0.18s ease-out;
+}
+@keyframes history-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dialogue-history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(216, 199, 163, 0.6);
+}
+.dialogue-history-title {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--ink);
+}
+.dialogue-history-close {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(216, 199, 163, 0.25);
+  border: 1px solid rgba(216, 199, 163, 0.6);
+  color: var(--ink-dim);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.dialogue-history-close:hover {
+  background: rgba(216, 199, 163, 0.45);
+  color: var(--ink);
+}
+.dialogue-history-body {
+  overflow-y: auto;
+  padding: 10px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.dialogue-history-empty {
+  padding: 16px 0;
+  text-align: center;
+  color: var(--ink-dim);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+/* 历史行：doctor（你）靠左、patient（患者名）靠右，镜像面对面气泡方位；配色区分 */
+.history-line {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 88%;
+}
+.history-line-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.history-line-text {
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255, 251, 240, 0.9);
+  border: 1px solid rgba(216, 199, 163, 0.6);
+}
+.history-line.doctor { align-self: flex-start; }
+.history-line.doctor .history-line-name { color: #35785a; }
+.history-line.doctor .history-line-text {
+  background: linear-gradient(135deg, rgba(243, 250, 244, 0.92), rgba(255, 253, 246, 0.92));
+}
+.history-line.patient { align-self: flex-end; align-items: flex-end; }
+.history-line.patient .history-line-name { color: #b06a3c; }
+.history-line.patient .history-line-text {
+  background: linear-gradient(135deg, rgba(255, 250, 238, 0.92), rgba(247, 238, 220, 0.92));
+}
+
+/* 窄视口：回顾窗更宽更接近全屏小窗，按钮收窄 */
+@media (max-width: 720px), (max-height: 520px) {
+  .dialogue-history-toggle,
+  .dialogue-pause-btn { padding: 7px 11px; font-size: 12px; }
+  .dialogue-history {
+    top: 50px;
+    right: 8px;
+    left: 8px;
+    width: auto;
+    max-height: 66vh;
+  }
+}
+
+/* 尊重系统减弱动效：回顾窗弹出立即完成 */
+@media (prefers-reduced-motion: reduce) {
+  .dialogue-history { animation: none; }
+}
+
+/* 浮动文字（P2-5 情绪化：浅色纸底/暖字、柔和渐隐；由 Overlays 渲染）。
+   维度数值浮动 + 机制语映射后的情绪反馈统一走此纸木质药丸，
+   kind 只做暖色调微差，不再深底霓虹抢眼。 */
 .floating-text {
   position: fixed;
   pointer-events: none;
   z-index: 200;
-  font-weight: 800;
-  font-size: 17px;
-  padding: 6px 18px;
-  border-radius: 20px;
-  background: rgba(32, 26, 20, 0.82);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 7px 18px;
+  border-radius: 999px;
+  background: rgba(255, 251, 240, 0.97);
+  border: 1.5px solid var(--paper-border);
+  box-shadow: var(--shadow-paper), 0 4px 14px rgba(90, 70, 40, 0.18);
+  color: #5c4632;
   white-space: nowrap;
   transform: translateX(-50%);
   animation: floatUp 2s ease-out forwards;
   letter-spacing: 0.5px;
 }
+/* 各 kind 柔和色调：浅纸底 + 暖字，弱对比不发亮 */
 .floating-text.good {
-  color: #7ef0b0;
-  border-color: rgba(126, 240, 176, 0.55);
-  text-shadow: 0 0 12px rgba(126, 240, 176, 0.35);
+  color: #35785a;
+  border-color: rgba(75, 150, 110, 0.5);
+  background: rgba(243, 250, 244, 0.97);
 }
 .floating-text.bad {
-  color: #ff9ba8;
-  border-color: rgba(255, 155, 168, 0.55);
-  text-shadow: 0 0 12px rgba(255, 155, 168, 0.35);
+  color: #a8554c;
+  border-color: rgba(190, 105, 90, 0.5);
+  background: rgba(252, 244, 240, 0.97);
 }
 .floating-text.warn {
-  color: #ffd18a;
-  border-color: rgba(255, 209, 138, 0.55);
-  text-shadow: 0 0 12px rgba(255, 209, 138, 0.35);
+  color: #9c6d2c;
+  border-color: rgba(196, 150, 70, 0.5);
+  background: rgba(252, 247, 235, 0.97);
+}
+/* 锁定提示：保留原意并带"锁着"图标 */
+.floating-text.warn::before {
+  content: "🔒 ";
+  font-size: 0.9em;
 }
 .floating-text.combo {
-  color: #ffd76a;
-  font-size: 20px;
-  border-color: rgba(255, 215, 106, 0.6);
-  background: rgba(58, 40, 14, 0.9);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), 0 0 26px rgba(255, 215, 106, 0.28);
+  color: #8f5f14;
+  font-size: 16.5px;
+  border-color: rgba(196, 150, 60, 0.6);
+  background: rgba(253, 246, 226, 0.97);
+  box-shadow: var(--shadow-paper), 0 4px 18px rgba(90, 70, 40, 0.22);
 }
 .floating-text.truth {
-  color: #c9b6ff;
-  border-color: rgba(201, 182, 255, 0.55);
-  text-shadow: 0 0 12px rgba(201, 182, 255, 0.35);
+  color: #6d5aa8;
+  border-color: rgba(120, 100, 180, 0.5);
+  background: rgba(245, 243, 252, 0.97);
 }
 
 @keyframes floatUp {
@@ -439,4 +651,3 @@
   82% { opacity: 1; }
   100% { opacity: 0; transform: translateX(-50%) translateY(-88px) scale(1); }
 }
-

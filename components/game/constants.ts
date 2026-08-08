@@ -75,12 +75,12 @@ export function catName(c: string): string {
 export function warmthEcho(e: EndingType, patientName?: string): string {
   const who = patientName ? `${patientName}` : "对方";
   const map: Record<EndingType, string> = {
-    cure: `${who}久违地笑了一下。那一刻你忽然明白：所谓治愈，不是你治好了谁，而是有人愿意坐下来，听他把话说完。`,
-    acceptance: `${who}带着不完美的自己走了出去。你没有替他解决所有问题，但你让他相信：带着伤口，也能继续往前走。`,
-    awakening: `${who}第一次看清了自己。你做的不是诊断，是递出了一面镜子——而他有勇气往里看。`,
+    cure: `${who}久违地笑了一下。那一刻你忽然明白：所谓治愈，不是你治好了谁，而是有人愿意坐下来，听TA把话说完。`,
+    acceptance: `${who}带着不完美的自己走了出去。你没有替TA解决所有问题，但你让TA相信：带着伤口，也能继续往前走。`,
+    awakening: `${who}第一次看清了自己。你做的不是诊断，是递出了一面镜子——而TA有勇气往里看。`,
     transfer: `${who}得到了更合适的帮助。承认「这超出我能做的」不是失败，是你对另一个生命最清醒的善意。`,
-    hidden: `你替${who}挡了一次风。这件事或许没人知道，但你知道，他知道。这就够了。`,
-    dependent: `${who}此刻很依赖你。这分依赖是真的，但你心里隐隐知道：真正的功课，是有一天让他不再需要你。`,
+    hidden: `你替${who}挡了一次风。这件事或许没人知道，但你知道，TA知道。这就够了。`,
+    dependent: `${who}此刻很依赖你。这分依赖是真的，但你心里隐隐知道：真正的功课，是有一天让TA不再需要你。`,
     worsen: `${who}的情况变糟了。你坐在空荡的诊室里，心里发紧。请记得：不是你不够好，是有些事，一个人扛不动。明天，我们再试一次。`,
     tragic: `这一页很难翻过去。你没法假装无事发生，也不必假装。允许自己难过——这份难过，恰恰说明你在乎。`,
   };

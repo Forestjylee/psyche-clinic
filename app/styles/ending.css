@@ -75,6 +75,51 @@
   font-style: italic;
 }
 
+/* 叙事式真相复盘：呈现「表象→现状」，留钩子不揭真相（纸木质小卡） */
+.ending-recap {
+  max-width: 460px;
+  margin: 0 auto 24px;
+  padding: 18px 22px 20px;
+  background: linear-gradient(165deg, #fffdf6, #fcf4e3);
+  border: 1px solid var(--paper-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-paper);
+  text-align: left;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: ending-recap-in 600ms ease-out 180ms forwards;
+}
+@keyframes ending-recap-in {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ending-recap { animation: none; opacity: 1; transform: none; }
+}
+.ending-recap-title {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--ink-dim);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.ending-recap-title::first-letter {
+  font-size: 15px;
+  color: var(--gold-deep);
+}
+.ending-recap-line {
+  font-family: var(--font-serif);
+  font-size: 14.5px;
+  line-height: 2;
+  color: var(--ink);
+  margin: 0;
+}
+.ending-recap-line + .ending-recap-line {
+  margin-top: 6px;
+  color: var(--ink-dim);
+}
+
 /* 温暖回响：把结局焦点从「数字奖励」拉回到「你陪伴了一个人」 */
 .ending-warmth {
   position: relative;

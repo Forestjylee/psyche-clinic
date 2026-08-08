@@ -200,6 +200,10 @@
   gap: 6px;
   margin-left: auto;
   padding: 7px 14px;
+  /* P2-9 修复：窄视口下 hud-stats 横向溢出（nowrap），时段文案「第 N 天 · 下午」
+     被压缩换行，把整条 hud-stats 撑到 160px 高，垂直盖住右上角「回顾/暂停」按钮。
+     禁止换行后胶囊恒为单行（高≈40px），hud-stats 不再越出 68px 顶栏带。 */
+  white-space: nowrap;
   background: linear-gradient(150deg, var(--paper-hi), var(--paper));
   border: 1px solid var(--paper-border);
   border-radius: 14px;

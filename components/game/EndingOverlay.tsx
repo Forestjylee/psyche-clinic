@@ -15,7 +15,7 @@ import {
   SENSITIVE_ENDINGS,
 } from "./constants";
 import { ChibiCharacter } from "./ChibiCharacter";
-import type { ChoiceEffect } from "@/lib/types";
+import type { ChoiceEffect, EndingType } from "@/lib/types";
 
 const DEFAULT_PALETTE = { primary: "#8a9a5b", secondary: "#6b7a4f", fog: "#efe7d8", bright: "#a8c06a" };
 
@@ -37,11 +37,12 @@ export function EndingOverlay() {
   }, [endingData?.ending]);
 
   if (!endingData) return null;
-  const { ending, title, text, reward, patientName } = endingData;
+  const { ending, title, text, reward, patientName, patientSurface } = endingData;
   const palette = endingData.patientPalette ?? DEFAULT_PALETTE;
   const isSensitive = SENSITIVE_ENDINGS.has(ending);
   const showChooser = isSensitive && mode === "choose";
   const showSkipped = isSensitive && (mode === "auto" || skipped);
+  const recap = patientSurface ? recapLines(ending, patientSurface) : null;
 
   const rememberAndSkip = () => {
     try {
@@ -93,6 +94,13 @@ export function EndingOverlay() {
                 text
               )}
             </div>
+            {recap ? (
+              <div className="ending-recap">
+                <div className="ending-recap-title">✎ {recap.title}</div>
+                <p className="ending-recap-line">{recap.lines[0]}</p>
+                <p className="ending-recap-line">{recap.lines[1]}</p>
+              </div>
+            ) : null}
             <div className="ending-warmth">
               <div className="ending-warmth-mark">✦ 温暖回响</div>
               <div className="ending-warmth-text">
@@ -119,6 +127,31 @@ export function EndingOverlay() {
       </div>
     </div>
   );
+}
+
+/**
+ * 叙事式真相复盘文案模板（纯呈现层）：
+ * 上句引「表象」（surface）——她来时，是{surface}。
+ * 下句按结局类型写「现状/钩子」，留钩子不揭真相；绝不输出 truth 字段文本。
+ * surface 为空时由调用方整块隐藏，不进入此处。
+ */
+function recapLines(
+  ending: EndingType,
+  surface: string
+): { title: string; lines: [string, string] } {
+  const hook: Record<EndingType, string> = {
+    cure: "这一程，TA身上那层所有人都以为的「没问题」被轻轻放下了。真正的答案，还藏在TA的记忆深处——也许下一次，TA愿意讲给你听。",
+    acceptance: "这一程，TA学会了带着那层「没问题」继续向前。可有些话TA仍没说出口，真正的答案，还锁在记忆深处。",
+    awakening: "这一程，TA在镜子里看清了自己的一部分。可镜子背面还有一行TA没读完的字——那些字，仍留在TA的记忆深处。",
+    transfer: "这一程，你陪TA走到了你能陪的尽头。TA的故事还差最后一页，而那页纸，藏在TA自己的记忆里，尚未被翻开。",
+    dependent: "这一程，TA紧紧握住了你的手。可有些裂缝，握得越紧越难愈合——TA真正的答案，还锁在记忆深处。",
+    worsen: "这一程，裂缝比想象中更深。你没能为TA补上，却看清了它最初的形状——它最早，并不是裂在这里的。",
+    tragic: "这一程，有些页你没能翻过去。可你最后看见的TA，从来不是TA来时那一个。TA的故事，停在了无人读完的地方。",
+    hidden: "这一程，你替TA守住了谁都不知道的秘密。而秘密最深处的那只抽屉，仍锁在TA的记忆里——钥匙，只在TA自己手中。",
+  };
+  // 修复：surface 自带句号（如「严重失眠、轻度抑郁。」）时去掉，避免双句号
+  const surfaceClean = surface.replace(/[。．.]+$/, "");
+  return { title: "你看见的 TA", lines: [`TA来时，是${surfaceClean}。`, hook[ending]] };
 }
 
 function Rewards({ r }: { r: ChoiceEffect }) {

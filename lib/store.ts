@@ -10,6 +10,7 @@ import type {
   Achievement,
   PatientPalette,
   PendingArrival,
+  ActiveSession,
 } from "./types";
 import {
   createInitialState,
@@ -67,6 +68,10 @@ export interface EndingData {
   patientName?: string;
   /** 患者配色，供结局页渲染 chibi 立绘 */
   patientPalette?: PatientPalette;
+  /** 患者表象描述（叙事式真相复盘用；为空则复盘块整块隐藏） */
+  patientSurface?: string;
+  /** 患者 id（记忆碎片集齐等后续功能预留） */
+  patientId?: string;
 }
 
 const MAX_GENERATED = 8;
@@ -153,6 +158,11 @@ export interface GameStore {
     patientId: string,
     lastState: PatientState
   ) => void;
+  // —— 会话断点（P2-8）——
+  /** 对话进行中持续更新草稿到 game.activeSession（仅草稿，随 saveGame 落盘） */
+  syncSessionDraft: (session: ActiveSession) => void;
+  /** 暂停并保存断点：写入 game + saveGame + 回大厅 */
+  pauseSession: () => void;
   // —— 通知 ——
   toast: (msg: string, kind?: "info" | "ok" | "warn") => void;
   pushFloating: (text: string, kind: string) => void;
@@ -615,6 +625,24 @@ export const useGameStore = create<GameStore>((set, get) => {
       playSound("click");
     },
 
+    syncSessionDraft: (session: ActiveSession) => {
+      // 草稿只写入 game.activeSession，不触发 commit/set：
+      // 暂停、中途退出（backToTitle 已有 saveGame）、结算清断点时随 saveGame 统一落盘
+      get().game.activeSession = session;
+    },
+
+    pauseSession: () => {
+      const g = get().game;
+      if (!g.activeSession) {
+        toast("还没有可保存的会话进度", "warn");
+        return;
+      }
+      saveGame(g);
+      set({ hasSave: true, currentPatient: null, scene: "clinic" });
+      playSound("page");
+      toast("已保存会话进度，可在预约清单继续", "ok");
+    },
+
     finishSession: (
       ending: EndingType,
       title: string,
@@ -624,6 +652,8 @@ export const useGameStore = create<GameStore>((set, get) => {
       lastState: PatientState
     ) => {
       const g = get().game;
+      // 结案清断点：仅清「本会话」的断点（activeSession 若指向其他已暂停患者则保留——暂停 A 后开诊 B 并结案，A 的进度不丢）
+      if (g.activeSession?.patientId === patientId) g.activeSession = null;
       // 应用奖励
       let leveledUp = false;
       if (reward) {
@@ -679,6 +709,8 @@ export const useGameStore = create<GameStore>((set, get) => {
           reward,
           patientName: get().currentPatient?.name,
           patientPalette: get().currentPatient?.palette,
+          patientSurface: get().currentPatient?.surface,
+          patientId: get().currentPatient?.id,
         },
       });
       // 每接诊 2 位，候诊区补充一位新患者

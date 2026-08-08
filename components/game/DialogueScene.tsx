@@ -1,17 +1,46 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
+import { useGameStore } from "@/lib/store";
 import { DialogueEngine } from "@/lib/engine/DialogueEngine";
-import type { DialogueNode, PatientEmotion, PatientState, MemoryFragment } from "@/lib/types";
+import type { DialogueNode, PatientEmotion, PatientState, MemoryFragment, ActiveSession } from "@/lib/types";
 import { allSkills } from "@/lib/data/skills";
 import { TypewriterText } from "./TypewriterText";
 import { TermText } from "./PsychTermSpan";
 import { emotionColors, emotionLabels } from "./constants";
 import { ChibiCharacter } from "./ChibiCharacter";
+import { CLINIC_LAYOUT } from "./phaser/clinic/clinicLayout";
+import { toEmotionalFloating } from "./floatingEmotion";
 
-/** 聊天区一条消息（旁白独立走顶部，不入历史） */
+/** 诊室 Phaser 画布（ClinicScene 底层房间 + 医生；ssr:false 动态挂载）。
+ *  Promise.all 同时取 GameCanvas 与 ClinicScene，闭包注入 scenes，
+ *  避免在客户端组件静态引入 Phaser（服务端渲染会崩溃）。 */
+const ClinicRoomCanvas = dynamic(
+  () =>
+    Promise.all([
+      import("./phaser/GameCanvas"),
+      import("./phaser/clinic/ClinicScene"),
+    ]).then(([canvas, clinic]) => {
+      const GameCanvasComp = canvas.GameCanvas;
+      const ClinicSceneComp = clinic.ClinicScene;
+      const ClinicRoom = () => <GameCanvasComp scenes={[ClinicSceneComp]} />;
+      return ClinicRoom;
+    }),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="phaser-canvas phaser-loading">诊室准备中…</div>
+    ),
+  }
+);
+
+/** 一句话记录（旁白独立走顶部，不入历史；P2-6 回顾窗用） */
 type Line = { id: string; speaker: "patient" | "doctor"; text: string };
+
+/** 逻辑坐标 → 覆盖层百分比（960×540 → 100%） */
+const logiPct = (v: number, total: number) => `${(v / total) * 100}%`;
 
 export function DialogueScene() {
   const {
@@ -24,62 +53,134 @@ export function DialogueScene() {
   } = useGame();
 
   const engineRef = useRef<DialogueEngine | null>(null);
-  const chatRef = useRef<HTMLDivElement | null>(null);
   const [node, setNode] = useState<DialogueNode | null>(null);
   const [pState, setPState] = useState<PatientState | null>(null);
   const [emotion, setEmotion] = useState<PatientEmotion>("neutral");
   const [flashback, setFlashback] = useState<MemoryFragment | null>(null);
+  // 保留但不滚动渲染：P2-6 回顾窗需要完整会话记录
   const [history, setHistory] = useState<Line[]>([]);
+  // 右上角回顾窗开关（P2-6，非阻塞，可边看边推进剧情）
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const historyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!currentPatient) return;
-    setHistory([]);
-    const eng = new DialogueEngine(currentPatient, game, {
-      onStateChange: (state, emo) => {
-        setPState({ ...state });
-        if (emo) setEmotion(emo as PatientEmotion);
-        achievementEngine?.onStateUpdate(state);
+    // P2-8 断点恢复：同一患者存在 activeSession 时重放历史 + 注入恢复参数
+    const activeSession = game.activeSession;
+    const resuming =
+      activeSession != null && activeSession.patientId === currentPatient.id;
+    if (resuming && activeSession) {
+      setHistory(
+        activeSession.history.map((l, i) => ({
+          id: `restore-${i}`,
+          speaker: l.speaker,
+          text: l.text,
+        }))
+      );
+    } else {
+      setHistory([]);
+    }
+    const eng = new DialogueEngine(
+      currentPatient,
+      game,
+      {
+        onStateChange: (state, emo) => {
+          setPState({ ...state });
+          if (emo) setEmotion(emo as PatientEmotion);
+          achievementEngine?.onStateUpdate(state);
+        },
+        onNodeEnter: (n) => {
+          setNode(n);
+          // 旁白走顶部展示，不入历史
+          const sp = n.speaker;
+          if (sp === "patient" || sp === "doctor") {
+            setHistory((h) => [
+              ...h,
+              { id: `${n.id}-${h.length}`, speaker: sp, text: n.text },
+            ]);
+          }
+        },
+        onChoiceMade: (choice) => {
+          const s = eng.getState();
+          achievementEngine?.onChoiceMade(choice.kind, s);
+        },
+        onComboTrigger: () => {
+          achievementEngine?.onComboTrigger();
+          playSound("combo");
+        },
+        // 机制语 → 情绪反馈（呈现层映射，不改引擎文案）
+        onFloatingText: (text, kind) => pushFloating(toEmotionalFloating(text, kind), kind),
+        onMemoryTrigger: (frag) => {
+          // 记忆碎片不自动关闭，等待玩家阅读后点击关闭
+          setFlashback(frag);
+          playSound("memory");
+        },
+        onEnding: (ending, title, text, reward) => {
+          const s = eng.getState();
+          finishSession(ending, title, text, reward, currentPatient.id, s);
+        },
       },
-      onNodeEnter: (n) => {
-        setNode(n);
-        // 旁白走顶部展示，不入左右聊天流
-        const sp = n.speaker;
-        if (sp === "patient" || sp === "doctor") {
-          setHistory((h) => [
-            ...h,
-            { id: `${n.id}-${h.length}`, speaker: sp, text: n.text },
-          ]);
-        }
-      },
-      onChoiceMade: (choice) => {
-        const s = eng.getState();
-        achievementEngine?.onChoiceMade(choice.kind, s);
-      },
-      onComboTrigger: () => {
-        achievementEngine?.onComboTrigger();
-        playSound("combo");
-      },
-      onFloatingText: (text, kind) => pushFloating(text, kind),
-      onMemoryTrigger: (frag) => {
-        // 记忆碎片不自动关闭，等待玩家阅读后点击关闭
-        setFlashback(frag);
-        playSound("memory");
-      },
-      onEnding: (ending, title, text, reward) => {
-        const s = eng.getState();
-        finishSession(ending, title, text, reward, currentPatient.id, s);
-      },
-    });
+      resuming && activeSession
+        ? {
+            nodeId: activeSession.nodeId,
+            state: activeSession.patientState,
+            triggeredMemories: activeSession.triggeredMemories,
+          }
+        : undefined
+    );
     engineRef.current = eng;
     eng.start();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPatient]);
 
-  // 聊天区自动滚动到底
+  /** 组装当前会话断点快照（P2-8）：引擎状态 + 断点节点 + 历史 + 已触发碎片 */
+  const snapshotSession = (): ActiveSession | null => {
+    const eng = engineRef.current;
+    if (!eng || !currentPatient) return null;
+    // 断点定位经 getResumeInfo()：补轮节点（_pad_*）不落剧本表，映射回其导向的真实结局节点，
+    // 恢复后引擎按 state.round 自动重建补轮（最终评审 I-1）。普通节点即自身 id。
+    const info = eng.getResumeInfo();
+    const nodeId = info.nodeId;
+    // 快照排除「恢复后会重建的行」：断点节点当前句（恢复后 start() 首次 enterNode 重新追加，
+    // 方案 B 防重复）+ 补轮前缀行（恢复后 buildPadNode 重建补轮独白/二选一会重新追加）。
+    const historyBeforeNode = history.filter(
+      (l) =>
+        !info.excludePrefixes.some((p) => l.id.startsWith(p)) &&
+        !l.id.startsWith(`${nodeId}-`)
+    );
+    return {
+      patientId: currentPatient.id,
+      nodeId,
+      patientState: eng.getState(),
+      history: historyBeforeNode.map(({ speaker, text }) => ({ speaker, text })),
+      triggeredMemories: eng.getTriggeredMemories(),
+    };
+  };
+
+  // 对话进行中持续把最新快照草稿写入 game.activeSession（不落盘），
+  // 「暂停」与 HUD「退出」（backToTitle 自带 saveGame）都据此保存断点
   useEffect(() => {
-    const el = chatRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [history]);
+    if (!currentPatient || !engineRef.current) return;
+    // P2-9 修复：结局节点不写回断点草稿。
+    // 结算（finishSession）已把 activeSession 置 null 并落盘；若此处再写回，
+    // 内存中的 activeSession 会残留为已完成患者，预约清单误显「继续上次」角标
+    // （周明远/陈洛结案后实测复现）。跳过结局节点即可让断点在结算后保持清空。
+    if (node?.isEnding) return;
+    // 只同步「属于本会话」的断点草稿：activeSession 指向其他已暂停患者时跳过，
+    // 避免新开的会话立即覆盖其断点——只有显式「暂停」或 activeSession 为空时的新会话才接管。
+    const active = useGameStore.getState().game.activeSession;
+    if (active && active.patientId !== currentPatient.id) return;
+    const s = snapshotSession();
+    if (s) useGameStore.getState().syncSessionDraft(s);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node, history, pState, currentPatient]);
+
+  // 打开回顾窗时滚到底部（最新一句可见）；已打开时新句追加不打扰玩家的翻看位置
+  useEffect(() => {
+    if (historyOpen && historyRef.current) {
+      historyRef.current.scrollTop = historyRef.current.scrollHeight;
+    }
+  }, [historyOpen]);
 
   const dismissFlashback = () => setFlashback(null);
 
@@ -111,7 +212,7 @@ export function DialogueScene() {
       return;
     }
     playSound("click");
-    // 玩家选择的发言进入右侧气泡，然后推进剧情
+    // 玩家选择的发言进入历史（P2-6 回顾窗用），然后推进剧情
     setHistory((h) => [
       ...h,
       { id: `player-${h.length}`, speaker: "doctor", text: c.text },
@@ -122,87 +223,149 @@ export function DialogueScene() {
   const emoColor = emotionColors[emotion];
   const palette = currentPatient.palette;
 
+  // —— 灯光呼吸层（P2-4）：共情/平静走暖橙，触及痛点走冷灰蓝；
+  // 真相 ≥60 视为「真相揭开」状态，持续打出一束光（flashback 浮层 z90 会盖住瞬时光束，故不用其作信号） ——
+  const warmEmotions: PatientEmotion[] = ["calm", "happy", "neutral"];
+  const lightTone = warmEmotions.includes(emotion) ? "light-warm" : "light-dim";
+  const revealTruth = !!pState && pState.truth >= 60;
+
+  // 当前句定位：narration 走顶部旁白，patient/doctor 走各自气泡锚点
+  const sp = node.speaker;
+  const isNarration = sp === "narration";
+  const bubbleAnchor =
+    sp === "patient" ? CLINIC_LAYOUT.bubbleAnchor.patient : CLINIC_LAYOUT.bubbleAnchor.doctor;
+  const bubbleName = sp === "patient" ? currentPatient.name : "你";
+
   return (
     <div className="scene dialogue-scene">
-      <div className="dialogue-narration">
-        {node.speaker === "narration" ? (
-          <TypewriterText key={node.id} text={node.text} />
+      {/* 底层诊室房间 + 医生坐像（Phaser FIT 铺满） */}
+      <ClinicRoomCanvas />
+
+      {/* 灯光呼吸层：半透明渐变叠在画布上（z1，气泡 z2 之上保持可读），随 emotion 切换色调 */}
+      <div className="dialogue-light" aria-hidden="true">
+        <div className={`light-plane light-warm ${lightTone === "light-warm" ? "on" : ""}`} />
+        <div className={`light-plane light-dim ${lightTone === "light-dim" ? "on" : ""}`} />
+        <div className={`light-beam ${revealTruth ? "on" : ""}`} />
+      </div>
+
+      {/* FIT 对齐覆盖层：与 Phaser 画布显示区域精确同框（960×540 等比居中） */}
+      <div className="clinic-stage">
+        {/* 患者立绘 + 姓名/情绪 tag（emotion 驱动，只走 React） */}
+        <div
+          className="patient-figure"
+          style={{
+            left: logiPct(CLINIC_LAYOUT.patientPos.x, CLINIC_LAYOUT.width),
+            top: logiPct(CLINIC_LAYOUT.patientPos.y, CLINIC_LAYOUT.height),
+          }}
+        >
+          <ChibiCharacter
+            palette={palette}
+            emotion={emotion}
+            size="lg"
+            className="patient-chibi"
+          />
+          <div className="patient-chip">
+            <span className="patient-chip-name">{currentPatient.name}</span>
+            <span className="patient-chip-emo" style={{ color: emoColor }}>
+              {emotionLabels[emotion]}
+            </span>
+          </div>
+        </div>
+
+        {/* 当前句：narration 顶部旁白 / patient·doctor 面对面气泡（换句重挂载打字） */}
+        {isNarration ? (
+          <div className="dialogue-narration" key={node.id}>
+            <TypewriterText text={node.text} />
+          </div>
         ) : (
-          <span className="dialogue-narration-deco">✦</span>
+          <div
+            key={node.id}
+            className={`speak-bubble ${sp}`}
+            style={{
+              left: logiPct(bubbleAnchor.x, CLINIC_LAYOUT.width),
+              top: logiPct(bubbleAnchor.y, CLINIC_LAYOUT.height),
+            }}
+          >
+            <span className="bubble-name">{bubbleName}</span>
+            <TypewriterText text={node.text} />
+          </div>
         )}
       </div>
 
-      <div className="dialogue-main">
-        {/* 左栏：患者立绘 + 状态 */}
-        <div className="patient-stage">
-          <div
-            className="patient-stage-bg"
-            style={
-              {
-                "--stage-color": palette.fog,
-                background: `linear-gradient(180deg, ${palette.fog}1c 0%, var(--bg-panel) 55%, var(--bg-panel-2) 100%)`,
-              } as React.CSSProperties
-            }
-          />
-          <div className="patient-figure">
-            <ChibiCharacter
-              palette={palette}
-              emotion={emotion}
-              size="xl"
-              className="patient-chibi"
-            />
-            <div className="patient-name-label">{currentPatient.name}</div>
-            <div className="patient-emotion-tag" style={{ color: emoColor }}>
-              {emotionLabels[emotion]}
-            </div>
-          </div>
-          {pState ? (
-            <div className="patient-status">
-              <StatusRow label="信任" value={pState.trust} color="var(--good)" />
-              <StatusRow label="防御" value={pState.defense} color="var(--bad)" />
-              <StatusRow label="心情" value={pState.mood} color="var(--accent)" />
-              <StatusRow label="真相" value={pState.truth} color="var(--truth)" />
-            </div>
-          ) : null}
+      {/* 角落四维（紧凑小尺寸；P2-5 再做淡化打磨） */}
+      {pState ? (
+        <div className="corner-stats">
+          <StatusRow label="信任" value={pState.trust} color="var(--good)" />
+          <StatusRow label="防御" value={pState.defense} color="var(--bad)" />
+          <StatusRow label="心情" value={pState.mood} color="var(--accent)" />
+          <StatusRow label="真相" value={pState.truth} color="var(--truth)" />
         </div>
+      ) : null}
 
-        {/* 聊天区：患者消息靠左，玩家消息靠右 */}
-        <div className="chat-area" ref={chatRef}>
-          {history.length === 0 ? (
-            <div className="chat-empty">……</div>
-          ) : (
-            history.map((line, i) => {
-              const isLast = i === history.length - 1;
-              const isPatient = line.speaker === "patient";
-              return (
-                <div
-                  key={line.id}
-                  className={`chat-line ${isPatient ? "chat-patient" : "chat-doctor"}`}
-                >
-                  {isPatient && (
-                    <div
-                      className="chat-avatar patient"
-                      style={{ background: `linear-gradient(150deg, ${palette.primary}, ${palette.secondary})` }}
-                    >
-                      {currentPatient.name.slice(0, 1)}
-                    </div>
-                  )}
-                  <div className={`chat-bubble ${isPatient ? "patient" : "doctor"}`}>
-                    {isLast ? (
-                      <TypewriterText key={line.id} text={line.text} />
-                    ) : (
-                      <div className="dialogue-text">{line.text}</div>
-                    )}
-                  </div>
-                  {!isPatient && <div className="chat-avatar doctor">你</div>}
-                </div>
-              );
-            })
-          )}
-        </div>
+      {/* 右上角「回顾」+「暂停」按钮（P2-6 回顾窗 / P2-8 断点快照） */}
+      <div className="dialogue-corner">
+        <button
+          className="dialogue-history-toggle"
+          onClick={() => {
+            playSound("click");
+            setHistoryOpen((v) => !v);
+          }}
+          aria-label={historyOpen ? "关闭本场对话回顾" : "打开本场对话回顾"}
+          aria-expanded={historyOpen}
+        >
+          <span aria-hidden="true">📖</span> 回顾
+        </button>
+        <button
+          className="dialogue-pause-btn"
+          onClick={() => {
+            playSound("click");
+            const s = snapshotSession();
+            if (s) {
+              // 先同步最新草稿再暂停（避免草稿 effect 尚未跑到的边缘情况）
+              useGameStore.getState().syncSessionDraft(s);
+              useGameStore.getState().pauseSession();
+            }
+          }}
+          aria-label="暂停并保存会话进度"
+          title="保存进度，稍后继续"
+        >
+          <span aria-hidden="true">⏸</span> 暂停
+        </button>
       </div>
 
-      {/* 底部：候选对话 */}
+      {/* 本场对话回顾窗：history 逐行渲染，患者/医生左右镜像 + 配色区分 */}
+      {historyOpen ? (
+        <div className="dialogue-history" role="dialog" aria-label="本场对话回顾">
+          <div className="dialogue-history-head">
+            <span className="dialogue-history-title">本场对话</span>
+            <button
+              className="dialogue-history-close"
+              onClick={() => setHistoryOpen(false)}
+              aria-label="关闭回顾窗"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="dialogue-history-body" ref={historyRef}>
+            {history.length === 0 ? (
+              <div className="dialogue-history-empty">本场对话还没有记录</div>
+            ) : (
+              history.map((line) => (
+                <div key={line.id} className={`history-line ${line.speaker}`}>
+                  <span className="history-line-name">
+                    {line.speaker === "patient" ? currentPatient.name : "你"}
+                  </span>
+                  <span className="history-line-text">
+                    <TermText text={line.text} />
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      ) : null}
+
+      {/* 底部：候选对话 / 继续 */}
       <div className="dialogue-options">
         {node.isEnding ? null : node.choices && node.choices.length > 0 ? (
           node.choices.map((c) => {

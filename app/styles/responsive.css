@@ -9,13 +9,9 @@
 
 /* 矮屏：压缩间距与字号，把纵向空间让给核心内容 */
 @media (max-height: 760px) {
-  .chat-area { padding: 14px 18px 16px; }
   .dialogue-text { font-size: 15.5px; min-height: 60px; line-height: 1.8; }
   .dialogue-options { gap: 6px; }
   .choice { padding: 9px 14px; font-size: 13.5px; }
-  .chibi.size-xl { width: 150px; }
-  .patient-stage { width: 240px; }
-  .patient-status { padding: 8px 12px; gap: 6px; }
   .status-row { font-size: 12.5px; }
   .status-label { font-size: 11.5px; }
   .status-value { font-size: 13px; }
@@ -30,12 +26,43 @@
   .ending-card { padding: 26px; }
 }
 
-/* 极矮屏：隐藏对话左侧状态条，进一步压缩，选项始终可点 */
+/* 极矮屏：进一步压缩，选项始终可点 */
 @media (max-height: 600px) {
-  .patient-status { display: none; }
-  .patient-name-label { font-size: 16px; }
-  .chat-area { padding: 10px 14px 12px; }
   .choice { padding: 8px 12px; }
   .dialogue-text { min-height: 48px; }
+}
+
+/* ========== 窄宽屏：HUD 顶栏压缩（P2-9 修复横向溢出） ==========
+   顶栏内容在视口 < ~960px 时超宽：隐藏诊所品牌（约 160px），
+   胶囊去标签/进度条只留图标+数值，保证右侧保存/退出按钮保持可见。 */
+
+/* 窄屏（平板/分屏/小笔记本）：隐藏品牌，胶囊瘦身 */
+@media (max-width: 960px) {
+  .hud { padding: 0 12px; gap: 10px; }
+  .hud-brand { display: none; }
+  .hud-stat { padding: 5px 11px; gap: 7px; }
+  .hud-stat-label { display: none; }
+  .hud-stat-bar { display: none; }
+  .hud-stat-value { font-size: 15px; }
+  .hud-stat-icon { width: 26px; height: 26px; font-size: 13px; }
+}
+
+/* 更窄（手机横屏/小窗）：进一步压缩，隐藏时段槽位与静音按钮 */
+@media (max-width: 700px) {
+  .hud { padding: 0 10px; gap: 6px; }
+  .hud-stats { gap: 4px; }
+  .hud-stat { padding: 4px 9px; gap: 5px; }
+  .hud-stat-icon { width: 22px; height: 22px; font-size: 12px; }
+  .hud-stat-value { font-size: 13px; }
+  .hud-day { padding: 5px 9px; font-size: 13px; }
+  .hud-slot-count { display: none; }
+  .hud-mute-btn { display: none; }
+  .hud-action-btn { padding: 4px 9px; font-size: 12px; }
+}
+
+/* 手机竖屏（≤540px）：保留金钱/理智两颗核心胶囊 + 时段 + 保存/退出 */
+@media (max-width: 540px) {
+  .hud-stat:has(.hud-stat-icon.lvl),
+  .hud-stat:has(.hud-stat-icon.rep) { display: none; }
 }
 

@@ -25,6 +25,42 @@ describe("createInitialState 复诊字段默认值", () => {
   });
 });
 
+describe("activeSession 会话断点默认值（P2-8）", () => {
+  it("初始状态 activeSession 为 null", () => {
+    const g = createInitialState();
+    expect(g.activeSession).toBeNull();
+  });
+  it("旧存档缺少 activeSession 时 migrate 补齐为 null", () => {
+    const legacy = {
+      doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
+      skills: [],
+      clinicUpgrades: [],
+      patientRecords: {},
+      day: 1,
+      slot: 0,
+      todayServed: [],
+      waitingDays: {},
+      abandoned: [],
+      messages: [],
+      generatedScenarios: [],
+    } as unknown as GameState;
+    const migrated = migrateGameState(legacy);
+    expect(migrated.activeSession).toBeNull();
+  });
+  it("已有 activeSession 的新存档不被覆盖", () => {
+    const fresh = createInitialState();
+    fresh.activeSession = {
+      patientId: "p1",
+      nodeId: "mid",
+      patientState: { trust: 40, defense: 5, mood: 60, truth: 30, round: 6 },
+      history: [{ speaker: "doctor", text: "你好" }],
+      triggeredMemories: ["m1"],
+    };
+    const migrated = migrateGameState(fresh);
+    expect(migrated.activeSession).toEqual(fresh.activeSession);
+  });
+});
+
 describe("migrateGameState 旧存档兼容", () => {
   it("旧存档缺少复诊字段时补齐默认值", () => {
     const legacy = {
