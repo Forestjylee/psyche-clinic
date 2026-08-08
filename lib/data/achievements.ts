@@ -125,7 +125,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "therapy_100_patients",
     name: "悬壶济世",
-    description: "累计让 100 位患者完成治疗。",
+    description: "你已经陪许多人，走过了放下心结的那一天。",
     category: "therapy",
     rarity: "legendary",
     target: 100,
@@ -409,7 +409,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "growth_skill_8",
     name: "学贯中西",
-    description: "同时解锁 8 项或以上技能。",
+    description: "你学过的每一种方法，都曾让一双手重新握紧希望。",
     category: "growth",
     rarity: "legendary",
     target: 8,
@@ -461,7 +461,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "clinic_money_100k",
     name: "日进斗金",
-    description: "诊所总资产（金钱）达到 100000。",
+    description: "诊室的灯火，照亮了这座小镇越来越多的夜晚。",
     category: "clinic",
     rarity: "legendary",
     target: 100000,
@@ -691,11 +691,11 @@ export const allAchievements: Achievement[] = [
     reward: { exp: 50, sanity: 20 },
   },
 
-  // ---------------- 主动获客类 9 个（v0.5.0） ----------------
+  // ---------------- 善意连接类 9 个（v0.5.0） ----------------
   {
     id: "discover_first",
     name: "广而告之",
-    description: "首次通过渠道投放发现潜在客户。",
+    description: "第一次，有人因为你的善意找到了你。",
     category: "discover",
     rarity: "common",
     target: 1,
@@ -705,7 +705,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "discover_5",
     name: "名声初起",
-    description: "累计进行 5 次渠道投放。",
+    description: "你的名字，开始被这座小镇记下。",
     category: "discover",
     rarity: "rare",
     target: 5,
@@ -715,7 +715,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "discover_15",
     name: "广撒渔网",
-    description: "累计进行 15 次渠道投放。",
+    description: "你为社区做过的事，正被越来越多的人记得。",
     category: "discover",
     rarity: "epic",
     target: 15,
@@ -725,7 +725,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "discover_all_channels",
     name: "四面开花",
-    description: "使用过全部获客渠道。",
+    description: "每一种善意，都曾带一个人来到你面前。",
     category: "discover",
     rarity: "epic",
     target: 4,
@@ -867,7 +867,7 @@ export const achievementCategoryLabels: Record<Achievement["category"], string> 
   clinic: "经营",
   ethics: "伦理",
   secret: "隐藏",
-  discover: "获客",
+  discover: "善意连接",
   aftercare: "回访",
 };
 

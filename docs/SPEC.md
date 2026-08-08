@@ -2,7 +2,7 @@
 
 | 字段 | 内容 |
 | --- | --- |
-| 文档版本 | v1.2.4 |
+| 文档版本 | v1.2.5 |
 | 维护人 | Psyche Clinic Team |
 | 最后更新 | 2026-08-08 |
 | 配套文档 | [PRD.md](./PRD.md) · [PLAN.md](./PLAN.md) · [DEPLOYMENT.md](./DEPLOYMENT.md) |
@@ -595,7 +595,7 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 
 分类分布：获客 9 / 回访 5 / 诊疗扩展 5 / 经营扩展 7 / 结局扩展 7 / 成长 3 / 伦理 4 / 隐藏 4。
 
-> **待修订标注（PLAN P5-4/P5-5）**：下列高频数值肝度型成就（`clinic_money_100k 日进斗金`、`therapy_100_patients 悬壶济世`、`growth_skill_8 学贯中西`、`discover_15 广撒渔网`、`discover_all_channels 四面开花`）按 PRD 场景7「成就=旅程里程碑、情感奖励」将**修订描述与奖励**，数值门槛可能放宽或语义转换，详见 PLAN P5-4/P5-5。
+> **修订标注（PLAN P5-4/P5-5）**：下列高频数值肝度型成就（`clinic_money_100k 日进斗金`、`therapy_100_patients 悬壶济世`、`growth_skill_8 学贯中西`、`discover_15 广撒渔网`、`discover_all_channels 四面开花`）按 PRD 场景7「成就=旅程里程碑、情感奖励」已修订：**描述（description）已于 P5-4 转为旅程里程碑语义**（不再写「累计让 100 位」「达到 100000」这类高频数值肝度目标，改为旅程纪念措辞，如「你已经陪许多人，走过了放下心结的那一天」）；**数值目标（target 列）与稀有度保持不变**，进度条仍显示达成进度；**奖励机制修订（情感化奖励：解锁信件/装饰/记忆碎片/特殊回访）待 P5-5**。
 
 **获客（新分类 `discover`，标签「获客」）**
 
@@ -743,6 +743,7 @@ interface GameStats {
 | v1.2.2 | 2026-08-08 | **评审修订（第二轮）**：§3.1 未落地字段统一标注「(规划, PLAN Px-x)」（unlockedFragments/activeSession）；§12.3 标注待修订高频数值成就（日进斗金/悬壶济世/学贯中西/广撒渔网/四面开花，对应 PLAN P5-4/P5-5）；§3.5/§3.6 慈善获客语义待 PLAN P5-2 同步（广告→善意连接） |
 | v1.2.3 | 2026-08-08 | **评审修订（第三轮）**：§3.5/§3.6 慈善获客语义落地（广告→善意连接：广告拉新 300 金 → 慈善活动费 30-150 金；渠道表改为捐图书角/资助社区讲座/公益宣传/治愈者口口相传）；DiscoveryScene 与相关 UI 文案同步 |
 | v1.2.4 | 2026-08-08 | **评审修订（第三轮）**：P5-3 理智完整机制落地（消耗：沉重病例 -10/坏结局 -15/连续不休息第 3 场起 -5；恢复：回访 +10/读信每封 +2/花园待一会 +5 每日一次；归零温情强制休息梦境 +35 恢复）；GameState 新增 sessionSinceRest/gardenDay；清理 sanity"倒闭"旧注释 |
+| v1.2.5 | 2026-08-08 | P5-4：成就描述转向「旅程里程碑」语义（discover_first/5/15/all_channels、therapy_100_patients、clinic_money_100k、growth_skill_8 共 7 个成就的 description 语义化，不再写高频数值肝度目标；name/target/稀有度不变）；§12.3 待修订标注更新（描述已完成，奖励待 P5-5） |
 
 ---
 
