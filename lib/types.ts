@@ -257,10 +257,15 @@ export interface ActiveSession {
   triggeredMemories: string[];
 }
 
+/** 序章「离开城市的原因」选择（P4-1：影响叙事不影响数值） */
+export type PrologueChoice = "burnout" | "witness" | "breath" | "heartbreak";
+
 /** 游戏全局状态 */
 export interface GameState {
   /** 诊所名称（玩家自定义，默认"森林诊所"） */
   clinicName: string;
+  /** 序章开场选择（可选：未选择=undefined，旧档兼容） */
+  prologueChoice?: PrologueChoice;
   doctor: DoctorStats;
   /** 已解锁技能 id */
   skills: string[];

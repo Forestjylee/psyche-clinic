@@ -11,6 +11,8 @@ import type {
   PatientPalette,
   PendingArrival,
   ActiveSession,
+  GameMessage,
+  PrologueChoice,
 } from "./types";
 import {
   createInitialState,
@@ -176,7 +178,10 @@ export interface GameStore {
   toggleMute: () => void;
   playSound: (name: SoundName) => void;
   expToNext: (lv: number) => number;
-  dismissPrologue: () => void;
+  /** 序章开场选择：记录「离开城市的原因」到 game.prologueChoice（P4-1，仅叙事） */
+  choosePrologue: (choice: PrologueChoice) => void;
+  /** 关闭序章；传入 letter 时按既有去重模式把开局信落进消息盒子 */
+  dismissPrologue: (letter?: GameMessage) => void;
   // —— 治愈回访 ——
   openReturnVisit: (patientId: string) => void;
   finishReturnVisit: () => void;
@@ -758,7 +763,17 @@ export const useGameStore = create<GameStore>((set, get) => {
     pushFloating,
     expToNext: expToNextLevel,
 
-    dismissPrologue: () => {
+    choosePrologue: (choice) => {
+      const g = get().game;
+      g.prologueChoice = choice;
+      commit();
+    },
+
+    dismissPrologue: (letter) => {
+      const g = get().game;
+      if (letter && !g.messages.find((l) => l.id === letter.id))
+        g.messages.unshift(letter);
+      commit();
       set({ prologueVisible: false });
       playSound("page");
     },

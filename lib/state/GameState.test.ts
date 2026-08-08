@@ -7,7 +7,7 @@ import {
   FOLLOW_UP_CHANCE,
   REPUTATION_LOSS_PER_ABANDON,
 } from "./GameState";
-import type { GameState, EndingType } from "../types";
+import type { GameState, EndingType, PrologueChoice } from "../types";
 
 const opts = { maxFollowUps: 2, graceDays: 5 };
 
@@ -22,6 +22,47 @@ describe("createInitialState 复诊字段默认值", () => {
   it("初始诊所名默认为森林诊所", () => {
     const g = createInitialState();
     expect(g.clinicName).toBe("森林诊所");
+  });
+});
+
+describe("prologueChoice 序章开场选择（P4-1）", () => {
+  it("初始状态 prologueChoice 为 undefined（可选字段，旧档兼容）", () => {
+    const g = createInitialState();
+    expect(g.prologueChoice).toBeUndefined();
+  });
+  it("接受合法选择值落档，且不影响任何数值字段", () => {
+    const g = createInitialState();
+    g.prologueChoice = "breath";
+    expect(g.prologueChoice).toBe("breath");
+    // 数值初始值不变：金钱/声望/理智/技能等仅叙事选择不触碰
+    expect(g.doctor.money).toBe(500);
+    expect(g.doctor.reputation).toBe(10);
+    expect(g.doctor.sanity).toBe(100);
+    expect(g.doctor.level).toBe(1);
+    expect(g.day).toBe(1);
+  });
+  it("migrate 不覆盖已选择值，未选择的旧档读 undefined 正常", () => {
+    const g = createInitialState();
+    g.prologueChoice = "heartbreak";
+    expect(migrateGameState(g).prologueChoice).toBe("heartbreak");
+    const legacy = {
+      doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
+      skills: [],
+      clinicUpgrades: [],
+      patientRecords: {},
+      day: 1,
+      slot: 0,
+      todayServed: [],
+      waitingDays: {},
+      abandoned: [],
+      messages: [],
+      generatedScenarios: [],
+    } as unknown as GameState;
+    expect(migrateGameState(legacy).prologueChoice).toBeUndefined();
+  });
+  it("PrologueChoice 类型仅含四个合法值", () => {
+    const all: PrologueChoice[] = ["burnout", "witness", "breath", "heartbreak"];
+    expect(all).toHaveLength(4);
   });
 });
 

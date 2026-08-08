@@ -92,3 +92,87 @@
   50% { opacity: 0.7; }
 }
 
+/* ===== P4-1 序章开场选择屏（离开城市的原因）===== */
+.prologue-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.prologue-choice-q {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 1.9;
+  color: #f3ead9;
+  letter-spacing: 1px;
+  margin-bottom: 26px;
+}
+.prologue-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+}
+.prologue-choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 15px 20px;
+  text-align: left;
+  font-family: var(--font-serif);
+  font-size: 17px;
+  letter-spacing: 1px;
+  color: #f3ead9;
+  background: linear-gradient(160deg, rgba(255, 250, 240, 0.07), rgba(255, 250, 240, 0.03));
+  border: 1px solid rgba(240, 160, 80, 0.25);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.15s;
+}
+.prologue-choice-btn:hover {
+  border-color: var(--accent);
+  background: linear-gradient(160deg, rgba(240, 160, 80, 0.14), rgba(240, 160, 80, 0.06));
+  transform: translateY(-1px);
+}
+.prologue-choice-btn:active {
+  transform: translateY(0) scale(0.99);
+}
+.prologue-choice-mark {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  opacity: 0.9;
+}
+.prologue-choice-btn:hover .prologue-choice-mark {
+  opacity: 1;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.prologue-choice-hint {
+  margin-top: 26px;
+  font-size: 12.5px;
+  line-height: 1.8;
+  letter-spacing: 1px;
+  color: rgba(243, 234, 217, 0.45);
+}
+
+/* 窄视口：选择屏不溢出，按钮/文字收缩 */
+@media (max-width: 520px) {
+  .prologue-content {
+    padding: 34px 22px;
+  }
+  .prologue-choice-q {
+    font-size: 17px;
+  }
+  .prologue-choice-btn {
+    font-size: 15.5px;
+    padding: 13px 16px;
+  }
+  .prologue-text {
+    font-size: 18px;
+  }
+}
+
