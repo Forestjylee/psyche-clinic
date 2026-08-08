@@ -164,6 +164,17 @@ describe("DialogueEngine 补轮节点断点（最终评审 I-1）", () => {
     expect(info.excludePrefixes).toEqual(["_pad_"]);
   });
 
+  it("补轮二选一节点（_pad_c_*，无 _padChoice 走自身 choices）同样映射回结局节点", () => {
+    const game = createInitialState();
+    const eng = new DialogueEngine(makeScenario(), game, makeCallbacks());
+    reachPad(eng); // _pad_1
+    eng.continue(); // _pad_1 autoNext -> _pad_c_1（医生二选一）
+    expect(eng.getCurrentNode().id).toBe("_pad_c_1");
+    const info = eng.getResumeInfo();
+    expect(info.nodeId).toBe("end");
+    expect(info.excludePrefixes).toEqual(["_pad_"]);
+  });
+
   it("以 getResumeInfo().nodeId 恢复：重建补轮续走，不回头重播、不重复叠加", () => {
     const game = createInitialState();
     const cb = makeCallbacks();
