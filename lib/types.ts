@@ -206,7 +206,7 @@ export interface Skill {
   id: string;
   name: string;
   description: string;
-  /** 所属流派 */
+  /** 陪伴风格 */
   school: SkillSchool;
   /** 消耗经验 */
   cost: number;
@@ -217,10 +217,9 @@ export interface Skill {
 }
 
 export type SkillSchool =
-  | "psychoanalysis" // 精神分析
-  | "cbt" // 认知行为
-  | "hypnosis" // 催眠
-  | "pharmacology"; // 药物学
+  | "gentle" // 更温柔 · 接住与安抚
+  | "sharp" // 更敏锐 · 看清与直面
+  | "firm"; // 更坚定 · 方向与托底
 
 /** 诊所升级项 */
 export interface ClinicUpgrade {

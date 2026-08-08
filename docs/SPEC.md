@@ -2,7 +2,7 @@
 
 | 字段 | 内容 |
 | --- | --- |
-| 文档版本 | v1.2.7 |
+| 文档版本 | v1.2.8 |
 | 维护人 | Psyche Clinic Team |
 | 最后更新 | 2026-08-08 |
 | 配套文档 | [PRD.md](./PRD.md) · [PLAN.md](./PLAN.md) · [DEPLOYMENT.md](./DEPLOYMENT.md) |
@@ -124,7 +124,7 @@ interface DoctorStats {
 
 interface GameState {
   doctor: DoctorStats;
-  skills: string[];                       // 已解锁技能 id
+  skills: string[];                       // 已解锁能力 id
   clinicUpgrades: string[];               // 诊所升级 id
   patientRecords: Record<string, EndingType>;  // 患者 id -> 结局
   day: number;                            // 游戏内日期
@@ -766,6 +766,7 @@ interface GameStats {
 | v1.2.5 | 2026-08-08 | P5-4：成就描述转向「旅程里程碑」语义（discover_first/5/15/all_channels、therapy_100_patients、clinic_money_100k、growth_skill_8 共 7 个成就的 description 语义化，不再写高频数值肝度目标；name/target/稀有度不变）；§12.3 待修订标注更新（描述已完成，奖励待 P5-5） |
 | v1.2.6 | 2026-08-08 | P5-5：成就奖励情感化（reward 新增 unlock 字段：解锁信件/诊室纪念物/记忆碎片/特殊回访，13 个成就配置；新增 achievementLetters 数据表 6 封信 + decor 3 件纪念物；store onUnlock 发放链路；AchievementEngine 零改动） |
 | v1.2.7 | 2026-08-08 | P5-6：名额提升机制（一天容量 3→动态 2-5：基础 2 + 声望 25/60 各 +1 + 候诊扩容设施 +1；phaseOfSlot 扩 5 档，slot 3-4 切入 night 相位激活夜间分支；queueTarget 改传 GameState；新增候诊扩容设施 1200 金） |
+| v1.2.8 | 2026-08-08 | P6-1：技能命名重构（技能树从专业流派改为倾听者能力语义：解梦术→让 ta 感到安全/自由联想→接住沉默/认知重构→看见防御下的脆弱/暴露疗法→陪 ta 直面恐惧/危机干预→在崩溃边缘陪住 ta/临床药理学→稳稳托住/新药研发→多一条路/催眠术·初级→坚定地引导/深度催眠→走向真相；skill id 全量重构 + truths/patients 的 requireSkill 引用同步；SkillSchool 改 3 陪伴风格 gentle/sharp/firm（更温柔/更敏锐/更坚定）；SkillsTree 同步；登记 SKILL_ID_MIGRATIONS 迁移映射表供 P6-3） |
 
 ---
 

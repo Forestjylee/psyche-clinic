@@ -537,7 +537,7 @@ export const patientB: PatientScenario = {
           id: "b15",
           text: "「其实……我有个朋友是侦探。这种事，他比警察好使。」",
           kind: "special",
-          requireSkill: "crisis_intervention",
+          requireSkill: "hold_through_crisis",
           effect: { trust: 20, truth: 40, doctorReputation: 5, doctorExp: 50 },
           next: "b_end_hidden",
           hint: "需要技能：危机干预",
