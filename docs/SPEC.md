@@ -2,9 +2,9 @@
 
 | 字段 | 内容 |
 | --- | --- |
-| 文档版本 | v0.5.0 |
+| 文档版本 | v1.2.3 |
 | 维护人 | Psyche Clinic Team |
-| 最后更新 | 2026-08-07 |
+| 最后更新 | 2026-08-08 |
 | 配套文档 | [PRD.md](./PRD.md) · [PLAN.md](./PLAN.md) · [DEPLOYMENT.md](./DEPLOYMENT.md) |
 | 文档目的 | 规定技术栈、目录结构、数据模型、引擎契约与部署架构，作为研发实施的硬约束 |
 
@@ -116,7 +116,7 @@ psyche-clinic-next/
 ```typescript
 interface DoctorStats {
   reputation: number;  // 声望：影响可接诊层级
-  sanity: number;      // 理智：过低触发幻觉/倒闭
+  sanity: number;      // 理智（自我关怀资源，非失败条件）：随沉重接诊/坏结局/连续不休息消耗，随休息/回访/读信等温柔方式恢复；归零触发温情强制休息（非倒闭）
   money: number;       // 金钱：升级诊所/技能
   exp: number;         // 经验：升级技能树
   level: number;       // 等级
@@ -134,8 +134,18 @@ interface GameState {
   abandoned: string[];                    // 已放弃治疗离开的患者 id
   discharged: string[];                   // 已离场患者 id（治愈/接纳/恶化/悲剧：不再复诊）
   followUpCount: Record<string, number>;  // patientId -> 已复诊次数（依赖/隐藏/觉醒/转介复诊）
+  todayFollowUps: string[];               // 今日复诊池命中患者 id
+  followUpIdleDays: Record<string, number>;  // 复诊患者未归天数（满宽限放弃复诊）
   messages: GameMessage[];                // 消息盒子（来信/提醒/通知）
   generatedScenarios: PatientScenario[];  // 生成器产出（≤5）
+  usedSeeds: string[];                    // 已用剧本 seed 去重
+  returnVisits: Record<string, { ending: EndingType; dueDay: number; arrived: boolean; seen: boolean }>;  // 患者 id -> 回访状态（治愈/接纳/觉醒后探望）
+  discoveryCandidates: DiscoveryCandidate[];  // 发现客户候选（慈善获客）
+  pendingArrivals: PendingArrival[];      // 已邀约待到达的客户
+  facilityPositions: Record<string, FacilityPosition>;  // 设施半自由摆放位置
+  unlockedFragments: Record<string, string[]>;  // (规划，PLAN P3-1) 患者 id -> 已解锁记忆碎片 id（PRD 场景4，碎片驱动完整真相）
+  activeSession?: { patientId: string; nodeId: string; patientState: PatientState; history: string[] };  // (规划，PLAN P2-8) 对话断点快照（PRD 场景2，可无痛中途退出）
+  stats: GameStats;                       // 累计统计（成就引擎，见 §12.4）
 }
 ```
 
@@ -265,7 +275,7 @@ interface AchievementProgress {
 
 ### 3.5 金钱经济系统（诊所经营）
 
-金钱定位为**诊所经营资源**（ADR-008），形成「接诊赚钱 → 升级/采购/广告 → 提升经营效率 → 赚更多」循环。
+金钱定位为**诊所经营资源**（ADR-008），形成「接诊赚钱 → 升级/采购/善意连接 → 提升经营效率 → 赚更多」循环。
 
 **收入**：初诊报酬（简单 150 / 普通 300 / 困难 600）；复诊报酬递减（70% / 40%）；`receptionist` 前台每日 +50。
 
@@ -275,18 +285,18 @@ interface AchievementProgress {
 | --- | --- | --- |
 | 多级设施升级 | 现有 5 项设施各 3 级，效果递增 | 2 级 ≈1.8× 1 级价、3 级 ≈2.5× 1 级价（沙发 300→540→750） |
 | 消耗品 | 一次性药品/道具，会话中解锁选项或提升治愈率 | 50-200 金 |
-| 广告拉新 | 提升每日新患者上限 +1 | 300 金/次，持续 3 天 |
+| 慈善活动费 | 善意连接渠道投入（捐图书角/资助讲座/公益宣传，见 §3.6） | 30-150 金/次 |
 
-**节奏**（ADR-010）：玩家单天约赚 500-1500 金；中期以高级设施与广告为主要消耗口，避免溢出。
+**节奏**（ADR-010）：玩家单天约赚 500-1500 金；中期以高级设施与慈善活动费为主要消耗口，避免溢出。
 
 ### 3.6 发现客户（主动获客，v0.4.0）
 
-**定位**：金钱经济循环的**主动消耗口**。玩家花钱通过广告/广播等渠道触达潜在客户，主动决定是否发送邀约；客户有概率接受，接受后于今日/明日/后日（概率分布）加入预约清单，形成「花钱获客 → 接诊赚钱」的可控循环。替代原「预约客户」按钮语义（被动等客）。
+**定位**：金钱经济循环的**主动消耗口**。玩家付出低额「慈善活动费」参与善意连接（捐图书角/资助社区讲座/公益宣传/口口相传），让需要的人主动找来，主动决定是否联系；被联系者有概率应约，应约者于今日/明日/后日（概率分布）加入预约清单，形成「善意连接 → 接诊赚钱」的可控循环。替代原「预约客户」按钮语义（被动等客）。
 
 **交互流程**：
 1. 首页「预约客户」按钮改名为「发现客户」，点击进入发现页（scene: `discover`）。
-2. 发现页展示获客渠道列表，每渠道标注花费 / 说明 / 预计产出。玩家确认后扣除金钱，生成候选客户（复用剧本生成器 `generateScenario` 产出候选，**不进入预约清单**）。
-3. 候选客户逐一展示，玩家对每位决定「发送邀约」或「暂不考虑」。
+2. 发现页展示连接方式列表，每项标注花费 / 说明 / 预计产出。玩家确认后扣除慈善活动费，生成候选客户（复用剧本生成器 `generateScenario` 产出候选，**不进入预约清单**）。
+3. 候选客户逐一展示，玩家对每位决定「联系 ta」或「再等等」。
 4. 邀约判定：接受概率 = 渠道基础接受率 + 声望加成（每 10 点声望 +2%，上限 +20%，clamp）。接受 → 按到达时间分布写入待到达队列；拒绝 → 消息盒子通知（不扣声望）。
 5. 每「休息一日」日终结算时，到达日到期的候选客户加入预约清单（`generatedScenarios`，受 `MAX_GENERATED` 上限约束，满则顺延下一日），并写入消息盒子通知。
 
@@ -306,10 +316,10 @@ pendingArrivals: PendingArrival[];
 
 | id | 名称 | 花费 | 说明 | 预计产出 | 基础接受率 |
 | --- | --- | --- | --- | --- | --- |
-| `flyer` | 传单 | 80 | 街头发放，触达大众 | 1 位 | 45% |
-| `radio` | 广播 | 200 | 本地电台，覆盖面广 | 2 位 | 55% |
-| `newspaper` | 报纸广告 | 380 | 专栏投放，触达中产 | 2 位 | 65% |
-| `referral` | 老客户转介 | 0（需声望 ≥ 40） | 治愈患者口碑介绍，质量高 | 1 位 | 80% |
+| `flyer` | 捐图书角 | 30 | 社区角落捐建小图书角 | 1 位 | 45% |
+| `radio` | 资助社区讲座 | 80 | 本地讲座，听过的人深夜来电 | 2 位 | 55% |
+| `newspaper` | 公益宣传 | 150 | 参与公益宣传，家属求助 | 2 位 | 65% |
+| `referral` | 治愈者口口相传 | 0（需声望 ≥ 40） | 被治愈者口碑介绍，质量高 | 1 位 | 80% |
 
 **到达时间分布**：今日 50% / 明日 30% / 后日 20%。
 
@@ -558,6 +568,8 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 
 分类分布：获客 9 / 回访 5 / 诊疗扩展 5 / 经营扩展 7 / 结局扩展 7 / 成长 3 / 伦理 4 / 隐藏 4。
 
+> **待修订标注（PLAN P5-4/P5-5）**：下列高频数值肝度型成就（`clinic_money_100k 日进斗金`、`therapy_100_patients 悬壶济世`、`growth_skill_8 学贯中西`、`discover_15 广撒渔网`、`discover_all_channels 四面开花`）按 PRD 场景7「成就=旅程里程碑、情感奖励」将**修订描述与奖励**，数值门槛可能放宽或语义转换，详见 PLAN P5-4/P5-5。
+
 **获客（新分类 `discover`，标签「获客」）**
 
 | id | 名称 | 稀有度 | 目标 | 统计源 |
@@ -699,14 +711,18 @@ interface GameStats {
 | v0.5.0 | 2026-08-07 | 成就图鉴扩充 38→80：删除生成器成就 2 个，新增获客/回访/复诊/结局/成长/伦理/隐藏 44 个（见 §12）；GameState 新增 `stats` 累计统计字段；`onSessionStart` 接收 `patientId`；`restOneDay` 末尾同步成就引擎；`Achievement.category` 扩展 `discover`/`aftercare`；图鉴卡片按稀有度降序排列 + 全部/已解锁/未解锁一键筛选（§12.6） |
 | v1.0.0 | 2026-08-07 | 界面场景化重构立项（§14）：grill-me 九项决策锁定（全量场景化/温暖手绘保留/Phaser+React 分工/大厅+诊室/点选导航/装修半自由/程序绘制/五期 M1-M5/逐句气泡+回顾）；独立文档体系 docs/kairosoft/{PRD,SPEC,PLAN}.md 完成；M1 技术地基动工 |
 | v1.1.0 | 2026-08-08 | 界面方向定稿为「治愈系手绘纸木质」（非开罗像素，用户决策，见 docs/kairosoft/PRD.md v1.2/v1.3）：纸木质 token 落地、HUD/底栏/面板换肤；**v1.3 彻底移除场景小人**（候诊改名牌卡片，返回按钮/面板窗口统一）；M1/M2 主体完成，`syncFacilities` 崩溃修复 |
+| v1.2.0 | 2026-08-08 | **文档治理**：主 PRD 全量重构为 v1.0.0（用户旅程视角重排玩法主线，五条根决策）；kairosoft 专项文档作废删除，界面方向并入新 PRD §5（叙事层>档案图鉴>经营层）。本节 §14 降级为历史参考 |
+| v1.2.1 | 2026-08-08 | **评审修订**：§3.1 数据模型同步实际字段（todayFollowUps/followUpIdleDays/usedSeeds/returnVisits/discoveryCandidates/pendingArrivals/facilityPositions/stats + 规划中 unlockedFragments）；清理 `sanity` 旧语义（"过低触发幻觉/倒闭"→自我关怀资源、归零温情强制休息） |
+| v1.2.2 | 2026-08-08 | **评审修订（第二轮）**：§3.1 未落地字段统一标注「(规划, PLAN Px-x)」（unlockedFragments/activeSession）；§12.3 标注待修订高频数值成就（日进斗金/悬壶济世/学贯中西/广撒渔网/四面开花，对应 PLAN P5-4/P5-5）；§3.5/§3.6 慈善获客语义待 PLAN P5-2 同步（广告→善意连接） |
+| v1.2.3 | 2026-08-08 | **评审修订（第三轮）**：§3.5/§3.6 慈善获客语义落地（广告→善意连接：广告拉新 300 金 → 慈善活动费 30-150 金；渠道表改为捐图书角/资助社区讲座/公益宣传/治愈者口口相传）；DiscoveryScene 与相关 UI 文案同步 |
 
 ---
 
 ## 14. 界面场景化重构 · 治愈系手绘纸木质（v1.0.0 · M1/M2 主体完成）
 
-> 本小节为立项摘要。产品需求见 [docs/kairosoft/PRD.md](./kairosoft/PRD.md)，技术规格见 [docs/kairosoft/SPEC.md](./kairosoft/SPEC.md)，实施计划见 [docs/kairosoft/PLAN.md](./kairosoft/PLAN.md)。
+> **文档治理注记（2026-08-08）**：本小节原配套的 kairosoft/{PRD,SPEC,PLAN}.md 专项文档已**作废删除**，其界面方向（场景化+温暖手绘+纸木质）与产品玩法主线决策已并入新主 [PRD.md](./PRD.md) v1.0.0（§5 界面呈现按新定位重审：**叙事层 > 档案图鉴 > 经营层**）。本节保留为历史决策与技术选型参考。
 >
-> **决策已锁定**：全量场景化（经营层+叙事层都进场景）｜治愈系手绘纸木质（非开罗像素）｜Phaser 场景 + React UI 覆盖层｜大厅+诊室双场景｜**v1.3 场景不绘制小人**（候诊改名牌卡片直接开诊）｜装修模式半自由摆放（位置仅视觉）｜AI 治愈插画背景 + 程序绘制交互叠加｜五期 M1-M5｜对话面对面逐句气泡+右上角回顾窗。
+> **决策已锁定**：全量场景化（经营层+叙事层都进场景）｜治愈系手绘纸木质（非开罗像素）｜Phaser 场景 + React UI 覆盖层｜大厅+诊室双场景｜**v1.3 场景不绘制小人**（候诊改名牌卡片直接开诊）｜装修模式半自由摆放（位置仅视觉）｜AI 治愈插画背景 + 程序绘制交互叠加｜五期 M1-M5｜对话面对面逐句气泡+右上角回顾窗。产品需求以新 PRD v1.0.0 为准。
 
 ### 14.1 目标与背景
 
@@ -751,7 +767,7 @@ interface GameStats {
 - **复用资产**：数据表（patients/skills/upgrades/discovery/achievements）、DialogueEngine、AchievementEngine、Storage 全部不动
 - **样式**：现有 `app/styles/` 模块化结构保留，新增 `phaser` 覆盖层样式（z-index 分层、canvas 尺寸/缩放）
 
-### 14.4 分阶段实施计划（五期，详见 docs/kairosoft/PLAN.md）
+### 14.4 分阶段实施计划（五期，M1/M2 已完成）
 
 每期独立可玩、独立提交，风险隔离：
 

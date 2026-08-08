@@ -121,7 +121,7 @@ export function ClinicHall() {
                 playSound("page");
                 setScene("discover");
               }}
-              title="花钱通过渠道触达潜在客户，主动邀约"
+              title="付出一点善意，让需要你的人找到你"
             >
               ＋ 发现客户
             </button>
