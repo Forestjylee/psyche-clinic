@@ -206,6 +206,7 @@
   font-size: var(--fs-md);
   color: var(--gold-deep);
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   letter-spacing: 1px;
   box-shadow: var(--shadow-paper);
 }
@@ -222,5 +223,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .hud-stat-value.pop { animation: none; }
+  .hud-stat { transition: none; }
+  .hud-stat-tip { transition: none; }
 }
 
