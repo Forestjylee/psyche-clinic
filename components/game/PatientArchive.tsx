@@ -64,7 +64,8 @@ export function PatientArchive() {
     ? game.messages.filter((m) => m.patientName === p.name)
     : [];
   const ending = status && status.kind === "closed" ? status.ending : undefined;
-  const recap = p && ending ? recapLines(ending, p.surface) : null;
+  // surface 真值守卫：生成患者 surface 非空（现状非活跃 bug），为空时不渲染破损复盘文案
+  const recap = p && ending && p.surface ? recapLines(ending, p.surface) : null;
 
   return (
     <div className="scene panel-view archive-view">
@@ -164,7 +165,8 @@ export function PatientArchive() {
             <section className="archive-block">
               <div className="archive-block-title">关于 ta</div>
               <p className="archive-intro">{p.intro}</p>
-              <p className="archive-surface">表象：{p.surface}</p>
+              {/* surface 空兜底「表象：未知」，保持区块结构稳定 */}
+              <p className="archive-surface">表象：{p.surface || "未知"}</p>
             </section>
 
             {/* —— 记忆碎片（已解锁卡片 + 未解锁剪影占位）—— */}

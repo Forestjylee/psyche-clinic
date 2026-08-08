@@ -110,6 +110,27 @@ describe("archivePatients 档案列表（见过驱动 + 顺序）", () => {
     // 全量患者（patientC/A/B）都在 allPatients 中，但未见于任何 game 状态
     expect(archivePatients(g).length).toBe(0);
   });
+  it("新患者接诊后自动出现在档案（无需注册），接诊前不出现", () => {
+    const g = createInitialState();
+    // 新生成患者剧本已入库，但尚未接诊（未进入任一 seen 状态）→ 不出现
+    g.generatedScenarios.push(genScenario("new_p"));
+    expect(archivePatients(g).length).toBe(0);
+    // 手写患者已结案，随后新生成患者被接诊（进入 seen 状态 → 自动入库）
+    g.patientRecords["chen_lo"] = "cure";
+    g.waitingDays["new_p"] = 0;
+    const ids = archivePatients(g).map((p) => p.id);
+    // 手写在前、生成患者自动出现在末尾，无需任何注册代码
+    expect(ids).toEqual(["chen_lo", "new_p"]);
+  });
+  it("同一位新患者结案后仍只出现一次（不因状态叠加重复入库）", () => {
+    const g = createInitialState();
+    g.generatedScenarios.push(genScenario("new_p"));
+    g.waitingDays["new_p"] = 1; // 候诊中被接诊
+    expect(archivePatients(g).map((p) => p.id)).toEqual(["new_p"]);
+    // 结案进入 patientRecords（叠加第二个 seen 状态），仍只出现一次
+    g.patientRecords["new_p"] = "cure";
+    expect(archivePatients(g).map((p) => p.id)).toEqual(["new_p"]);
+  });
 });
 
 describe("deriveArchiveStatus 状态推导优先级", () => {
