@@ -83,7 +83,6 @@ export function drawPicture(
   const frame = toHex(frameColor || "#8a5a3b");
   const bright = toHex(brightColor || "#f0d090");
   const paper = 0xfffaf0;
-  const ink = 0x6a5c48;
 
   // 外框
   g.fillStyle(frame, 1);
@@ -106,7 +105,6 @@ export function drawPicture(
       strokeThickness: 3,
     })
     .setOrigin(0.5);
-  void ink;
 
   const container = scene.add.container(x, y, [g, label]);
   container.setSize(w, h);

@@ -95,7 +95,7 @@ export const DECOR_DEFS: DecorDef[] = [
     kind: "flower",
     slot: "flower_lin_xiao",
     size: { w: 30, h: 34 },
-    defaultPos: { x: 420, y: 250 },
+    defaultPos: { x: 420, y: 290 },
   },
   {
     id: "flower_chen_lo",
