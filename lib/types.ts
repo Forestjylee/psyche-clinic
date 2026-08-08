@@ -243,6 +243,20 @@ export interface FacilityPosition {
   y: number;
 }
 
+/** 会话断点快照：对话可中断恢复（PRD 场景2）。单例，同一时间只有一个进行中会话 */
+export interface ActiveSession {
+  /** 进行中会话的患者 id */
+  patientId: string;
+  /** 断点节点 id（engine 恢复后 start() 从此继续） */
+  nodeId: string;
+  /** 断点时的患者四维状态（engine 直接恢复） */
+  patientState: PatientState;
+  /** 已发生的对话记录（回放进回顾窗；id 由呈现层恢复时补） */
+  history: { speaker: "patient" | "doctor"; text: string }[];
+  /** 已触发的记忆碎片 id（恢复后不重复闪回） */
+  triggeredMemories: string[];
+}
+
 /** 游戏全局状态 */
 export interface GameState {
   /** 诊所名称（玩家自定义，默认"森林诊所"） */
@@ -291,6 +305,8 @@ export interface GameState {
   facilityPositions: Record<string, FacilityPosition>;
   /** 累计统计（成就系统只读，运行时各动作累加） */
   stats: GameStats;
+  /** 会话断点快照（P2-8）：对话进行中持续草稿，暂停/中途退出随 saveGame 落盘，结案清除 */
+  activeSession?: ActiveSession | null;
 }
 
 /** 成就统计字段：各动作（发现/邀约/复诊/回访/休息）运行时累加，成就引擎读取 */

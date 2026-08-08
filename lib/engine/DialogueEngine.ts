@@ -26,6 +26,16 @@ function flavorText(dim: string, delta: number): string {
   return ` · ${t}`;
 }
 
+/** 会话断点恢复参数（P2-8 纯新增）：恢复后 start() 从 restore.nodeId 正常推进 */
+export interface EngineRestore {
+  /** 断点节点 id（失效时回退到场景 startNode） */
+  nodeId: string;
+  /** 断点时的患者状态（engine 直接接管） */
+  state: PatientState;
+  /** 已触发的记忆碎片 id（恢复后不重复闪回） */
+  triggeredMemories: string[];
+}
+
 /** 会话事件回调 */
 export interface SessionCallbacks {
   onStateChange: (state: PatientState, emotion?: string) => void;
@@ -55,21 +65,31 @@ export class DialogueEngine {
   constructor(
     scenario: PatientScenario,
     game: GameState,
-    callbacks: SessionCallbacks
+    callbacks: SessionCallbacks,
+    restore?: EngineRestore
   ) {
     this.scenario = scenario;
     this.game = game;
     this.callbacks = callbacks;
-    this.state = {
-      ...scenario.initialState,
-      // 诊所升级加成：舒适的沙发增加初始信任
-      trust:
-        scenario.initialState.trust +
-        this.getInitialTrustBonus(),
-    };
     this.minRounds =
       scenario.difficulty === "困难" ? 8 : scenario.difficulty === "普通" ? 6 : 5;
-    this.currentNode = scenario.dialogues[scenario.startNode];
+    if (restore) {
+      // 断点恢复：state 为快照浅拷贝、currentNode 定位到断点节点（失效回退起始节点）、
+      // 已看过的记忆碎片不重复闪回。其余方法（start/choose/continue/enterNode）原样复用。
+      this.state = { ...restore.state };
+      this.currentNode =
+        scenario.dialogues[restore.nodeId] ?? scenario.dialogues[scenario.startNode];
+      this.triggeredMemories = new Set(restore.triggeredMemories);
+    } else {
+      this.state = {
+        ...scenario.initialState,
+        // 诊所升级加成：舒适的沙发增加初始信任
+        trust:
+          scenario.initialState.trust +
+          this.getInitialTrustBonus(),
+      };
+      this.currentNode = scenario.dialogues[scenario.startNode];
+    }
   }
 
   private getInitialTrustBonus(): number {
@@ -357,6 +377,11 @@ export class DialogueEngine {
 
   getCurrentNode(): DialogueNode {
     return this.currentNode;
+  }
+
+  /** 已触发的记忆碎片 id（P2-8 纯新增，断点快照用；恢复后不重复闪回） */
+  getTriggeredMemories(): string[] {
+    return Array.from(this.triggeredMemories);
   }
 
   /** 生成结局信件（写入消息盒子） */

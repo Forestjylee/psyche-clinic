@@ -425,12 +425,18 @@
   .patient-figure .patient-chip { font-size: 1.4cqw; padding: 0.5cqw 1.3cqw; }
 }
 
-/* —— 右上角「回顾」按钮 + 本场对话回顾窗（P2-6，纸木质浮层） —— */
-.dialogue-history-toggle {
+/* —— 右上角「回顾」+「暂停」按钮 + 本场对话回顾窗（P2-6 回顾 / P2-8 断点，纸木质浮层） —— */
+.dialogue-corner {
   position: absolute;
   top: 12px;
   right: 12px;
   z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dialogue-history-toggle,
+.dialogue-pause-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -446,9 +452,18 @@
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.dialogue-history-toggle:hover {
+.dialogue-history-toggle:hover,
+.dialogue-pause-btn:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-paper), 0 4px 14px rgba(90, 70, 40, 0.18);
+}
+/* 暂停按钮语义色：偏暖强调（保存进度、稍后继续） */
+.dialogue-pause-btn {
+  color: var(--accent);
+}
+.dialogue-pause-btn:hover {
+  color: var(--accent);
+  background: linear-gradient(165deg, rgba(255, 249, 238, 0.97), rgba(250, 242, 228, 0.95));
 }
 
 /* 回顾窗：普通定位的 .dialogue-scene 直接子级（同 .dialogue-light 做法），
@@ -559,7 +574,8 @@
 
 /* 窄视口：回顾窗更宽更接近全屏小窗，按钮收窄 */
 @media (max-width: 720px), (max-height: 520px) {
-  .dialogue-history-toggle { padding: 7px 11px; font-size: 12px; }
+  .dialogue-history-toggle,
+  .dialogue-pause-btn { padding: 7px 11px; font-size: 12px; }
   .dialogue-history {
     top: 50px;
     right: 8px;

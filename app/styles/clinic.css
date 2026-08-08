@@ -213,6 +213,26 @@
   border: 1px solid rgba(120, 140, 170, 0.4);
 }
 
+/* P2-8：断点患者（继续上次）——覆盖 served-today 的置灰，保持可点击 */
+.patient-card.resuming {
+  opacity: 1;
+  cursor: pointer;
+  filter: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow-card);
+}
+.patient-card.resuming:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow-card), 0 8px 20px rgba(90, 70, 40, 0.18);
+}
+.patient-resume-tag {
+  margin-top: 6px;
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
 .patient-avatar {
   width: 72px;
   height: 72px;

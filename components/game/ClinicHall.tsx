@@ -38,9 +38,11 @@ export function ClinicHall() {
     }
     return !!game.returnVisits[p.id]?.arrived && !game.returnVisits[p.id]?.seen;
   };
-  // 首页清单：今日已接诊的客户隐藏（次日恢复）；可对话的客户优先排顶部
+  // 有断点的患者（activeSession）：即使今日已接诊也保留在清单，供「继续上次」
+  const resumableId = game.activeSession?.patientId ?? null;
+  // 首页清单：今日已接诊的客户隐藏（次日恢复，断点患者除外）；可对话的客户优先排顶部
   const sortedAvailable = allAvailable
-    .filter((p) => !game.todayServed.includes(p.id))
+    .filter((p) => resumableId === p.id || !game.todayServed.includes(p.id))
     .sort((a, b) => Number(canTalk(b)) - Number(canTalk(a)));
   const totalPatients = allAvailable.length;
   const achCount = achievementEngine
@@ -63,7 +65,13 @@ export function ClinicHall() {
     }
     const locked = p.requireReputation ? game.doctor.reputation < p.requireReputation : false;
     const servedToday = game.todayServed.includes(p.id);
-    if (locked || servedToday) {
+    const resuming = resumableId === p.id;
+    if (locked) {
+      playSound("locked");
+      return;
+    }
+    // 今日已接诊：仅断点患者可点击「继续上次」恢复会话
+    if (servedToday && !resuming) {
       playSound("locked");
       return;
     }
@@ -117,6 +125,7 @@ export function ClinicHall() {
               const completed = game.patientRecords[p.id];
               const rv = game.returnVisits[p.id];
               const returning = !!rv?.arrived && !rv.seen;
+              const resuming = resumableId === p.id;
               const locked = p.requireReputation
                 ? game.doctor.reputation < p.requireReputation
                 : false;
@@ -128,7 +137,7 @@ export function ClinicHall() {
               return (
                 <div
                   key={p.id}
-                  className={`patient-card ${locked ? "locked" : ""} ${completed ? "completed" : ""} ${servedToday ? "served-today" : ""} ${decaying ? "decaying" : ""} ${critical ? "critical" : ""} ${returning ? "returning" : ""}`}
+                  className={`patient-card ${locked ? "locked" : ""} ${completed ? "completed" : ""} ${servedToday ? "served-today" : ""} ${resuming ? "resuming" : ""} ${decaying ? "decaying" : ""} ${critical ? "critical" : ""} ${returning ? "returning" : ""}`}
                   style={
                     {
                       "--card-accent": p.palette.primary,
@@ -167,7 +176,9 @@ export function ClinicHall() {
                         需要声望 {p.requireReputation}（当前 {game.doctor.reputation}）
                       </div>
                     ) : null}
-                    {returning ? (
+                    {resuming ? (
+                      <div className="patient-resume-tag">⏸ 上次对话未完成 · 点击继续</div>
+                    ) : returning ? (
                       <div className="patient-return-tag">✿ 他来看你了 · 点击探望</div>
                     ) : servedToday ? (
                       <div className="patient-served-tag">今日已接诊 · 明日可复诊</div>

@@ -3,8 +3,9 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
+import { useGameStore } from "@/lib/store";
 import { DialogueEngine } from "@/lib/engine/DialogueEngine";
-import type { DialogueNode, PatientEmotion, PatientState, MemoryFragment } from "@/lib/types";
+import type { DialogueNode, PatientEmotion, PatientState, MemoryFragment, ActiveSession } from "@/lib/types";
 import { allSkills } from "@/lib/data/skills";
 import { TypewriterText } from "./TypewriterText";
 import { TermText } from "./PsychTermSpan";
@@ -64,48 +65,95 @@ export function DialogueScene() {
 
   useEffect(() => {
     if (!currentPatient) return;
-    setHistory([]);
-    const eng = new DialogueEngine(currentPatient, game, {
-      onStateChange: (state, emo) => {
-        setPState({ ...state });
-        if (emo) setEmotion(emo as PatientEmotion);
-        achievementEngine?.onStateUpdate(state);
+    // P2-8 断点恢复：同一患者存在 activeSession 时重放历史 + 注入恢复参数
+    const activeSession = game.activeSession;
+    const resuming =
+      activeSession != null && activeSession.patientId === currentPatient.id;
+    if (resuming && activeSession) {
+      setHistory(
+        activeSession.history.map((l, i) => ({
+          id: `restore-${i}`,
+          speaker: l.speaker,
+          text: l.text,
+        }))
+      );
+    } else {
+      setHistory([]);
+    }
+    const eng = new DialogueEngine(
+      currentPatient,
+      game,
+      {
+        onStateChange: (state, emo) => {
+          setPState({ ...state });
+          if (emo) setEmotion(emo as PatientEmotion);
+          achievementEngine?.onStateUpdate(state);
+        },
+        onNodeEnter: (n) => {
+          setNode(n);
+          // 旁白走顶部展示，不入历史
+          const sp = n.speaker;
+          if (sp === "patient" || sp === "doctor") {
+            setHistory((h) => [
+              ...h,
+              { id: `${n.id}-${h.length}`, speaker: sp, text: n.text },
+            ]);
+          }
+        },
+        onChoiceMade: (choice) => {
+          const s = eng.getState();
+          achievementEngine?.onChoiceMade(choice.kind, s);
+        },
+        onComboTrigger: () => {
+          achievementEngine?.onComboTrigger();
+          playSound("combo");
+        },
+        // 机制语 → 情绪反馈（呈现层映射，不改引擎文案）
+        onFloatingText: (text, kind) => pushFloating(toEmotionalFloating(text, kind), kind),
+        onMemoryTrigger: (frag) => {
+          // 记忆碎片不自动关闭，等待玩家阅读后点击关闭
+          setFlashback(frag);
+          playSound("memory");
+        },
+        onEnding: (ending, title, text, reward) => {
+          const s = eng.getState();
+          finishSession(ending, title, text, reward, currentPatient.id, s);
+        },
       },
-      onNodeEnter: (n) => {
-        setNode(n);
-        // 旁白走顶部展示，不入历史
-        const sp = n.speaker;
-        if (sp === "patient" || sp === "doctor") {
-          setHistory((h) => [
-            ...h,
-            { id: `${n.id}-${h.length}`, speaker: sp, text: n.text },
-          ]);
-        }
-      },
-      onChoiceMade: (choice) => {
-        const s = eng.getState();
-        achievementEngine?.onChoiceMade(choice.kind, s);
-      },
-      onComboTrigger: () => {
-        achievementEngine?.onComboTrigger();
-        playSound("combo");
-      },
-      // 机制语 → 情绪反馈（呈现层映射，不改引擎文案）
-      onFloatingText: (text, kind) => pushFloating(toEmotionalFloating(text, kind), kind),
-      onMemoryTrigger: (frag) => {
-        // 记忆碎片不自动关闭，等待玩家阅读后点击关闭
-        setFlashback(frag);
-        playSound("memory");
-      },
-      onEnding: (ending, title, text, reward) => {
-        const s = eng.getState();
-        finishSession(ending, title, text, reward, currentPatient.id, s);
-      },
-    });
+      resuming && activeSession
+        ? {
+            nodeId: activeSession.nodeId,
+            state: activeSession.patientState,
+            triggeredMemories: activeSession.triggeredMemories,
+          }
+        : undefined
+    );
     engineRef.current = eng;
     eng.start();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPatient]);
+
+  /** 组装当前会话断点快照（P2-8）：引擎状态 + 断点节点 + 历史 + 已触发碎片 */
+  const snapshotSession = (): ActiveSession | null => {
+    const eng = engineRef.current;
+    if (!eng || !currentPatient) return null;
+    return {
+      patientId: currentPatient.id,
+      nodeId: eng.getCurrentNode().id,
+      patientState: eng.getState(),
+      history: history.map(({ speaker, text }) => ({ speaker, text })),
+      triggeredMemories: eng.getTriggeredMemories(),
+    };
+  };
+
+  // 对话进行中持续把最新快照草稿写入 game.activeSession（不落盘），
+  // 「暂停」与 HUD「退出」（backToTitle 自带 saveGame）都据此保存断点
+  useEffect(() => {
+    if (!currentPatient || !engineRef.current) return;
+    const s = snapshotSession();
+    if (s) useGameStore.getState().syncSessionDraft(s);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node, history, pState, currentPatient]);
 
   // 打开回顾窗时滚到底部（最新一句可见）；已打开时新句追加不打扰玩家的翻看位置
   useEffect(() => {
@@ -234,18 +282,36 @@ export function DialogueScene() {
         </div>
       ) : null}
 
-      {/* 右上角「回顾」按钮：打开本场对话历史小窗（P2-6，非阻塞） */}
-      <button
-        className="dialogue-history-toggle"
-        onClick={() => {
-          playSound("click");
-          setHistoryOpen((v) => !v);
-        }}
-        aria-label={historyOpen ? "关闭本场对话回顾" : "打开本场对话回顾"}
-        aria-expanded={historyOpen}
-      >
-        <span aria-hidden="true">📖</span> 回顾
-      </button>
+      {/* 右上角「回顾」+「暂停」按钮（P2-6 回顾窗 / P2-8 断点快照） */}
+      <div className="dialogue-corner">
+        <button
+          className="dialogue-history-toggle"
+          onClick={() => {
+            playSound("click");
+            setHistoryOpen((v) => !v);
+          }}
+          aria-label={historyOpen ? "关闭本场对话回顾" : "打开本场对话回顾"}
+          aria-expanded={historyOpen}
+        >
+          <span aria-hidden="true">📖</span> 回顾
+        </button>
+        <button
+          className="dialogue-pause-btn"
+          onClick={() => {
+            playSound("click");
+            const s = snapshotSession();
+            if (s) {
+              // 先同步最新草稿再暂停（避免草稿 effect 尚未跑到的边缘情况）
+              useGameStore.getState().syncSessionDraft(s);
+              useGameStore.getState().pauseSession();
+            }
+          }}
+          aria-label="暂停并保存会话进度"
+          title="保存进度，稍后继续"
+        >
+          <span aria-hidden="true">⏸</span> 暂停
+        </button>
+      </div>
 
       {/* 本场对话回顾窗：history 逐行渲染，患者/医生左右镜像 + 配色区分 */}
       {historyOpen ? (

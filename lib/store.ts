@@ -10,6 +10,7 @@ import type {
   Achievement,
   PatientPalette,
   PendingArrival,
+  ActiveSession,
 } from "./types";
 import {
   createInitialState,
@@ -157,6 +158,11 @@ export interface GameStore {
     patientId: string,
     lastState: PatientState
   ) => void;
+  // —— 会话断点（P2-8）——
+  /** 对话进行中持续更新草稿到 game.activeSession（仅草稿，随 saveGame 落盘） */
+  syncSessionDraft: (session: ActiveSession) => void;
+  /** 暂停并保存断点：写入 game + saveGame + 回大厅 */
+  pauseSession: () => void;
   // —— 通知 ——
   toast: (msg: string, kind?: "info" | "ok" | "warn") => void;
   pushFloating: (text: string, kind: string) => void;
@@ -619,6 +625,24 @@ export const useGameStore = create<GameStore>((set, get) => {
       playSound("click");
     },
 
+    syncSessionDraft: (session: ActiveSession) => {
+      // 草稿只写入 game.activeSession，不触发 commit/set：
+      // 暂停、中途退出（backToTitle 已有 saveGame）、结算清断点时随 saveGame 统一落盘
+      get().game.activeSession = session;
+    },
+
+    pauseSession: () => {
+      const g = get().game;
+      if (!g.activeSession) {
+        toast("还没有可保存的会话进度", "warn");
+        return;
+      }
+      saveGame(g);
+      set({ hasSave: true, currentPatient: null, scene: "clinic" });
+      playSound("page");
+      toast("已保存会话进度，可在预约清单继续", "ok");
+    },
+
     finishSession: (
       ending: EndingType,
       title: string,
@@ -628,6 +652,8 @@ export const useGameStore = create<GameStore>((set, get) => {
       lastState: PatientState
     ) => {
       const g = get().game;
+      // 结案清断点：会话结束不再可恢复
+      g.activeSession = null;
       // 应用奖励
       let leveledUp = false;
       if (reward) {
