@@ -553,7 +553,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "clinic_full_day",
     name: "门庭若市",
-    description: "单日接待满全部名额（3 位）。",
+    description: "单日接待满全部名额（5 位）。",
     category: "clinic",
     rarity: "rare",
     target: 1,

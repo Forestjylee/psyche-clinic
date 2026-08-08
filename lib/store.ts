@@ -1026,11 +1026,11 @@ export const useGameStore = create<GameStore>((set, get) => {
           g.stats.aftercareCount += 1;
           if (!g.stats.aftercareEndings.includes(rv.ending))
             g.stats.aftercareEndings.push(rv.ending);
+          // P5-3 回访恢复：好好告别后理智 +10
+          g.doctor.sanity = clamp(g.doctor.sanity + 10, 0, 100);
+          toast(`${p?.name ?? "ta"} 好好告别了。你也觉得，心里松了一些。理智 +10`, "ok");
         }
       }
-      // P5-3 回访恢复：好好告别后理智 +10
-      g.doctor.sanity = clamp(g.doctor.sanity + 10, 0, 100);
-      toast(`${p?.name ?? "ta"} 好好告别了。你也觉得，心里松了一些。理智 +10`, "ok");
       commit();
       playSound("page");
       set({ currentReturnPatient: null });
