@@ -157,6 +157,11 @@ export function DialogueScene() {
   // 「暂停」与 HUD「退出」（backToTitle 自带 saveGame）都据此保存断点
   useEffect(() => {
     if (!currentPatient || !engineRef.current) return;
+    // P2-9 修复：结局节点不写回断点草稿。
+    // 结算（finishSession）已把 activeSession 置 null 并落盘；若此处再写回，
+    // 内存中的 activeSession 会残留为已完成患者，预约清单误显「继续上次」角标
+    // （周明远/陈洛结案后实测复现）。跳过结局节点即可让断点在结算后保持清空。
+    if (node?.isEnding) return;
     const s = snapshotSession();
     if (s) useGameStore.getState().syncSessionDraft(s);
     // eslint-disable-next-line react-hooks/exhaustive-deps
