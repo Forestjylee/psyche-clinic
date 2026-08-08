@@ -76,6 +76,13 @@ export function DialogueScene() {
   const [lockedHintOn, setLockedHintOn] = useState<string | null>(null);
   const lockedHintNodeRef = useRef<string | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  // 教学气泡定位（scene 相对坐标）：C1 修复——气泡移出 .dialogue-options 滚动容器，
+  // 作为 .dialogue-scene 直接子级、按目标选项 getBoundingClientRect 换算坐标，避免被 overflow 裁剪
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const [bubblePos, setBubblePos] = useState<{
+    empathy?: { left: number; top: number };
+    locked?: { left: number; top: number };
+  }>({});
 
   useEffect(() => {
     if (!currentPatient) return;
@@ -282,6 +289,49 @@ export function DialogueScene() {
     setLockedHintOn(null);
   };
 
+  // 教学气泡定位：以 .dialogue-scene 为锚，按目标选项 getBoundingClientRect 换算 scene 相对坐标。
+  // 共情气泡在选项左侧、锁定气泡在选项右侧；clamp 防越出视口；resize 时重算。
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+    const compute = () => {
+      const sceneRect = scene.getBoundingClientRect();
+      const GAP = 20;
+      const BUBBLE_W = 186;
+      const clampX = (left: number) =>
+        Math.max(8, Math.min(left, sceneRect.width - BUBBLE_W - 8));
+      const measure = (choiceId: string) => {
+        const el = scene.querySelector<HTMLElement>(
+          `[data-choice-id="${CSS.escape(choiceId)}"]`
+        );
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return {
+          left: r.left - sceneRect.left,
+          right: r.right - sceneRect.left,
+          top: r.top - sceneRect.top + r.height / 2,
+        };
+      };
+      const pos: {
+        empathy?: { left: number; top: number };
+        locked?: { left: number; top: number };
+      } = {};
+      if (empathyHintId) {
+        const m = measure(empathyHintId);
+        if (m) pos.empathy = { left: clampX(m.left - BUBBLE_W - GAP), top: m.top };
+      }
+      if (lockedHintOn) {
+        const m = measure(lockedHintOn);
+        if (m) pos.locked = { left: clampX(m.right + GAP), top: m.top };
+      }
+      setBubblePos(pos);
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node, empathyHintId, lockedHintOn]);
+
   if (!currentPatient || !node) return null;
 
   const meetsRequirement = (require?: {
@@ -347,7 +397,7 @@ export function DialogueScene() {
   const bubbleName = sp === "patient" ? currentPatient.name : "你";
 
   return (
-    <div className="scene dialogue-scene">
+    <div className="scene dialogue-scene" ref={sceneRef}>
       {/* 底层诊室房间 + 医生坐像（Phaser FIT 铺满） */}
       <ClinicRoomCanvas />
 
@@ -511,34 +561,19 @@ export function DialogueScene() {
               ? `需要技能：${skillName}`
               : "";
             return (
-              <div key={c.id} className="choice-wrap">
-                <button
-                  className={`choice ${locked ? "choice-locked" : ""}`}
-                  disabled={locked}
-                  onClick={() => onChoose(c.id)}
-                  onMouseEnter={() => !locked && playSound("hover")}
-                >
-                  <span className="choice-text">
-                    <TermText text={c.text} />
-                    {hint ? <div className="choice-hint">{hint}</div> : null}
-                  </span>
-                </button>
-                {empathyHintId === c.id ? (
-                  <div className="teach-bubble teach-empathy" role="note">
-                    这是共情——一句温和的话，让对方放松，愿意多说一点。
-                  </div>
-                ) : null}
-                {locked && lockedHintOn === c.id ? (
-                  <div className="teach-bubble teach-locked" role="note">
-                    <span className="teach-locked-text">
-                      这个选项还锁着——要么满足前置条件，要么学会对应的话术。
-                    </span>
-                    <button className="teach-gotit" onClick={dismissLockedHint}>
-                      知道了
-                    </button>
-                  </div>
-                ) : null}
-              </div>
+              <button
+                key={c.id}
+                data-choice-id={c.id}
+                className={`choice ${locked ? "choice-locked" : ""}`}
+                disabled={locked}
+                onClick={() => onChoose(c.id)}
+                onMouseEnter={() => !locked && playSound("hover")}
+              >
+                <span className="choice-text">
+                  <TermText text={c.text} />
+                  {hint ? <div className="choice-hint">{hint}</div> : null}
+                </span>
+              </button>
             );
           })
         ) : (
@@ -553,6 +588,32 @@ export function DialogueScene() {
           </button>
         )}
       </div>
+
+      {/* 教学浮层（P4-4）：.dialogue-scene 直接子级、按选项 rect 定位（C1：不放进选项滚动容器，
+          否则被 overflow-y:auto 裁剪）；纯提示非阻塞——共情 pointer-events:none，锁定仅「知道了」可点 */}
+      {empathyHintId && bubblePos.empathy ? (
+        <div
+          className="teach-bubble teach-empathy"
+          role="note"
+          style={{ left: bubblePos.empathy.left, top: bubblePos.empathy.top }}
+        >
+          这是共情——一句温和的话，让对方放松，愿意多说一点。
+        </div>
+      ) : null}
+      {lockedHintOn && bubblePos.locked ? (
+        <div
+          className="teach-bubble teach-locked"
+          role="note"
+          style={{ left: bubblePos.locked.left, top: bubblePos.locked.top }}
+        >
+          <span className="teach-locked-text">
+            这个选项还锁着——要么满足前置条件，要么学会对应的话术。
+          </span>
+          <button className="teach-gotit" onClick={dismissLockedHint}>
+            知道了
+          </button>
+        </div>
+      ) : null}
 
       {flashback ? (
         <div className="memory-flash" role="dialog" aria-label="记忆碎片">

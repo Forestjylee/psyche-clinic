@@ -398,19 +398,13 @@
 .choice-locked:hover { transform: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
 
 /* —— P4-4 边做边学：共情/锁定教学浮层（纸木气泡，非阻塞：不遮罩、不改选项行为，
-   只在选项旁提示 + 点击/关闭时落 localStorage 标记） —— */
-.choice-wrap {
-  position: relative;
-  width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
-  flex-shrink: 0;
-}
+   只在选项旁提示 + 点击/关闭时落 localStorage 标记）。
+   C1 修复：气泡是 .dialogue-scene 直接子级（left/top 由组件按目标选项 rect 换算），
+   不放进 .dialogue-options——否则 overflow-y:auto 会把越出容器的气泡裁剪掉。 —— */
 .teach-bubble {
   position: absolute;
-  top: 50%;
+  z-index: 16;
   transform: translateY(-50%);
-  z-index: 2;
   width: 186px;
   padding: 9px 12px;
   border-radius: 12px;
@@ -426,14 +420,13 @@
   from { opacity: 0; transform: translateY(-44%); }
   to   { opacity: 1; transform: translateY(-50%); }
 }
-/* 共情提示：选项左侧，纯视觉（pointer-events:none 绝不拦截任何选项点击） */
+/* 共情提示：纯视觉（pointer-events:none 绝不拦截任何点击） */
 .teach-empathy {
-  right: calc(100% + 20px);
   pointer-events: none;
 }
-/* 锁定提示：选项右侧，仅「知道了」按钮可点，其余区域透传不挡点击 */
+/* 锁定提示：容器 pointer-events:none 透传不挡相邻选项点击，仅「知道了」按钮可点 */
 .teach-locked {
-  left: calc(100% + 20px);
+  pointer-events: none;
   display: flex;
   flex-direction: column;
   gap: 7px;
