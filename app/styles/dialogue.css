@@ -230,7 +230,8 @@
   cursor: pointer;
 }
 
-/* —— 角落四维（紧凑小卡，P2-5 再做淡化打磨） —— */
+/* —— 角落四维（紧凑小卡，P2-5 淡显强化：默认低对比不抢焦点，
+   hover/长按 强化显示；指针 hover 的设备上 才整体提亮，触摸端 :active 等效长按） —— */
 .corner-stats {
   position: absolute;
   top: 12px;
@@ -238,17 +239,43 @@
   z-index: 9;
   width: 158px;
   padding: 9px 12px;
-  background: rgba(255, 251, 240, 0.9);
-  border: 1px solid var(--paper-border);
+  background: rgba(255, 251, 240, 0.72);
+  border: 1px solid rgba(180, 160, 120, 0.4);
   border-radius: 12px;
-  box-shadow: var(--shadow-paper);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   gap: 5px;
-  opacity: 0.75;
-  transition: opacity 0.25s ease;
+  /* 默认淡显：半透明卡 + 低透明度内容（弱色），让玩家关注患者而非数值 */
+  opacity: 0.6;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
-.corner-stats:hover {
+/* 弱色：条与标签/数值在默认态降透明，形成"低对比"层次 */
+.corner-stats .status-bar { opacity: 0.65; }
+.corner-stats .status-bar-fill { opacity: 0.55; }
+.corner-stats .status-label,
+.corner-stats .status-value { opacity: 0.72; }
+/* 强化：hover 或触摸长按（:active）时更亮、放大、不透明 */
+.corner-stats:hover,
+.corner-stats:active {
+  opacity: 1;
+  transform: scale(1.06);
+  background: rgba(255, 251, 240, 0.97);
+  border-color: var(--paper-border);
+  box-shadow: var(--shadow-paper);
+}
+.corner-stats:hover .status-bar,
+.corner-stats:active .status-bar,
+.corner-stats:hover .status-bar-fill,
+.corner-stats:active .status-bar-fill,
+.corner-stats:hover .status-label,
+.corner-stats:active .status-label,
+.corner-stats:hover .status-value,
+.corner-stats:active .status-value {
   opacity: 1;
 }
 .corner-stats .status-row {
@@ -258,6 +285,10 @@
 .corner-stats .status-label { font-size: 11px; }
 .corner-stats .status-bar { height: 8px; }
 .corner-stats .status-value { font-size: 12px; }
+/* 尊重系统减弱动效：淡化/强化切换立即完成 */
+@media (prefers-reduced-motion: reduce) {
+  .corner-stats { transition: none; }
+}
 
 .status-row {
   display: flex;
@@ -394,52 +425,58 @@
   .patient-figure .patient-chip { font-size: 1.4cqw; padding: 0.5cqw 1.3cqw; }
 }
 
-/* 浮动数值文字（对话反馈：清晰、停留足够久；由 Overlays 渲染，沿用现状） */
+/* 浮动文字（P2-5 情绪化：浅色纸底/暖字、柔和渐隐；由 Overlays 渲染）。
+   维度数值浮动 + 机制语映射后的情绪反馈统一走此纸木质药丸，
+   kind 只做暖色调微差，不再深底霓虹抢眼。 */
 .floating-text {
   position: fixed;
   pointer-events: none;
   z-index: 200;
-  font-weight: 800;
-  font-size: 17px;
-  padding: 6px 18px;
-  border-radius: 20px;
-  background: rgba(32, 26, 20, 0.82);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 7px 18px;
+  border-radius: 999px;
+  background: rgba(255, 251, 240, 0.97);
+  border: 1.5px solid var(--paper-border);
+  box-shadow: var(--shadow-paper), 0 4px 14px rgba(90, 70, 40, 0.18);
+  color: #5c4632;
   white-space: nowrap;
   transform: translateX(-50%);
   animation: floatUp 2s ease-out forwards;
   letter-spacing: 0.5px;
 }
+/* 各 kind 柔和色调：浅纸底 + 暖字，弱对比不发亮 */
 .floating-text.good {
-  color: #7ef0b0;
-  border-color: rgba(126, 240, 176, 0.55);
-  text-shadow: 0 0 12px rgba(126, 240, 176, 0.35);
+  color: #35785a;
+  border-color: rgba(75, 150, 110, 0.5);
+  background: rgba(243, 250, 244, 0.97);
 }
 .floating-text.bad {
-  color: #ff9ba8;
-  border-color: rgba(255, 155, 168, 0.55);
-  text-shadow: 0 0 12px rgba(255, 155, 168, 0.35);
+  color: #a8554c;
+  border-color: rgba(190, 105, 90, 0.5);
+  background: rgba(252, 244, 240, 0.97);
 }
 .floating-text.warn {
-  color: #ffd18a;
-  border-color: rgba(255, 209, 138, 0.55);
-  text-shadow: 0 0 12px rgba(255, 209, 138, 0.35);
+  color: #9c6d2c;
+  border-color: rgba(196, 150, 70, 0.5);
+  background: rgba(252, 247, 235, 0.97);
+}
+/* 锁定提示：保留原意并带"锁着"图标 */
+.floating-text.warn::before {
+  content: "🔒 ";
+  font-size: 0.9em;
 }
 .floating-text.combo {
-  color: #ffd76a;
-  font-size: 20px;
-  border-color: rgba(255, 215, 106, 0.6);
-  background: rgba(58, 40, 14, 0.9);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), 0 0 26px rgba(255, 215, 106, 0.28);
+  color: #8f5f14;
+  font-size: 16.5px;
+  border-color: rgba(196, 150, 60, 0.6);
+  background: rgba(253, 246, 226, 0.97);
+  box-shadow: var(--shadow-paper), 0 4px 18px rgba(90, 70, 40, 0.22);
 }
 .floating-text.truth {
-  color: #c9b6ff;
-  border-color: rgba(201, 182, 255, 0.55);
-  text-shadow: 0 0 12px rgba(201, 182, 255, 0.35);
+  color: #6d5aa8;
+  border-color: rgba(120, 100, 180, 0.5);
+  background: rgba(245, 243, 252, 0.97);
 }
 
 @keyframes floatUp {

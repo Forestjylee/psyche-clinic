@@ -11,6 +11,7 @@ import { TermText } from "./PsychTermSpan";
 import { emotionColors, emotionLabels } from "./constants";
 import { ChibiCharacter } from "./ChibiCharacter";
 import { CLINIC_LAYOUT } from "./phaser/clinic/clinicLayout";
+import { toEmotionalFloating } from "./floatingEmotion";
 
 /** 诊室 Phaser 画布（ClinicScene 底层房间 + 医生；ssr:false 动态挂载）。
  *  Promise.all 同时取 GameCanvas 与 ClinicScene，闭包注入 scenes，
@@ -86,7 +87,8 @@ export function DialogueScene() {
         achievementEngine?.onComboTrigger();
         playSound("combo");
       },
-      onFloatingText: (text, kind) => pushFloating(text, kind),
+      // 机制语 → 情绪反馈（呈现层映射，不改引擎文案）
+      onFloatingText: (text, kind) => pushFloating(toEmotionalFloating(text, kind), kind),
       onMemoryTrigger: (frag) => {
         // 记忆碎片不自动关闭，等待玩家阅读后点击关闭
         setFlashback(frag);
