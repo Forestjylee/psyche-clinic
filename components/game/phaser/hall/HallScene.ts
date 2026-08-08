@@ -233,8 +233,8 @@ export class HallScene extends Phaser.Scene {
     pill.lineStyle(1, style.pillBorder, 1);
     const pw = daysText.width + 16;
     const ph = 17;
-    pill.fillRoundedRect(6 - 6, -12 - ph / 2, pw, ph, 9);
-    pill.strokeRoundedRect(6 - 6, -12 - ph / 2, pw, ph, 9);
+    pill.fillRoundedRect(6, -12 - ph / 2, pw, ph, 9);
+    pill.strokeRoundedRect(6, -12 - ph / 2, pw, ph, 9);
 
     // 动态状态语（观察性、中性句式，随等待天数分级换档）
     const status = this.add
