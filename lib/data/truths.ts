@@ -450,7 +450,7 @@ const truthGrief: TruthTemplate = {
           },
           {
             id: "gc3",
-            text: "「我给你开点抑制REM睡眠的药，让你不做梦。」",
+            text: "「我给你开点药，能让你不做梦。」",
             kind: "prescribe",
             effect: { mood: 6, doctorMoney: 50, doctorSanity: -2 },
             next: "g3_p2_med",
@@ -1302,7 +1302,7 @@ const truthPostpartum: TruthTemplate = {
         choices: [
           {
             id: "gc4",
-            text: `「${n}，深呼吸。你听我说——你刚才说的，叫"侵入性念头"，是产后抑郁非常常见的症状。它的特点就是：你越害怕，它越频繁。它的出现，恰恰证明你不会做。一个真正想伤害孩子的妈妈，不会有这种"画面"让她崩溃。」`,
+            text: `「${n}，深呼吸。你听我说——你刚才说的那种"突然冒出来的可怕念头"，是产后抑郁非常常见的症状。它的特点就是：你越害怕，它越频繁。它的出现，恰恰证明你不会做。一个真正想伤害孩子的妈妈，不会有这种"画面"让她崩溃。」`,
             kind: "empathy",
             requireSkill: "see_through_defense",
             effect: { trust: 28, defense: -20, mood: 15, truth: 35, doctorExp: 40 },
@@ -2865,7 +2865,7 @@ const truthHikikomori: TruthTemplate = {
           },
           {
             id: "gc8",
-            text: "「我们用'意义重构'疗法，重新定义'成功'。不是只有买房结婚才算成功。」",
+            text: "「我们一起重新看看'成功'这两个字——不是只有买房结婚才算成功。」",
             kind: "special",
             requireSkill: "hold_silence",
             effect: { trust: 22, mood: 18, truth: 30, doctorReputation: 5, doctorExp: 50, doctorSanity: -6 },
@@ -3364,7 +3364,7 @@ const truthAssaultComplexTrauma: TruthTemplate = {
           },
           {
             id: "gc8",
-            text: `「我们做'叙事重构'——把'是我的错'写下来，再一句一句质问它：证据在哪？谁该负责？慢慢地，你会看见那句话不是真相，是他塞给你的。」`,
+            text: `「我们把'是我的错'这句话写下来，再一句一句质问它：证据在哪？谁该负责？慢慢地，你会看见那句话不是真相，是他塞给你的。」`,
             kind: "special",
             requireSkill: "hold_silence",
             effect: { trust: 22, mood: 14, truth: 30, doctorReputation: 6, doctorExp: 50, doctorSanity: -6 },
