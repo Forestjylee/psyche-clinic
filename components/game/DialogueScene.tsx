@@ -58,6 +58,9 @@ export function DialogueScene() {
   const [flashback, setFlashback] = useState<MemoryFragment | null>(null);
   // 保留但不滚动渲染：P2-6 回顾窗需要完整会话记录
   const [history, setHistory] = useState<Line[]>([]);
+  // 右上角回顾窗开关（P2-6，非阻塞，可边看边推进剧情）
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const historyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!currentPatient) return;
@@ -103,6 +106,13 @@ export function DialogueScene() {
     eng.start();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPatient]);
+
+  // 打开回顾窗时滚到底部（最新一句可见）；已打开时新句追加不打扰玩家的翻看位置
+  useEffect(() => {
+    if (historyOpen && historyRef.current) {
+      historyRef.current.scrollTop = historyRef.current.scrollHeight;
+    }
+  }, [historyOpen]);
 
   const dismissFlashback = () => setFlashback(null);
 
@@ -221,6 +231,51 @@ export function DialogueScene() {
           <StatusRow label="防御" value={pState.defense} color="var(--bad)" />
           <StatusRow label="心情" value={pState.mood} color="var(--accent)" />
           <StatusRow label="真相" value={pState.truth} color="var(--truth)" />
+        </div>
+      ) : null}
+
+      {/* 右上角「回顾」按钮：打开本场对话历史小窗（P2-6，非阻塞） */}
+      <button
+        className="dialogue-history-toggle"
+        onClick={() => {
+          playSound("click");
+          setHistoryOpen((v) => !v);
+        }}
+        aria-label={historyOpen ? "关闭本场对话回顾" : "打开本场对话回顾"}
+        aria-expanded={historyOpen}
+      >
+        <span aria-hidden="true">📖</span> 回顾
+      </button>
+
+      {/* 本场对话回顾窗：history 逐行渲染，患者/医生左右镜像 + 配色区分 */}
+      {historyOpen ? (
+        <div className="dialogue-history" role="dialog" aria-label="本场对话回顾">
+          <div className="dialogue-history-head">
+            <span className="dialogue-history-title">本场对话</span>
+            <button
+              className="dialogue-history-close"
+              onClick={() => setHistoryOpen(false)}
+              aria-label="关闭回顾窗"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="dialogue-history-body" ref={historyRef}>
+            {history.length === 0 ? (
+              <div className="dialogue-history-empty">本场对话还没有记录</div>
+            ) : (
+              history.map((line) => (
+                <div key={line.id} className={`history-line ${line.speaker}`}>
+                  <span className="history-line-name">
+                    {line.speaker === "patient" ? currentPatient.name : "你"}
+                  </span>
+                  <span className="history-line-text">
+                    <TermText text={line.text} />
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       ) : null}
 
