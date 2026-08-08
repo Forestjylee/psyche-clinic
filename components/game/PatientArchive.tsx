@@ -11,10 +11,18 @@ import {
   archivePatients,
   archiveStatusText,
   deriveArchiveStatus,
+  filterArchivePatients,
   fragmentCount,
+  type ArchiveFilter,
   type ArchiveStatus,
   unlockedFragmentsFor,
 } from "./archive";
+
+const FILTERS: { key: ArchiveFilter; label: string }[] = [
+  { key: "all", label: "全部" },
+  { key: "closed", label: "已治愈" },
+  { key: "incomplete", label: "碎片未集齐" },
+];
 
 /** 头像表情：已结案用结局表情，已离场（放弃/离场）用焦虑，其余平静 */
 function archiveEmotion(p: PatientScenario, status: ArchiveStatus): PatientEmotion {
@@ -27,11 +35,13 @@ export function PatientArchive() {
   const { game, setScene, playSound } = useGame();
   // 相册式翻页：进入场景时 main 会因 key={scene} 重挂载，页码自然重置
   const [page, setPage] = useState(0);
+  const [filter, setFilter] = useState<ArchiveFilter>("all");
 
   const patients = archivePatients(game);
-  const total = patients.length;
+  const filtered = filterArchivePatients(patients, game, filter);
+  const total = filtered.length;
   const cur = total > 0 ? Math.min(page, total - 1) : 0;
-  const p = total > 0 ? patients[cur] : null;
+  const p = total > 0 ? filtered[cur] : null;
 
   const goPrev = () => {
     if (cur <= 0) return;
@@ -70,10 +80,31 @@ export function PatientArchive() {
       <h2>患 者 档 案</h2>
       <p className="subtitle">见过的每一位患者，都留在这本记忆册里。</p>
 
+      {/* 筛选按钮组：切换筛选时重置页码；空态下也保留，方便切回 */}
+      <div className="archive-filter" role="group" aria-label="按状态筛选档案">
+        {FILTERS.map((f) => (
+          <button
+            key={f.key}
+            className={`archive-filter-btn ${filter === f.key ? "active" : ""}`}
+            onClick={() => {
+              playSound("click");
+              setFilter(f.key);
+              setPage(0);
+            }}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       {!p ? (
-        <div className="empty-state">
-          还没有见过任何患者，去接诊一位吧。
-        </div>
+        patients.length === 0 ? (
+          <div className="empty-state">
+            还没有见过任何患者，去接诊一位吧。
+          </div>
+        ) : (
+          <div className="empty-state">没有符合这个筛选的患者。</div>
+        )
       ) : (
         <>
           <div className="archive-nav" aria-label="相册翻页">

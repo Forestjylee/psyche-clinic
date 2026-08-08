@@ -3,6 +3,39 @@
    贴合治愈系纸木质（复用 --paper / --paper-border / --shadow-paper 等变量）
    ============================================================ */
 
+/* —— 档案筛选按钮组（贴合纸木质，参考 achievements 筛选） —— */
+.archive-filter {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.archive-filter-btn {
+  padding: 7px 16px;
+  background: linear-gradient(135deg, var(--paper-hi), var(--paper));
+  border: 1px solid var(--paper-border);
+  border-radius: 999px;
+  color: var(--ink-dim);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  box-shadow: var(--shadow-paper), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.archive-filter-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+.archive-filter-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+
 /* —— 相册翻页导航条 —— */
 .archive-nav {
   display: flex;
@@ -331,6 +364,8 @@
   .archive-name { font-size: 20px; flex-wrap: wrap; gap: 6px; }
   .archive-nav { gap: 10px; }
   .archive-nav-btn { padding: 7px 12px; font-size: 12.5px; }
+  .archive-filter { gap: 6px; margin-bottom: 14px; }
+  .archive-filter-btn { padding: 6px 12px; font-size: 12.5px; }
 }
 @media (max-height: 760px) {
   .archive-page { padding: 18px 20px 22px; }

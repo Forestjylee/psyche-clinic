@@ -134,3 +134,32 @@ export function archiveStatusText(status: ArchiveStatus): string {
         : "候诊 / 治疗中";
   }
 }
+
+/** 档案筛选：全部 / 已结案(已治愈) / 碎片未集齐 */
+export type ArchiveFilter = "all" | "closed" | "incomplete";
+
+/**
+ * 档案筛选纯函数：
+ * - "all"：原样返回入参。
+ * - "closed"：只保留 patientRecords[id] 存在的患者（PRD 场景4 基本状态「已治愈」对应结案）。
+ * - "incomplete"：只保留有碎片系统（fragmentCount > 0）且未全部集齐的患者。
+ * 保持入参顺序（手写在前、生成在后）。
+ */
+export function filterArchivePatients(
+  patients: PatientScenario[],
+  game: GameState,
+  filter: ArchiveFilter
+): PatientScenario[] {
+  switch (filter) {
+    case "all":
+      return patients;
+    case "closed":
+      return patients.filter(
+        (p) => deriveArchiveStatus(game, p.id).kind === "closed"
+      );
+    case "incomplete":
+      return patients.filter(
+        (p) => fragmentCount(p) > 0 && !allFragmentsCollected(game, p)
+      );
+  }
+}

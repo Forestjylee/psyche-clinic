@@ -9,6 +9,7 @@ import {
   archiveStatusText,
   fragmentById,
   fragmentCount,
+  filterArchivePatients,
   unlockedFragmentsFor,
 } from "./archive";
 
@@ -178,6 +179,61 @@ describe("碎片查询（memoryFragments + followUpFragments）", () => {
     // 顺序由 unlockedFragments 数组决定
     g.unlockedFragments["gen_today"] = ["ghost_frag", "gen_today_m1"];
     expect(unlockedFragmentsFor(g, p).map((f) => f.id)).toEqual(["gen_today_m1"]);
+  });
+});
+
+describe("filterArchivePatients 档案筛选（全部/已治愈/碎片未集齐）", () => {
+  it('"all" 原样返回入参（保持顺序，同引用）', () => {
+    const g = createInitialState();
+    const p1 = genScenario("all_1");
+    const p2 = genScenario("all_2");
+    const input = [p1, p2];
+    expect(filterArchivePatients(input, g, "all")).toBe(input);
+    expect(filterArchivePatients(input, g, "all")).toEqual([p1, p2]);
+  });
+  it('"closed" 只保留 patientRecords 中的已治愈患者', () => {
+    const g = createInitialState();
+    const cured = genScenario("cured_p");
+    const active = genScenario("active_p");
+    g.patientRecords["cured_p"] = "cure";
+    const out = filterArchivePatients([cured, active], g, "closed");
+    expect(out.map((p) => p.id)).toEqual(["cured_p"]);
+  });
+  it('"closed" 排除 abandoned/discharged/followup/active', () => {
+    const g = createInitialState();
+    const cured = genScenario("cured_p");
+    g.patientRecords["cured_p"] = "cure";
+    const aban = genScenario("ab_p");
+    g.abandoned.push("ab_p");
+    const dis = genScenario("dis_p");
+    g.discharged.push("dis_p");
+    const fu = genScenario("fu_p");
+    g.followUpCount["fu_p"] = 1;
+    const act = genScenario("act_p");
+    g.waitingDays["act_p"] = 2;
+    const out = filterArchivePatients([aban, cured, dis, fu, act], g, "closed");
+    expect(out.map((p) => p.id)).toEqual(["cured_p"]);
+  });
+  it('"incomplete" 只保留有碎片系统且未集齐的患者', () => {
+    const g = createInitialState();
+    const incomplete = genScenario("incom_p"); // 有 1 个碎片但未解锁
+    const complete = genScenario("comp_p");
+    g.unlockedFragments["comp_p"] = ["comp_p_m1"]; // 已集齐
+    const noFrag = genScenario("nofrag_p");
+    noFrag.memoryFragments = []; // 无碎片系统
+    const out = filterArchivePatients([incomplete, complete, noFrag], g, "incomplete");
+    expect(out.map((p) => p.id)).toEqual(["incom_p"]);
+  });
+  it('"incomplete" 多碎片部分集齐仍算未集齐，全部集齐后排除', () => {
+    const g = createInitialState();
+    const p = genScenario("multi_p");
+    p.followUpFragments = [
+      { id: "multi_p_f1", trigger: { truth: 10 }, title: "复诊片段", text: "复诊记忆。", emotion: "calm" },
+    ];
+    g.unlockedFragments["multi_p"] = ["multi_p_m1"]; // 2 个里只解锁 1 个
+    expect(filterArchivePatients([p], g, "incomplete").map((x) => x.id)).toEqual(["multi_p"]);
+    g.unlockedFragments["multi_p"] = ["multi_p_m1", "multi_p_f1"];
+    expect(filterArchivePatients([p], g, "incomplete")).toEqual([]);
   });
 });
 
