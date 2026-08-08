@@ -67,6 +67,10 @@ export interface EndingData {
   patientName?: string;
   /** 患者配色，供结局页渲染 chibi 立绘 */
   patientPalette?: PatientPalette;
+  /** 患者表象描述（叙事式真相复盘用；为空则复盘块整块隐藏） */
+  patientSurface?: string;
+  /** 患者 id（记忆碎片集齐等后续功能预留） */
+  patientId?: string;
 }
 
 const MAX_GENERATED = 8;
@@ -679,6 +683,8 @@ export const useGameStore = create<GameStore>((set, get) => {
           reward,
           patientName: get().currentPatient?.name,
           patientPalette: get().currentPatient?.palette,
+          patientSurface: get().currentPatient?.surface,
+          patientId: get().currentPatient?.id,
         },
       });
       // 每接诊 2 位，候诊区补充一位新患者
