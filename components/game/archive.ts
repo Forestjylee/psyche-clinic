@@ -71,6 +71,20 @@ export function unlockedFragmentsFor(
     .filter((f): f is MemoryFragment => !!f);
 }
 
+/**
+ * 碎片系统存在且全部解锁：true 时才揭示完整真相（PRD 场景4 泄底封口出口）。
+ * 泄底封口：仅此判定为 true 时，调用方才允许在档案集齐区块渲染 p.truth。
+ */
+export function allFragmentsCollected(
+  game: GameState,
+  p: PatientScenario
+): boolean {
+  return (
+    fragmentCount(p) > 0 &&
+    unlockedFragmentsFor(game, p).length >= fragmentCount(p)
+  );
+}
+
 export type ArchiveStatusKind =
   | "closed" // 已结案：patientRecords[id] 存在
   | "abandoned" // 已离场 · 放弃治疗

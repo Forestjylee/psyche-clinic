@@ -175,6 +175,72 @@
   white-space: pre-line;
 }
 
+/* —— 未解锁碎片：剪影占位（与已解锁卡片形成明暗对照）—— */
+.archive-fragment-placeholders {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.archive-fragment-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(
+    150deg,
+    rgba(96, 78, 56, 0.05),
+    rgba(96, 78, 56, 0.02)
+  );
+  border: 1.5px dashed var(--paper-border);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+.archive-fragment-silhouette {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: linear-gradient(
+    150deg,
+    rgba(96, 78, 56, 0.26),
+    rgba(96, 78, 56, 0.1)
+  );
+  border: 1px solid rgba(96, 78, 56, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  color: rgba(96, 78, 56, 0.35);
+}
+.archive-fragment-placeholder-text {
+  font-size: 13.5px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+}
+
+/* —— 真相浮现（碎片全部集齐才揭示；泄底封口出口）—— */
+.archive-truth {
+  margin-top: 4px;
+}
+.archive-truth-text {
+  font-size: 14.5px;
+  line-height: 2;
+  color: var(--ink);
+  white-space: pre-line;
+  background: linear-gradient(
+    150deg,
+    rgba(240, 180, 90, 0.12),
+    rgba(240, 180, 90, 0.04)
+  );
+  border: 1px solid var(--gold);
+  border-left: 4px solid var(--gold);
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-paper);
+}
+
 /* —— 结局记录 —— */
 .archive-ending {
   display: flex;

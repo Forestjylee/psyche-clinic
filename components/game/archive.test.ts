@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createInitialState } from "../../lib/state/GameState";
 import type { GameState, PatientScenario } from "../../lib/types";
 import {
+  allFragmentsCollected,
   seenPatientIds,
   archivePatients,
   deriveArchiveStatus,
@@ -177,5 +178,47 @@ describe("碎片查询（memoryFragments + followUpFragments）", () => {
     // 顺序由 unlockedFragments 数组决定
     g.unlockedFragments["gen_today"] = ["ghost_frag", "gen_today_m1"];
     expect(unlockedFragmentsFor(g, p).map((f) => f.id)).toEqual(["gen_today_m1"]);
+  });
+});
+
+describe("allFragmentsCollected 集齐判定（PRD 泄底封口出口）", () => {
+  it("无碎片系统（fragmentCount 为 0）→ false", () => {
+    const g = createInitialState();
+    const p = genScenario("p1");
+    g.generatedScenarios = [p];
+    p.memoryFragments = [];
+    expect(allFragmentsCollected(g, p)).toBe(false);
+  });
+  it("有碎片但未集齐 → false", () => {
+    const g = createInitialState();
+    const p = genScenario("p1");
+    g.generatedScenarios = [p];
+    g.unlockedFragments["p1"] = [];
+    expect(allFragmentsCollected(g, p)).toBe(false);
+  });
+  it("碎片全部集齐 → true", () => {
+    const g = createInitialState();
+    const p = genScenario("p1");
+    g.generatedScenarios = [p];
+    g.unlockedFragments["p1"] = ["p1_m1"];
+    expect(allFragmentsCollected(g, p)).toBe(true);
+  });
+  it("初诊+复诊多碎片：缺一段 false，补齐 true", () => {
+    const g = createInitialState();
+    const p = genScenario("p1");
+    g.generatedScenarios = [p];
+    p.followUpFragments = [
+      {
+        id: "p1_f1",
+        trigger: { truth: 10 },
+        title: "复诊片段",
+        text: "复诊记忆。",
+        emotion: "calm",
+      },
+    ];
+    g.unlockedFragments["p1"] = ["p1_m1"];
+    expect(allFragmentsCollected(g, p)).toBe(false);
+    g.unlockedFragments["p1"] = ["p1_m1", "p1_f1"];
+    expect(allFragmentsCollected(g, p)).toBe(true);
   });
 });

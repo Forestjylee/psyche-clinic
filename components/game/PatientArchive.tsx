@@ -7,6 +7,7 @@ import { endingColor, endingEmotion, endingLabel } from "./constants";
 import { ChibiCharacter } from "./ChibiCharacter";
 import { recapLines } from "./EndingOverlay";
 import {
+  allFragmentsCollected,
   archivePatients,
   archiveStatusText,
   deriveArchiveStatus,
@@ -46,8 +47,9 @@ export function PatientArchive() {
   // —— 每页数据组装（纯函数层，见 archive.ts）——
   const status = p ? deriveArchiveStatus(game, p.id) : null;
   const fragments = p ? unlockedFragmentsFor(game, p) : [];
-  const hasMore = p ? fragmentCount(p) > fragments.length : false;
   const missingFragments = p ? Math.max(0, fragmentCount(p) - fragments.length) : 0;
+  // 泄底封口出口：仅碎片全部集齐时才允许在集齐区块渲染 p.truth
+  const truthRevealed = p ? allFragmentsCollected(game, p) : false;
   const letters: GameMessage[] = p
     ? game.messages.filter((m) => m.patientName === p.name)
     : [];
@@ -134,12 +136,10 @@ export function PatientArchive() {
               <p className="archive-surface">表象：{p.surface}</p>
             </section>
 
-            {/* —— 记忆碎片（已解锁；未解锁占位留 P3-3）—— */}
+            {/* —— 记忆碎片（已解锁卡片 + 未解锁剪影占位）—— */}
             <section className="archive-block">
               <div className="archive-block-title">记忆碎片</div>
-              {fragments.length === 0 ? (
-                <p className="archive-note">还没有解锁的记忆碎片。</p>
-              ) : (
+              {fragments.length > 0 ? (
                 <div className="archive-fragment-list">
                   {fragments.map((f) => (
                     <div className="archive-fragment" key={f.id}>
@@ -148,13 +148,38 @@ export function PatientArchive() {
                     </div>
                   ))}
                 </div>
+              ) : (
+                <p className="archive-note">还没有解锁的记忆碎片。</p>
               )}
-              {hasMore ? (
-                <p className="archive-note dim">
-                  还有 {missingFragments} 段未记起的片段……
-                </p>
+              {missingFragments > 0 ? (
+                <div className="archive-fragment-placeholders">
+                  {Array.from({ length: missingFragments }, (_, i) => (
+                    <div className="archive-fragment-placeholder" key={i}>
+                      <span
+                        className="archive-fragment-silhouette"
+                        aria-hidden="true"
+                      >
+                        ◇
+                      </span>
+                      <p className="archive-fragment-placeholder-text">
+                        还有一个片段没被记起
+                      </p>
+                    </div>
+                  ))}
+                  <p className="archive-note dim">
+                    还差 {missingFragments} 段，集齐后 ta 的完整记忆会浮现。
+                  </p>
+                </div>
               ) : null}
             </section>
+
+            {/* —— 真相浮现（碎片全部集齐才揭示；PRD 场景4 泄底封口出口，档案唯一允许展示 truth 的位置）—— */}
+            {truthRevealed ? (
+              <section className="archive-block archive-truth">
+                <div className="archive-block-title">真相浮现</div>
+                <p className="archive-truth-text">{p.truth}</p>
+              </section>
+            ) : null}
 
             {/* —— 结局记录（表象→现状复盘，不展开完整真相）—— */}
             {recap ? (
