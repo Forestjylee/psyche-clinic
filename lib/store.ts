@@ -94,7 +94,10 @@ let floatId = 0;
 export type SoundName = Parameters<ReturnType<typeof getSound>["play"]>[0];
 
 /** 按 id 查找患者剧本（手写 + 生成） */
-function scenarioById(g: GameState, id: string): PatientScenario | undefined {
+export function scenarioById(
+  g: GameState,
+  id: string
+): PatientScenario | undefined {
   return [...allPatients, ...g.generatedScenarios].find((p) => p.id === id);
 }
 
@@ -112,6 +115,9 @@ function serveablePatients(g: GameState): PatientScenario[] {
  * 记录已用种子 id 用于去重：seedId 已存在说明上一轮池已耗尽、回退全池重洗，
  * 此时重置本轮去重记录重新开始；否则加入已用列表。
  */
+/** P5-3：本次会话是否为危机接诊（患者等待≥4天），startSession 记录、finishSession 结算用 */
+let lastSessionCritical = false;
+
 function markSeedUsed(g: GameState, s: PatientScenario): void {
   if (!s.seedId) return;
   if (g.usedSeeds.includes(s.seedId)) {
@@ -138,6 +144,10 @@ export interface GameStore {
   currentReturnPatient: PatientScenario | null;
   /** 新游戏进入大厅时展示序章浮层 */
   prologueVisible: boolean;
+  /** P5-3 归零梦境：结算归零置 pending，结局页关闭时转 visible（瞬时状态，不落盘） */
+  restDreamPending: boolean;
+  /** P5-3 归零梦境：当前是否展示梦境 overlay（瞬时状态，不落盘） */
+  restDreamVisible: boolean;
   // —— 初始化（App 挂载时调用一次）——
   init: () => void;
   // —— 场景切换 ——
@@ -149,6 +159,10 @@ export interface GameStore {
   startSession: (p: PatientScenario) => void;
   // —— 操作 ——
   restOneDay: () => void;
+  /** P5-3 花园待一会：每日一次理智 +5（温柔恢复渠道） */
+  spendTimeInGarden: () => void;
+  /** P5-3 归零梦境收尾：梦里见到帮助过的人，醒后理智部分恢复 */
+  dismissRestDream: () => void;
   learnSkill: (id: string) => void;
   buyUpgrade: (id: string) => void;
   /** 装修模式：保存设施摆放位置（仅视觉） */
@@ -281,6 +295,8 @@ export const useGameStore = create<GameStore>((set, get) => {
     currentPatient: null,
     currentReturnPatient: null,
     prologueVisible: false,
+    restDreamPending: false,
+    restDreamVisible: false,
 
     init: () => {
       const eng = new AchievementEngine(get().game, (a) => {
@@ -353,6 +369,8 @@ export const useGameStore = create<GameStore>((set, get) => {
         return;
       }
       if (!g.todayServed.includes(p.id)) g.todayServed.push(p.id);
+      // P5-3 危机接诊标记：患者等待≥4天视为沉重病例（与成就口径一致），结算时消耗理智
+      lastSessionCritical = (g.waitingDays[p.id] ?? 0) >= 4;
       // 病情恶化可逆：患者来就诊，等待天数归零，暂缓放弃
       g.waitingDays[p.id] = 0;
       get().achievementEngine?.onSessionStart(p.id);
@@ -424,6 +442,8 @@ export const useGameStore = create<GameStore>((set, get) => {
       let base = 15;
       if (g.clinicUpgrades.includes("rest_room")) base += 10;
       g.doctor.sanity = clamp(g.doctor.sanity + base, 0, 100);
+      // P5-3 连续接诊计数归零（休息是自我关怀，重置「连续不休息」累计）
+      g.sessionSinceRest = 0;
       if (g.clinicUpgrades.includes("receptionist")) g.doctor.money += 50;
       // 成就累计：零流失天数（当日无流失）/ 连续休息理智≥60 天数 / 邀约到诊 / 直接型指标同步
       if (!events.some((e) => e.type === "abandon" || e.type === "abandonFollowUp"))
@@ -779,6 +799,16 @@ export const useGameStore = create<GameStore>((set, get) => {
         g.doctor = r.stats;
         leveledUp = r.leveledUp;
       }
+      // P5-3 理智消耗：沉重病例 / 坏结局 / 连续不休息（自我关怀资源，非倒闭惩罚）
+      g.sessionSinceRest = (g.sessionSinceRest ?? 0) + 1;
+      if (lastSessionCritical)
+        g.doctor.sanity = clamp(g.doctor.sanity - 10, 0, 100);
+      if (ending === "tragic" || ending === "worsen")
+        g.doctor.sanity = clamp(g.doctor.sanity - 15, 0, 100);
+      if (g.sessionSinceRest >= 3) {
+        g.doctor.sanity = clamp(g.doctor.sanity - 5, 0, 100);
+        if (g.sessionSinceRest === 3) toast("你已经连续接诊很久了，休息一下吧", "warn");
+      }
       // 记录结局
       g.patientRecords[patientId] = ending;
       // 治愈/接纳/觉醒结局：登记 N 天后回访探望（温暖闭环）
@@ -840,20 +870,43 @@ export const useGameStore = create<GameStore>((set, get) => {
           patientId: get().currentPatient?.id,
         },
       });
+      // P5-3 归零温情场景：结算后理智归零 → 结局页关闭时进入梦境（restDreamPending 只留这一处写）
+      if (get().game.doctor.sanity <= 0) set({ restDreamPending: true });
       // 每接诊 2 位，候诊区补充一位新患者
       if (g.slot % 2 === 0) void replenishQueue();
     },
 
     markAllMessagesRead: () => {
       const g = get().game;
-      if (g.messages.some((m) => !m.read)) {
-        g.messages = g.messages.map((m) => ({ ...m, read: true }));
-        commit();
-      }
+      if (!g.messages.some((m) => !m.read)) return;
+      // P5-3 读信恢复：本次新读的每封来信（kind === "letter"）+2 理智（静默，不 toast）
+      const unreadLetters = g.messages.filter((m) => !m.read && m.kind === "letter").length;
+      g.messages = g.messages.map((m) => ({ ...m, read: true }));
+      if (unreadLetters > 0)
+        g.doctor.sanity = clamp(g.doctor.sanity + unreadLetters * 2, 0, 100);
+      commit();
     },
 
     dismissAchievement: () => set({ achievementToast: null }),
-    dismissEnding: () => set({ endingData: null, currentPatient: null, scene: "clinic" }),
+    dismissEnding: () => {
+      const pending = get().restDreamPending;
+      set({
+        endingData: null,
+        currentPatient: null,
+        scene: "clinic",
+        restDreamPending: false,
+        restDreamVisible: pending,
+      });
+    },
+    /** P5-3 归零梦境收尾：梦里见到帮助过的人，醒后理智部分恢复（自我关怀，非惩罚） */
+    dismissRestDream: () => {
+      const g = get().game;
+      g.doctor.sanity = clamp(g.doctor.sanity + 35, 0, 100);
+      commit();
+      set({ restDreamVisible: false });
+      playSound("rest");
+      toast("你在梦里见到了被你帮助过的人。醒后，心里缓过来一些。理智 +35", "ok");
+    },
 
     toggleMute: () => {
       const nm = !get().muted;
@@ -910,9 +963,27 @@ export const useGameStore = create<GameStore>((set, get) => {
             g.stats.aftercareEndings.push(rv.ending);
         }
       }
+      // P5-3 回访恢复：好好告别后理智 +10
+      g.doctor.sanity = clamp(g.doctor.sanity + 10, 0, 100);
+      toast(`${p?.name ?? "ta"} 好好告别了。你也觉得，心里松了一些。理智 +10`, "ok");
       commit();
       playSound("page");
       set({ currentReturnPatient: null });
+    },
+
+    /** P5-3 花园待一会：每日一次理智 +5（温柔恢复渠道） */
+    spendTimeInGarden: () => {
+      const g = get().game;
+      if (g.gardenDay === g.day) {
+        toast("今天已经在花园待过了，明天再来吧", "warn");
+        playSound("locked");
+        return;
+      }
+      g.gardenDay = g.day;
+      g.doctor.sanity = clamp(g.doctor.sanity + 5, 0, 100);
+      commit();
+      playSound("rest");
+      toast("在花园里坐了一会儿，心里松了些。理智 +5", "ok");
     },
   };
 });

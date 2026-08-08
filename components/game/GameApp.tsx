@@ -22,6 +22,7 @@ import { PatientArchive } from "./PatientArchive";
 import { Onboarding } from "./Onboarding";
 import { Prologue } from "./Prologue";
 import { VisitOverlay } from "./VisitOverlay";
+import { RestDreamOverlay } from "./RestDreamOverlay";
 
 export function GameApp() {
   const { scene, game, prologueVisible, currentReturnPatient } = useGame();
@@ -74,6 +75,7 @@ export function GameApp() {
       {currentReturnPatient ? <VisitOverlay /> : null}
       <Overlays />
       <EndingOverlay />
+      <RestDreamOverlay />
       <AchievementUnlockToast />
     </>
   );

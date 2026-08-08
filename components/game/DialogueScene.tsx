@@ -76,6 +76,9 @@ export function DialogueScene() {
   const [lockedHintOn, setLockedHintOn] = useState<string | null>(null);
   const lockedHintNodeRef = useRef<string | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  // P5-3 低理智疲惫句：会话首次进入且理智≤35 时顶部淡入一句（每会话一次，纯提示非阻塞）
+  const [tiredOn, setTiredOn] = useState(false);
+  const tiredRef = useRef(false);
   // 教学气泡定位（scene 相对坐标）：C1 修复——气泡移出 .dialogue-options 滚动容器，
   // 作为 .dialogue-scene 直接子级、按目标选项 getBoundingClientRect 换算坐标，避免被 overflow 裁剪
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -152,6 +155,15 @@ export function DialogueScene() {
     );
     engineRef.current = eng;
     eng.start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPatient]);
+
+  // P5-3 低理智疲惫句：每会话首次进入且理智≤35 时置 on（淡入淡出走 CSS，不走历史、不影响对话流）
+  useEffect(() => {
+    if (currentPatient && game.doctor.sanity <= 35 && !tiredRef.current) {
+      tiredRef.current = true;
+      setTiredOn(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPatient]);
 
@@ -410,6 +422,13 @@ export function DialogueScene() {
 
       {/* FIT 对齐覆盖层：与 Phaser 画布显示区域精确同框（960×540 等比居中） */}
       <div className="clinic-stage">
+        {/* P5-3 低理智疲惫句：顶部中央小字，淡入淡出、pointer-events:none、不入历史 */}
+        {tiredOn ? (
+          <div className="dialogue-tired" role="note">
+            今天……你也有些累了。这场对话结束，早点休息吧。
+          </div>
+        ) : null}
+
         {/* 患者立绘 + 姓名/情绪 tag（emotion 驱动，只走 React） */}
         <div
           className="patient-figure"

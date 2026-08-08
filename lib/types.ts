@@ -4,7 +4,7 @@
 export interface DoctorStats {
   /** 声望：影响可接诊的患者层级 */
   reputation: number;
-  /** 理智值：过低会出现幻觉选项，甚至倒闭 */
+  /** 理智值（自我关怀资源，非失败条件）：随沉重接诊/坏结局/连续不休息消耗，随休息/回访/读信/花园恢复；归零触发温情强制休息（非倒闭） */
   sanity: number;
   /** 金钱：用于升级诊所、技能 */
   money: number;
@@ -318,6 +318,10 @@ export interface GameState {
   placedDecors?: string[];
   /** 装修：花/画 decor id -> 摆放位置（逻辑坐标，视觉） */
   decorPositions?: Record<string, FacilityPosition>;
+  /** 理智（P5-3）：自上次休息以来连续接诊场次（连续不休息消耗计数） */
+  sessionSinceRest?: number;
+  /** 理智（P5-3）：最近一次「花园待一会」的日期（同日仅一次，记录最后使用日） */
+  gardenDay?: number;
   /** 累计统计（成就系统只读，运行时各动作累加） */
   stats: GameStats;
   /** patientId -> 已解锁记忆碎片 id（P3 档案图鉴：碎片驱动完整真相，PRD 场景4） */

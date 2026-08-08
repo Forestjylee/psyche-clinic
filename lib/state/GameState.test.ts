@@ -429,6 +429,40 @@ describe("DECOR_DEFS 装饰数据完整性（P5-1）", () => {
   });
 });
 
+describe("P5-3 理智字段默认值（理智完整机制）", () => {
+  it("初始状态 sessionSinceRest / gardenDay 默认 0", () => {
+    const g = createInitialState();
+    expect(g.sessionSinceRest).toBe(0);
+    expect(g.gardenDay).toBe(0);
+  });
+  it("旧存档缺少理智字段时 migrate 补齐为 0", () => {
+    const legacy = {
+      doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
+      skills: [],
+      clinicUpgrades: [],
+      patientRecords: {},
+      day: 1,
+      slot: 0,
+      todayServed: [],
+      waitingDays: {},
+      abandoned: [],
+      messages: [],
+      generatedScenarios: [],
+    } as unknown as GameState;
+    const migrated = migrateGameState(legacy);
+    expect(migrated.sessionSinceRest).toBe(0);
+    expect(migrated.gardenDay).toBe(0);
+  });
+  it("已有值的新存档不被覆盖", () => {
+    const fresh = createInitialState();
+    fresh.sessionSinceRest = 4;
+    fresh.gardenDay = 12;
+    const migrated = migrateGameState(fresh);
+    expect(migrated.sessionSinceRest).toBe(4);
+    expect(migrated.gardenDay).toBe(12);
+  });
+});
+
 describe("引导患者剧本无坏结局（P4-5 首诊不可选恶化分支）", () => {
   it("GUIDED_PATIENT_ID 存在于 allPatients 首位，requireReputation 为 0", () => {
     const guided = allPatients.find((p) => p.id === GUIDED_PATIENT_ID);

@@ -2,7 +2,7 @@
 
 | 字段 | 内容 |
 | --- | --- |
-| 文档版本 | v1.2.3 |
+| 文档版本 | v1.2.4 |
 | 维护人 | Psyche Clinic Team |
 | 最后更新 | 2026-08-08 |
 | 配套文档 | [PRD.md](./PRD.md) · [PLAN.md](./PLAN.md) · [DEPLOYMENT.md](./DEPLOYMENT.md) |
@@ -145,6 +145,8 @@ interface GameState {
   facilityPositions: Record<string, FacilityPosition>;  // 设施半自由摆放位置
   unlockedFragments: Record<string, string[]>;  // (规划，PLAN P3-1) 患者 id -> 已解锁记忆碎片 id（PRD 场景4，碎片驱动完整真相）
   activeSession?: { patientId: string; nodeId: string; patientState: PatientState; history: string[] };  // (规划，PLAN P2-8) 对话断点快照（PRD 场景2，可无痛中途退出）
+  sessionSinceRest?: number;              // 理智（P5-3）：自上次休息以来连续接诊场次（连续不休息消耗计数）
+  gardenDay?: number;                     // 理智（P5-3）：最近一次「花园待一会」的日期（同日仅一次）
   stats: GameStats;                       // 累计统计（成就引擎，见 §12.4）
 }
 ```
@@ -332,6 +334,31 @@ pendingArrivals: PendingArrival[];
 **数据流**：发现页 UI → `store.discover(channelId)`（扣金钱、生成候选）→ `store.invite(candidateId)`（判定接受、写 `pendingArrivals` / 通知拒绝）→ `restOneDay`（结算到达：入预约清单 + 消息通知）。
 
 **扩展空间**：渠道为数据表，新增渠道仅追加 `discovery.ts` 数据；接受率/到达分布常量集中于此；后续可扩展「客户质量」（高付出渠道产出高难度/高报酬客户）。
+
+### 3.7 理智（自我关怀资源，P5-3）
+
+理智定位为**自我关怀资源**（非失败条件）：随沉重接诊/坏结局/连续不休息而消耗，通过温柔方式恢复；理智低时是叙事提醒（BGM 变沉、画面变暗、对话里医生也累了），归零不 Game Over，而是触发温情的强制休息场景（PRD 场景6）。
+
+**消耗**（`finishSession` 结算后，非首诊坏结局受 `clampFirstSessionEnding` 约束）：
+
+| 触发 | 数值 | 说明 |
+| --- | --- | --- |
+| 接诊沉重病例 | -10 | 患者等待 ≥4 天（`startSession` 记录危机标记，与成就口径一致） |
+| 坏结局 | -15 | 结局为悲剧 `tragic` / 恶化 `worsen` |
+| 连续不休息 | -5 | 自上次休息第 3 场起每场（仅第 3 场 toast 提醒一次） |
+
+**恢复**：
+
+| 渠道 | 数值 | 说明 |
+| --- | --- | --- |
+| 休息一日 | +15 | 休息室 `rest_room` 升级 +10（合计 25），同时 `sessionSinceRest` 归零 |
+| 治愈回访 | +10 | 「好好告别」结案离场时恢复（`finishReturnVisit`） |
+| 读信 | +2/封 | 打开消息盒子，本次新读的未读来信（`kind === "letter"`）每封 +2（静默） |
+| 花园待一会 | +5 | 每日一次（`gardenDay === day` 时拦截），温柔恢复渠道 |
+
+**归零温情场景**：结算后理智 ≤0 → `restDreamPending`（瞬时状态）→ 结局页关闭（`dismissEnding`）转 `restDreamVisible` → 全屏梦境 overlay（`RestDreamOverlay`，z-index 350）展示帮助过的人（治愈/接纳/觉醒结局患者名签，无则兜底文案）→ 点「慢慢醒过来」（`dismissRestDream`）理智恢复 +35。非 Game Over、非倒闭。
+
+**成就联动**：`stats.sanityStreak`（连续休息后理智≥60 天数）驱动「神完气足」（`clinic_sanity_keep`）；`secret_sanity_zero` 归零成就已有（AchievementEngine 只读）。
 
 ---
 
@@ -715,6 +742,7 @@ interface GameStats {
 | v1.2.1 | 2026-08-08 | **评审修订**：§3.1 数据模型同步实际字段（todayFollowUps/followUpIdleDays/usedSeeds/returnVisits/discoveryCandidates/pendingArrivals/facilityPositions/stats + 规划中 unlockedFragments）；清理 `sanity` 旧语义（"过低触发幻觉/倒闭"→自我关怀资源、归零温情强制休息） |
 | v1.2.2 | 2026-08-08 | **评审修订（第二轮）**：§3.1 未落地字段统一标注「(规划, PLAN Px-x)」（unlockedFragments/activeSession）；§12.3 标注待修订高频数值成就（日进斗金/悬壶济世/学贯中西/广撒渔网/四面开花，对应 PLAN P5-4/P5-5）；§3.5/§3.6 慈善获客语义待 PLAN P5-2 同步（广告→善意连接） |
 | v1.2.3 | 2026-08-08 | **评审修订（第三轮）**：§3.5/§3.6 慈善获客语义落地（广告→善意连接：广告拉新 300 金 → 慈善活动费 30-150 金；渠道表改为捐图书角/资助社区讲座/公益宣传/治愈者口口相传）；DiscoveryScene 与相关 UI 文案同步 |
+| v1.2.4 | 2026-08-08 | **评审修订（第三轮）**：P5-3 理智完整机制落地（消耗：沉重病例 -10/坏结局 -15/连续不休息第 3 场起 -5；恢复：回访 +10/读信每封 +2/花园待一会 +5 每日一次；归零温情强制休息梦境 +35 恢复）；GameState 新增 sessionSinceRest/gardenDay；清理 sanity"倒闭"旧注释 |
 
 ---
 

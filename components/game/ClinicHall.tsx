@@ -20,6 +20,7 @@ export function ClinicHall() {
     startSession,
     setScene,
     restOneDay,
+    spendTimeInGarden,
     playSound,
     expToNext,
     achievementEngine,
@@ -278,6 +279,13 @@ export function ClinicHall() {
               guide="rest"
               className={game.doctor.sanity < 50 ? "rest-low" : undefined}
               onClick={restOneDay}
+            />
+            <SideBtn
+              label="花园待一会"
+              right="理智 +5"
+              rightClass={`rest-side-tag ${game.gardenDay === game.day ? "done" : game.doctor.sanity < 50 ? "low" : ""}`}
+              className={game.gardenDay === game.day ? "garden-done" : game.doctor.sanity < 50 ? "rest-low" : undefined}
+              onClick={spendTimeInGarden}
             />
           </div>
           <div className="side-card">

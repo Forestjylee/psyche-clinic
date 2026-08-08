@@ -163,6 +163,8 @@ export function createInitialState(): GameState {
     unlockedDecors: [],
     placedDecors: [],
     decorPositions: {},
+    sessionSinceRest: 0,
+    gardenDay: 0,
     stats: {
       discoverCount: 0,
       channelsUsed: [],
@@ -202,6 +204,9 @@ export function migrateGameState(data: GameState): GameState {
   if (!Array.isArray(data.unlockedDecors)) data.unlockedDecors = [];
   if (!Array.isArray(data.placedDecors)) data.placedDecors = [];
   if (!data.decorPositions) data.decorPositions = {};
+  // 理智（P5-3）：连续接诊计数 / 花园使用日（旧存档补默认 0）
+  if (data.sessionSinceRest === undefined) data.sessionSinceRest = 0;
+  if (data.gardenDay === undefined) data.gardenDay = 0;
   // 会话断点快照（旧存档补默认 null）
   if (!data.activeSession) data.activeSession = null;
   // 档案图鉴：已解锁记忆碎片（旧存档补默认空，P3-1）
