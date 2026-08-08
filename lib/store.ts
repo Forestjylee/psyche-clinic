@@ -163,6 +163,9 @@ export interface GameStore {
   syncSessionDraft: (session: ActiveSession) => void;
   /** 暂停并保存断点：写入 game + saveGame + 回大厅 */
   pauseSession: () => void;
+  // —— 患者档案图鉴（P3）——
+  /** 记忆碎片解锁落库：把 fragmentId 记入 game.unlockedFragments[patientId]（已存在则跳过） */
+  unlockFragment: (patientId: string, fragmentId: string) => void;
   // —— 通知 ——
   toast: (msg: string, kind?: "info" | "ok" | "warn") => void;
   pushFloating: (text: string, kind: string) => void;
@@ -641,6 +644,16 @@ export const useGameStore = create<GameStore>((set, get) => {
       set({ hasSave: true, currentPatient: null, scene: "clinic" });
       playSound("page");
       toast("已保存会话进度，可在预约清单继续", "ok");
+    },
+
+    unlockFragment: (patientId: string, fragmentId: string) => {
+      const g = get().game;
+      // 惰性初始化该患者碎片列表；已解锁过则不去重追加（P3-1 验收 2）
+      if (!g.unlockedFragments[patientId]) g.unlockedFragments[patientId] = [];
+      if (!g.unlockedFragments[patientId].includes(fragmentId)) {
+        g.unlockedFragments[patientId].push(fragmentId);
+      }
+      commit();
     },
 
     finishSession: (

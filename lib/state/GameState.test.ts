@@ -25,6 +25,36 @@ describe("createInitialState 复诊字段默认值", () => {
   });
 });
 
+describe("unlockedFragments 档案图鉴字段默认值（P3-1）", () => {
+  it("初始状态 unlockedFragments 为空对象", () => {
+    const g = createInitialState();
+    expect(g.unlockedFragments).toEqual({});
+  });
+  it("旧存档缺少 unlockedFragments 时 migrate 补齐为 {}", () => {
+    const legacy = {
+      doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
+      skills: [],
+      clinicUpgrades: [],
+      patientRecords: {},
+      day: 1,
+      slot: 0,
+      todayServed: [],
+      waitingDays: {},
+      abandoned: [],
+      messages: [],
+      generatedScenarios: [],
+    } as unknown as GameState;
+    const migrated = migrateGameState(legacy);
+    expect(migrated.unlockedFragments).toEqual({});
+  });
+  it("已有 unlockedFragments 的新存档不被覆盖", () => {
+    const fresh = createInitialState();
+    fresh.unlockedFragments = { p1: ["f1", "f2"] };
+    const migrated = migrateGameState(fresh);
+    expect(migrated.unlockedFragments).toEqual({ p1: ["f1", "f2"] });
+  });
+});
+
 describe("activeSession 会话断点默认值（P2-8）", () => {
   it("初始状态 activeSession 为 null", () => {
     const g = createInitialState();

@@ -171,6 +171,7 @@ export function createInitialState(): GameState {
       noLossDays: 0,
       sanityStreak: 0,
     },
+    unlockedFragments: {},
     activeSession: null,
   };
 }
@@ -194,6 +195,8 @@ export function migrateGameState(data: GameState): GameState {
   if (!data.facilityPositions) data.facilityPositions = {};
   // 会话断点快照（旧存档补默认 null）
   if (!data.activeSession) data.activeSession = null;
+  // 档案图鉴：已解锁记忆碎片（旧存档补默认空，P3-1）
+  if (!data.unlockedFragments) data.unlockedFragments = {};
   // 成就统计（旧存档补默认）
   if (!data.stats) {
     data.stats = {

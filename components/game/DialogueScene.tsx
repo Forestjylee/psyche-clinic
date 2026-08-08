@@ -50,6 +50,7 @@ export function DialogueScene() {
     finishSession,
     pushFloating,
     playSound,
+    unlockFragment,
   } = useGame();
 
   const engineRef = useRef<DialogueEngine | null>(null);
@@ -114,6 +115,7 @@ export function DialogueScene() {
           // 记忆碎片不自动关闭，等待玩家阅读后点击关闭
           setFlashback(frag);
           playSound("memory");
+          unlockFragment(currentPatient.id, frag.id); // P3-1 新增：碎片解锁落库
         },
         onEnding: (ending, title, text, reward) => {
           const s = eng.getState();

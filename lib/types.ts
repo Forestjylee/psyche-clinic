@@ -305,6 +305,8 @@ export interface GameState {
   facilityPositions: Record<string, FacilityPosition>;
   /** 累计统计（成就系统只读，运行时各动作累加） */
   stats: GameStats;
+  /** patientId -> 已解锁记忆碎片 id（P3 档案图鉴：碎片驱动完整真相，PRD 场景4） */
+  unlockedFragments: Record<string, string[]>;
   /** 会话断点快照（P2-8）：对话进行中持续草稿，暂停/中途退出随 saveGame 落盘，结案清除 */
   activeSession?: ActiveSession | null;
 }
