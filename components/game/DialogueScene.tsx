@@ -162,6 +162,10 @@ export function DialogueScene() {
     // 内存中的 activeSession 会残留为已完成患者，预约清单误显「继续上次」角标
     // （周明远/陈洛结案后实测复现）。跳过结局节点即可让断点在结算后保持清空。
     if (node?.isEnding) return;
+    // 只同步「属于本会话」的断点草稿：activeSession 指向其他已暂停患者时跳过，
+    // 避免新开的会话立即覆盖其断点——只有显式「暂停」或 activeSession 为空时的新会话才接管。
+    const active = useGameStore.getState().game.activeSession;
+    if (active && active.patientId !== currentPatient.id) return;
     const s = snapshotSession();
     if (s) useGameStore.getState().syncSessionDraft(s);
     // eslint-disable-next-line react-hooks/exhaustive-deps

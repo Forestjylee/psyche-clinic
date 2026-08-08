@@ -652,8 +652,8 @@ export const useGameStore = create<GameStore>((set, get) => {
       lastState: PatientState
     ) => {
       const g = get().game;
-      // 结案清断点：会话结束不再可恢复
-      g.activeSession = null;
+      // 结案清断点：仅清「本会话」的断点（activeSession 若指向其他已暂停患者则保留——暂停 A 后开诊 B 并结案，A 的进度不丢）
+      if (g.activeSession?.patientId === patientId) g.activeSession = null;
       // 应用奖励
       let leveledUp = false;
       if (reward) {
