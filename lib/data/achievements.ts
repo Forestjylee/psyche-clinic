@@ -20,7 +20,11 @@ export const allAchievements: Achievement[] = [
     rarity: "common",
     target: 1,
     icon: "❶",
-    reward: { exp: 20, money: 100 },
+    reward: {
+      exp: 20,
+      money: 100,
+      unlock: { letter: "ach_letter_first_heal" },
+    },
   },
   {
     id: "therapy_5_patients",
@@ -140,7 +144,11 @@ export const allAchievements: Achievement[] = [
     rarity: "epic",
     target: 10,
     icon: "◉",
-    reward: { exp: 250, reputation: 8 },
+    reward: {
+      exp: 250,
+      reputation: 8,
+      unlock: { decor: "trophy_different" },
+    },
   },
   {
     id: "therapy_deep_truth",
@@ -150,7 +158,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 3,
     icon: "◎",
-    reward: { exp: 80, reputation: 5 },
+    reward: {
+      exp: 80,
+      reputation: 5,
+      unlock: { fragment: { patientId: "zhou_mingyuan", fragmentId: "zhou_m3" } },
+    },
   },
 
   // ---------------- 结局收集类 10 个 ----------------
@@ -162,7 +174,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 1,
     icon: "✿",
-    reward: { exp: 50, reputation: 5 },
+    reward: {
+      exp: 50,
+      reputation: 5,
+      unlock: { decor: "trophy_first_heal" },
+    },
   },
   {
     id: "ending_cure_10",
@@ -182,7 +198,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 1,
     icon: "✦",
-    reward: { exp: 60, reputation: 4 },
+    reward: {
+      exp: 60,
+      reputation: 4,
+      unlock: { letter: "ach_letter_awakening" },
+    },
   },
   {
     id: "ending_acceptance_1",
@@ -202,7 +222,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 1,
     icon: "↗",
-    reward: { exp: 40, reputation: 4 },
+    reward: {
+      exp: 40,
+      reputation: 4,
+      unlock: { letter: "ach_letter_transfer" },
+    },
   },
   {
     id: "ending_dependent_1",
@@ -476,7 +500,11 @@ export const allAchievements: Achievement[] = [
     rarity: "common",
     target: 7,
     icon: "⑦",
-    reward: { exp: 30, money: 100 },
+    reward: {
+      exp: 30,
+      money: 100,
+      unlock: { letter: "ach_letter_seven_days" },
+    },
   },
   {
     id: "clinic_day_15",
@@ -486,7 +514,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 15,
     icon: "⑮",
-    reward: { exp: 80, money: 300 },
+    reward: {
+      exp: 80,
+      money: 300,
+      unlock: { letter: "ach_letter_half_month" },
+    },
   },
   {
     id: "clinic_day_50",
@@ -611,7 +643,12 @@ export const allAchievements: Achievement[] = [
     target: 30,
     icon: "？",
     hidden: true,
-    reward: { exp: 200, money: 500, sanity: 30 },
+    reward: {
+      exp: 200,
+      money: 500,
+      sanity: 30,
+      unlock: { decor: "trophy_seeds" },
+    },
   },
   {
     id: "secret_bookworm",
@@ -792,7 +829,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 1,
     icon: "✿",
-    reward: { exp: 40, reputation: 3 },
+    reward: {
+      exp: 40,
+      reputation: 3,
+      unlock: { letter: "ach_letter_reunion" },
+    },
   },
   {
     id: "aftercare_3",
@@ -802,7 +843,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 3,
     icon: "❀",
-    reward: { exp: 80, reputation: 5 },
+    reward: {
+      exp: 80,
+      reputation: 5,
+      unlock: { fragment: { patientId: "lin_xiao", fragmentId: "lin_m3" } },
+    },
   },
   {
     id: "aftercare_5",
@@ -812,7 +857,11 @@ export const allAchievements: Achievement[] = [
     rarity: "epic",
     target: 5,
     icon: "❁",
-    reward: { exp: 150, reputation: 8 },
+    reward: {
+      exp: 150,
+      reputation: 8,
+      unlock: { returnVisit: "chen_lo" },
+    },
   },
   {
     id: "aftercare_8",
@@ -832,7 +881,11 @@ export const allAchievements: Achievement[] = [
     rarity: "epic",
     target: 1,
     icon: "❂",
-    reward: { exp: 200, reputation: 10 },
+    reward: {
+      exp: 200,
+      reputation: 10,
+      unlock: { returnVisit: "xiao_bei" },
+    },
   },
 ];
 

@@ -2,7 +2,7 @@
 
 | 字段 | 内容 |
 | --- | --- |
-| 文档版本 | v1.2.5 |
+| 文档版本 | v1.2.6 |
 | 维护人 | Psyche Clinic Team |
 | 最后更新 | 2026-08-08 |
 | 配套文档 | [PRD.md](./PRD.md) · [PLAN.md](./PLAN.md) · [DEPLOYMENT.md](./DEPLOYMENT.md) |
@@ -595,7 +595,7 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 
 分类分布：获客 9 / 回访 5 / 诊疗扩展 5 / 经营扩展 7 / 结局扩展 7 / 成长 3 / 伦理 4 / 隐藏 4。
 
-> **修订标注（PLAN P5-4/P5-5）**：下列高频数值肝度型成就（`clinic_money_100k 日进斗金`、`therapy_100_patients 悬壶济世`、`growth_skill_8 学贯中西`、`discover_15 广撒渔网`、`discover_all_channels 四面开花`）按 PRD 场景7「成就=旅程里程碑、情感奖励」已修订：**描述（description）已于 P5-4 转为旅程里程碑语义**（不再写「累计让 100 位」「达到 100000」这类高频数值肝度目标，改为旅程纪念措辞，如「你已经陪许多人，走过了放下心结的那一天」）；**数值目标（target 列）与稀有度保持不变**，进度条仍显示达成进度；**奖励机制修订（情感化奖励：解锁信件/装饰/记忆碎片/特殊回访）待 P5-5**。
+> **修订标注（PLAN P5-5）**：成就奖励已情感化落地——关键成就（first 系列 / 七日 / 半月 / 旧雨重逢 / 觉醒 / 转介 / 一针见血 / 温情常在 / 念念不忘 / 故人重逢 / 第一次治愈 / 见众生 / 第一天）新增解锁信件、诊室纪念物、记忆碎片、特殊回访；数值奖励（声望/理智/经验/金钱）保留为成长与经营来源。详情见 §12.6。
 
 **获客（新分类 `discover`，标签「获客」）**
 
@@ -714,7 +714,24 @@ interface GameStats {
 
 新分类 `discover`/`aftercare` 需扩展 `Achievement["category"]` 联合类型与 `achievementCategoryLabels`。
 
-### 12.6 图鉴排序与筛选（v0.5.0）
+### 12.6 成就情感化奖励（P5-5）
+
+**定位**：成就奖励在保留数值（声望/理智/经验/金钱，成长与经营来源）的同时，新增**情感化奖励**维度——解锁信件 / 诊室纪念物 / 记忆碎片 / 特殊回访。发放链路完全在 store 层 `onUnlock` 回调完成，`AchievementEngine`（lib/engine，冻结）零改动，`reward.unlock` 字段对它透明（只读已知数值字段）。
+
+`Achievement["reward"]` 新增 `unlock` 字段（lib/types.ts），四种类型：
+
+| unlock 类型 | 字段 | 数据来源 | 发放行为 |
+| --- | --- | --- | --- |
+| 纪念信 | `unlock.letter` | `lib/data/achievementLetters.ts`（新增，6 封） | 查表 → 按 id 去重 → `g.messages.unshift` 进消息盒（kind="letter"），toast「收到一封来信」 |
+| 诊室纪念物 | `unlock.decor` | `lib/data/decor.ts` 新增 3 件 `source.kind==="achievement"` 的 flower 纪念物（向阳花 / 多肉拼盘 / 启程的种子） | 幂等解锁 `unlockedDecors` + 摆放 `placedDecors`/`decorPositions`（对齐 P5-1 挂画钩子模式） |
+| 记忆碎片 | `unlock.fragment` | 患者 `memoryFragments` / `followUpFragments` | 调 `store.unlockFragment(patientId, fragmentId)`（内含 P5-1 挂画钩子 + commit） |
+| 特殊回访 | `unlock.returnVisit` | 手写患者 id | 患者已治愈（`patientRecords[pid]` 存在）且无待办回访 → 覆盖 `returnVisits[pid]` 安排一次额外探望；未治愈静默跳过 |
+
+- **发放链路**：store init 的 `onUnlock` 回调改为 `(a) => { applyAchievementUnlock(a); showAchievement(a); commit(); }`；`applyAchievementUnlock`（store 模块内 helper）按上述四类逐项发放。
+- **图鉴展示**：`AchievementsPage` 的 `Reward` 组件在数值奖励后追加解锁物品行（📨 来信 / 🪴 诊室纪念 / 🧩 记忆碎片 / ✿ 一位故人将来探望），unlock 不依赖数值 reward 存在。
+- **13 个成就映射**（6 封信 / 3 纪念物 / 2 碎片 / 2 回访）：letter × 6（therapy_first_patient / clinic_day_7 / aftercare_first / ending_awakening_1 / clinic_day_15 / ending_transfer_1）；decor × 3（ending_cure_1 / therapy_10_different / secret_day_1）；fragment × 2（therapy_deep_truth → zhou_m3 / aftercare_3 → lin_m3）；returnVisit × 2（aftercare_5 → chen_lo / aftercare_all_types → xiao_bei）。
+
+### 12.7 图鉴排序与筛选（v0.5.0）
 
 - **默认排序**：每个分类内按稀有度降序展示（legendary → epic → rare → common），`achievements.ts` 导出 `RARITY_ORDER: Record<AchievementRarity, number>`（传说 0 … 普通 3），`AchievementsPage` 分组时按 `RARITY_ORDER[a.rarity]` 排序。
 - **一键筛选**：图鉴顶部（返回按钮下方）加筛选按钮组「全部 / 已解锁 / 未解锁」，`useState<"all" | "unlocked" | "locked">` 记忆当前筛选：
@@ -744,6 +761,7 @@ interface GameStats {
 | v1.2.3 | 2026-08-08 | **评审修订（第三轮）**：§3.5/§3.6 慈善获客语义落地（广告→善意连接：广告拉新 300 金 → 慈善活动费 30-150 金；渠道表改为捐图书角/资助社区讲座/公益宣传/治愈者口口相传）；DiscoveryScene 与相关 UI 文案同步 |
 | v1.2.4 | 2026-08-08 | **评审修订（第三轮）**：P5-3 理智完整机制落地（消耗：沉重病例 -10/坏结局 -15/连续不休息第 3 场起 -5；恢复：回访 +10/读信每封 +2/花园待一会 +5 每日一次；归零温情强制休息梦境 +35 恢复）；GameState 新增 sessionSinceRest/gardenDay；清理 sanity"倒闭"旧注释 |
 | v1.2.5 | 2026-08-08 | P5-4：成就描述转向「旅程里程碑」语义（discover_first/5/15/all_channels、therapy_100_patients、clinic_money_100k、growth_skill_8 共 7 个成就的 description 语义化，不再写高频数值肝度目标；name/target/稀有度不变）；§12.3 待修订标注更新（描述已完成，奖励待 P5-5） |
+| v1.2.6 | 2026-08-08 | P5-5：成就奖励情感化（reward 新增 unlock 字段：解锁信件/诊室纪念物/记忆碎片/特殊回访，13 个成就配置；新增 achievementLetters 数据表 6 封信 + decor 3 件纪念物；store onUnlock 发放链路；AchievementEngine 零改动） |
 
 ---
 

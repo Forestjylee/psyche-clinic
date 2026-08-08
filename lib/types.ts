@@ -477,6 +477,17 @@ export interface Achievement {
     sanity?: number;
     exp?: number;
     money?: number;
+    /** P5-5 情感化奖励：解锁一件回忆/一封信/一次特殊回访（与数值奖励并存，数值保留为成长与经营来源） */
+    unlock?: {
+      /** 解锁一封成就纪念信（lib/data/achievementLetters.ts 的信件 id） */
+      letter?: string;
+      /** 解锁一件诊室纪念物（lib/data/decor.ts 的 decor id，kind="flower" 纪念形态） */
+      decor?: string;
+      /** 赠予一块记忆碎片（走 unlockFragment 通路） */
+      fragment?: { patientId: string; fragmentId: string };
+      /** 触发一位已治愈患者的额外回访（患者未治愈则静默跳过） */
+      returnVisit?: string;
+    };
   };
   /** 是否为隐藏成就（未解锁时灰名灰描述） */
   hidden?: boolean;

@@ -414,6 +414,7 @@
 .ach-reward .r-neg { color: var(--bad); }
 .ach-reward .r-money { color: var(--gold); }
 .ach-reward .r-exp { color: var(--accent-2); }
+.ach-reward .r-unlock { color: var(--text-dim); }
 .ach-date {
   font-size: 12px;
   color: var(--text-muted);

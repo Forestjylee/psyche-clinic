@@ -40,6 +40,7 @@ import {
   flowerForPatient,
   pictureForFragment,
 } from "./data/decor";
+import { getAchievementLetter } from "./data/achievementLetters";
 import { bridge, EVENTS } from "./bridge/EventBridge";
 import {
   discoveryChannels,
@@ -252,6 +253,69 @@ export const useGameStore = create<GameStore>((set, get) => {
     window.setTimeout(() => set({ achievementToast: null }), dur);
   };
 
+  /** P5-5 情感化奖励发放（成就解锁时由 onUnlock 回调调用） */
+  const applyAchievementUnlock = (a: Achievement) => {
+    const unlock = a.reward?.unlock;
+    if (!unlock) return;
+    const g = get().game;
+    // 1) 纪念信：查表 → 去重 → unshift 进消息盒
+    if (unlock.letter) {
+      const L = getAchievementLetter(unlock.letter);
+      if (L && !g.messages.find((m) => m.id === L.id)) {
+        g.messages.unshift({
+          id: L.id,
+          kind: "letter",
+          title: L.title,
+          body: L.body,
+          day: g.day,
+          read: false,
+          patientName: L.patientName,
+          tone: L.tone,
+        });
+        toast(`收到一封来信：「${L.title}」`, "ok");
+      }
+    }
+    // 2) 纪念物：幂等解锁并摆放（对齐 P5-1 挂画钩子模式）
+    if (unlock.decor) {
+      const d = decorById(unlock.decor);
+      if (d && d.kind === "flower") {
+        if (!g.unlockedDecors) g.unlockedDecors = [];
+        if (!g.placedDecors) g.placedDecors = [];
+        if (!g.decorPositions) g.decorPositions = {};
+        if (!g.unlockedDecors.includes(d.id)) {
+          g.unlockedDecors.push(d.id);
+          if (!g.placedDecors.includes(d.id)) g.placedDecors.push(d.id);
+          if (!g.decorPositions[d.id] && d.defaultPos) {
+            g.decorPositions[d.id] = { ...d.defaultPos };
+          }
+          toast(`诊室里多了一件纪念：「${d.name}」。`, "ok");
+        }
+      }
+    }
+    // 3) 记忆碎片：走 unlockFragment 通路（内含 P5-1 挂画钩子 + toast + commit）
+    if (unlock.fragment) {
+      get().unlockFragment(unlock.fragment.patientId, unlock.fragment.fragmentId);
+    }
+    // 4) 特殊回访：患者已治愈/接纳/觉醒（回访语义结局）且无待办回访 → 安排一次额外探望；其它结局或未接待静默跳过
+    if (unlock.returnVisit) {
+      const pid = unlock.returnVisit;
+      const rec = g.patientRecords[pid];
+      if (rec === "cure" || rec === "acceptance" || rec === "awakening") {
+        const existing = g.returnVisits[pid];
+        if (!existing || existing.seen) {
+          g.returnVisits[pid] = {
+            ending: rec,
+            dueDay: g.day + 1,
+            arrived: false,
+            seen: false,
+          };
+          const p = scenarioById(g, pid);
+          toast(`收到消息：${p?.name ?? "一位故人"}想再来看看你。`, "ok");
+        }
+      }
+    }
+  };
+
   /** 补充预约清单：低于目标人数时自动生成新客户加入，并写入通知消息 */
   const replenishQueue = async () => {
     const g = get().game;
@@ -300,6 +364,7 @@ export const useGameStore = create<GameStore>((set, get) => {
 
     init: () => {
       const eng = new AchievementEngine(get().game, (a) => {
+        applyAchievementUnlock(a);
         showAchievement(a);
         commit();
       });

@@ -379,6 +379,18 @@ export class HallScene extends Phaser.Scene {
         frag?.title ?? ""
       );
     }
+    // P5-5 成就纪念物：无患者，走固定暖阳色（纸木界面协调），与既有 flower 同一画法
+    if (src.kind === "achievement") {
+      return drawFlower(
+        this,
+        "#e8b04b",
+        pos.x,
+        pos.y,
+        decorId,
+        def.size.w,
+        def.size.h
+      );
+    }
     return null;
   }
 

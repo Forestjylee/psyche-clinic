@@ -12,7 +12,8 @@ import type { FacilityPosition } from "../types";
 export type DecorSource =
   | { kind: "upgrade"; upgradeId: string } // 购置设施解锁该设施外观变体
   | { kind: "patient"; patientId: string } // 患者治愈/接纳结局后送的花
-  | { kind: "fragment"; patientId: string; fragmentId: string }; // 记忆碎片解锁的挂画
+  | { kind: "fragment"; patientId: string; fragmentId: string } // 记忆碎片解锁的挂画
+  | { kind: "achievement" }; // 成就解锁的旅程纪念物（无患者，暖阳固定配色）
 
 export interface DecorDef {
   id: string;
@@ -116,6 +117,37 @@ export const DECOR_DEFS: DecorDef[] = [
     slot: "flower_zhou_mingyuan",
     size: { w: 30, h: 34 },
     defaultPos: { x: 640, y: 440 },
+  },
+  // ========== 成就解锁的旅程纪念物（3 个，无患者，暖阳固定配色） ==========
+  {
+    id: "trophy_first_heal",
+    name: "向阳花",
+    story: "第一场治愈那天，你给窗台添了一小盆向日葵。现在它开了。",
+    source: { kind: "achievement" },
+    kind: "flower",
+    slot: "trophy_first_heal",
+    size: { w: 30, h: 34 },
+    defaultPos: { x: 480, y: 220 },
+  },
+  {
+    id: "trophy_different",
+    name: "多肉拼盘",
+    story: "接见过十种不同的心事之后，你给窗台添了一盆多肉。它们不声张，却都活着。",
+    source: { kind: "achievement" },
+    kind: "flower",
+    slot: "trophy_different",
+    size: { w: 30, h: 34 },
+    defaultPos: { x: 300, y: 120 },
+  },
+  {
+    id: "trophy_seeds",
+    name: "启程的种子",
+    story: "诊所开张那天有人送的一包种子。你一直没拆，等着哪天，心里有了发芽的心情。",
+    source: { kind: "achievement" },
+    kind: "flower",
+    slot: "trophy_seeds",
+    size: { w: 30, h: 34 },
+    defaultPos: { x: 60, y: 180 },
   },
   // ========== 记忆碎片挂画（4 个，每个患者第一块碎片） ==========
   {

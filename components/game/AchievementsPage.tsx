@@ -8,6 +8,9 @@ import {
   achievementCategoryLabels,
   RARITY_ORDER,
 } from "@/lib/data/achievements";
+import { getAchievementLetter } from "@/lib/data/achievementLetters";
+import { decorById } from "@/lib/data/decor";
+import { allPatients } from "@/lib/data/patients";
 import type { Achievement, AchievementCategory } from "@/lib/types";
 
 const order: AchievementCategory[] = [
@@ -164,7 +167,7 @@ export function AchievementsPage() {
                         <div className="ach-desc">
                           {hidden ? "达成特定条件后解锁查看。" : a.description}
                         </div>
-                        {a.reward ? <Reward r={a.reward} /> : null}
+                        {a.reward ? <Reward a={a} /> : null}
                         {p.unlocked && p.unlockedAt ? (
                           <div className="ach-date">
                             解锁于 {new Date(p.unlockedAt).toLocaleString()}
@@ -195,17 +198,41 @@ export function AchievementsPage() {
   );
 }
 
-function Reward({ r }: { r: NonNullable<Achievement["reward"]> }) {
+function Reward({ a }: { a: Achievement }) {
+  const r = a.reward;
   const parts: string[] = [];
-  if (r.reputation) parts.push(`<span class="r-pos">声望 +${r.reputation}</span>`);
-  if (r.sanity)
+  if (r?.reputation) parts.push(`<span class="r-pos">声望 +${r.reputation}</span>`);
+  if (r?.sanity)
     parts.push(
       r.sanity >= 0
         ? `<span class="r-pos">理智 +${r.sanity}</span>`
         : `<span class="r-neg">理智 ${r.sanity}</span>`
     );
-  if (r.money) parts.push(`<span class="r-money">金钱 +${r.money}</span>`);
-  if (r.exp) parts.push(`<span class="r-exp">经验 +${r.exp}</span>`);
+  if (r?.money) parts.push(`<span class="r-money">金钱 +${r.money}</span>`);
+  if (r?.exp) parts.push(`<span class="r-exp">经验 +${r.exp}</span>`);
+  // P5-5 情感化奖励：解锁信件 / 诊室纪念物 / 记忆碎片 / 特殊回访
+  const unlock = r?.unlock;
+  if (unlock) {
+    if (unlock.letter) {
+      const L = getAchievementLetter(unlock.letter);
+      if (L) parts.push(`<span class="r-unlock">📨 来信「${L.title}」</span>`);
+    }
+    if (unlock.decor) {
+      const d = decorById(unlock.decor);
+      if (d) parts.push(`<span class="r-unlock">🪴 诊室纪念「${d.name}」</span>`);
+    }
+    if (unlock.fragment) {
+      const patient = allPatients.find((p) => p.id === unlock.fragment?.patientId);
+      const frag = (patient?.memoryFragments ?? [])
+        .concat(patient?.followUpFragments ?? [])
+        .find((f) => f.id === unlock.fragment?.fragmentId);
+      if (frag)
+        parts.push(`<span class="r-unlock">🧩 记忆碎片「${frag.title}」</span>`);
+    }
+    if (unlock.returnVisit)
+      parts.push(`<span class="r-unlock">✿ 一位故人将来探望</span>`);
+  }
+  if (parts.length === 0) return null;
   return (
     <div
       className="ach-reward"
