@@ -266,6 +266,8 @@ export interface GameState {
   clinicName: string;
   /** 序章开场选择（可选：未选择=undefined，旧档兼容） */
   prologueChoice?: PrologueChoice;
+  /** 序章已通过标记（P4-3：完成或跳过序章后落档 true，防重复进入；可选字段，旧档兼容） */
+  prologuePassed?: boolean;
   doctor: DoctorStats;
   /** 已解锁技能 id */
   skills: string[];

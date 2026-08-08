@@ -192,6 +192,18 @@ export function Prologue() {
 
   return (
     <div className="prologue" role="dialog" aria-modal="true" aria-label="序章" onClick={advance}>
+      {/* P4-3：跳过按钮右上角全程可见（含选择屏），stopPropagation 防整块推进误触发 */}
+      <button
+        type="button"
+        className="prologue-skip"
+        aria-label="跳过序章"
+        onClick={(e) => {
+          e.stopPropagation();
+          dismissPrologue(prologueLetter);
+        }}
+      >
+        跳过
+      </button>
       <div className="prologue-content" key={idx}>
         {step.kind === "choice" ? (
           <div className="prologue-choice">

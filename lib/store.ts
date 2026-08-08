@@ -773,6 +773,8 @@ export const useGameStore = create<GameStore>((set, get) => {
       const g = get().game;
       if (letter && !g.messages.find((l) => l.id === letter.id))
         g.messages.unshift(letter);
+      // P4-3：完成序章与跳过序章都标记为已通过（§9 纯新增，防重复进入）
+      g.prologuePassed = true;
       commit();
       set({ prologueVisible: false });
       playSound("page");

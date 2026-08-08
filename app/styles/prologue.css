@@ -60,6 +60,31 @@
   color: rgba(243, 234, 217, 0.5);
   animation: prologue-blink 1.6s ease-in-out infinite;
 }
+/* ===== P4-3 序章跳过按钮（右上角，全程可见）===== */
+.prologue-skip {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 1;
+  padding: 6px 20px;
+  border: 1px solid rgba(240, 160, 80, 0.35);
+  border-radius: 999px;
+  background: linear-gradient(160deg, rgba(255, 250, 240, 0.07), rgba(255, 250, 240, 0.03));
+  color: rgba(243, 234, 217, 0.72);
+  font-family: var(--font-serif);
+  font-size: 13px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s, background 0.18s;
+}
+.prologue-skip:hover {
+  border-color: var(--accent);
+  color: #f3ead9;
+  background: linear-gradient(160deg, rgba(240, 160, 80, 0.14), rgba(240, 160, 80, 0.06));
+}
+.prologue-skip:active {
+  transform: translateY(0) scale(0.98);
+}
 .prologue-dots {
   position: fixed;
   bottom: 42px;

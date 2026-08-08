@@ -66,6 +66,32 @@ describe("prologueChoice 序章开场选择（P4-1）", () => {
   });
 });
 
+describe("prologuePassed 序章已通过标记（P4-3）", () => {
+  it("初始状态 prologuePassed 为 undefined（可选字段，新档显示序章）", () => {
+    const g = createInitialState();
+    expect(g.prologuePassed).toBeUndefined();
+  });
+  it("migrate 后保留已落档值，旧档无此字段迁移后仍 undefined", () => {
+    const g = createInitialState();
+    g.prologuePassed = true;
+    expect(migrateGameState(g).prologuePassed).toBe(true);
+    const legacy = {
+      doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
+      skills: [],
+      clinicUpgrades: [],
+      patientRecords: {},
+      day: 1,
+      slot: 0,
+      todayServed: [],
+      waitingDays: {},
+      abandoned: [],
+      messages: [],
+      generatedScenarios: [],
+    } as unknown as GameState;
+    expect(migrateGameState(legacy).prologuePassed).toBeUndefined();
+  });
+});
+
 describe("unlockedFragments 档案图鉴字段默认值（P3-1）", () => {
   it("初始状态 unlockedFragments 为空对象", () => {
     const g = createInitialState();

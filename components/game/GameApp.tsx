@@ -69,7 +69,7 @@ export function GameApp() {
         {scene === "archive" ? <PatientArchive /> : null}
       </main>
       <div className={`sanity-vignette ${scene !== "title" && game.doctor.sanity <= 35 ? "active" : ""}`} />
-      {scene === "clinic" && prologueVisible ? <Prologue /> : null}
+      {scene === "clinic" && prologueVisible && !game.prologuePassed ? <Prologue /> : null}
       {scene === "clinic" && !prologueVisible ? <Onboarding /> : null}
       {currentReturnPatient ? <VisitOverlay /> : null}
       <Overlays />
