@@ -29,11 +29,12 @@ export function BottomBar() {
   };
 
   const items: {
-    key: Scene | "rest";
+    key: Scene | "rest" | "archive";
     icon: string;
     label: string;
     badge?: string | number;
     badgeClass?: string;
+    disabled?: boolean;
     onClick: () => void;
     title: string;
   }[] = [
@@ -86,6 +87,14 @@ export function BottomBar() {
       title: "成就图鉴",
     },
     {
+      key: "archive",
+      icon: "🗂",
+      label: "档案",
+      disabled: true,
+      onClick: () => {},
+      title: "患者档案 · 即将开放",
+    },
+    {
       key: "rest",
       icon: "😴",
       label: "休息",
@@ -109,6 +118,7 @@ export function BottomBar() {
             className={`bb-item ${active ? "active" : ""}`}
             onClick={it.onClick}
             title={it.title}
+            disabled={it.disabled}
           >
             <span className="bb-icon">{it.icon}</span>
             {it.badge !== undefined ? (
