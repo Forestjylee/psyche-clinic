@@ -13,6 +13,7 @@ export const EVENTS = {
   decorateMode: "decorateMode",
   syncFacilities: "syncFacilities",
   refreshPatients: "refreshPatients",
+  openAppointmentList: "openAppointmentList",
   // Phaser → React 交互
   sceneReady: "sceneReady",
   patientClicked: "patientClicked",

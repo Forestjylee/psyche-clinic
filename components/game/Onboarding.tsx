@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
+import { bridge, EVENTS } from "@/lib/bridge/EventBridge";
 
 /** 首次游玩标记 key */
 export const ONBOARDED_KEY = "ps.onboarded";
@@ -111,7 +112,10 @@ export function Onboarding() {
       ok = true;
     }
     if (ok) {
-      // 等布局稳定后计算高亮框
+      // 首启引导的三个 spotlight 目标都在预约清单弹层内：先发指令自动打开清单，
+      // 保证目标 DOM 必然在场（触发与玩家是否手动开清单解耦）。
+      bridge.emit(EVENTS.openAppointmentList, {});
+      // 等清单挂载 + 布局稳定后计算高亮框
       const t = window.setTimeout(() => setShow(true), 400);
       return () => window.clearTimeout(t);
     }

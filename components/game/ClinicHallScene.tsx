@@ -31,6 +31,14 @@ export function ClinicHallScene() {
   // 订阅 game 引用：数据变更（接诊/休息/生成等）→ 通知 Phaser 刷新候诊小人
   const gameRef = useGameStore((s) => s.game);
 
+  // 首启引导 → 自动打开预约清单（spotlight 目标在清单弹层内）
+  useEffect(() => {
+    const off = bridge.on(EVENTS.openAppointmentList, () => {
+      setListOpen(true);
+    });
+    return off;
+  }, []);
+
   // 玩家点击场景设施 → 打开升级面板
   useEffect(() => {
     const off = bridge.on(EVENTS.facilityClicked, () => {
