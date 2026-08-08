@@ -90,9 +90,8 @@ export function BottomBar() {
       key: "archive",
       icon: "🗂",
       label: "档案",
-      disabled: true,
-      onClick: () => {},
-      title: "患者档案 · 即将开放",
+      onClick: () => go("archive"),
+      title: "患者档案",
     },
     {
       key: "rest",

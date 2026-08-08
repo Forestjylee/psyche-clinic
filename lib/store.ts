@@ -48,7 +48,8 @@ export type Scene =
   | "tracking"
   | "generator"
   | "achievements"
-  | "discover";
+  | "discover"
+  | "archive";
 
 export interface ToastItem {
   id: number;

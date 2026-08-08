@@ -135,7 +135,7 @@ export function EndingOverlay() {
  * 下句按结局类型写「现状/钩子」，留钩子不揭真相；绝不输出 truth 字段文本。
  * surface 为空时由调用方整块隐藏，不进入此处。
  */
-function recapLines(
+export function recapLines(
   ending: EndingType,
   surface: string
 ): { title: string; lines: [string, string] } {
