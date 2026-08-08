@@ -469,3 +469,281 @@
   letter-spacing: 1px;
 }
 
+/* ========== P5-1 装饰区（记忆的陈列馆） ========== */
+.decor-section {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 2px dashed var(--border-soft);
+}
+.decor-section-title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.decor-section-title::before {
+  content: "🖼";
+  font-size: 18px;
+}
+.decor-section-sub {
+  color: var(--ink-dim);
+  font-size: var(--fs-md);
+  margin: 6px 0 18px 2px;
+  line-height: 1.7;
+}
+.decor-block {
+  margin-bottom: 18px;
+}
+.decor-block-title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.decor-block-title::before {
+  content: "▸";
+  color: var(--accent);
+}
+.decor-empty {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px dashed var(--border-soft);
+  color: var(--ink-dim);
+  font-size: var(--fs-md);
+  line-height: 1.7;
+}
+.decor-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 14px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--paper-hi), var(--paper));
+  border: 1px solid var(--paper-border);
+  box-shadow: var(--shadow-paper), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+.decor-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.decor-row-name {
+  font-weight: 800;
+  font-size: var(--fs-md);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.decor-row-name .decor-kind {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0 7px;
+  opacity: 0.85;
+}
+.decor-row-story {
+  font-size: 12px;
+  color: var(--ink-dim);
+  line-height: 1.7;
+  font-style: italic;
+}
+.decor-row-switch {
+  display: inline-flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.decor-pill {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.decor-pill:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.decor-pill.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--glow-accent);
+}
+.decor-toggle {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.decor-toggle:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.decor-toggle.on {
+  background: linear-gradient(135deg, var(--good), #3aa878);
+  border-color: transparent;
+  color: #fff;
+}
+
+/* ========== P5-3 理智完整机制 ========== */
+
+/* 花园待一会 · 当日已用（SideBtn 变暗 + 删除线观感） */
+.side-btn.garden-done {
+  opacity: 0.55;
+  cursor: default;
+}
+.side-btn.garden-done:hover {
+  border-color: var(--border);
+  background: var(--bg-card);
+  padding-left: 0;
+}
+.side-btn.garden-done:hover::before { width: 0; }
+.rest-side-tag.done {
+  color: var(--text-muted) !important;
+  text-decoration: line-through;
+}
+
+/* 归零温情梦境 overlay（纸木风，z350 高于结局页 300、低于 toast 400） */
+.rest-dream-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 350;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(38, 34, 28, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: rest-dream-mask-in 0.5s ease-out;
+}
+@keyframes rest-dream-mask-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.rest-dream-card {
+  position: relative;
+  max-width: 460px;
+  width: 86vw;
+  padding: 34px 40px 30px;
+  border-radius: 22px;
+  background: linear-gradient(165deg, rgba(255, 253, 246, 0.98), rgba(247, 242, 232, 0.97));
+  border: 1px solid var(--paper-border);
+  box-shadow: var(--shadow-paper), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  text-align: center;
+  animation: rest-dream-card-in 0.55s ease-out;
+}
+@keyframes rest-dream-card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.rest-dream-title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+.rest-dream-text {
+  font-family: var(--font-serif);
+  font-size: 15.5px;
+  line-height: 2;
+  color: var(--ink-dim);
+  margin: 0 0 14px;
+}
+.rest-dream-people {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 6px 0 18px;
+}
+.rest-dream-person {
+  display: inline-block;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(224, 192, 112, 0.16);
+  border: 1px solid rgba(224, 192, 112, 0.55);
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #8a6a3f;
+}
+.rest-dream-btn {
+  margin-top: 8px;
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-family: inherit;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border: none;
+  box-shadow: 0 4px 14px var(--accent-glow);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.rest-dream-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px var(--accent-glow);
+}
+
+/* 低理智疲惫句：对话场景顶部中央小字，淡入淡出、非阻塞 */
+.dialogue-tired {
+  position: absolute;
+  top: 1.6cqh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  max-width: 80cqw;
+  padding: 0.8cqh 3cqw;
+  border-radius: 999px;
+  background: rgba(255, 251, 240, 0.82);
+  border: 1px solid var(--paper-border);
+  box-shadow: var(--shadow-paper);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.6cqw;
+  letter-spacing: 2px;
+  color: #6b5a3e;
+  text-align: center;
+  pointer-events: none;
+  animation: dialogue-tired-fade 5s ease-in-out forwards;
+}
+@keyframes dialogue-tired-fade {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+

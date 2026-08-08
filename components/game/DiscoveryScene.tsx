@@ -5,8 +5,8 @@ import { discoveryChannels } from "@/lib/data/discovery";
 import { ChibiCharacter } from "./ChibiCharacter";
 
 /**
- * 发现客户：花钱通过渠道触达潜在客户，主动决定是否邀约。
- * 对应 SPEC.md 3.6「发现客户（主动获客）」。
+ * 善意连接：付出一点善意的成本，让需要的人找上门，主动决定是否联系。
+ * 对应 SPEC.md 3.6「善意连接（主动获客）」。
  */
 export function DiscoveryScene() {
   const { game, setScene, discover, invite, discardCandidate, playSound } = useGame();
@@ -23,13 +23,13 @@ export function DiscoveryScene() {
       >
         ◂ 返回诊所
       </button>
-      <h2>发 现 客 户</h2>
+      <h2>善 意 连 接</h2>
       <p className="subtitle">
-        花钱通过广告、广播等方式触达潜在客户，主动发送邀约。客户有概率接受，接受后择日到诊。
+        声誉，会让需要你的人找上门来。付出一点善意，也许就有人愿意来聊聊。邀约是否被接受，看缘分。
       </p>
 
       <div className="discover-section">
-        <div className="discover-section-title">获客渠道</div>
+        <div className="discover-section-title">连接方式</div>
         <div className="discover-channels">
           {discoveryChannels.map((ch) => {
             const locked = ch.requireReputation ? rep < ch.requireReputation : false;
@@ -56,7 +56,7 @@ export function DiscoveryScene() {
                     void discover(ch.id);
                   }}
                 >
-                  {locked ? "声望不足" : afford ? "开始发现" : "金钱不足"}
+                  {locked ? "声望不足" : afford ? "付出善意" : "金钱不足"}
                 </button>
               </div>
             );
@@ -66,13 +66,13 @@ export function DiscoveryScene() {
 
       <div className="discover-section">
         <div className="discover-section-title">
-          潜在客户
+          需要你的人
           {game.discoveryCandidates.length > 0
             ? `（${game.discoveryCandidates.length} 位待处理）`
             : ""}
         </div>
         {game.discoveryCandidates.length === 0 ? (
-          <div className="empty-state">还没有候选客户，选择上方渠道发现客户吧。</div>
+          <div className="empty-state">还没有人找上门。愿意的话，先在上方做一件善事。</div>
         ) : (
           <div className="discover-candidates">
             {game.discoveryCandidates.map((c) => (
@@ -86,10 +86,10 @@ export function DiscoveryScene() {
                 </div>
                 <div className="discover-candidate-actions">
                   <button className="discover-invite-btn" onClick={() => invite(c.id)}>
-                    发送邀约
+                    联系 ta
                   </button>
                   <button className="discover-discard-btn" onClick={() => discardCandidate(c.id)}>
-                    暂不考虑
+                    再等等
                   </button>
                 </div>
               </div>
@@ -99,7 +99,7 @@ export function DiscoveryScene() {
       </div>
 
       <p className="discover-note">
-        邀约接受后有概率今日 / 明日 / 后日到诊（今日名额已满则顺延）。未邀约的候选会在休息后过期。
+        被你联系的人，有的会应约而来。未联系的候选，会在休息后离开。
       </p>
     </div>
   );

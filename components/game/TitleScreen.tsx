@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import {
   DISCLAIMER_TITLE,
   DISCLAIMER_PARAGRAPHS,
   HELP_LINE,
   HELP_LINE_NAME,
+  SKIP_SENSITIVE_KEY,
 } from "./constants";
 
 export function TitleScreen() {
@@ -14,6 +15,28 @@ export function TitleScreen() {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [showNaming, setShowNaming] = useState(false);
   const [clinicName, setClinicName] = useState("森林诊所");
+  const [skipSensitive, setSkipSensitive] = useState(false);
+
+  useEffect(() => {
+    // 挂载时读记忆偏好（与结局页「跳过这段演出」按钮共用同一 key，天然双向同步）
+    try {
+      setSkipSensitive(localStorage.getItem(SKIP_SENSITIVE_KEY) === "1");
+    } catch {
+      setSkipSensitive(false);
+    }
+  }, []);
+
+  const toggleSkipSensitive = () => {
+    const next = !skipSensitive;
+    setSkipSensitive(next);
+    try {
+      if (next) localStorage.setItem(SKIP_SENSITIVE_KEY, "1");
+      else localStorage.removeItem(SKIP_SENSITIVE_KEY);
+    } catch {
+      /* ignore */
+    }
+    playSound("click");
+  };
 
   return (
     <div className="title-screen">
@@ -47,6 +70,22 @@ export function TitleScreen() {
           </button>
         ) : null}
       </div>
+      <button
+        type="button"
+        className={`title-pref${skipSensitive ? " on" : ""}`}
+        role="switch"
+        aria-checked={skipSensitive}
+        aria-label="敏感结局演出自动以简短方式呈现"
+        onClick={toggleSkipSensitive}
+      >
+        <span className="title-pref-toggle" aria-hidden="true" />
+        <span className="title-pref-text">
+          <span className="title-pref-label">敏感结局演出自动以简短方式呈现</span>
+          <span className="title-pref-sub">
+            开启后，涉及较重剧情的结局会自动跳过演出、只留一句简短收尾。你随时可以在这里关掉。
+          </span>
+        </span>
+      </button>
       {showNaming ? (
         <div
           className="disclaimer-backdrop"

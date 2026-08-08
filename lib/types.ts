@@ -4,7 +4,7 @@
 export interface DoctorStats {
   /** 声望：影响可接诊的患者层级 */
   reputation: number;
-  /** 理智值：过低会出现幻觉选项，甚至倒闭 */
+  /** 理智值（自我关怀资源，非失败条件）：随沉重接诊/坏结局/连续不休息消耗，随休息/回访/读信/花园恢复；归零触发温情强制休息（非倒闭） */
   sanity: number;
   /** 金钱：用于升级诊所、技能 */
   money: number;
@@ -206,7 +206,7 @@ export interface Skill {
   id: string;
   name: string;
   description: string;
-  /** 所属流派 */
+  /** 陪伴风格 */
   school: SkillSchool;
   /** 消耗经验 */
   cost: number;
@@ -217,10 +217,9 @@ export interface Skill {
 }
 
 export type SkillSchool =
-  | "psychoanalysis" // 精神分析
-  | "cbt" // 认知行为
-  | "hypnosis" // 催眠
-  | "pharmacology"; // 药物学
+  | "gentle" // 更温柔 · 接住与安抚
+  | "sharp" // 更敏锐 · 看清与直面
+  | "firm"; // 更坚定 · 方向与托底
 
 /** 诊所升级项 */
 export interface ClinicUpgrade {
@@ -233,6 +232,8 @@ export interface ClinicUpgrade {
     initialTrustBonus?: number;
     sanityRecoveryBonus?: number;
     reputationBonus?: number;
+    /** 每日接诊名额 +N（P5-6 候诊扩容） */
+    capacityBonus?: number;
   };
   unlocked?: boolean;
 }
@@ -257,10 +258,17 @@ export interface ActiveSession {
   triggeredMemories: string[];
 }
 
+/** 序章「离开城市的原因」选择（P4-1：影响叙事不影响数值） */
+export type PrologueChoice = "burnout" | "witness" | "breath" | "heartbreak";
+
 /** 游戏全局状态 */
 export interface GameState {
   /** 诊所名称（玩家自定义，默认"森林诊所"） */
   clinicName: string;
+  /** 序章开场选择（可选：未选择=undefined，旧档兼容） */
+  prologueChoice?: PrologueChoice;
+  /** 序章已通过标记（P4-3：完成或跳过序章后落档 true，防重复进入；可选字段，旧档兼容） */
+  prologuePassed?: boolean;
   doctor: DoctorStats;
   /** 已解锁技能 id */
   skills: string[];
@@ -270,7 +278,7 @@ export interface GameState {
   patientRecords: Record<string, EndingType>;
   /** 当前日期（游戏内） */
   day: number;
-  /** 今日已接待名额（0..MAX_SLOTS，默认 8 个/天） */
+  /** 今日已接待名额（0..MAX_SLOTS，动态容量：第 1 天 2 位起，声望/设施可增至 5） */
   slot: number;
   /** 今日已接诊的患者 id（当天不能重复接诊，休息日清空） */
   todayServed: string[];
@@ -303,8 +311,22 @@ export interface GameState {
   pendingArrivals: PendingArrival[];
   /** 装修模式：设施摆放位置 upgradeId -> 场景坐标（仅视觉，不影响数值） */
   facilityPositions: Record<string, FacilityPosition>;
+  /** 装修（P5-1）：设施 upgradeId -> 激活的变体 decor id（"" 或缺失 = 默认外观） */
+  facilityDecors?: Record<string, string>;
+  /** 装修：已解锁的装饰 id（花/画；变体由购置设施隐含，不入此列） */
+  unlockedDecors?: string[];
+  /** 装修：当前摆放在大厅的花/画 decor id 列表 */
+  placedDecors?: string[];
+  /** 装修：花/画 decor id -> 摆放位置（逻辑坐标，视觉） */
+  decorPositions?: Record<string, FacilityPosition>;
+  /** 理智（P5-3）：自上次休息以来连续接诊场次（连续不休息消耗计数） */
+  sessionSinceRest?: number;
+  /** 理智（P5-3）：最近一次「花园待一会」的日期（同日仅一次，记录最后使用日） */
+  gardenDay?: number;
   /** 累计统计（成就系统只读，运行时各动作累加） */
   stats: GameStats;
+  /** patientId -> 已解锁记忆碎片 id（P3 档案图鉴：碎片驱动完整真相，PRD 场景4） */
+  unlockedFragments: Record<string, string[]>;
   /** 会话断点快照（P2-8）：对话进行中持续草稿，暂停/中途退出随 saveGame 落盘，结案清除 */
   activeSession?: ActiveSession | null;
 }
@@ -456,6 +478,17 @@ export interface Achievement {
     sanity?: number;
     exp?: number;
     money?: number;
+    /** P5-5 情感化奖励：解锁一件回忆/一封信/一次特殊回访（与数值奖励并存，数值保留为成长与经营来源） */
+    unlock?: {
+      /** 解锁一封成就纪念信（lib/data/achievementLetters.ts 的信件 id） */
+      letter?: string;
+      /** 解锁一件诊室纪念物（lib/data/decor.ts 的 decor id，kind="flower" 纪念形态） */
+      decor?: string;
+      /** 赠予一块记忆碎片（走 unlockFragment 通路） */
+      fragment?: { patientId: string; fragmentId: string };
+      /** 触发一位已治愈患者的额外回访（患者未治愈则静默跳过） */
+      returnVisit?: string;
+    };
   };
   /** 是否为隐藏成就（未解锁时灰名灰描述） */
   hidden?: boolean;

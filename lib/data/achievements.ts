@@ -20,7 +20,11 @@ export const allAchievements: Achievement[] = [
     rarity: "common",
     target: 1,
     icon: "❶",
-    reward: { exp: 20, money: 100 },
+    reward: {
+      exp: 20,
+      money: 100,
+      unlock: { letter: "ach_letter_first_heal" },
+    },
   },
   {
     id: "therapy_5_patients",
@@ -125,7 +129,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "therapy_100_patients",
     name: "悬壶济世",
-    description: "累计让 100 位患者完成治疗。",
+    description: "你已经陪许多人，走过了放下心结的那一天。",
     category: "therapy",
     rarity: "legendary",
     target: 100,
@@ -140,7 +144,11 @@ export const allAchievements: Achievement[] = [
     rarity: "epic",
     target: 10,
     icon: "◉",
-    reward: { exp: 250, reputation: 8 },
+    reward: {
+      exp: 250,
+      reputation: 8,
+      unlock: { decor: "trophy_different" },
+    },
   },
   {
     id: "therapy_deep_truth",
@@ -150,7 +158,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 3,
     icon: "◎",
-    reward: { exp: 80, reputation: 5 },
+    reward: {
+      exp: 80,
+      reputation: 5,
+      unlock: { fragment: { patientId: "zhou_mingyuan", fragmentId: "zhou_m3" } },
+    },
   },
 
   // ---------------- 结局收集类 10 个 ----------------
@@ -162,7 +174,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 1,
     icon: "✿",
-    reward: { exp: 50, reputation: 5 },
+    reward: {
+      exp: 50,
+      reputation: 5,
+      unlock: { decor: "trophy_first_heal" },
+    },
   },
   {
     id: "ending_cure_10",
@@ -182,7 +198,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 1,
     icon: "✦",
-    reward: { exp: 60, reputation: 4 },
+    reward: {
+      exp: 60,
+      reputation: 4,
+      unlock: { letter: "ach_letter_awakening" },
+    },
   },
   {
     id: "ending_acceptance_1",
@@ -202,7 +222,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 1,
     icon: "↗",
-    reward: { exp: 40, reputation: 4 },
+    reward: {
+      exp: 40,
+      reputation: 4,
+      unlock: { letter: "ach_letter_transfer" },
+    },
   },
   {
     id: "ending_dependent_1",
@@ -409,7 +433,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "growth_skill_8",
     name: "学贯中西",
-    description: "同时解锁 8 项或以上技能。",
+    description: "你学过的每一种方法，都曾让一双手重新握紧希望。",
     category: "growth",
     rarity: "legendary",
     target: 8,
@@ -461,7 +485,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "clinic_money_100k",
     name: "日进斗金",
-    description: "诊所总资产（金钱）达到 100000。",
+    description: "诊室的灯火，照亮了这座小镇越来越多的夜晚。",
     category: "clinic",
     rarity: "legendary",
     target: 100000,
@@ -476,7 +500,11 @@ export const allAchievements: Achievement[] = [
     rarity: "common",
     target: 7,
     icon: "⑦",
-    reward: { exp: 30, money: 100 },
+    reward: {
+      exp: 30,
+      money: 100,
+      unlock: { letter: "ach_letter_seven_days" },
+    },
   },
   {
     id: "clinic_day_15",
@@ -486,7 +514,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 15,
     icon: "⑮",
-    reward: { exp: 80, money: 300 },
+    reward: {
+      exp: 80,
+      money: 300,
+      unlock: { letter: "ach_letter_half_month" },
+    },
   },
   {
     id: "clinic_day_50",
@@ -521,7 +553,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "clinic_full_day",
     name: "门庭若市",
-    description: "单日接待满全部名额（3 位）。",
+    description: "单日接待满全部名额（5 位）。",
     category: "clinic",
     rarity: "rare",
     target: 1,
@@ -611,7 +643,12 @@ export const allAchievements: Achievement[] = [
     target: 30,
     icon: "？",
     hidden: true,
-    reward: { exp: 200, money: 500, sanity: 30 },
+    reward: {
+      exp: 200,
+      money: 500,
+      sanity: 30,
+      unlock: { decor: "trophy_seeds" },
+    },
   },
   {
     id: "secret_bookworm",
@@ -691,11 +728,11 @@ export const allAchievements: Achievement[] = [
     reward: { exp: 50, sanity: 20 },
   },
 
-  // ---------------- 主动获客类 9 个（v0.5.0） ----------------
+  // ---------------- 善意连接类 9 个（v0.5.0） ----------------
   {
     id: "discover_first",
     name: "广而告之",
-    description: "首次通过渠道投放发现潜在客户。",
+    description: "第一次，有人因为你的善意找到了你。",
     category: "discover",
     rarity: "common",
     target: 1,
@@ -705,7 +742,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "discover_5",
     name: "名声初起",
-    description: "累计进行 5 次渠道投放。",
+    description: "你的名字，开始被这座小镇记下。",
     category: "discover",
     rarity: "rare",
     target: 5,
@@ -715,7 +752,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "discover_15",
     name: "广撒渔网",
-    description: "累计进行 15 次渠道投放。",
+    description: "你为社区做过的事，正被越来越多的人记得。",
     category: "discover",
     rarity: "epic",
     target: 15,
@@ -725,7 +762,7 @@ export const allAchievements: Achievement[] = [
   {
     id: "discover_all_channels",
     name: "四面开花",
-    description: "使用过全部获客渠道。",
+    description: "每一种善意，都曾带一个人来到你面前。",
     category: "discover",
     rarity: "epic",
     target: 4,
@@ -792,7 +829,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 1,
     icon: "✿",
-    reward: { exp: 40, reputation: 3 },
+    reward: {
+      exp: 40,
+      reputation: 3,
+      unlock: { letter: "ach_letter_reunion" },
+    },
   },
   {
     id: "aftercare_3",
@@ -802,7 +843,11 @@ export const allAchievements: Achievement[] = [
     rarity: "rare",
     target: 3,
     icon: "❀",
-    reward: { exp: 80, reputation: 5 },
+    reward: {
+      exp: 80,
+      reputation: 5,
+      unlock: { fragment: { patientId: "lin_xiao", fragmentId: "lin_m3" } },
+    },
   },
   {
     id: "aftercare_5",
@@ -812,7 +857,11 @@ export const allAchievements: Achievement[] = [
     rarity: "epic",
     target: 5,
     icon: "❁",
-    reward: { exp: 150, reputation: 8 },
+    reward: {
+      exp: 150,
+      reputation: 8,
+      unlock: { returnVisit: "chen_lo" },
+    },
   },
   {
     id: "aftercare_8",
@@ -832,7 +881,11 @@ export const allAchievements: Achievement[] = [
     rarity: "epic",
     target: 1,
     icon: "❂",
-    reward: { exp: 200, reputation: 10 },
+    reward: {
+      exp: 200,
+      reputation: 10,
+      unlock: { returnVisit: "xiao_bei" },
+    },
   },
 ];
 
@@ -867,7 +920,7 @@ export const achievementCategoryLabels: Record<Achievement["category"], string> 
   clinic: "经营",
   ethics: "伦理",
   secret: "隐藏",
-  discover: "获客",
+  discover: "善意连接",
   aftercare: "回访",
 };
 

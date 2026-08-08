@@ -60,6 +60,31 @@
   color: rgba(243, 234, 217, 0.5);
   animation: prologue-blink 1.6s ease-in-out infinite;
 }
+/* ===== P4-3 序章跳过按钮（右上角，全程可见）===== */
+.prologue-skip {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 1;
+  padding: 6px 20px;
+  border: 1px solid rgba(240, 160, 80, 0.35);
+  border-radius: 999px;
+  background: linear-gradient(160deg, rgba(255, 250, 240, 0.07), rgba(255, 250, 240, 0.03));
+  color: rgba(243, 234, 217, 0.72);
+  font-family: var(--font-serif);
+  font-size: 13px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s, background 0.18s;
+}
+.prologue-skip:hover {
+  border-color: var(--accent);
+  color: #f3ead9;
+  background: linear-gradient(160deg, rgba(240, 160, 80, 0.14), rgba(240, 160, 80, 0.06));
+}
+.prologue-skip:active {
+  transform: translateY(0) scale(0.98);
+}
 .prologue-dots {
   position: fixed;
   bottom: 42px;
@@ -90,5 +115,443 @@
 @keyframes prologue-blink {
   0%, 100% { opacity: 0.2; }
   50% { opacity: 0.7; }
+}
+
+/* ===== P4-1 序章开场选择屏（离开城市的原因）===== */
+.prologue-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.prologue-choice-q {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 1.9;
+  color: #f3ead9;
+  letter-spacing: 1px;
+  margin-bottom: 26px;
+}
+.prologue-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+}
+.prologue-choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 15px 20px;
+  text-align: left;
+  font-family: var(--font-serif);
+  font-size: 17px;
+  letter-spacing: 1px;
+  color: #f3ead9;
+  background: linear-gradient(160deg, rgba(255, 250, 240, 0.07), rgba(255, 250, 240, 0.03));
+  border: 1px solid rgba(240, 160, 80, 0.25);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.15s;
+}
+.prologue-choice-btn:hover {
+  border-color: var(--accent);
+  background: linear-gradient(160deg, rgba(240, 160, 80, 0.14), rgba(240, 160, 80, 0.06));
+  transform: translateY(-1px);
+}
+.prologue-choice-btn:active {
+  transform: translateY(0) scale(0.99);
+}
+.prologue-choice-mark {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  opacity: 0.9;
+}
+.prologue-choice-btn:hover .prologue-choice-mark {
+  opacity: 1;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.prologue-choice-hint {
+  margin-top: 26px;
+  font-size: 12.5px;
+  line-height: 1.8;
+  letter-spacing: 1px;
+  color: rgba(243, 234, 217, 0.45);
+}
+
+/* 窄视口：选择屏不溢出，按钮/文字收缩 */
+@media (max-width: 520px) {
+  .prologue-content {
+    padding: 34px 22px;
+  }
+  .prologue-choice-q {
+    font-size: 17px;
+  }
+  .prologue-choice-btn {
+    font-size: 15.5px;
+    padding: 13px 16px;
+  }
+  .prologue-text {
+    font-size: 18px;
+  }
+}
+
+/* ===== P4-2 序章动作步骤（挂门牌 / 整理诊室 / 泡茶）===== */
+.prologue-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.prologue-action-lead {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  line-height: 1.9;
+  color: #f3ead9;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+}
+.prologue-action-btn {
+  margin-top: 22px;
+  padding: 12px 34px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-size: 15px;
+  letter-spacing: 3px;
+  font-weight: 700;
+  font-family: var(--font-serif);
+  cursor: pointer;
+  box-shadow: 0 6px 20px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: transform 0.15s;
+}
+.prologue-action-btn:hover { transform: translateY(-1px); }
+.prologue-action-btn:active { transform: translateY(0) scale(0.99); }
+.prologue-action-done {
+  margin-top: 22px;
+  font-family: var(--font-serif);
+  font-size: 17px;
+  line-height: 1.9;
+  color: #f3ead9;
+  letter-spacing: 1px;
+  animation: prologue-done-in 0.6s ease forwards;
+}
+@keyframes prologue-done-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* -- 挂门牌（sign）-- */
+.prologue-sign { display: flex; flex-direction: column; align-items: center; }
+.prologue-sign-plate {
+  position: relative;
+  width: 232px;
+  height: 64px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #9a6a34, #7a4f24);
+  border: 1px solid rgba(255, 250, 240, 0.28);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: rotate(-5deg);
+  transition: transform 0.6s ease;
+}
+.prologue-sign-plate::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3a2a18;
+  box-shadow: 0 0 0 2px rgba(255, 250, 240, 0.22);
+}
+.prologue-sign-plate-text {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  letter-spacing: 6px;
+  color: #f7ecd9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+.prologue-sign.is-hung .prologue-sign-plate {
+  transform: rotate(0deg);
+  animation: prologue-sign-sway 1.1s ease-in-out 1;
+}
+@keyframes prologue-sign-sway {
+  0% { transform: rotate(-5deg); }
+  22% { transform: rotate(3.5deg); }
+  44% { transform: rotate(-2deg); }
+  66% { transform: rotate(1deg); }
+  85% { transform: rotate(-0.4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* -- 整理诊室（tidy）-- */
+.prologue-tidy-items {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+.prologue-tidy-item {
+  position: relative;
+  flex: 1 1 82px;
+  max-width: 104px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px 10px;
+  border-radius: 12px;
+  background: linear-gradient(160deg, rgba(255, 250, 240, 0.07), rgba(255, 250, 240, 0.03));
+  border: 1px solid rgba(240, 160, 80, 0.25);
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.15s;
+  font-family: var(--font-serif);
+  color: #f3ead9;
+}
+.prologue-tidy-item:hover {
+  border-color: var(--accent);
+  background: linear-gradient(160deg, rgba(240, 160, 80, 0.14), rgba(240, 160, 80, 0.06));
+  transform: translateY(-1px);
+}
+.prologue-tidy-item.is-tidy {
+  border-color: rgba(143, 191, 107, 0.6);
+}
+.prologue-tidy-label {
+  font-size: 12.5px;
+  line-height: 1.5;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+.prologue-tidy-check {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #9cc97b;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.3s ease 0.25s, transform 0.3s ease 0.25s;
+}
+.prologue-tidy-item.is-tidy .prologue-tidy-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 三件物品的纯 CSS 色块视觉（books / plant / clock） */
+.ptv {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 8px;
+  transition: transform 0.5s ease;
+}
+.prologue-tidy-item:not(.is-tidy) .ptv-books { transform: rotate(-6deg) translateY(2px); }
+.prologue-tidy-item:not(.is-tidy) .ptv-plant { transform: rotate(-9deg) translateY(1px); }
+.prologue-tidy-item:not(.is-tidy) .ptv-clock { transform: rotate(-16deg); }
+.prologue-tidy-item.is-tidy .ptv { transform: none; }
+
+.ptv-books { flex-direction: column; gap: 3px; }
+.ptv-book { display: block; height: 7px; border-radius: 2px; }
+.ptv-book:nth-child(1) { width: 30px; background: #c98a4b; }
+.ptv-book:nth-child(2) { width: 23px; background: #a96a3a; }
+.ptv-book:nth-child(3) { width: 27px; background: #7a4f24; }
+
+.ptv-plant::before,
+.ptv-plant::after {
+  content: "";
+  position: absolute;
+  width: 13px;
+  height: 9px;
+  background: #7ba05b;
+  border-radius: 60% 10% 60% 10%;
+}
+.ptv-plant::before { top: 5px; left: 11px; transform: rotate(-24deg); }
+.ptv-plant::after { top: 9px; right: 10px; transform: rotate(156deg); }
+.ptv-stem {
+  position: absolute;
+  bottom: 10px;
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: #5f8a45;
+}
+.ptv-pot {
+  position: absolute;
+  bottom: 0;
+  width: 22px;
+  height: 13px;
+  border-radius: 2px 2px 6px 6px;
+  background: linear-gradient(180deg, #c0825c, #a05a3a);
+}
+
+.ptv-clock {
+  border-radius: 50%;
+  background: #f3ead9;
+  border: 2px solid #a96a3a;
+}
+.ptv-clock::before,
+.ptv-clock::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 2px;
+  border-radius: 2px;
+  background: #5a3a1a;
+  transform-origin: left center;
+}
+.ptv-clock::before { width: 9px; transform: translate(-50%, -50%) rotate(90deg); }
+.ptv-clock::after { width: 13px; transform: translate(-50%, -50%) rotate(15deg); }
+
+/* -- 泡茶（tea）-- */
+.prologue-tea { display: flex; flex-direction: column; align-items: center; }
+.prologue-tea-stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 40px;
+  height: 92px;
+  margin-top: 8px;
+}
+.prologue-kettle {
+  position: relative;
+  width: 46px;
+  height: 42px;
+}
+.prologue-kettle::before {
+  content: "";
+  position: absolute;
+  bottom: 7px;
+  right: -9px;
+  width: 15px;
+  height: 8px;
+  border-radius: 0 6px 6px 0;
+  background: #67676f;
+}
+.prologue-kettle-body {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 26px;
+  border-radius: 14px 14px 8px 8px;
+  background: linear-gradient(180deg, #83838f, #5e5e6a);
+}
+.prologue-kettle-lid {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 5px;
+  border-radius: 3px;
+  background: #6e6e7a;
+}
+.prologue-steam {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  width: 3px;
+  height: 12px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.6);
+  animation: prologue-steam-rise 1.6s ease-in-out infinite;
+}
+.prologue-steam-1 { transform: translateX(-7px); animation-delay: 0s; }
+.prologue-steam-2 { transform: translateX(5px); animation-delay: 0.55s; }
+@keyframes prologue-steam-rise {
+  0% { opacity: 0; transform: translateY(0) scaleX(1); }
+  30% { opacity: 0.75; }
+  100% { opacity: 0; transform: translateY(-14px) scaleX(1.5); }
+}
+.prologue-cup {
+  position: relative;
+  width: 30px;
+  height: 34px;
+}
+.prologue-cup::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 24px;
+  height: 21px;
+  border: 2px solid #c9b89a;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  background: rgba(255, 250, 240, 0.1);
+  transition: background 0.5s ease;
+}
+.prologue-cup::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 20px;
+  width: 9px;
+  height: 6px;
+  border: 2px solid #c9b89a;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+}
+.prologue-cup.is-full::before {
+  background: linear-gradient(180deg, #b0651f, #8a4d1d);
+}
+.prologue-tea-steam {
+  position: absolute;
+  bottom: 22px;
+  left: 12px;
+  width: 3px;
+  height: 11px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.55);
+  animation: prologue-steam-rise 1.7s ease-in-out infinite;
+}
+
+/* 窄视口：动作内容不溢出，色块/文字收缩 */
+@media (max-width: 520px) {
+  .prologue-action-lead { font-size: 16px; }
+  .prologue-action-btn { font-size: 14px; padding: 11px 26px; }
+  .prologue-sign-plate { width: 200px; }
+  .prologue-sign-plate-text { font-size: 19px; letter-spacing: 4px; }
+  .prologue-tidy-label { font-size: 11.5px; }
+}
+
+/* 动画降级：关闭往复动画/过渡，保留完成态最终视觉 */
+@media (prefers-reduced-motion: reduce) {
+  .prologue-action-done,
+  .prologue-sign.is-hung .prologue-sign-plate,
+  .prologue-steam,
+  .prologue-tea-steam {
+    animation: none;
+  }
+  .prologue-sign.is-hung .prologue-sign-plate {
+    transform: rotate(0deg);
+  }
+  .prologue-tidy-item .ptv,
+  .prologue-steam,
+  .prologue-tea-steam {
+    transition: none;
+  }
+  .prologue-steam,
+  .prologue-tea-steam {
+    opacity: 0.5;
+  }
 }
 

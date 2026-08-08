@@ -338,10 +338,10 @@ const truthWorkplaceBullying: TruthTemplate = {
             id: "gc11",
             text: `「${n}，你刚才提到'阳台'——这是非常重要的信号。我需要你答应我，未来一周不会做任何伤害自己的事。我们一起来制定一个脱困计划：取证、心理咨询、劳动仲裁，一步一步来。你不是一个人。」`,
             kind: "special",
-            requireSkill: "crisis_intervention",
+            requireSkill: "hold_through_crisis",
             effect: { trust: 30, mood: 25, truth: 40, doctorReputation: 8, doctorExp: 60, doctorSanity: -8 },
             next: "g2_end_cure",
-            hint: "需要技能：危机干预",
+            hint: "需要技能：在崩溃边缘陪住 ta",
           },
           {
             id: "gc12",
@@ -441,16 +441,16 @@ const truthGrief: TruthTemplate = {
           },
           {
             id: "gc2",
-            text: "「反复梦境通常是潜意识在处理未完成的事件。我们试试解梦。」",
+            text: "「反复梦见同一个人，也许是心底深处还有没说完的话。说说那个梦，我陪你看它想告诉你什么。」",
             kind: "logic",
-            requireSkill: "freud_dream",
+            requireSkill: "make_ta_safe",
             effect: { trust: 18, defense: -18, truth: 30, doctorExp: 30 },
             next: "g3_p2_open",
-            hint: "需要技能：解梦术",
+            hint: "需要技能：让 ta 感到安全",
           },
           {
             id: "gc3",
-            text: "「我给你开点抑制REM睡眠的药，让你不做梦。」",
+            text: "「我给你开点药，能让你不做梦。」",
             kind: "prescribe",
             effect: { mood: 6, doctorMoney: 50, doctorSanity: -2 },
             next: "g3_p2_med",
@@ -479,12 +479,12 @@ const truthGrief: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: "「自责是哀伤的常见反应，但它不等于责任。我们用CBT的方法，一起识别这个非理性信念。」",
+            text: "「自责是哀伤的常见反应，但它不等于责任。我们一起看看，那个'都是我的错'的想法，是不是真的。」",
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 15, defense: -12, mood: 5, truth: 25, doctorExp: 25 },
             next: "g3_p3_cbt",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc6",
@@ -498,7 +498,7 @@ const truthGrief: TruthTemplate = {
       g3_p2_open: {
         id: "g3_p2_open",
         speaker: "patient",
-        text: "您会解梦？我梦见她站在路口等我，每次我想走过去，她就退后一步。我永远走不到她面前。",
+        text: "您愿意听我说那个梦？我梦见她站在路口等我，每次我想走过去，她就退后一步。我永远走不到她面前。",
         emotion: "scared",
         choices: [
           {
@@ -512,10 +512,10 @@ const truthGrief: TruthTemplate = {
             id: "gc8",
             text: "「梦里你追不上她，是因为你还没原谅自己。我们试试在梦里完成这场对话。」",
             kind: "special",
-            requireSkill: "hypnosis_basic",
+            requireSkill: "guide_firmly",
             effect: { trust: 25, mood: 15, truth: 35, doctorExp: 40, doctorSanity: -5 },
             next: "g3_p3",
-            hint: "需要技能：催眠术·初级",
+            hint: "需要技能：坚定地引导",
           },
         ],
       },
@@ -529,7 +529,7 @@ const truthGrief: TruthTemplate = {
       g3_p3_cbt: {
         id: "g3_p3_cbt",
         speaker: "patient",
-        text: "非理性信念……（苦笑）也许吧。可理性告诉我'不是你的错'，我心里却清清楚楚知道，那天我本来可以去的。",
+        text: "也许吧……（苦笑）可理性告诉我'不是你的错'，我心里却清清楚楚知道，那天我本来可以去的。",
         emotion: "neutral",
         autoNext: "g3_p3",
       },
@@ -647,12 +647,12 @@ const truthChildhoodTrauma: TruthTemplate = {
           },
           {
             id: "gc2",
-            text: "「这听起来像解离症状。我们做几个 grounding 练习，先把意识锚定在当下。」",
+            text: "「这听起来像解离症状。我们先做一个把意识拉回当下的练习，慢慢来。」",
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 10, defense: -5, mood: 8, doctorExp: 20 },
             next: "g4_p2_ground",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc3",
@@ -692,12 +692,12 @@ const truthChildhoodTrauma: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: "「我们用催眠帮你找回那些被压抑的记忆，看看到底是谁伤害了你。」",
+            text: "「我们走到最深处去，我陪着你，找回那些被压抑的记忆，看看到底是谁伤害了你。」",
             kind: "hypnosis",
-            requireSkill: "hypnosis_deep",
+            requireSkill: "toward_truth",
             effect: { trust: 10, defense: -25, mood: -20, truth: 50, doctorExp: 50, doctorSanity: -10 },
             next: "g4_p3_forced",
-            hint: "需要技能：深度催眠（高风险）",
+            hint: "需要技能：走向真相（高风险）",
           },
           {
             id: "gc6",
@@ -740,7 +740,7 @@ const truthChildhoodTrauma: TruthTemplate = {
         choices: [
           {
             id: "gc9",
-            text: `「${n}，告不告他，由你决定，不是今天决定。你不需要任何证据来'证明'你受过的伤。我们要做的，是让你的身体知道——现在已经安全了，那间房间不会再回来。我推荐你做长程创伤治疗，我也在，但你需要更专业的陪伴。」`,
+            text: `「${n}，告不告他，由你决定，不是今天决定。你不需要任何证据来'证明'你受过的伤。我们要做的，是让你的身体知道——现在已经安全了，那间房间不会再回来。我推荐你接受更长的、更深入的治疗，我也在，但你需要更专业的陪伴。」`,
             kind: "special",
             require: { trust: 55 },
             effect: { trust: 25, mood: 20, truth: 40, doctorReputation: 8, doctorExp: 60, doctorSanity: -10 },
@@ -749,13 +749,13 @@ const truthChildhoodTrauma: TruthTemplate = {
           },
           {
             id: "gc10",
-            text: "「我们会用 EMDR 帮你重新加工这些记忆。过程会很辛苦，但我会一直陪你。我们一步一步来。」",
+            text: "「我会陪着你，一小步一小步靠近那段记忆，直到它不再那样吓到你。过程会很辛苦，但我会一直陪你。我们一步一步来。」",
             kind: "special",
             require: { trust: 45 },
-            requireSkill: "exposure_therapy",
+            requireSkill: "face_fear",
             effect: { trust: 22, mood: 18, truth: 35, doctorReputation: 6, doctorExp: 50, doctorSanity: -8 },
             next: "g4_end_cure",
-            hint: "需要技能：暴露疗法 + 信任≥45",
+            hint: "需要技能：陪 ta 直面恐惧 + 信任≥45",
           },
           {
             id: "gc11",
@@ -796,7 +796,7 @@ const truthChildhoodTrauma: TruthTemplate = {
       g4_end_hidden: {
         id: "g4_end_hidden",
         speaker: "narration",
-        text: `那场催眠之后，${n}再也没有来过。半年后她/他寄来一张明信片，没署名，只写着：「那不是我的记忆，是您种下的。但我活下来了，因为我选择不再追问。谢谢您及时停下。」你把明信片夹进了病历本最后。`,
+        text: `那场深谈之后，${n}再也没有来过。半年后她/他寄来一张明信片，没署名，只写着：「那不是我的记忆，是您种下的。但我活下来了，因为我选择不再追问。谢谢您及时停下。」你把明信片夹进了病历本最后。`,
         isEnding: true,
         endingType: "hidden",
         endingTitle: "隐藏结局 · 选择不再追问",
@@ -806,7 +806,7 @@ const truthChildhoodTrauma: TruthTemplate = {
       g4_end_tragic: {
         id: "g4_end_tragic",
         speaker: "narration",
-        text: `${n}离开了你的诊室，三年后她/他起诉了"舅舅的家人"，理由是童年性侵。法庭上，对方律师出示了你催眠诱导时的录音——${n}败诉，被判赔偿名誉损失。她/他在博客上写下最后一篇：「我分不清什么是真的了。」`,
+        text: `${n}离开了你的诊室，三年后她/他起诉了"舅舅的家人"，理由是童年性侵。法庭上，对方律师出示了你诱导回忆时的录音——${n}败诉，被判赔偿名誉损失。她/他在博客上写下最后一篇：「我分不清什么是真的了。」`,
         isEnding: true,
         endingType: "tragic",
         endingTitle: "悲剧结局 · 分不清什么是真的",
@@ -984,10 +984,10 @@ const truthGenderIdentity: TruthTemplate = {
             id: "gc12",
             text: "「性别探索可以是漫长的过程。我们不急着下结论，给你半年时间慢慢来。期间停药、定期复诊、家庭咨询。无论你最后决定什么，我都陪你。」",
             kind: "special",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 22, mood: 18, truth: 30, doctorReputation: 5, doctorExp: 50, doctorSanity: -5 },
             next: "g5_end_explore",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc13",
@@ -1087,12 +1087,12 @@ const truthLeftBehind: TruthTemplate = {
           },
           {
             id: "gc2",
-            text: "「孝顺是中国文化的核心。但孝顺不等于被剥削。我们一起用CBT分析你的'孝顺信念'。」",
+            text: "「孝顺是中国文化的核心。但孝顺不等于被剥削。我们一起看看，'不付出一切就是不孝'这个念头，是不是真的。」",
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 12, defense: -8, truth: 20, doctorExp: 25 },
             next: "g6_p2",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc3",
@@ -1172,10 +1172,10 @@ const truthLeftBehind: TruthTemplate = {
             id: "gc8",
             text: "「我们做一场空椅对话。你对着那把空椅子，把你对外婆的思念、对妈妈的愤怒，全部说出来。这些情绪压抑太久了。」",
             kind: "special",
-            requireSkill: "free_association",
+            requireSkill: "hold_silence",
             effect: { trust: 22, mood: 18, truth: 30, doctorReputation: 5, doctorExp: 50, doctorSanity: -6 },
             next: "g6_end_awaken",
-            hint: "需要技能：自由联想",
+            hint: "需要技能：接住沉默",
           },
           {
             id: "gc9",
@@ -1217,7 +1217,7 @@ const truthLeftBehind: TruthTemplate = {
       g6_end_transfer: {
         id: "g6_end_transfer",
         speaker: "narration",
-        text: `你把${n}转介给了一位专门做家庭系统治疗的前辈。临别时她/他抱了抱你：「医生，您是第一个让我觉得'我不是不孝'的人。这就够了。」`,
+        text: `你把${n}转介给了一位专门做家庭治疗的前辈。临别时她/他抱了抱你：「医生，您是第一个让我觉得'我不是不孝'的人。这就够了。」`,
         isEnding: true,
         endingType: "transfer",
         endingTitle: "转介结局 · 我不是不孝",
@@ -1240,13 +1240,13 @@ const truthLeftBehind: TruthTemplate = {
 
 // ---------- 真相 07：产后抑郁与伤害婴儿的念头 ----------
 // 真实背景：产后精神病（Postpartum Psychosis）发生率约 1-2/1000，
-// 但伤害婴儿的侵入性思维在产后抑郁中极为普遍却极少被谈论。
-// 关键：区分"侵入性思维"与"杀婴意念"——前者是症状，后者是危险。
+// 但伤害婴儿的可怕念头在产后抑郁中极为普遍却极少被谈论。
+// 关键：区分"可怕念头"与"杀婴意念"——前者是症状，后者是危险。
 const truthPostpartum: TruthTemplate = {
   id: "postpartum_psychosis",
   name: "产后抑郁",
   truth: (ctx) =>
-    `表面是${ctx.symptom.name}，真相是${ctx.name}产后出现严重的情绪崩溃，并伴随伤害婴儿的侵入性思维，但极度害怕被贴上"坏妈妈"的标签而不敢说出。`,
+    `表面是${ctx.symptom.name}，真相是${ctx.name}产后出现严重的情绪崩溃，并伴随伤害婴儿的可怕念头，但极度害怕被贴上"坏妈妈"的标签而不敢说出。`,
   buildDialogues: (ctx) => {
     const n = ctx.name;
     const emo = ctx.symptom.emotion;
@@ -1266,14 +1266,14 @@ const truthPostpartum: TruthTemplate = {
           },
           {
             id: "gc2",
-            text: "「产后抑郁很常见，我们用爱丁堡量表评估一下严重程度。」",
+            text: "「产后抑郁很常见，我们先评估一下，你到底有多难受。」",
             kind: "logic",
             effect: { trust: 8, defense: -5, truth: 10, doctorMoney: 60 },
             next: "g7_p2_scale",
           },
           {
             id: "gc3",
-            text: "「我先开点哺乳期安全的SSRI，你回去吃两周看看。」",
+            text: "「我先开点哺乳期安全的药，你回去吃两周看看。」",
             kind: "prescribe",
             effect: { mood: 8, doctorMoney: 80, doctorSanity: -2 },
             next: "g7_p2_med",
@@ -1302,12 +1302,12 @@ const truthPostpartum: TruthTemplate = {
         choices: [
           {
             id: "gc4",
-            text: `「${n}，深呼吸。你听我说——你刚才说的，叫"侵入性思维"，是产后抑郁非常常见的症状。它的特点就是：你越害怕，它越频繁。它的出现，恰恰证明你不会做。一个真正想伤害孩子的妈妈，不会有这种"画面"让她崩溃。」`,
+            text: `「${n}，深呼吸。你听我说——你刚才说的那种"突然冒出来的可怕念头"，是产后抑郁非常常见的症状。它的特点就是：你越害怕，它越频繁。它的出现，恰恰证明你不会做。一个真正想伤害孩子的妈妈，不会有这种"画面"让她崩溃。」`,
             kind: "empathy",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 28, defense: -20, mood: 15, truth: 35, doctorExp: 40 },
             next: "g7_p3",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc5",
@@ -1457,12 +1457,12 @@ const truthSchoolBullying: TruthTemplate = {
           },
           {
             id: "gc2",
-            text: "「学校恐惧症很常见。我们做暴露疗法，让你逐步脱敏。」",
+            text: "「学校恐惧症很常见。我陪着你，一小步一小步靠近教室，直到你不那么怕。」",
             kind: "logic",
-            requireSkill: "exposure_therapy",
+            requireSkill: "face_fear",
             effect: { trust: 10, defense: -5, mood: 5, doctorExp: 25 },
             next: "g8_p2_exposure",
-            hint: "需要技能：暴露疗法",
+            hint: "需要技能：陪 ta 直面恐惧",
           },
           {
             id: "gc3",
@@ -1493,7 +1493,7 @@ const truthSchoolBullying: TruthTemplate = {
       g8_p2_exposure: {
         id: "g8_p2_exposure",
         speaker: "patient",
-        text: `（摇头）医生，暴露疗法是治恐惧症的。可我害怕的不是教室，是教室里的人。你让我"逐步脱敏"，相当于让我逐步习惯被打。`,
+        text: `（摇头）医生，这个方法对怕教室的人或许有用。可我害怕的不是教室，是教室里的人。你让我"一小步一小步靠近"，相当于让我一步一步习惯被打。`,
         emotion: "angry",
         autoNext: "g8_p2",
       },
@@ -1512,12 +1512,12 @@ const truthSchoolBullying: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: "「我们用CBT的方法，识别你心里'是我的错'这个非理性信念。」",
+            text: "「我们一起看看，你心里'是我的错'这个念头，是不是真的。」",
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 15, defense: -12, mood: 8, truth: 25, doctorExp: 25 },
             next: "g8_p3",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc6",
@@ -1545,10 +1545,10 @@ const truthSchoolBullying: TruthTemplate = {
             id: "gc7",
             text: `「${n}，你没有疯。自伤是你目前找到的唯一能让自己平静的方式。但今天我们一起来找一个更安全的方式。同时，我需要你答应我——未来一周不划自己。如果你撑不住，随时打我电话。我们一起面对。」`,
             kind: "special",
-            requireSkill: "crisis_intervention",
+            requireSkill: "hold_through_crisis",
             effect: { trust: 30, mood: 25, truth: 40, doctorReputation: 8, doctorExp: 60, doctorSanity: -8 },
             next: "g8_end_cure",
-            hint: "需要技能：危机干预",
+            hint: "需要技能：在崩溃边缘陪住 ta",
           },
           {
             id: "gc8",
@@ -1692,12 +1692,12 @@ const truthEatingDisorder: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: "「我们用CBT-E（针对进食障碍的CBT）系统治疗。重点是规律进食，重建身体感受。」",
+            text: "「我们先重建'好好吃饭'的感觉——你身体还记得什么是舒服。重点是规律进食，慢慢找回身体的感受。」",
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 18, defense: -15, mood: 8, truth: 25, doctorExp: 30 },
             next: "g9_p3",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc6",
@@ -1836,10 +1836,10 @@ const truthDID: TruthTemplate = {
             id: "gc2",
             text: "「这种'替别人说话'的现象，可能是解离症状。你能告诉我，你第一次出现是什么时候吗？」",
             kind: "logic",
-            requireSkill: "freud_dream",
+            requireSkill: "make_ta_safe",
             effect: { trust: 12, defense: -8, truth: 30, doctorExp: 30 },
             next: "g10_p2",
-            hint: "需要技能：解梦术（精神分析基础）",
+            hint: "需要技能：让 ta 感到安全",
           },
           {
             id: "gc3",
@@ -1874,16 +1874,16 @@ const truthDID: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: "「我们用催眠试着召唤其他'部分'，看看一共有几位。」",
+            text: "「我们试着让其他'部分'愿意出来说话，看看一共有几位。」",
             kind: "hypnosis",
-            requireSkill: "hypnosis_deep",
+            requireSkill: "toward_truth",
             effect: { trust: 5, defense: -20, mood: -15, truth: 45, doctorExp: 50, doctorSanity: -10 },
             next: "g10_p3_forced",
-            hint: "需要技能：深度催眠（高风险）",
+            hint: "需要技能：走向真相（高风险）",
           },
           {
             id: "gc6",
-            text: "「这种症状非常严重，我应该立刻给你开抗精神病药。」",
+            text: "「这种症状非常严重，我应该立刻给你开点能让你安静下来的药。」",
             kind: "prescribe",
             effect: { trust: -15, defense: 20, mood: -10, doctorMoney: 80 },
             next: "g10_end_worsen",
@@ -1934,10 +1934,10 @@ const truthDID: TruthTemplate = {
             text: `「你们五位需要慢慢互相认识，这叫'合作'阶段。最终的目标是'整合'——不是消灭谁，是让你们成为${n}的不同面向。这是漫长的过程，可能要几年。我会陪你们。」`,
             kind: "special",
             require: { trust: 45 },
-            requireSkill: "free_association",
+            requireSkill: "hold_silence",
             effect: { trust: 25, mood: 20, truth: 35, doctorReputation: 6, doctorExp: 55, doctorSanity: -8 },
             next: "g10_end_awaken",
-            hint: "需要技能：自由联想 + 信任≥45",
+            hint: "需要技能：接住沉默 + 信任≥45",
           },
           {
             id: "gc11",
@@ -1950,7 +1950,7 @@ const truthDID: TruthTemplate = {
           },
           {
             id: "gc12",
-            text: "「这些'人格'是不存在的，是你想象出来的。我会用抗精神病药帮你消除他们。」",
+            text: "「这些'人格'是不存在的，是你想象出来的。我会给你开点药，让它们安静下来。」",
             kind: "confront",
             effect: { trust: -25, defense: 30, mood: -20, doctorSanity: -5 },
             next: "g10_end_tragic",
@@ -1991,11 +1991,11 @@ const truthDID: TruthTemplate = {
       g10_end_tragic: {
         id: "g10_end_tragic",
         speaker: "narration",
-        text: `抗精神病药压制了"声音"，但没治愈创伤。${n}半年后自杀。她/他的遗书只有一句话："影子说，唯一让她停下的方式，是让所有人都停下。"`,
+        text: `药物压制了"声音"，但没治愈创伤。${n}半年后自杀。她/他的遗书只有一句话："影子说，唯一让她停下的方式，是让所有人都停下。"`,
         isEnding: true,
         endingType: "tragic",
         endingTitle: "悲剧结局 · 让所有人都停下",
-        endingText: `你用抗精神病药"消除"了她/他的生存策略。当保护者消失，身体也随之崩塌。`,
+        endingText: `你用药物"消除"了她/他的生存策略。当保护者消失，身体也随之崩塌。`,
         endingReward: { doctorReputation: -25, doctorMoney: 0, doctorExp: 15, doctorSanity: -30 },
       },
       g10_end_worsen: {
@@ -2039,14 +2039,14 @@ const truthCombatPTSD: TruthTemplate = {
           },
           {
             id: "gc2",
-            text: "「这是典型的PTSD症状：闪回、警觉增高、回避。我们做CAPS-5评估。」",
+            text: "「这是典型的PTSD症状：闪回、警觉增高、回避。我们先评估一下，你到底有多难受。」",
             kind: "logic",
             effect: { trust: 8, defense: -5, truth: 10, doctorMoney: 60 },
             next: "g11_p2_clinical",
           },
           {
             id: "gc3",
-            text: "「我给你开SSRI和哌唑嗪（治噩梦）。两周复诊。」",
+            text: "「我先开点药，让噩梦少一些。两周复诊。」",
             kind: "prescribe",
             effect: { mood: 8, doctorMoney: 80, doctorSanity: -2 },
             next: "g11_p2_med",
@@ -2063,7 +2063,7 @@ const truthCombatPTSD: TruthTemplate = {
       g11_p2_med: {
         id: "g11_p2_med",
         speaker: "patient",
-        text: "（攥紧药方）医生，哌唑嗪能让我不做梦吗？可我心里知道——不是梦的问题。是醒着的时候，我也能看见他。",
+        text: "（攥紧药方）医生，这药能让我不做梦吗？可我心里知道——不是梦的问题。是醒着的时候，我也能看见他。",
         emotion: "scared",
         autoNext: "g11_p2",
       },
@@ -2082,12 +2082,12 @@ const truthCombatPTSD: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: "「我们用CPT（认知加工疗法）处理你的'责任信念'。重点不是'不是你的错'，是看清'你的责任边界'在哪里。」",
+            text: "「我们慢慢理清'责任'这件事。重点不是'不是你的错'，是看清'你的责任边界'在哪里。」",
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 18, defense: -15, mood: 5, truth: 25, doctorExp: 30 },
             next: "g11_p3",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc6",
@@ -2115,12 +2115,12 @@ const truthCombatPTSD: TruthTemplate = {
           },
           {
             id: "gc8",
-            text: "「我们做 EMDR 处理小张那次记忆，让它的'热度'降下来。你不需要忘记他，你需要让他不再每天折磨你。」",
+            text: "「我陪着你，一起靠近小张那次记忆，让它的'热度'降下来。你不需要忘记他，你需要让他不再每天折磨你。」",
             kind: "special",
-            requireSkill: "exposure_therapy",
+            requireSkill: "face_fear",
             effect: { trust: 22, mood: 18, truth: 30, doctorReputation: 5, doctorExp: 50, doctorSanity: -6 },
             next: "g11_end_awaken",
-            hint: "需要技能：暴露疗法",
+            hint: "需要技能：陪 ta 直面恐惧",
           },
           {
             id: "gc9",
@@ -2153,7 +2153,7 @@ const truthCombatPTSD: TruthTemplate = {
       g11_end_awaken: {
         id: "g11_end_awaken",
         speaker: "patient",
-        text: `（半年后）医生，EMDR做完了。小张那个画面还在，但它不再像"刚刚发生"，更像是"很多年前"。我现在能跟老婆一起给孩子的房间刷墙了。我还是怕，但我也开始期待。`,
+        text: `（半年后）医生，那几次治疗做完了。小张那个画面还在，但它不再像"刚刚发生"，更像是"很多年前"。我现在能跟老婆一起给孩子的房间刷墙了。我还是怕，但我也开始期待。`,
         emotion: "calm",
         isEnding: true,
         endingType: "awakening",
@@ -2295,12 +2295,12 @@ const truthStockholm: TruthTemplate = {
           },
           {
             id: "gc8",
-            text: `「${n}，437天的囚禁，你的生存机制把'他偶尔的好'放大了。这是大脑保护你的方式，不是你的错。我们做长程创伤治疗，慢慢重建你的'现实感'。」`,
+            text: `「${n}，437天的囚禁，你的生存机制把'他偶尔的好'放大了。这是大脑保护你的方式，不是你的错。我们做更长的、更深的陪伴，慢慢重建你的'现实感'。」`,
             kind: "special",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 22, mood: 18, truth: 30, doctorReputation: 5, doctorExp: 50, doctorSanity: -6 },
             next: "g12_end_awaken",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc9",
@@ -2404,12 +2404,12 @@ const truthCultEscape: TruthTemplate = {
           },
           {
             id: "gc2",
-            text: "「邪教洗脑是一种精神控制，需要系统的去程序化（deprogramming）治疗。我帮你制定方案。」",
+            text: "「邪教洗脑是一种精神控制。我们一起慢慢解开那些'相信'，一条一条来。我帮你制定方案。」",
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 12, defense: -8, truth: 25, doctorExp: 25 },
             next: "g13_p2",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc3",
@@ -2442,12 +2442,12 @@ const truthCultEscape: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: "「我们用CBT识别你内化的'师父信念'，逐一检验它们的真实性。这是去程序化的核心。」",
+            text: "「我们一起解开那些'师父教你的相信'，一条一条看看它们是不是真的。这是解开的第一步。」",
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 18, defense: -15, mood: 8, truth: 25, doctorExp: 30 },
             next: "g13_p3",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc6",
@@ -2477,10 +2477,10 @@ const truthCultEscape: TruthTemplate = {
             id: "gc8",
             text: "「我们一起梳理你的'信念地图'——哪些是组织灌输的，哪些是你自己的。这是一个漫长的重建过程，但你不再独自面对。」",
             kind: "special",
-            requireSkill: "free_association",
+            requireSkill: "hold_silence",
             effect: { trust: 22, mood: 18, truth: 30, doctorReputation: 5, doctorExp: 50, doctorSanity: -6 },
             next: "g13_end_awaken",
-            hint: "需要技能：自由联想",
+            hint: "需要技能：接住沉默",
           },
           {
             id: "gc9",
@@ -2585,14 +2585,14 @@ const truthEarlyDementia: TruthTemplate = {
             id: "gc2",
             text: "「这是高危自杀风险。我需要你立刻签安全协议，并通知家属。」",
             kind: "confront",
-            requireSkill: "crisis_intervention",
+            requireSkill: "hold_through_crisis",
             effect: { trust: -5, defense: 15, mood: -10, truth: 30, doctorExp: 35 },
             next: "g14_p2_crisis",
-            hint: "需要技能：危机干预",
+            hint: "需要技能：在崩溃边缘陪住 ta",
           },
           {
             id: "gc3",
-            text: "「现在的胆碱酯酶抑制剂可以延缓进展。你应该尽早开始服药。」",
+            text: "「现在的药可以延缓进展。你应该尽早开始服药。」",
             kind: "prescribe",
             effect: { mood: 5, doctorMoney: 80, doctorSanity: -2 },
             next: "g14_p2_med",
@@ -2630,7 +2630,7 @@ const truthEarlyDementia: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: "「这是病理性的抑郁反应，应该用SSRI治疗。等你情绪好转，思路会不一样。」",
+            text: "「这是病理性的抑郁反应，应该先用药物治疗。等你情绪好转，思路会不一样。」",
             kind: "prescribe",
             effect: { trust: 5, defense: 10, mood: 5, doctorMoney: 60 },
             next: "g14_p2_med2",
@@ -2659,7 +2659,7 @@ const truthEarlyDementia: TruthTemplate = {
         choices: [
           {
             id: "gc7",
-            text: `「${n}，这三件事——带学生毕业、对妻子说爱、为自己写一份"尊严宣言"——就是你接下来三年的使命。我陪你一起完成。同时，我们一起做'意义疗法'：在被遗忘之前，活完。如果你撑不住，随时来找我。我不会评判你的任何决定，但我会陪你到最后一刻。」`,
+            text: `「${n}，这三件事——带学生毕业、对妻子说爱、为自己写一份"尊严宣言"——就是你接下来三年的使命。我陪你一起完成。同时，我们一起找回'剩下的日子'的意义：在被遗忘之前，活完。如果你撑不住，随时来找我。我不会评判你的任何决定，但我会陪你到最后一刻。」`,
             kind: "special",
             require: { trust: 50 },
             effect: { trust: 28, mood: 22, truth: 40, doctorReputation: 8, doctorExp: 60, doctorSanity: -10 },
@@ -2668,12 +2668,12 @@ const truthEarlyDementia: TruthTemplate = {
           },
           {
             id: "gc8",
-            text: "「我们用意义疗法（Logotherapy）一起找你'剩余生命的意义'。这不是放弃，是另一种战斗。」",
+            text: "「我们一起找回'剩下的日子'的意义。这不是放弃，是另一种战斗。」",
             kind: "special",
-            requireSkill: "free_association",
+            requireSkill: "hold_silence",
             effect: { trust: 22, mood: 18, truth: 30, doctorReputation: 5, doctorExp: 50, doctorSanity: -8 },
             next: "g14_end_awaken",
-            hint: "需要技能：自由联想",
+            hint: "需要技能：接住沉默",
           },
           {
             id: "gc9",
@@ -2777,12 +2777,12 @@ const truthHikikomori: TruthTemplate = {
           },
           {
             id: "gc2",
-            text: "「蛰居是一种适应不良的回避。我们做行为激活，从每天出门5分钟开始。」",
+            text: "「蛰居是回避带来的。我陪着你，一小步一小步来——先从每天出门5分钟开始。」",
             kind: "logic",
-            requireSkill: "exposure_therapy",
+            requireSkill: "face_fear",
             effect: { trust: 8, defense: -5, mood: 5, doctorExp: 25 },
             next: "g15_p2_behavior",
-            hint: "需要技能：暴露疗法",
+            hint: "需要技能：陪 ta 直面恐惧",
           },
           {
             id: "gc3",
@@ -2806,7 +2806,7 @@ const truthHikikomori: TruthTemplate = {
       g15_p2_behavior: {
         id: "g15_p2_behavior",
         speaker: "patient",
-        text: "（苦笑）医生，我懂行为激活。我也试过——第一天出门5分钟，第二天7分钟。然后某天我在便利店碰到高中同学，他叫我名字我装没听见。回家后我再也没出过门。",
+        text: "（苦笑）医生，这个方法我试过——第一天出门5分钟，第二天7分钟。然后某天我在便利店碰到高中同学，他叫我名字我装没听见。回家后我再也没出过门。",
         emotion: "sad",
         autoNext: "g15_p2",
       },
@@ -2825,12 +2825,12 @@ const truthHikikomori: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: "「我们用CBT识别你的'全或无思维'——一次失败就等于彻底失败。这是非理性信念。」",
+            text: "「我们一起看看那个'一次失败就等于彻底失败'的想法，是不是真的——它不是定局，只是吓住你的念头。」",
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 18, defense: -15, mood: 8, truth: 25, doctorExp: 30 },
             next: "g15_p3",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc6",
@@ -2865,12 +2865,12 @@ const truthHikikomori: TruthTemplate = {
           },
           {
             id: "gc8",
-            text: "「我们用'意义重构'疗法，重新定义'成功'。不是只有买房结婚才算成功。」",
+            text: "「我们一起重新看看'成功'这两个字——不是只有买房结婚才算成功。」",
             kind: "special",
-            requireSkill: "free_association",
+            requireSkill: "hold_silence",
             effect: { trust: 22, mood: 18, truth: 30, doctorReputation: 5, doctorExp: 50, doctorSanity: -6 },
             next: "g15_end_awaken",
-            hint: "需要技能：自由联想",
+            hint: "需要技能：接住沉默",
           },
           {
             id: "gc9",
@@ -2971,12 +2971,12 @@ const truthPerfectionismSelfharm: TruthTemplate = {
           },
           {
             id: "gc3",
-            text: `「我们用CBT识别'全或无'信念——'第三十名=废物'是非理性信念。我们一起重构它。」`,
+            text: `「我们一起看看'第三十名=废物'这个想法，是不是真的。它不是判决，我们一起把它翻过来。」`,
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 12, defense: -8, mood: 6, truth: 22, doctorExp: 28 },
             next: "g16_p2",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
         ],
       },
@@ -3040,10 +3040,10 @@ const truthPerfectionismSelfharm: TruthTemplate = {
             id: "gc8",
             text: `「我们用'接纳'——不再跟'必须完美'的声音对抗，而是允许它存在，但不照它说的做。你比那个声音大。」`,
             kind: "special",
-            requireSkill: "free_association",
+            requireSkill: "hold_silence",
             effect: { trust: 22, mood: 16, truth: 30, doctorReputation: 6, doctorExp: 50, doctorSanity: -6 },
             next: "g16_end_awaken",
-            hint: "需要技能：自由联想",
+            hint: "需要技能：接住沉默",
           },
           {
             id: "gc9",
@@ -3126,12 +3126,12 @@ const truthCaregiverBurnout: TruthTemplate = {
           },
           {
             id: "gc3",
-            text: `「你的失眠和焦虑是真实的躯体反应。我开一些助眠和抗焦虑药物，先让你睡一觉。」`,
+            text: `「你的失眠和焦虑是真实的躯体反应。我先开点药，让身体歇一歇、能睡一觉。」`,
             kind: "prescribe",
-            requireSkill: "pharma_basic",
+            requireSkill: "hold_steady",
             effect: { trust: 14, mood: 12, defense: -6, doctorExp: 25 },
             next: "g17_p2",
-            hint: "需要技能：基础药理",
+            hint: "需要技能：稳稳托住",
           },
         ],
       },
@@ -3160,12 +3160,12 @@ const truthCaregiverBurnout: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: `「侵入性念头在重度照护者中发生率超过70%。它不代表你的意愿，代表你的极限。我们该谈的不是'怎么不想'，是'怎么让你能喘口气'。」`,
+            text: `「那些突然冒出来的可怕念头，在重度照护者中很常见。它不代表你的意愿，代表你的极限。我们该谈的不是'怎么不想'，是'怎么让你能喘口气'。」`,
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 20, defense: -14, mood: 10, truth: 26, doctorExp: 32 },
             next: "g17_p3",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc6",
@@ -3195,10 +3195,10 @@ const truthCaregiverBurnout: TruthTemplate = {
             id: "gc8",
             text: `「我们重新定义'照护'——不是24小时贴身才算爱。允许自己'不够好'，也是一种照护。这周请邻居替你守两小时，你去公园坐坐。」`,
             kind: "special",
-            requireSkill: "free_association",
+            requireSkill: "hold_silence",
             effect: { trust: 22, mood: 16, truth: 28, doctorReputation: 5, doctorExp: 48, doctorSanity: -5 },
             next: "g17_end_acceptance",
-            hint: "需要技能：自由联想",
+            hint: "需要技能：接住沉默",
           },
           {
             id: "gc9",
@@ -3211,7 +3211,7 @@ const truthCaregiverBurnout: TruthTemplate = {
           },
           {
             id: "gc10",
-            text: `「药物能让你撑下去。我加量助眠药。」`,
+            text: `「药物能让你撑下去。我加点药。」`,
             kind: "prescribe",
             effect: { trust: -4, defense: 12, mood: 6 },
             next: "g17_end_dependent",
@@ -3267,7 +3267,7 @@ const truthCaregiverBurnout: TruthTemplate = {
 // ---------- 真相 18：性侵幸存者的复杂创伤 ----------
 // 真实背景：性侵幸存者常以躯体化（慢性盆腔痛、性恐惧、解离）就诊，回避谈论事件，
 // 伴「是我的错」的自我责备与羞耻。WHO 数据全球约 1/3 女性遭遇过性暴力。
-// 创伤聚焦治疗（如 EMDR、CPT）是循证手段。本模板以夺回身体主权为康复主线。
+// 创伤聚焦治疗是循证手段。本模板以夺回身体主权为康复主线。
 const truthAssaultComplexTrauma: TruthTemplate = {
   id: "assault_complex_trauma",
   name: "性侵幸存者复杂创伤",
@@ -3331,12 +3331,12 @@ const truthAssaultComplexTrauma: TruthTemplate = {
           },
           {
             id: "gc5",
-            text: `「这是典型的创伤后反应。你的疼痛、恐惧、解离都是身体在'重演'。我们用稳定化技术先帮你建立安全感。」`,
+            text: `「这是典型的创伤后反应。你的疼痛、恐惧、解离都是身体在'重演'。我们先让身体相信——此刻是安全的。」`,
             kind: "logic",
-            requireSkill: "cbt_basic",
+            requireSkill: "see_through_defense",
             effect: { trust: 20, defense: -14, mood: 8, truth: 26, doctorExp: 32 },
             next: "g18_p3",
-            hint: "需要技能：认知重构",
+            hint: "需要技能：看见防御下的脆弱",
           },
           {
             id: "gc6",
@@ -3355,7 +3355,7 @@ const truthAssaultComplexTrauma: TruthTemplate = {
         choices: [
           {
             id: "gc7",
-            text: `「${n}，听好——我们做三件事。第一，我帮你联系一位受过创伤聚焦培训的治疗师，用EMDR帮你处理那段记忆，让它从'正在发生'变成'曾经发生'；第二，我们一起做一个练习——下次'是我的错'冒出来，你把手放在心口，对自己说：'那不是我的错，我活下来了'；第三，你想不想，由你决定，要不要报案——无论你选哪个，我都在。这是你的身体，你的决定，从来都是。」`,
+            text: `「${n}，听好——我们做三件事。第一，我帮你联系一位受过创伤聚焦培训的治疗师，用创伤聚焦的方法帮你处理那段记忆，让它从'正在发生'变成'曾经发生'；第二，我们一起做一个练习——下次'是我的错'冒出来，你把手放在心口，对自己说：'那不是我的错，我活下来了'；第三，你想不想，由你决定，要不要报案——无论你选哪个，我都在。这是你的身体，你的决定，从来都是。」`,
             kind: "special",
             require: { trust: 55 },
             effect: { trust: 28, mood: 18, truth: 38, doctorReputation: 10, doctorExp: 62, doctorSanity: -8 },
@@ -3364,16 +3364,16 @@ const truthAssaultComplexTrauma: TruthTemplate = {
           },
           {
             id: "gc8",
-            text: `「我们做'叙事重构'——把'是我的错'写下来，再一句一句质问它：证据在哪？谁该负责？慢慢地，你会看见那句话不是真相，是他塞给你的。」`,
+            text: `「我们把'是我的错'这句话写下来，再一句一句质问它：证据在哪？谁该负责？慢慢地，你会看见那句话不是真相，是他塞给你的。」`,
             kind: "special",
-            requireSkill: "free_association",
+            requireSkill: "hold_silence",
             effect: { trust: 22, mood: 14, truth: 30, doctorReputation: 6, doctorExp: 50, doctorSanity: -6 },
             next: "g18_end_awaken",
-            hint: "需要技能：自由联想",
+            hint: "需要技能：接住沉默",
           },
           {
             id: "gc9",
-            text: `「复杂性创伤需要专科创伤治疗（EMDR/CPT）。我这里能做支持性陪伴，但核心处理我帮你转介给创伤治疗师。这不是我接不住你，是你值得更专门的照护。」`,
+            text: `「复杂性创伤需要更专门的创伤治疗。我这里能做支持性陪伴，但核心处理我帮你转介给创伤治疗师。这不是我接不住你，是你值得更专门的照护。」`,
             kind: "logic",
             require: { trust: 45 },
             effect: { trust: 16, mood: 10, truth: 24, doctorExp: 30 },
@@ -3385,7 +3385,7 @@ const truthAssaultComplexTrauma: TruthTemplate = {
       g18_end_cure: {
         id: "g18_end_cure",
         speaker: "narration",
-        text: `一年后，${n}在创伤治疗师那里完成了EMDR。疼痛没有完全消失，但她/他不再怕自己的身体。她/他报了案——不是为了结果，是为了「把这件事从他手里拿回来」。她/他给你寄了张照片：她/他站在海边，张开手臂。配文：「医生，这是我的身体。我学会了说这句话。」`,
+        text: `一年后，${n}在创伤治疗师那里完成了那段治疗。疼痛没有完全消失，但她/他不再怕自己的身体。她/他报了案——不是为了结果，是为了「把这件事从他手里拿回来」。她/他给你寄了张照片：她/他站在海边，张开手臂。配文：「医生，这是我的身体。我学会了说这句话。」`,
         isEnding: true,
         endingType: "cure",
         endingTitle: "治愈结局 · 这是我的身体",

@@ -4,7 +4,7 @@
 .onboarding {
   position: fixed;
   inset: 0;
-  z-index: 95;
+  z-index: 250;
   pointer-events: none;
 }
 .onboarding-mask {
@@ -184,5 +184,44 @@
 @keyframes onboarding-full-in {
   from { opacity: 0; transform: translateY(10px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ===== P4-4 对话玩法速览（DialogueQuickview）· 确认按钮居中 ===== */
+.quickview-actions {
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== P4-4 四维淡显：沿用游戏内 .corner-stats 的视觉语言（默认低对比，hover/长按强化） =====
+   默认：整个速览 stats 区半透明低对比，条/标签进一步降透明，弱化考试感；
+   hover 或触摸长按（:active）时提到全亮 + 轻微放大，与角落四维一致。 */
+.onboarding-full-stats {
+  opacity: 0.72;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.onboarding-full-stats .onboarding-stat-bar { opacity: 0.65; }
+.onboarding-full-stats .onboarding-stat-fill { opacity: 0.55; }
+.onboarding-full-stats .onboarding-stat-label,
+.onboarding-full-stats .onboarding-stat-desc { opacity: 0.72; }
+.onboarding-full-stats:hover,
+.onboarding-full-stats:active {
+  opacity: 1;
+  transform: scale(1.03);
+}
+.onboarding-full-stats:hover .onboarding-stat-bar,
+.onboarding-full-stats:active .onboarding-stat-bar,
+.onboarding-full-stats:hover .onboarding-stat-fill,
+.onboarding-full-stats:active .onboarding-stat-fill,
+.onboarding-full-stats:hover .onboarding-stat-label,
+.onboarding-full-stats:active .onboarding-stat-label,
+.onboarding-full-stats:hover .onboarding-stat-desc,
+.onboarding-full-stats:active .onboarding-stat-desc {
+  opacity: 1;
+}
+.onboarding-stat-fill {
+  transition: width 0.5s ease, opacity 0.25s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-full-stats { transition: none; }
 }
 

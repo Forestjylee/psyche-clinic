@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useGame } from "@/lib/hooks/useGame";
-import { slotPhaseLabel, isNightSlot, MAX_SLOTS } from "@/lib/state/GameState";
+import { slotPhaseLabel, isNightSlot, todayCapacity } from "@/lib/state/GameState";
 
 export function HUD() {
   const { game, scene, expToNext, toggleMute, muted, saveNow, backToTitle, playSound } = useGame();
@@ -14,7 +14,7 @@ export function HUD() {
   const repColor = d.reputation > 60 ? "var(--accent)" : d.reputation > 30 ? "var(--accent-2)" : "var(--text-muted)";
   const phase = slotPhaseLabel(game.slot);
   const night = isNightSlot(game.slot);
-  const slotsFull = game.slot >= MAX_SLOTS;
+  const slotsFull = game.slot >= todayCapacity(game);
 
   return (
     <div className="hud">
@@ -75,7 +75,7 @@ export function HUD() {
           </div>
           <div className="hud-stat-tip">
             <span className="hud-tip-title">金钱 · ${d.money}</span>
-            <span className="hud-tip-line">用途：通过渠道发现客户、购置诊所设施、购买部分技能。</span>
+            <span className="hud-tip-line">用途：参与善意连接、购置诊所设施、购买部分技能。</span>
             <span className="hud-tip-line">获得：接诊收费是主要收入，前台助理每日额外进账，完成成就另有奖金。</span>
           </div>
         </div>
@@ -97,7 +97,7 @@ export function HUD() {
           </div>
           <div className="hud-stat-tip">
             <span className="hud-tip-title">声望 · {d.reputation}</span>
-            <span className="hud-tip-line">用途：决定可接待的高门槛患者，以及高级获客渠道的解锁条件。</span>
+            <span className="hud-tip-line">用途：决定可接待的高门槛患者，以及高级连接方式的解锁条件。</span>
             <span className="hud-tip-line">获得：达成治愈等好结局、完成成就、购置「心理学藏书架」都会提升；流失客户会降低。</span>
           </div>
         </div>
@@ -127,7 +127,7 @@ export function HUD() {
           <span className="hud-phase-icon">{night ? "🌙" : "☀"}</span>
           第 {game.day} 天 · {phase}
           <span className="hud-slot-count">
-            {game.slot}/{MAX_SLOTS}
+            {game.slot}/{todayCapacity(game)}
           </span>
         </div>
         <button

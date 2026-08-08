@@ -1,42 +1,42 @@
 import type { DiscoveryChannel } from "../types";
 
 /**
- * 发现客户：获客渠道数据表（数据驱动，新增渠道只需在此追加一项）。
- * 对应 SPEC.md 3.6「发现客户（主动获客）」。
+ * 善意连接：连接方式数据表（慈善活动/口口相传/家属求助，数据驱动，新增渠道只需在此追加一项）。
+ * 对应 SPEC.md 3.6「善意连接（主动获客）」。
  */
 export const discoveryChannels: DiscoveryChannel[] = [
   {
     id: "flyer",
-    name: "街头发传单",
-    cost: 80,
-    desc: "在街角散发传单，触达大众。成本低，来客随缘。",
+    name: "捐图书角",
+    cost: 30,
+    desc: "在社区角落捐建一个小图书角。善意会慢慢传开。",
     minCount: 1,
     maxCount: 1,
     acceptRate: 0.45,
   },
   {
     id: "radio",
-    name: "本地广播",
-    cost: 200,
-    desc: "投放本地电台广告，覆盖面广，有一定筛选。",
+    name: "资助社区讲座",
+    cost: 80,
+    desc: "资助社区办一场心理讲座。听过的人，深夜会想起你。",
     minCount: 2,
     maxCount: 2,
     acceptRate: 0.55,
   },
   {
     id: "newspaper",
-    name: "报纸专栏",
-    cost: 380,
-    desc: "报纸心理专栏广告，触达中高收入人群。",
+    name: "公益宣传",
+    cost: 150,
+    desc: "参与一场公益宣传，会有家属为家人悄悄来打听。",
     minCount: 2,
     maxCount: 2,
     acceptRate: 0.65,
   },
   {
     id: "referral",
-    name: "老客户转介",
+    name: "治愈者口口相传",
     cost: 0,
-    desc: "由已治愈的患者口碑介绍，质量高。需声望 40。",
+    desc: "被你治愈过的人，会向身边需要帮助的人提起你。需声望 40。",
     minCount: 1,
     maxCount: 1,
     acceptRate: 0.8,

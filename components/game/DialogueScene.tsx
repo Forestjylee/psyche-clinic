@@ -5,12 +5,20 @@ import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import { useGameStore } from "@/lib/store";
 import { DialogueEngine } from "@/lib/engine/DialogueEngine";
-import type { DialogueNode, PatientEmotion, PatientState, MemoryFragment, ActiveSession } from "@/lib/types";
+import type {
+  DialogueNode,
+  DialogueChoice,
+  PatientEmotion,
+  PatientState,
+  MemoryFragment,
+  ActiveSession,
+} from "@/lib/types";
 import { allSkills } from "@/lib/data/skills";
 import { TypewriterText } from "./TypewriterText";
 import { TermText } from "./PsychTermSpan";
 import { emotionColors, emotionLabels } from "./constants";
 import { ChibiCharacter } from "./ChibiCharacter";
+import { DialogueQuickview, TAUGHT_EMPATHY_KEY, TAUGHT_LOCKED_KEY } from "./Onboarding";
 import { CLINIC_LAYOUT } from "./phaser/clinic/clinicLayout";
 import { toEmotionalFloating } from "./floatingEmotion";
 
@@ -50,6 +58,7 @@ export function DialogueScene() {
     finishSession,
     pushFloating,
     playSound,
+    unlockFragment,
   } = useGame();
 
   const engineRef = useRef<DialogueEngine | null>(null);
@@ -62,6 +71,21 @@ export function DialogueScene() {
   // 右上角回顾窗开关（P2-6，非阻塞，可边看边推进剧情）
   const [historyOpen, setHistoryOpen] = useState(false);
   const historyRef = useRef<HTMLDivElement>(null);
+  // P4-4 边做边学：共情/锁定教学浮层状态 + 「帮助」速览开关（只走渲染层，不改引擎）
+  const [empathyHintId, setEmpathyHintId] = useState<string | null>(null);
+  const [lockedHintOn, setLockedHintOn] = useState<string | null>(null);
+  const lockedHintNodeRef = useRef<string | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
+  // P5-3 低理智疲惫句：会话首次进入且理智≤35 时顶部淡入一句（每会话一次，纯提示非阻塞）
+  const [tiredOn, setTiredOn] = useState(false);
+  const tiredRef = useRef(false);
+  // 教学气泡定位（scene 相对坐标）：C1 修复——气泡移出 .dialogue-options 滚动容器，
+  // 作为 .dialogue-scene 直接子级、按目标选项 getBoundingClientRect 换算坐标，避免被 overflow 裁剪
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const [bubblePos, setBubblePos] = useState<{
+    empathy?: { left: number; top: number };
+    locked?: { left: number; top: number };
+  }>({});
 
   useEffect(() => {
     if (!currentPatient) return;
@@ -114,6 +138,7 @@ export function DialogueScene() {
           // 记忆碎片不自动关闭，等待玩家阅读后点击关闭
           setFlashback(frag);
           playSound("memory");
+          unlockFragment(currentPatient.id, frag.id); // P3-1 新增：碎片解锁落库
         },
         onEnding: (ending, title, text, reward) => {
           const s = eng.getState();
@@ -130,6 +155,15 @@ export function DialogueScene() {
     );
     engineRef.current = eng;
     eng.start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPatient]);
+
+  // P5-3 低理智疲惫句：每会话首次进入且理智≤35 时置 on（淡入淡出走 CSS，不走历史、不影响对话流）
+  useEffect(() => {
+    if (currentPatient && game.doctor.sanity <= 35 && !tiredRef.current) {
+      tiredRef.current = true;
+      setTiredOn(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPatient]);
 
@@ -184,6 +218,132 @@ export function DialogueScene() {
 
   const dismissFlashback = () => setFlashback(null);
 
+  /** P4-4：选项是否锁定（前置要求不足或技能缺失），教学浮层与渲染共用同一判定 */
+  const isChoiceLocked = (c: DialogueChoice): boolean => {
+    const s = engineRef.current?.getState();
+    let meets = true;
+    if (c.require && s) {
+      if (c.require.trust !== undefined && s.trust < c.require.trust) meets = false;
+      else if (c.require.defense !== undefined && s.defense > c.require.defense) meets = false;
+      else if (c.require.mood !== undefined && s.mood < c.require.mood) meets = false;
+      else if (c.require.truth !== undefined && s.truth < c.require.truth) meets = false;
+    }
+    const hasSkill = !c.requireSkill || game.skills.includes(c.requireSkill);
+    return !meets || !hasSkill;
+  };
+
+  // 共情教学：node 换了重算——未教过且本节点含「未锁定」共情选项时，提示第一个共情选项。
+  // 点击落标记在 onChoose（点共情→学成；点别的→仅清提示，下个共情节点再弹）。
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!node) return;
+    let taught = false;
+    try {
+      taught = !!localStorage.getItem(TAUGHT_EMPATHY_KEY);
+    } catch {
+      /* 隐私模式/SSR 兜底：当作未教过，正常引导 */
+    }
+    if (taught) {
+      setEmpathyHintId(null);
+      return;
+    }
+    const target = node.choices?.find((c) => c.kind === "empathy" && !isChoiceLocked(c));
+    setEmpathyHintId(target ? target.id : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node]);
+
+  // 锁定教学：node 换了重算——首次从「显示过锁定提示」的节点推进走即落标记（教一次即可）
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!node) return;
+    let taught = false;
+    try {
+      taught = !!localStorage.getItem(TAUGHT_LOCKED_KEY);
+    } catch {
+      /* noop */
+    }
+    if (taught) {
+      lockedHintNodeRef.current = null;
+      setLockedHintOn(null);
+      return;
+    }
+    const shownOn = lockedHintNodeRef.current;
+    if (shownOn != null && shownOn !== node.id) {
+      // 从显示过锁定提示的节点推进 → 视为首次关闭，落标记
+      lockedHintNodeRef.current = null;
+      try {
+        localStorage.setItem(TAUGHT_LOCKED_KEY, "1");
+      } catch {
+        /* noop */
+      }
+      setLockedHintOn(null);
+      return;
+    }
+    const lockedChoice = node.choices?.find((c) => isChoiceLocked(c));
+    if (lockedChoice) {
+      lockedHintNodeRef.current = node.id;
+      setLockedHintOn(lockedChoice.id);
+    } else {
+      setLockedHintOn(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node]);
+
+  /** 锁定提示「知道了」：首次关闭即落标记，之后不再教 */
+  const dismissLockedHint = () => {
+    playSound("click");
+    try {
+      localStorage.setItem(TAUGHT_LOCKED_KEY, "1");
+    } catch {
+      /* noop */
+    }
+    lockedHintNodeRef.current = null;
+    setLockedHintOn(null);
+  };
+
+  // 教学气泡定位：以 .dialogue-scene 为锚，按目标选项 getBoundingClientRect 换算 scene 相对坐标。
+  // 共情气泡在选项左侧、锁定气泡在选项右侧；clamp 防越出视口；resize 时重算。
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+    const compute = () => {
+      const sceneRect = scene.getBoundingClientRect();
+      const GAP = 20;
+      const BUBBLE_W = 186;
+      const clampX = (left: number) =>
+        Math.max(8, Math.min(left, sceneRect.width - BUBBLE_W - 8));
+      const measure = (choiceId: string) => {
+        const el = scene.querySelector<HTMLElement>(
+          `[data-choice-id="${CSS.escape(choiceId)}"]`
+        );
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return {
+          left: r.left - sceneRect.left,
+          right: r.right - sceneRect.left,
+          top: r.top - sceneRect.top + r.height / 2,
+        };
+      };
+      const pos: {
+        empathy?: { left: number; top: number };
+        locked?: { left: number; top: number };
+      } = {};
+      if (empathyHintId) {
+        const m = measure(empathyHintId);
+        if (m) pos.empathy = { left: clampX(m.left - BUBBLE_W - GAP), top: m.top };
+      }
+      if (lockedHintOn) {
+        const m = measure(lockedHintOn);
+        if (m) pos.locked = { left: clampX(m.right + GAP), top: m.top };
+      }
+      setBubblePos(pos);
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node, empathyHintId, lockedHintOn]);
+
   if (!currentPatient || !node) return null;
 
   const meetsRequirement = (require?: {
@@ -211,6 +371,18 @@ export function DialogueScene() {
       playSound("locked");
       return;
     }
+    // P4-4 边做边学：共情教学——点了共情选项即落标记（学成永不再弹）；
+    // 点了非共情选项仅清提示不落标记（下个共情节点再弹一次）
+    if (empathyHintId) {
+      if (c.kind === "empathy") {
+        try {
+          localStorage.setItem(TAUGHT_EMPATHY_KEY, "1");
+        } catch {
+          /* noop */
+        }
+      }
+      setEmpathyHintId(null);
+    }
     playSound("click");
     // 玩家选择的发言进入历史（P2-6 回顾窗用），然后推进剧情
     setHistory((h) => [
@@ -237,7 +409,7 @@ export function DialogueScene() {
   const bubbleName = sp === "patient" ? currentPatient.name : "你";
 
   return (
-    <div className="scene dialogue-scene">
+    <div className="scene dialogue-scene" ref={sceneRef}>
       {/* 底层诊室房间 + 医生坐像（Phaser FIT 铺满） */}
       <ClinicRoomCanvas />
 
@@ -250,6 +422,13 @@ export function DialogueScene() {
 
       {/* FIT 对齐覆盖层：与 Phaser 画布显示区域精确同框（960×540 等比居中） */}
       <div className="clinic-stage">
+        {/* P5-3 低理智疲惫句：顶部中央小字，淡入淡出、pointer-events:none、不入历史 */}
+        {tiredOn ? (
+          <div className="dialogue-tired" role="note">
+            今天……你也有些累了。这场对话结束，早点休息吧。
+          </div>
+        ) : null}
+
         {/* 患者立绘 + 姓名/情绪 tag（emotion 驱动，只走 React） */}
         <div
           className="patient-figure"
@@ -331,6 +510,17 @@ export function DialogueScene() {
         >
           <span aria-hidden="true">⏸</span> 暂停
         </button>
+        <button
+          className="dialogue-help-btn"
+          onClick={() => {
+            playSound("click");
+            setHelpOpen(true);
+          }}
+          aria-label="打开对话玩法速览"
+          title="对话玩法速览回看"
+        >
+          <span aria-hidden="true">❓</span> 帮助
+        </button>
       </div>
 
       {/* 本场对话回顾窗：history 逐行渲染，患者/医生左右镜像 + 配色区分 */}
@@ -365,13 +555,22 @@ export function DialogueScene() {
         </div>
       ) : null}
 
+      {/* 对话玩法速览回看（P4-4 帮助入口）：模态面板，关闭后会话零改动、对话原样继续 */}
+      {helpOpen ? (
+        <DialogueQuickview
+          onClose={() => {
+            playSound("click");
+            setHelpOpen(false);
+          }}
+        />
+      ) : null}
+
       {/* 底部：候选对话 / 继续 */}
       <div className="dialogue-options">
         {node.isEnding ? null : node.choices && node.choices.length > 0 ? (
           node.choices.map((c) => {
-            const meets = meetsRequirement(c.require);
+            const locked = isChoiceLocked(c);
             const hasSkill = !c.requireSkill || game.skills.includes(c.requireSkill);
-            const locked = !meets || !hasSkill;
             const skillName = c.requireSkill
               ? allSkills.find((s) => s.id === c.requireSkill)?.name
               : null;
@@ -383,6 +582,7 @@ export function DialogueScene() {
             return (
               <button
                 key={c.id}
+                data-choice-id={c.id}
                 className={`choice ${locked ? "choice-locked" : ""}`}
                 disabled={locked}
                 onClick={() => onChoose(c.id)}
@@ -407,6 +607,32 @@ export function DialogueScene() {
           </button>
         )}
       </div>
+
+      {/* 教学浮层（P4-4）：.dialogue-scene 直接子级、按选项 rect 定位（C1：不放进选项滚动容器，
+          否则被 overflow-y:auto 裁剪）；纯提示非阻塞——共情 pointer-events:none，锁定仅「知道了」可点 */}
+      {empathyHintId && bubblePos.empathy ? (
+        <div
+          className="teach-bubble teach-empathy"
+          role="note"
+          style={{ left: bubblePos.empathy.left, top: bubblePos.empathy.top }}
+        >
+          这是共情——一句温和的话，让对方放松，愿意多说一点。
+        </div>
+      ) : null}
+      {lockedHintOn && bubblePos.locked ? (
+        <div
+          className="teach-bubble teach-locked"
+          role="note"
+          style={{ left: bubblePos.locked.left, top: bubblePos.locked.top }}
+        >
+          <span className="teach-locked-text">
+            这个选项还锁着——要么满足前置条件，要么学会对应的话术。
+          </span>
+          <button className="teach-gotit" onClick={dismissLockedHint}>
+            知道了
+          </button>
+        </div>
+      ) : null}
 
       {flashback ? (
         <div className="memory-flash" role="dialog" aria-label="记忆碎片">

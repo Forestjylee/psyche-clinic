@@ -537,14 +537,14 @@ export const patientB: PatientScenario = {
           id: "b15",
           text: "「其实……我有个朋友是侦探。这种事，他比警察好使。」",
           kind: "special",
-          requireSkill: "crisis_intervention",
+          requireSkill: "hold_through_crisis",
           effect: { trust: 20, truth: 40, doctorReputation: 5, doctorExp: 50 },
           next: "b_end_hidden",
-          hint: "需要技能：危机干预",
+          hint: "需要技能：在崩溃边缘陪住 ta",
         },
         {
           id: "b14b",
-          text: "「我建议您还是住院观察一段时间。幻觉史不算短，稳妥起见，接受系统治疗最保险。」",
+          text: "「我建议您还是住院观察一段时间。幻觉史不算短，稳妥起见，接受更全面专业的治疗最保险。」",
           kind: "confront",
           effect: { trust: -18, defense: 20, mood: -12 },
           next: "b_end_worsen",
@@ -641,7 +641,7 @@ export const patientC: PatientScenario = {
         },
         {
           id: "c2",
-          text: "「失眠很常见。我给你开点助眠药，先让你能睡。」",
+          text: "「失眠很常见。我先开点药，让你能睡。」",
           kind: "prescribe",
           effect: { mood: 10, doctorMoney: 50 },
           next: "c_p2_med",
@@ -733,4 +733,274 @@ export const patientC: PatientScenario = {
   },
 };
 
-export const allPatients: PatientScenario[] = [patientC, patientA, patientB];
+// ========== 引导患者：第一位来访者 小北（P4-5 首诊机制保障）==========
+// 与玩家序章「burnout（承认疲惫）/ breath（想推开一扇窗）」两个背景镜像：
+// 刚裸辞的年轻人，让玩家看到「有人和我曾一样被困住」。剧本只有 cure/acceptance 两种结局，
+// 无任何可导向坏结局的选项分支（首诊不可选恶化分支）；结局文案纸木温暖。
+export const GUIDED_PATIENT_ID = "xiao_bei";
+
+export const patientG: PatientScenario = {
+  id: GUIDED_PATIENT_ID,
+  name: "小北",
+  title: "26岁 · 刚裸辞",
+  intro: "面试完第 12 家公司，他在楼下长椅坐了很久，忽然不想再去了。",
+  surface: "失眠、迷茫，被所有人说「疯了」。",
+  truth: "长期活在比较里，从未被允许停下来；辞职是他第一次为自己做决定。",
+  palette: {
+    primary: "#f0a868",
+    secondary: "#d98a5a",
+    fog: "#3a2415",
+    bright: "#ffe0b0",
+  },
+  initialState: {
+    trust: 35,
+    defense: 20,
+    mood: 45,
+    truth: 0,
+    round: 0,
+  },
+  baseReward: 180,
+  difficulty: "简单",
+  requireReputation: 0,
+  startNode: "x_start",
+  memoryFragments: [
+    {
+      id: "xiao_m1",
+      trigger: { truth: 25 },
+      title: "饭桌上的比较",
+      text: "从小到大，饭桌上总有一句：「你看看人家。」我考了第九名，别人问第七名为什么不是我；我进了大厂，别人问什么时候买房。我拼了命往前跑，跑到忘了自己为什么跑。可我从没问过，那个「别人」，是不是也想停下来喘口气。",
+      emotion: "sad",
+    },
+    {
+      id: "xiao_m2",
+      trigger: { truth: 55 },
+      title: "长椅上的下午",
+      text: "交辞呈那天，我在楼下长椅坐了很久。手机震个不停——同事问稿子，领导问交接，妈妈问周末回不回家吃饭。我把手机调成静音，阳光落在手背上，暖洋洋的。我忽然想起来，我已经三年，没有这样安静地坐过十分钟了。原来停下来，天不会塌，云还在慢慢走。",
+      emotion: "calm",
+    },
+  ],
+  dialogues: {
+    x_start: {
+      id: "x_start",
+      speaker: "patient",
+      text: "医生，我没病，真的。我就是……上个月把工作辞了。所有人都说我疯了——房贷没还完、五险一金断缴、别人都在往上爬，就我一个人往后退。可我辞职那天，是我三年来头一次睡着觉。您说，我是不是真的疯了？",
+      emotion: "anxious",
+      choices: [
+        {
+          id: "x1",
+          text: "「一个三年没睡过整觉的人，辞职后能睡着了——这恰恰说明，是原来的生活让你病了。」",
+          kind: "empathy",
+          effect: { trust: 10, defense: -8, mood: 5 },
+          next: "x_p1",
+        },
+        {
+          id: "x2",
+          text: "「你辞的，是一份什么样的工作？」",
+          kind: "probe",
+          effect: { trust: 5, defense: -3 },
+          next: "x_p1",
+        },
+        {
+          id: "x3",
+          text: "「裸辞确实需要勇气，但也有人会觉得冲动。你考虑过后路吗？」",
+          kind: "logic",
+          effect: { trust: -5, defense: 8, mood: -5 },
+          next: "x_p1_def",
+        },
+      ],
+    },
+    x_p1_def: {
+      id: "x_p1_def",
+      speaker: "patient",
+      text: "（他苦笑）怎么没考虑过。存款我算过了，够撑一年。可我辞职第二天，我妈就打电话来，说别人家孩子都在还房贷，就我在「瞎折腾」。我是不是太自私了？",
+      emotion: "sad",
+      autoNext: "x_p1",
+    },
+    x_p1: {
+      id: "x_p1",
+      speaker: "patient",
+      text: "我在一家设计公司干了四年。改不完的稿，回不完的消息，凌晨两点的写字楼。我也不知道从哪天开始，我活成了别人眼里的「还不错的年轻人」，却越来越不像我自己。",
+      emotion: "neutral",
+      choices: [
+        {
+          id: "x4",
+          text: "「为了活成『别人眼里的样子』，你把真正的自己藏起来了。现在你想把他找回来，对吗？」",
+          kind: "empathy",
+          effect: { trust: 15, defense: -10, truth: 10 },
+          next: "x_p2_open",
+        },
+        {
+          id: "x5",
+          text: "「你有技能、有存款。裸辞其实不是终点，是给了自己一个重新选的机会。」",
+          kind: "logic",
+          effect: { trust: 5, mood: 5 },
+          next: "x_p2_normal",
+        },
+        {
+          id: "x6",
+          text: "（把温热的茶轻轻推过去，等他继续说）",
+          kind: "silence",
+          effect: { trust: 8, defense: -5, mood: 3 },
+          next: "x_p2_open",
+        },
+      ],
+    },
+    x_p2_normal: {
+      id: "x_p2_normal",
+      speaker: "patient",
+      text: "……重新选。可我除了改稿，不知道自己还会什么。我有点怕，怕自己辞职一年后，还是一事无成，连「别人家的孩子」都做不成了。",
+      emotion: "scared",
+      choices: [
+        {
+          id: "x7",
+          text: "「『别人家的孩子』做不成，那做你自己，不好吗？」",
+          kind: "empathy",
+          effect: { trust: 10, defense: -8, truth: 10 },
+          next: "x_p2_open",
+        },
+        {
+          id: "x8",
+          text: "「辞职那刻的心情，你还记得吗？从那个决定里，你或许能找到答案。」",
+          kind: "probe",
+          effect: { trust: 10, truth: 15 },
+          next: "x_p2_open",
+        },
+      ],
+    },
+    x_p2_open: {
+      id: "x_p2_open",
+      speaker: "patient",
+      text: "（他低下头，声音轻了很多）我其实……是想画画。小时候我特别爱画画，画什么像什么。可我妈说「画画能当饭吃吗」，我就再也没画过。辞职那天，我鬼使神差买了一套水彩。可我把盒子打开就哭了——我不知道该画什么。我太久没有为自己活过了。",
+      emotion: "sad",
+      choices: [
+        {
+          id: "x9",
+          text: "「你会买那套水彩，不是鬼使神差，是那个被藏起来的你在跟你打招呼。」",
+          kind: "empathy",
+          effect: { trust: 20, defense: -15, mood: 10, truth: 20 },
+          next: "x_p3_truth",
+        },
+        {
+          id: "x10",
+          text: "「你哭，不是怕画不好——你是怕辜负那套水彩，也怕辜负终于敢停下来的自己。」",
+          kind: "confront",
+          require: { trust: 40 },
+          effect: { trust: 15, truth: 25 },
+          next: "x_p3_truth",
+          hint: "需要信任≥40",
+        },
+        {
+          id: "x11",
+          text: "「辞职不是终点，你只是把方向盘拿回了自己手里。接下来想开去哪，慢慢想，来得及。」",
+          kind: "logic",
+          effect: { trust: 5, mood: 8 },
+          next: "x_p3_calm",
+        },
+      ],
+    },
+    x_p3_calm: {
+      id: "x_p3_calm",
+      speaker: "patient",
+      text: "（他愣了愣）把方向盘拿回自己手里……我妈要是听见您这么说，估计得炸。但您说得对，辞都辞了，与其后悔，不如想想这一年到底想怎么活。",
+      emotion: "calm",
+      choices: [
+        {
+          id: "x12",
+          text: "「辞职那天，你在楼下长椅坐了很久。那时候，你在想什么？」",
+          kind: "probe",
+          effect: { trust: 10, truth: 15 },
+          next: "x_p3_truth",
+        },
+        {
+          id: "x13",
+          text: "「不用急着想清楚。允许自己慢一点，这一年就当作是给自己放的长假。」",
+          kind: "logic",
+          effect: { trust: 10, mood: 8 },
+          next: "x_end_acceptance",
+        },
+      ],
+    },
+    x_p3_truth: {
+      id: "x_p3_truth",
+      speaker: "patient",
+      text: "（他望着窗外，声音很轻）辞职那天，我在楼下长椅坐了很久。以前我总觉得，停下来就是掉队——别人都在往前跑，我凭什么停。可那天太阳特别好，我忽然觉得，原来停下来，天也不会塌。",
+      emotion: "calm",
+      choices: [
+        {
+          id: "x14",
+          text: "「你活了二十六年，第一次允许自己停下来。这不是掉队，是你开始为自己活了。」",
+          kind: "empathy",
+          effect: { trust: 15, mood: 10, truth: 15 },
+          next: "x_p4_truth",
+        },
+        {
+          id: "x15",
+          text: "「阳光落在手背上的那一刻，你心里冒出来的那个念头，是什么？」",
+          kind: "probe",
+          effect: { trust: 10, truth: 20 },
+          next: "x_p4_truth",
+        },
+      ],
+    },
+    x_p4_truth: {
+      id: "x_p4_truth",
+      speaker: "patient",
+      text: "（他抬起眼，眼睛有点亮）我想用这一年，把画画捡起来。画什么不知道，可能画得一团糟。但我想试试——哪怕最后什么都没画出来，我也算，为自己活过一年。",
+      emotion: "happy",
+      choices: [
+        {
+          id: "x16",
+          text: "「我不是要给你开药。我想告诉你——你的存款、你的时间、你重新燃起的那点想画画的心，都是你给自己开的『方子』。去吧。」",
+          kind: "special",
+          effect: { trust: 20, mood: 20, truth: 20, doctorExp: 30 },
+          next: "x_end_cure",
+        },
+        {
+          id: "x17",
+          text: "「能说出这句话的你，和那个只敢在深夜偷偷想辞职的你，已经不一样了。我为你高兴。」",
+          kind: "empathy",
+          effect: { trust: 15, mood: 15 },
+          next: "x_end_cure",
+        },
+        {
+          id: "x18",
+          text: "「不用急着当画家。这一年，你只需要允许自己停下来，允许自己画得不好，允许自己慢慢想清楚要什么。」",
+          kind: "logic",
+          effect: { trust: 10, mood: 10 },
+          next: "x_end_acceptance",
+        },
+      ],
+    },
+    x_end_cure: {
+      id: "x_end_cure",
+      speaker: "narration",
+      text: "（半年后）小北寄来一张明信片：一片很大的天空，远处有山，近处是半截画到一半的水彩——一棵树，树下坐着一个穿卫衣的人。背面只写了一句：医生，谢谢你那天没有对我说「想开点」。我画完了。",
+      isEnding: true,
+      endingType: "cure",
+      endingTitle: "治愈结局 · 第一张水彩",
+      endingText: "小北用一年时间，把丢掉二十年的画笔捡了回来。他寄来的明信片被裱在诊室墙上——那是你的第一位来访者，为你画的天空。",
+      endingReward: { doctorReputation: 6, doctorMoney: 200, doctorExp: 40, doctorSanity: 6 },
+    },
+    x_end_acceptance: {
+      id: "x_end_acceptance",
+      speaker: "narration",
+      text: "（三个月后）小北又来了一次，没有预约，就坐在候诊室等你下班。他说：医生，我这三个月什么「大事」都没干成，但每天会画两笔，画得很烂，可我心里是安定的。我大概还没找到方向，但至少，我不再怕停下来了。",
+      isEnding: true,
+      endingType: "acceptance",
+      endingTitle: "接纳结局 · 停下来的资格",
+      endingText: "小北没有一夜之间成为画家，但他学会了允许自己停下来。有些答案不用急着找——能安心地坐在原地，本身就是一种前进。",
+      endingReward: { doctorReputation: 4, doctorMoney: 180, doctorExp: 30, doctorSanity: 5 },
+    },
+  },
+  returnDialogue: {
+    title: "小北的回访",
+    lines: [
+      { speaker: "patient", text: "医生，我今天去画室上了第一节课。我画了一只鸟，飞得歪歪扭扭的，老师居然说很有灵气。", emotion: "happy" },
+      { speaker: "patient", text: "你看，就是这只。以前我总觉得，做不好就不配开始。现在我知道了——不完美的人，也配拥有自己的画。", emotion: "happy" },
+      { speaker: "doctor", text: "它不是飞得歪，它是刚开始学飞。你也是。" },
+      { speaker: "patient", text: "（笑了）对，我也是。谢谢您，医生。", emotion: "calm" },
+    ],
+  },
+};
+
+export const allPatients: PatientScenario[] = [patientG, patientC, patientA, patientB];

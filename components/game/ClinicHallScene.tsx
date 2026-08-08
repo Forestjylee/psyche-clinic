@@ -7,6 +7,7 @@ import { ClinicHall } from "./ClinicHall";
 import { ClinicUpgrades } from "./ClinicUpgrades";
 import { bridge, EVENTS } from "@/lib/bridge/EventBridge";
 import type {
+  DecorDroppedEvent,
   FacilityDroppedEvent,
   PatientClickedEvent,
 } from "@/lib/bridge/types";
@@ -31,6 +32,14 @@ export function ClinicHallScene() {
   // 订阅 game 引用：数据变更（接诊/休息/生成等）→ 通知 Phaser 刷新候诊小人
   const gameRef = useGameStore((s) => s.game);
 
+  // 首启引导 → 自动打开预约清单（spotlight 目标在清单弹层内）
+  useEffect(() => {
+    const off = bridge.on(EVENTS.openAppointmentList, () => {
+      setListOpen(true);
+    });
+    return off;
+  }, []);
+
   // 玩家点击场景设施 → 打开升级面板
   useEffect(() => {
     const off = bridge.on(EVENTS.facilityClicked, () => {
@@ -43,6 +52,14 @@ export function ClinicHallScene() {
   useEffect(() => {
     const off = bridge.on(EVENTS.facilityDropped, (e: FacilityDroppedEvent) => {
       useGameStore.getState().setFacilityPosition(e.id, e.x, e.y);
+    });
+    return off;
+  }, []);
+
+  // 装修模式落格（花/画）→ 持久化位置（P5-1）
+  useEffect(() => {
+    const off = bridge.on(EVENTS.decorDropped, (e: DecorDroppedEvent) => {
+      useGameStore.getState().setDecorPosition(e.id, e.x, e.y);
     });
     return off;
   }, []);

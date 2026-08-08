@@ -1,7 +1,7 @@
 "use client";
 
 import { useGame } from "@/lib/hooks/useGame";
-import { allPatients } from "@/lib/data/patients";
+import { allPatients, GUIDED_PATIENT_ID } from "@/lib/data/patients";
 import { allSkills, allClinicUpgrades } from "@/lib/data/skills";
 import { allAchievements } from "@/lib/data/achievements";
 import { endingColor, endingLabel, endingEmotion } from "./constants";
@@ -11,6 +11,7 @@ import {
   DECAY_START_DAY,
   WARN_DAY,
   ABANDON_DAY,
+  firstSessionDone,
 } from "@/lib/state/GameState";
 
 export function ClinicHall() {
@@ -19,6 +20,7 @@ export function ClinicHall() {
     startSession,
     setScene,
     restOneDay,
+    spendTimeInGarden,
     playSound,
     expToNext,
     achievementEngine,
@@ -29,21 +31,33 @@ export function ClinicHall() {
   const allAvailable = [...allPatients, ...game.generatedScenarios].filter(
     (p) => !game.abandoned.includes(p.id)
   );
-  // 可对话：未完成且声望已解锁，或治愈回访已到访（探望非治疗）
+  // 首诊机制保障（P4-5）：任何患者完成一次接诊即首诊完成；完成前除引导患者外全部锁定
+  const firstUnlocked = firstSessionDone(game);
+  // 有断点的患者（activeSession）：即使今日已接诊也保留在清单，供「继续上次」
+  const resumableId = game.activeSession?.patientId ?? null;
+  // 引导患者锁定：首诊未完成时，非引导患者不可接诊（day-1 队列锁定）；
+  // 断点患者豁免（评审修复）：可正常「继续上次」，不影响首诊锁定（断点只能来自已开始的会话）
+  const guidedLocked = (p: (typeof allAvailable)[number]) =>
+    p.id !== GUIDED_PATIENT_ID && !firstUnlocked && resumableId !== p.id;
+  // 可对话：未完成且声望已解锁、且未被首诊锁定，或治愈回访已到访（探望非治疗）
   const canTalk = (p: (typeof allAvailable)[number]) => {
     if (!game.patientRecords[p.id]) {
+      if (guidedLocked(p)) return false;
       if (p.requireReputation && game.doctor.reputation < p.requireReputation)
         return false;
       return true;
     }
     return !!game.returnVisits[p.id]?.arrived && !game.returnVisits[p.id]?.seen;
   };
-  // 有断点的患者（activeSession）：即使今日已接诊也保留在清单，供「继续上次」
-  const resumableId = game.activeSession?.patientId ?? null;
   // 首页清单：今日已接诊的客户隐藏（次日恢复，断点患者除外）；可对话的客户优先排顶部
   const sortedAvailable = allAvailable
     .filter((p) => resumableId === p.id || !game.todayServed.includes(p.id))
-    .sort((a, b) => Number(canTalk(b)) - Number(canTalk(a)));
+    .sort((a, b) => {
+      const byTalk = Number(canTalk(b)) - Number(canTalk(a));
+      if (byTalk !== 0) return byTalk;
+      // 引导患者（第一位来访者）恒置顶
+      return Number(b.id === GUIDED_PATIENT_ID) - Number(a.id === GUIDED_PATIENT_ID);
+    });
   const totalPatients = allAvailable.length;
   const achCount = achievementEngine
     ? Object.values(achievementEngine.getProgressMap()).filter((p) => p.unlocked).length
@@ -63,7 +77,7 @@ export function ClinicHall() {
       openReturnVisit(p.id);
       return;
     }
-    const locked = p.requireReputation ? game.doctor.reputation < p.requireReputation : false;
+    const locked = guidedLocked(p) || (p.requireReputation ? game.doctor.reputation < p.requireReputation : false);
     const servedToday = game.todayServed.includes(p.id);
     const resuming = resumableId === p.id;
     if (locked) {
@@ -108,7 +122,7 @@ export function ClinicHall() {
                 playSound("page");
                 setScene("discover");
               }}
-              title="花钱通过渠道触达潜在客户，主动邀约"
+              title="付出一点善意，让需要你的人找到你"
             >
               ＋ 发现客户
             </button>
@@ -126,9 +140,8 @@ export function ClinicHall() {
               const rv = game.returnVisits[p.id];
               const returning = !!rv?.arrived && !rv.seen;
               const resuming = resumableId === p.id;
-              const locked = p.requireReputation
-                ? game.doctor.reputation < p.requireReputation
-                : false;
+              const firstSessionLocked = guidedLocked(p);
+              const locked = firstSessionLocked || (p.requireReputation ? game.doctor.reputation < p.requireReputation : false);
               const servedToday = game.todayServed.includes(p.id);
               const waitDays = game.waitingDays[p.id] ?? 0;
               const alive = !completed && !locked;
@@ -170,10 +183,15 @@ export function ClinicHall() {
                       ) : null}
                     </div>
                     <div className="patient-title">{p.title}</div>
+                    {p.id === GUIDED_PATIENT_ID && !completed ? (
+                      <div className="patient-guide-tag">第一位来访者</div>
+                    ) : null}
                     <div className="patient-intro">{p.intro}</div>
                     {locked ? (
                       <div className="patient-locked-tag">
-                        需要声望 {p.requireReputation}（当前 {game.doctor.reputation}）
+                        {firstSessionLocked
+                          ? "先见见今天的第一位来访者"
+                          : `需要声望 ${p.requireReputation}（当前 ${game.doctor.reputation}）`}
                       </div>
                     ) : null}
                     {resuming ? (
@@ -261,6 +279,13 @@ export function ClinicHall() {
               guide="rest"
               className={game.doctor.sanity < 50 ? "rest-low" : undefined}
               onClick={restOneDay}
+            />
+            <SideBtn
+              label="花园待一会"
+              right="理智 +5"
+              rightClass={`rest-side-tag ${game.gardenDay === game.day ? "done" : game.doctor.sanity < 50 ? "low" : ""}`}
+              className={game.gardenDay === game.day ? "garden-done" : game.doctor.sanity < 50 ? "rest-low" : undefined}
+              onClick={spendTimeInGarden}
             />
           </div>
           <div className="side-card">

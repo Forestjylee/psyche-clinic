@@ -7,17 +7,15 @@ import { allSkills } from "@/lib/data/skills";
 import type { Skill, SkillSchool } from "@/lib/types";
 
 const schoolNames: Record<SkillSchool, string> = {
-  psychoanalysis: "精神分析学派",
-  cbt: "认知行为学派",
-  hypnosis: "催眠学派",
-  pharmacology: "药物学派",
+  gentle: "更温柔",
+  sharp: "更敏锐",
+  firm: "更坚定",
 };
 
 const schoolDescriptions: Record<SkillSchool, string> = {
-  psychoanalysis: "由梦境与潜意识入手，触及心灵深处的症结。",
-  cbt: "用理性对话重塑认知，直面非理性信念。",
-  hypnosis: "引导与暗示，深入意识的深水区。",
-  pharmacology: "以药物辅助治疗，缓解顽固症状。",
+  gentle: "你接住 ta 的情绪，让 ta 愿意慢下来、说出来。",
+  sharp: "你看得清 ta 在回避什么，也敢陪 ta 走进最害怕的地方。",
+  firm: "在 ta 迷茫时给出方向，稳稳托住。",
 };
 
 /* —— 线描图标（SVG 手绘，统一 stroke 风格）—— */
@@ -29,43 +27,37 @@ const ico = {
   strokeLinejoin: "round",
 } as const;
 
-// 学派图标（流派单选胶囊）
+// 风格图标（陪伴风格单选胶囊）
 const schoolIcons: Record<SkillSchool, ReactNode> = {
-  psychoanalysis: (
+  gentle: (
     <svg viewBox="0 0 24 24" {...ico}>
       <path d="M7.5 10a4.5 4.5 0 0 1 4.5-4.5c2 0 3.7 1.4 4.2 3.3a3.8 3.8 0 0 1 .3 5.2H8.2A3.5 3.5 0 0 1 7.5 10Z" />
       <path d="M12 3.5 12.7 5l1.5.7-1.5.7L12 7.9l-.7-1.5-1.5-.7 1.5-.7Z" />
     </svg>
   ),
-  cbt: (
+  sharp: (
     <svg viewBox="0 0 24 24" {...ico}>
       <circle cx="12" cy="12" r="3.2" />
       <path d="M12 4.5v2.2M12 17.3v2.2M4.5 12h2.2M17.3 12h2.2M6.5 6.5l1.6 1.6M15.9 15.9l1.6 1.6M17.5 6.5l-1.6 1.6M8.1 15.9l-1.6 1.6" />
     </svg>
   ),
-  hypnosis: (
+  firm: (
     <svg viewBox="0 0 24 24" {...ico}>
       <path d="M13 5a7 7 0 1 1-7 7 7 7 0 0 1 7-7Z" />
       <path d="M13 9a3 3 0 1 0 3 3 3 3 0 0 0-3-3Z" />
-    </svg>
-  ),
-  pharmacology: (
-    <svg viewBox="0 0 24 24" {...ico}>
-      <rect x="7" y="3" width="10" height="18" rx="5" />
-      <path d="M7 9.5h10" />
     </svg>
   ),
 };
 
 // 技能专属图标（技能树节点）
 const skillIcons: Record<string, ReactNode> = {
-  freud_dream: (
+  make_ta_safe: (
     <svg viewBox="0 0 24 24" {...ico}>
       <path d="M7.5 10a4.5 4.5 0 0 1 4.5-4.5c2 0 3.7 1.4 4.2 3.3a3.8 3.8 0 0 1 .3 5.2H8.2A3.5 3.5 0 0 1 7.5 10Z" />
       <path d="M12 3.5 12.7 5l1.5.7-1.5.7L12 7.9l-.7-1.5-1.5-.7 1.5-.7Z" />
     </svg>
   ),
-  free_association: (
+  hold_silence: (
     <svg viewBox="0 0 24 24" {...ico}>
       <circle cx="6" cy="6" r="2" />
       <circle cx="18" cy="6" r="2" />
@@ -73,43 +65,43 @@ const skillIcons: Record<string, ReactNode> = {
       <path d="M7.4 7.4l3.2 9.2M16.6 7.4l-3.2 9.2" />
     </svg>
   ),
-  cbt_basic: (
+  see_through_defense: (
     <svg viewBox="0 0 24 24" {...ico}>
       <circle cx="12" cy="12" r="3.2" />
       <path d="M12 4.5v2.2M12 17.3v2.2M4.5 12h2.2M17.3 12h2.2M6.5 6.5l1.6 1.6M15.9 15.9l1.6 1.6M17.5 6.5l-1.6 1.6M8.1 15.9l-1.6 1.6" />
     </svg>
   ),
-  exposure_therapy: (
+  face_fear: (
     <svg viewBox="0 0 24 24" {...ico}>
       <circle cx="12" cy="12" r="4" />
       <path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6" />
     </svg>
   ),
-  hypnosis_basic: (
+  guide_firmly: (
     <svg viewBox="0 0 24 24" {...ico}>
       <path d="M13 5a7 7 0 1 1-7 7 7 7 0 0 1 7-7Z" />
       <path d="M13 9a3 3 0 1 0 3 3 3 3 0 0 0-3-3Z" />
     </svg>
   ),
-  hypnosis_deep: (
+  toward_truth: (
     <svg viewBox="0 0 24 24" {...ico}>
       <path d="M3.5 12c2-4 5-6 8.5-6s6.5 2 8.5 6c-2 4-5 6-8.5 6s-6.5-2-8.5-6Z" />
       <circle cx="12" cy="12" r="2.5" />
     </svg>
   ),
-  pharma_basic: (
+  hold_steady: (
     <svg viewBox="0 0 24 24" {...ico}>
       <rect x="7" y="3" width="10" height="18" rx="5" />
       <path d="M7 9.5h10" />
     </svg>
   ),
-  new_drug: (
+  another_way: (
     <svg viewBox="0 0 24 24" {...ico}>
       <path d="M9.5 3h5M10.5 3v5l-4.2 9.2a2 2 0 0 0 1.8 2.8h7.8a2 2 0 0 0 1.8-2.8L13.5 8V3" />
       <path d="M8.6 15h6.8M12 11.5v3" />
     </svg>
   ),
-  crisis_intervention: (
+  hold_through_crisis: (
     <svg viewBox="0 0 24 24" {...ico}>
       <path d="M12 3l6.5 2.8v5.2c0 4.3-2.8 7.4-6.5 9-3.7-1.6-6.5-4.7-6.5-9V5.8Z" />
       <path d="M9.5 12h5M12 9.5v5" />
@@ -195,9 +187,9 @@ function buildTree(
 
 export function SkillsTree() {
   const { game, learnSkill, setScene, playSound, expToNext } = useGame();
-  const schools: SkillSchool[] = ["psychoanalysis", "cbt", "hypnosis", "pharmacology"];
+  const schools: SkillSchool[] = ["gentle", "sharp", "firm"];
   const unlockedIds = new Set(game.skills);
-  const [school, setSchool] = useState<SkillSchool>("psychoanalysis");
+  const [school, setSchool] = useState<SkillSchool>("gentle");
 
   return (
     <div className="scene panel-view">
@@ -212,11 +204,11 @@ export function SkillsTree() {
       </button>
       <h2>技 能 树</h2>
       <p className="subtitle">
-        通过接诊积累经验，习得不同流派的诊疗技艺。当前 EXP：{game.doctor.exp} /{" "}
+        通过接诊积累经验，学会不同的倾听与陪伴方式。当前 EXP：{game.doctor.exp} /{" "}
         {expToNext(game.doctor.level)}
       </p>
 
-      {/* 流派单选：先选流派，再展示对应技能树 */}
+      {/* 陪伴风格单选：先选风格，再展示对应技能树 */}
       <div className="tech-school-picker">
         {schools.map((s) => {
           const skills = allSkills.filter((x) => x.school === s);

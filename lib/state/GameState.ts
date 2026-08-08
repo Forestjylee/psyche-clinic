@@ -6,12 +6,13 @@ import type {
   EndingType,
 } from "../types";
 import { saveGameState, loadGameState, clearGameState } from "./Storage";
+import { SKILL_ID_MIGRATIONS } from "../data/skills";
 
 // ============================================================
 // 时间系统常量
 // ============================================================
-/** 一天最多接待的患者数（每次会话深入，一天限 3 位，保证体验深度） */
-export const MAX_SLOTS = 3;
+/** 一天最多接待的患者数（动态容量上限，一天最多 5 位，保证体验深度） */
+export const MAX_SLOTS = 5;
 /** 等待满 N 天开始「病情加重」 */
 export const DECAY_START_DAY = 2;
 /** 等待满 N 天弹窗提醒 */
@@ -159,6 +160,12 @@ export function createInitialState(): GameState {
     discoveryCandidates: [],
     pendingArrivals: [],
     facilityPositions: {},
+    facilityDecors: {},
+    unlockedDecors: [],
+    placedDecors: [],
+    decorPositions: {},
+    sessionSinceRest: 0,
+    gardenDay: 0,
     stats: {
       discoverCount: 0,
       channelsUsed: [],
@@ -171,6 +178,7 @@ export function createInitialState(): GameState {
       noLossDays: 0,
       sanityStreak: 0,
     },
+    unlockedFragments: {},
     activeSession: null,
   };
 }
@@ -192,8 +200,18 @@ export function migrateGameState(data: GameState): GameState {
   if (!Array.isArray(data.pendingArrivals)) data.pendingArrivals = [];
   // 装修模式：设施位置（旧存档补默认空）
   if (!data.facilityPositions) data.facilityPositions = {};
+  // 装修（P5-1）：设施外观变体 / 解锁装饰 / 摆放装饰 / 装饰位置（旧存档补默认空）
+  if (!data.facilityDecors) data.facilityDecors = {};
+  if (!Array.isArray(data.unlockedDecors)) data.unlockedDecors = [];
+  if (!Array.isArray(data.placedDecors)) data.placedDecors = [];
+  if (!data.decorPositions) data.decorPositions = {};
+  // 理智（P5-3）：连续接诊计数 / 花园使用日（旧存档补默认 0）
+  if (data.sessionSinceRest === undefined) data.sessionSinceRest = 0;
+  if (data.gardenDay === undefined) data.gardenDay = 0;
   // 会话断点快照（旧存档补默认 null）
   if (!data.activeSession) data.activeSession = null;
+  // 档案图鉴：已解锁记忆碎片（旧存档补默认空，P3-1）
+  if (!data.unlockedFragments) data.unlockedFragments = {};
   // 成就统计（旧存档补默认）
   if (!data.stats) {
     data.stats = {
@@ -209,6 +227,9 @@ export function migrateGameState(data: GameState): GameState {
       sanityStreak: 0,
     };
   }
+  // 技能（P6-1）：旧技能 id → 新能力 id 映射迁移，防技能引用悬空（PRD §7 不丢档）
+  if (!Array.isArray(data.skills)) data.skills = [];
+  else data.skills = data.skills.map((s) => SKILL_ID_MIGRATIONS[s] ?? s);
   return data;
 }
 
@@ -280,6 +301,32 @@ export function clamp(value: number, min = 0, max = 100): number {
 }
 
 // ============================================================
+// 首诊机制保障（P4-5）：玩家第一次接诊必须是「成功、温暖、有意义」的
+// 纯函数，只依赖 patientRecords 参数，不 import lib/data（保持数据层序）
+// ============================================================
+
+/** 首诊是否已完成：任何患者完成过一次接诊即首诊完成（暂停断点 activeSession 不计入） */
+export function firstSessionDone(
+  g: Pick<GameState, "patientRecords">
+): boolean {
+  return Object.keys(g.patientRecords).length > 0;
+}
+
+/**
+ * 首诊结局 clamp：首诊未完成时，恶化/悲剧结局改判为「接纳」（PRD 场景1），
+ * 保证第一次体验是成功、温暖的；首诊完成后原样返回，不影响后续诊疗自由度。
+ */
+export function clampFirstSessionEnding(
+  g: Pick<GameState, "patientRecords">,
+  ending: EndingType
+): EndingType {
+  if (!firstSessionDone(g) && (ending === "worsen" || ending === "tragic")) {
+    return "acceptance";
+  }
+  return ending;
+}
+
+// ============================================================
 // 时间系统：时段换算
 // ============================================================
 const PHASE_LABEL: Record<TimePhase, string> = {
@@ -289,11 +336,12 @@ const PHASE_LABEL: Record<TimePhase, string> = {
   night: "夜晚",
 };
 
-/** 根据当日已用名额换算时段（一天 3 位：清晨 / 下午 / 傍晚，之后打烊） */
+/** 根据当日已用名额换算时段（一天最多 5 位：清晨 / 下午 / 傍晚 / 夜晚×2，之后打烊） */
 export function phaseOfSlot(slot: number): TimePhase {
   if (slot < 1) return "morning";
   if (slot < 2) return "afternoon";
-  return "evening";
+  if (slot < 3) return "evening";
+  return "night";
 }
 
 export function isNightSlot(slot: number): boolean {
@@ -379,7 +427,16 @@ export function advanceDayState(
   return events;
 }
 
-/** 候诊人数目标：从 1 位起步缓慢增长，第 5 天起达到一天 3 位上限（深入优先） */
-export function queueTarget(day: number): number {
-  return Math.min(MAX_SLOTS, 1 + Math.floor((day - 1) / 2));
+/** 今日可接诊名额：第 1 天 2 位起，随声望（≥25/≥60）与「候诊扩容」设施递增，上限 MAX_SLOTS */
+export function todayCapacity(g: GameState): number {
+  let cap = 2;
+  if (g.doctor.reputation >= 25) cap += 1;
+  if (g.doctor.reputation >= 60) cap += 1;
+  if (g.clinicUpgrades.includes("reception_expand")) cap += 1;
+  return Math.min(MAX_SLOTS, cap);
+}
+
+/** 候诊人数目标：与当日可接名额一致（深入优先） */
+export function queueTarget(g: GameState): number {
+  return todayCapacity(g);
 }
