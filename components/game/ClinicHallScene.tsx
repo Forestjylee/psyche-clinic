@@ -7,6 +7,7 @@ import { ClinicHall } from "./ClinicHall";
 import { ClinicUpgrades } from "./ClinicUpgrades";
 import { bridge, EVENTS } from "@/lib/bridge/EventBridge";
 import type {
+  DecorDroppedEvent,
   FacilityDroppedEvent,
   PatientClickedEvent,
 } from "@/lib/bridge/types";
@@ -51,6 +52,14 @@ export function ClinicHallScene() {
   useEffect(() => {
     const off = bridge.on(EVENTS.facilityDropped, (e: FacilityDroppedEvent) => {
       useGameStore.getState().setFacilityPosition(e.id, e.x, e.y);
+    });
+    return off;
+  }, []);
+
+  // 装修模式落格（花/画）→ 持久化位置（P5-1）
+  useEffect(() => {
+    const off = bridge.on(EVENTS.decorDropped, (e: DecorDroppedEvent) => {
+      useGameStore.getState().setDecorPosition(e.id, e.x, e.y);
     });
     return off;
   }, []);

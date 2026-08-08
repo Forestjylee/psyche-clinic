@@ -310,6 +310,14 @@ export interface GameState {
   pendingArrivals: PendingArrival[];
   /** 装修模式：设施摆放位置 upgradeId -> 场景坐标（仅视觉，不影响数值） */
   facilityPositions: Record<string, FacilityPosition>;
+  /** 装修（P5-1）：设施 upgradeId -> 激活的变体 decor id（"" 或缺失 = 默认外观） */
+  facilityDecors?: Record<string, string>;
+  /** 装修：已解锁的装饰 id（花/画；变体由购置设施隐含，不入此列） */
+  unlockedDecors?: string[];
+  /** 装修：当前摆放在大厅的花/画 decor id 列表 */
+  placedDecors?: string[];
+  /** 装修：花/画 decor id -> 摆放位置（逻辑坐标，视觉） */
+  decorPositions?: Record<string, FacilityPosition>;
   /** 累计统计（成就系统只读，运行时各动作累加） */
   stats: GameStats;
   /** patientId -> 已解锁记忆碎片 id（P3 档案图鉴：碎片驱动完整真相，PRD 场景4） */

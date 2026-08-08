@@ -159,6 +159,10 @@ export function createInitialState(): GameState {
     discoveryCandidates: [],
     pendingArrivals: [],
     facilityPositions: {},
+    facilityDecors: {},
+    unlockedDecors: [],
+    placedDecors: [],
+    decorPositions: {},
     stats: {
       discoverCount: 0,
       channelsUsed: [],
@@ -193,6 +197,11 @@ export function migrateGameState(data: GameState): GameState {
   if (!Array.isArray(data.pendingArrivals)) data.pendingArrivals = [];
   // 装修模式：设施位置（旧存档补默认空）
   if (!data.facilityPositions) data.facilityPositions = {};
+  // 装修（P5-1）：设施外观变体 / 解锁装饰 / 摆放装饰 / 装饰位置（旧存档补默认空）
+  if (!data.facilityDecors) data.facilityDecors = {};
+  if (!Array.isArray(data.unlockedDecors)) data.unlockedDecors = [];
+  if (!Array.isArray(data.placedDecors)) data.placedDecors = [];
+  if (!data.decorPositions) data.decorPositions = {};
   // 会话断点快照（旧存档补默认 null）
   if (!data.activeSession) data.activeSession = null;
   // 档案图鉴：已解锁记忆碎片（旧存档补默认空，P3-1）

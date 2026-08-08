@@ -36,6 +36,12 @@ import { AchievementEngine } from "./engine/AchievementEngine";
 import { DialogueEngine } from "./engine/DialogueEngine";
 import { allSkills, allClinicUpgrades } from "./data/skills";
 import {
+  decorById,
+  flowerForPatient,
+  pictureForFragment,
+} from "./data/decor";
+import { bridge, EVENTS } from "./bridge/EventBridge";
+import {
   discoveryChannels,
   inviteAcceptRate,
   arrivalDayOffset,
@@ -147,6 +153,12 @@ export interface GameStore {
   buyUpgrade: (id: string) => void;
   /** 装修模式：保存设施摆放位置（仅视觉） */
   setFacilityPosition: (id: string, x: number, y: number) => void;
+  /** 装修（P5-1）：设置设施外观变体（"" = 恢复默认），同步 Phaser 重绘 */
+  setFacilityDecor: (upgradeId: string, variantId: string) => void;
+  /** 装修（P5-1）：摆放/收起一个花或画装饰 */
+  toggleDecor: (decorId: string) => void;
+  /** 装修（P5-1）：保存花/画摆放位置（拖动落格） */
+  setDecorPosition: (decorId: string, x: number, y: number) => void;
   generateScenario: (opts: Record<string, unknown>, random: boolean) => void;
   deleteScenario: (id: string) => void;
   // —— 发现客户 ——
@@ -499,6 +511,45 @@ export const useGameStore = create<GameStore>((set, get) => {
       commit();
     },
 
+    setFacilityDecor: (upgradeId: string, variantId: string) => {
+      const g = get().game;
+      if (!g.facilityDecors) g.facilityDecors = {};
+      g.facilityDecors[upgradeId] = variantId;
+      commit();
+      // 通知 Phaser 重绘该设施（换外观变体）
+      bridge.emit(EVENTS.syncFacilities, { facilities: [] });
+      playSound("click");
+      const v = variantId ? decorById(variantId) : undefined;
+      toast(v ? `已切换：${v.name}` : "已恢复默认外观", "ok");
+    },
+
+    toggleDecor: (decorId: string) => {
+      const g = get().game;
+      if (!g.placedDecors) g.placedDecors = [];
+      if (!g.decorPositions) g.decorPositions = {};
+      const idx = g.placedDecors.indexOf(decorId);
+      const def = decorById(decorId);
+      if (idx >= 0) {
+        g.placedDecors.splice(idx, 1);
+        toast(`已收起：${def?.name ?? decorId}`);
+      } else {
+        g.placedDecors.push(decorId);
+        if (!g.decorPositions[decorId] && def?.defaultPos) {
+          g.decorPositions[decorId] = { ...def.defaultPos };
+        }
+        toast(`已摆放：${def?.name ?? decorId}`, "ok");
+      }
+      commit();
+      playSound("click");
+    },
+
+    setDecorPosition: (decorId: string, x: number, y: number) => {
+      const g = get().game;
+      if (!g.decorPositions) g.decorPositions = {};
+      g.decorPositions[decorId] = { x, y };
+      commit();
+    },
+
     generateScenario: (opts: Record<string, unknown>, random: boolean) => {
       const g = get().game;
       if (g.generatedScenarios.length >= MAX_GENERATED) {
@@ -673,6 +724,22 @@ export const useGameStore = create<GameStore>((set, get) => {
       if (!g.unlockedFragments[patientId].includes(fragmentId)) {
         g.unlockedFragments[patientId].push(fragmentId);
       }
+      // P5-1 装饰钩子：记忆碎片解锁 → 挂画自动解锁并摆放
+      const pic = pictureForFragment(patientId, fragmentId);
+      if (pic) {
+        if (!g.unlockedDecors) g.unlockedDecors = [];
+        if (!g.placedDecors) g.placedDecors = [];
+        if (!g.decorPositions) g.decorPositions = {};
+        if (!g.unlockedDecors.includes(pic.id)) {
+          g.unlockedDecors.push(pic.id);
+          if (!g.placedDecors.includes(pic.id)) g.placedDecors.push(pic.id);
+          if (!g.decorPositions[pic.id] && pic.defaultPos) {
+            g.decorPositions[pic.id] = { ...pic.defaultPos };
+          }
+          const p = scenarioById(g, patientId);
+          toast(`墙上多了一幅「${p?.name ?? "患者"}」的记忆画。`, "ok");
+        }
+      }
       commit();
     },
 
@@ -733,6 +800,24 @@ export const useGameStore = create<GameStore>((set, get) => {
       }
       // 时间系统：接诊一位，消耗一个当日名额；天只随「休息」推进
       g.slot += 1;
+      // P5-1 装饰钩子：治愈/接纳结局 → 患者送花（自动解锁并摆放），不改既有结算
+      if (ending === "cure" || ending === "acceptance") {
+        const flower = flowerForPatient(patientId);
+        if (flower) {
+          if (!g.unlockedDecors) g.unlockedDecors = [];
+          if (!g.placedDecors) g.placedDecors = [];
+          if (!g.decorPositions) g.decorPositions = {};
+          if (!g.unlockedDecors.includes(flower.id)) {
+            g.unlockedDecors.push(flower.id);
+            if (!g.placedDecors.includes(flower.id)) g.placedDecors.push(flower.id);
+            if (!g.decorPositions[flower.id] && flower.defaultPos) {
+              g.decorPositions[flower.id] = { ...flower.defaultPos };
+            }
+            const p = scenarioById(g, patientId);
+            toast(`${p?.name ?? "患者"} 送来了一盆花。谢谢你认真听他说。`, "ok");
+          }
+        }
+      }
       // 成就
       get().achievementEngine?.onSessionEnd(ending, patientId, lastState);
       get().achievementEngine?.onGameStateSynced(g);

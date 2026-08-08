@@ -19,6 +19,7 @@ export const EVENTS = {
   patientClicked: "patientClicked",
   facilityClicked: "facilityClicked",
   facilityDropped: "facilityDropped",
+  decorDropped: "decorDropped",
   doctorArrived: "doctorArrived",
   doorClicked: "doorClicked",
   patientMoveDone: "patientMoveDone",

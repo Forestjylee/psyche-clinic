@@ -11,6 +11,8 @@ import {
 } from "./GameState";
 import type { GameState, EndingType, PrologueChoice } from "../types";
 import { allPatients, GUIDED_PATIENT_ID } from "../data/patients";
+import { allClinicUpgrades } from "../data/skills";
+import { DECOR_DEFS } from "../data/decor";
 
 const opts = { maxFollowUps: 2, graceDays: 5 };
 
@@ -317,6 +319,113 @@ describe("clampFirstSessionEnding 首诊结局 clamp（P4-5）", () => {
     const g = createInitialState();
     g.patientRecords = { xiao_bei: "cure" };
     expect(clampFirstSessionEnding(g, "worsen")).toBe("worsen");
+  });
+});
+
+describe("P5-1 装饰字段默认值（装修=记忆的陈列馆）", () => {
+  it("初始状态 4 个装饰字段为默认空值", () => {
+    const g = createInitialState();
+    expect(g.facilityDecors).toEqual({});
+    expect(g.unlockedDecors).toEqual([]);
+    expect(g.placedDecors).toEqual([]);
+    expect(g.decorPositions).toEqual({});
+  });
+  it("旧存档缺少装饰字段时 migrate 补齐默认值", () => {
+    const legacy = {
+      doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
+      skills: [],
+      clinicUpgrades: [],
+      patientRecords: {},
+      day: 1,
+      slot: 0,
+      todayServed: [],
+      waitingDays: {},
+      abandoned: [],
+      messages: [],
+      generatedScenarios: [],
+    } as unknown as GameState;
+    const migrated = migrateGameState(legacy);
+    expect(migrated.facilityDecors).toEqual({});
+    expect(migrated.unlockedDecors).toEqual([]);
+    expect(migrated.placedDecors).toEqual([]);
+    expect(migrated.decorPositions).toEqual({});
+  });
+  it("已有装饰字段的新存档不被覆盖", () => {
+    const fresh = createInitialState();
+    fresh.facilityDecors = { comfort_sofa: "variant_sofa" };
+    fresh.unlockedDecors = ["flower_xiao_bei"];
+    fresh.placedDecors = ["flower_xiao_bei"];
+    fresh.decorPositions = { flower_xiao_bei: { x: 640, y: 210 } };
+    const migrated = migrateGameState(fresh);
+    expect(migrated.facilityDecors).toEqual({ comfort_sofa: "variant_sofa" });
+    expect(migrated.unlockedDecors).toEqual(["flower_xiao_bei"]);
+    expect(migrated.placedDecors).toEqual(["flower_xiao_bei"]);
+    expect(migrated.decorPositions).toEqual({
+      flower_xiao_bei: { x: 640, y: 210 },
+    });
+  });
+});
+
+describe("DECOR_DEFS 装饰数据完整性（P5-1）", () => {
+  it("id 全局唯一", () => {
+    const ids = DECOR_DEFS.map((d) => d.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+  it("每个 variant 的 slot 对应存在的升级项（allClinicUpgrades）", () => {
+    const upgradeIds = new Set(allClinicUpgrades.map((u) => u.id));
+    for (const d of DECOR_DEFS) {
+      if (d.kind !== "variant") continue;
+      expect(upgradeIds.has(d.slot), `${d.id} slot=${d.slot}`).toBe(true);
+      const src = d.source;
+      if (src.kind === "upgrade") {
+        expect(src.upgradeId, `${d.id} source.upgradeId`).toBe(d.slot);
+      }
+    }
+  });
+  it("每个 flower 的 patientId 对应存在的患者（allPatients）", () => {
+    const patientIds = new Set(allPatients.map((p) => p.id));
+    for (const d of DECOR_DEFS) {
+      if (d.kind !== "flower") continue;
+      const src = d.source;
+      if (src.kind !== "patient") continue;
+      expect(patientIds.has(src.patientId), `${d.id}`).toBe(true);
+      expect(d.defaultPos, `${d.id} flower 需有 defaultPos`).toBeDefined();
+    }
+  });
+  it("每个 picture 的 fragmentId 存在于对应患者的 memoryFragments", () => {
+    for (const d of DECOR_DEFS) {
+      if (d.kind !== "picture") continue;
+      const src = d.source;
+      if (src.kind !== "fragment") continue;
+      const patient = allPatients.find((p) => p.id === src.patientId);
+      expect(patient, `${d.id} 患者不存在`).toBeDefined();
+      expect(
+        (patient!.memoryFragments ?? []).some((f) => f.id === src.fragmentId),
+        `${d.id} 碎片 ${src.fragmentId} 不存在`
+      ).toBe(true);
+      expect(d.defaultPos, `${d.id} picture 需有 defaultPos`).toBeDefined();
+    }
+  });
+  it("所有花/画 defaultPos 在场景边界内且互不重叠（粗略）", () => {
+    const placed = DECOR_DEFS.filter(
+      (d) => d.kind === "flower" || d.kind === "picture"
+    );
+    for (const d of placed) {
+      const p = d.defaultPos!;
+      expect(p.x).toBeGreaterThanOrEqual(24);
+      expect(p.x).toBeLessThanOrEqual(936);
+      expect(p.y).toBeGreaterThanOrEqual(24);
+      expect(p.y).toBeLessThanOrEqual(516);
+    }
+    for (let i = 0; i < placed.length; i++) {
+      for (let j = i + 1; j < placed.length; j++) {
+        const a = placed[i].defaultPos!;
+        const b = placed[j].defaultPos!;
+        const overlapX = Math.abs(a.x - b.x) < (placed[i].size.w + placed[j].size.w) / 2;
+        const overlapY = Math.abs(a.y - b.y) < (placed[i].size.h + placed[j].size.h) / 2;
+        expect(overlapX && overlapY, `${placed[i].id} 与 ${placed[j].id} 重叠`).toBe(false);
+      }
+    }
   });
 });
 

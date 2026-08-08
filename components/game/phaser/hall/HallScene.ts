@@ -6,6 +6,8 @@ import type {
   DecorateModeEvent,
 } from "@/lib/bridge/types";
 import { drawFacility, facilityDefById } from "../draw/Furniture";
+import { drawFlower, drawPicture } from "../draw/Decor";
+import { decorById } from "@/lib/data/decor";
 import { useGameStore } from "@/lib/store";
 import type { PatientScenario } from "@/lib/types";
 import { allPatients } from "@/lib/data/patients";
@@ -50,6 +52,7 @@ const TIER_STYLE: Record<
  *  不再绘制医生/患者小人（用户决策：彻底移除小人，回归治愈系插画背景）。 */
 export class HallScene extends Phaser.Scene {
   private facilities: Phaser.GameObjects.Container[] = [];
+  private decorContainers: Phaser.GameObjects.Container[] = [];
   private waitCards: Phaser.GameObjects.Container[] = [];
   private decorateMode = false;
   /** 正在拖动的设施（装修模式） */
@@ -64,6 +67,7 @@ export class HallScene extends Phaser.Scene {
   create(): void {
     // 背景由 CSS 层（#app[data-scene]）全屏提供，画布透明，这里只画交互元素
     this.redrawFacilities();
+    this.redrawDecors();
     this.redrawWaitingCards();
 
     // 装修模式拖动（按住设施拖动，松手落格）
@@ -114,6 +118,7 @@ export class HallScene extends Phaser.Scene {
     if (!this.isAlive()) return;
     this.decorateMode = e.on;
     this.facilities.forEach((c) => c.setAlpha(e.on ? 0.55 : 1));
+    this.decorContainers.forEach((c) => c.setAlpha(e.on ? 0.55 : 1));
     if (!e.on) {
       this.dragging = null;
     }
@@ -122,6 +127,7 @@ export class HallScene extends Phaser.Scene {
   private handleRefreshPatients = (): void => {
     if (!this.isAlive()) return;
     this.redrawWaitingCards();
+    this.redrawDecors();
   };
 
   // ================= 候诊患者卡（取代小人） =================
@@ -316,7 +322,7 @@ export class HallScene extends Phaser.Scene {
 
   // ================= 设施 =================
 
-  /** 从 store 读取已购置设施并按自定义/默认位置绘制 */
+  /** 从 store 读取已购置设施并按自定义/默认位置绘制（含 P5-1 外观变体） */
   private redrawFacilities(): void {
     this.facilities.forEach((c) => c.destroy());
     this.facilities = [];
@@ -329,10 +335,86 @@ export class HallScene extends Phaser.Scene {
           x: def.defaultPos.x,
           y: def.defaultPos.y,
         };
-      const c = drawFacility(this, def, pos.x, pos.y);
+      const variantId = g.facilityDecors?.[upId] ?? "";
+      const c = drawFacility(this, def, pos.x, pos.y, variantId);
       this.facilities.push(c);
       this.attachFacilityClick(c, def.id);
     }
+  }
+
+  // ================= 装饰（P5-1：花/画） =================
+
+  /** 绘制单个花/画装饰：从 store 读位置（decorPositions ?? defaultPos） */
+  private drawPlacedDecor(
+    decorId: string
+  ): Phaser.GameObjects.Container | null {
+    const def = decorById(decorId);
+    if (!def) return null;
+    const g = useGameStore.getState().game;
+    const pos = g.decorPositions?.[decorId] ?? def.defaultPos;
+    if (!pos) return null;
+    const src = def.source;
+    if (src.kind === "patient") {
+      const patient = allPatients.find((p) => p.id === src.patientId);
+      return drawFlower(
+        this,
+        patient?.palette.primary ?? "#e0a868",
+        pos.x,
+        pos.y,
+        decorId
+      );
+    }
+    if (src.kind === "fragment") {
+      const patient = allPatients.find((p) => p.id === src.patientId);
+      const frag = (patient?.memoryFragments ?? []).find(
+        (f) => f.id === src.fragmentId
+      );
+      return drawPicture(
+        this,
+        patient?.palette.primary ?? "#8a5a3b",
+        patient?.palette.bright ?? "#f0d090",
+        pos.x,
+        pos.y,
+        decorId,
+        frag?.title ?? ""
+      );
+    }
+    return null;
+  }
+
+  /** 重绘全部已摆放装饰（花/画），装修模式可拖动 */
+  private redrawDecors(): void {
+    this.decorContainers.forEach((c) => c.destroy());
+    this.decorContainers = [];
+    const g = useGameStore.getState().game;
+    for (const did of g.placedDecors ?? []) {
+      const c = this.drawPlacedDecor(did);
+      if (!c) continue;
+      this.decorContainers.push(c);
+      this.attachDecorClick(c);
+    }
+  }
+
+  private attachDecorClick(c: Phaser.GameObjects.Container): void {
+    c.setInteractive(
+      new Phaser.Geom.Rectangle(
+        -c.getData("decorW") / 2,
+        -c.getData("decorH") / 2,
+        c.getData("decorW"),
+        c.getData("decorH")
+      ),
+      Phaser.Geom.Rectangle.Contains
+    );
+    c.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      pointer.event.stopPropagation();
+      // 装修模式：按下即开始拖动（落格由 pointerup 统一处理）
+      if (this.decorateMode) {
+        this.dragging = c;
+        this.dragFrom = { x: c.x, y: c.y };
+        c.setDepth(30);
+      }
+      // 普通模式：装饰无额外动作（纯陈列）
+    });
   }
 
   private attachFacilityClick(
@@ -367,8 +449,10 @@ export class HallScene extends Phaser.Scene {
     const c = this.dragging;
     if (!c) return;
     c.setDepth(5);
-    const w = c.getData("defW") as number;
-    const h = c.getData("defH") as number;
+    // 区分设施（defW）与装饰（decorW）
+    const isDecor = c.getData("facilityId") === undefined;
+    const w = c.getData(isDecor ? "decorW" : "defW") as number;
+    const h = c.getData(isDecor ? "decorH" : "defH") as number;
     // 落格：吸附到网格中心（逻辑分辨率 960×540，tile 48px 对齐场景内 40..920）
     const snap = 24;
     let nx = Math.round(c.x / snap) * snap;
@@ -383,11 +467,16 @@ export class HallScene extends Phaser.Scene {
     }
     c.setPosition(nx, ny);
     // 通知 React：持久化位置（走 store action，Phaser 不直接改）
-    const id = c.getData("facilityId") as string;
-    bridge.emit(EVENTS.facilityDropped, { id, x: nx, y: ny });
+    if (isDecor) {
+      const did = c.getData("decorId") as string;
+      bridge.emit(EVENTS.decorDropped, { id: did, x: nx, y: ny });
+    } else {
+      const id = c.getData("facilityId") as string;
+      bridge.emit(EVENTS.facilityDropped, { id, x: nx, y: ny });
+    }
   }
 
-  /** 简单碰撞：与房间门/花盆/出生点重叠则视为冲突 */
+  /** 简单碰撞：与其它设施/装饰、房间门/花盆、出生点重叠则视为冲突 */
   private collidesFacility(
     nx: number,
     ny: number,
@@ -401,6 +490,19 @@ export class HallScene extends Phaser.Scene {
       if (other === self) continue;
       const ow = other.getData("defW") as number;
       const oh = other.getData("defH") as number;
+      const rectB = new Phaser.Geom.Rectangle(
+        other.x - ow / 2,
+        other.y - oh / 2,
+        ow,
+        oh
+      );
+      if (Phaser.Geom.Rectangle.Overlaps(rectA, rectB)) return true;
+    }
+    // 与其它已摆放装饰（花/画）重叠
+    for (const other of this.decorContainers) {
+      if (other === self) continue;
+      const ow = other.getData("decorW") as number;
+      const oh = other.getData("decorH") as number;
       const rectB = new Phaser.Geom.Rectangle(
         other.x - ow / 2,
         other.y - oh / 2,
