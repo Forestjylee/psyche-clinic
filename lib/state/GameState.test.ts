@@ -8,6 +8,10 @@ import {
   REPUTATION_LOSS_PER_ABANDON,
   firstSessionDone,
   clampFirstSessionEnding,
+  todayCapacity,
+  phaseOfSlot,
+  queueTarget,
+  MAX_SLOTS,
 } from "./GameState";
 import type { GameState, EndingType, PrologueChoice } from "../types";
 import { allPatients, GUIDED_PATIENT_ID } from "../data/patients";
@@ -460,6 +464,69 @@ describe("P5-3 理智字段默认值（理智完整机制）", () => {
     const migrated = migrateGameState(fresh);
     expect(migrated.sessionSinceRest).toBe(4);
     expect(migrated.gardenDay).toBe(12);
+  });
+});
+
+describe("todayCapacity 今日可接诊名额（P5-6 动态容量）", () => {
+  it("基础档位：第 1 天声望 10 无设施 → 2 位", () => {
+    const g = createInitialState();
+    expect(g.doctor.reputation).toBe(10);
+    expect(g.clinicUpgrades).toEqual([]);
+    expect(todayCapacity(g)).toBe(2);
+  });
+  it("声望 ≥25 → +1（3 位）", () => {
+    const g = createInitialState();
+    g.doctor.reputation = 25;
+    expect(todayCapacity(g)).toBe(3);
+  });
+  it("声望 ≥60 → 再 +1（4 位）", () => {
+    const g = createInitialState();
+    g.doctor.reputation = 60;
+    expect(todayCapacity(g)).toBe(4);
+  });
+  it("购置「候诊扩容」→ +1（基础 2 + 声望档位 4 → 5 位）", () => {
+    const g = createInitialState();
+    g.doctor.reputation = 60;
+    g.clinicUpgrades.push("reception_expand");
+    expect(todayCapacity(g)).toBe(5);
+  });
+  it("声望满 + 候诊扩容也永不超 MAX_SLOTS（封顶 5）", () => {
+    const g = createInitialState();
+    g.doctor.reputation = 100;
+    g.clinicUpgrades.push("reception_expand");
+    expect(todayCapacity(g)).toBe(5);
+    expect(todayCapacity(g)).toBeLessThanOrEqual(MAX_SLOTS);
+  });
+});
+
+describe("phaseOfSlot 时段映射扩展（P5-6）", () => {
+  it("slot 0-2 保持 morning/afternoon/evening", () => {
+    expect(phaseOfSlot(0)).toBe("morning");
+    expect(phaseOfSlot(1)).toBe("afternoon");
+    expect(phaseOfSlot(2)).toBe("evening");
+  });
+  it("slot 3 与 4 → night（第 4-5 场切入夜晚，激活夜间分支）", () => {
+    expect(phaseOfSlot(3)).toBe("night");
+    expect(phaseOfSlot(4)).toBe("night");
+  });
+  it("slot 5（当天接满后）同样为 night", () => {
+    expect(phaseOfSlot(5)).toBe("night");
+  });
+});
+
+describe("queueTarget 候诊目标（P5-6）", () => {
+  it("queueTarget(g) 与今日可接名额一致（基础 2 / 声望 25 变 3）", () => {
+    const g = createInitialState();
+    expect(queueTarget(g)).toBe(2);
+    g.doctor.reputation = 25;
+    expect(queueTarget(g)).toBe(3);
+  });
+  it("候诊扩容后 queueTarget 同步到 5", () => {
+    const g = createInitialState();
+    g.doctor.reputation = 100;
+    g.clinicUpgrades.push("reception_expand");
+    expect(queueTarget(g)).toBe(todayCapacity(g));
+    expect(queueTarget(g)).toBe(5);
   });
 });
 

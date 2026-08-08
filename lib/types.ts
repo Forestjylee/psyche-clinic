@@ -233,6 +233,8 @@ export interface ClinicUpgrade {
     initialTrustBonus?: number;
     sanityRecoveryBonus?: number;
     reputationBonus?: number;
+    /** 每日接诊名额 +N（P5-6 候诊扩容） */
+    capacityBonus?: number;
   };
   unlocked?: boolean;
 }
@@ -277,7 +279,7 @@ export interface GameState {
   patientRecords: Record<string, EndingType>;
   /** 当前日期（游戏内） */
   day: number;
-  /** 今日已接待名额（0..MAX_SLOTS，默认 8 个/天） */
+  /** 今日已接待名额（0..MAX_SLOTS，动态容量：第 1 天 2 位起，声望/设施可增至 5） */
   slot: number;
   /** 今日已接诊的患者 id（当天不能重复接诊，休息日清空） */
   todayServed: string[];

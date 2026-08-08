@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useGame } from "@/lib/hooks/useGame";
-import { slotPhaseLabel, isNightSlot, MAX_SLOTS } from "@/lib/state/GameState";
+import { slotPhaseLabel, isNightSlot, todayCapacity } from "@/lib/state/GameState";
 
 export function HUD() {
   const { game, scene, expToNext, toggleMute, muted, saveNow, backToTitle, playSound } = useGame();
@@ -14,7 +14,7 @@ export function HUD() {
   const repColor = d.reputation > 60 ? "var(--accent)" : d.reputation > 30 ? "var(--accent-2)" : "var(--text-muted)";
   const phase = slotPhaseLabel(game.slot);
   const night = isNightSlot(game.slot);
-  const slotsFull = game.slot >= MAX_SLOTS;
+  const slotsFull = game.slot >= todayCapacity(game);
 
   return (
     <div className="hud">
@@ -127,7 +127,7 @@ export function HUD() {
           <span className="hud-phase-icon">{night ? "🌙" : "☀"}</span>
           第 {game.day} 天 · {phase}
           <span className="hud-slot-count">
-            {game.slot}/{MAX_SLOTS}
+            {game.slot}/{todayCapacity(game)}
           </span>
         </div>
         <button

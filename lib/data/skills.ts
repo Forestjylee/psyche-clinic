@@ -121,4 +121,11 @@ export const allClinicUpgrades: ClinicUpgrade[] = [
     cost: 800,
     effect: { reputationBonus: 0 },
   },
+  {
+    id: "reception_expand",
+    name: "候诊扩容",
+    description: "多添几把椅子，每天能多接待一位来访者（每日名额 +1）。",
+    cost: 1200,
+    effect: { capacityBonus: 1 },
+  },
 ];

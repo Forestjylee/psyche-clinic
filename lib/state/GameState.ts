@@ -10,8 +10,8 @@ import { saveGameState, loadGameState, clearGameState } from "./Storage";
 // ============================================================
 // 时间系统常量
 // ============================================================
-/** 一天最多接待的患者数（每次会话深入，一天限 3 位，保证体验深度） */
-export const MAX_SLOTS = 3;
+/** 一天最多接待的患者数（动态容量上限，一天最多 5 位，保证体验深度） */
+export const MAX_SLOTS = 5;
 /** 等待满 N 天开始「病情加重」 */
 export const DECAY_START_DAY = 2;
 /** 等待满 N 天弹窗提醒 */
@@ -332,11 +332,12 @@ const PHASE_LABEL: Record<TimePhase, string> = {
   night: "夜晚",
 };
 
-/** 根据当日已用名额换算时段（一天 3 位：清晨 / 下午 / 傍晚，之后打烊） */
+/** 根据当日已用名额换算时段（一天最多 5 位：清晨 / 下午 / 傍晚 / 夜晚×2，之后打烊） */
 export function phaseOfSlot(slot: number): TimePhase {
   if (slot < 1) return "morning";
   if (slot < 2) return "afternoon";
-  return "evening";
+  if (slot < 3) return "evening";
+  return "night";
 }
 
 export function isNightSlot(slot: number): boolean {
@@ -422,7 +423,16 @@ export function advanceDayState(
   return events;
 }
 
-/** 候诊人数目标：从 1 位起步缓慢增长，第 5 天起达到一天 3 位上限（深入优先） */
-export function queueTarget(day: number): number {
-  return Math.min(MAX_SLOTS, 1 + Math.floor((day - 1) / 2));
+/** 今日可接诊名额：第 1 天 2 位起，随声望（≥25/≥60）与「候诊扩容」设施递增，上限 MAX_SLOTS */
+export function todayCapacity(g: GameState): number {
+  let cap = 2;
+  if (g.doctor.reputation >= 25) cap += 1;
+  if (g.doctor.reputation >= 60) cap += 1;
+  if (g.clinicUpgrades.includes("reception_expand")) cap += 1;
+  return Math.min(MAX_SLOTS, cap);
+}
+
+/** 候诊人数目标：与当日可接名额一致（深入优先） */
+export function queueTarget(g: GameState): number {
+  return todayCapacity(g);
 }

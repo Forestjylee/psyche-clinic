@@ -2,7 +2,7 @@
 
 | 字段 | 内容 |
 | --- | --- |
-| 文档版本 | v1.2.6 |
+| 文档版本 | v1.2.7 |
 | 维护人 | Psyche Clinic Team |
 | 最后更新 | 2026-08-08 |
 | 配套文档 | [PRD.md](./PRD.md) · [PLAN.md](./PLAN.md) · [DEPLOYMENT.md](./DEPLOYMENT.md) |
@@ -273,7 +273,7 @@ interface AchievementProgress {
 1. 清空 `slot` 与 `todayServed`；
 2. 候诊患者 `waitingDays[id] += 1`，触发加重/放弃判定；
 3. 复诊池患者按结局概率 roll：命中→`todayFollowUps`；未命中→`followUpIdleDays`+1、满宽限放弃复诊扣声望离场；
-4. 候诊人数不足 `queueTarget(day)` 时由生成器补充新人。
+4. 候诊人数不足 `queueTarget(g)` 时由生成器补充新人。
 
 ### 3.5 金钱经济系统（诊所经营）
 
@@ -288,8 +288,11 @@ interface AchievementProgress {
 | 多级设施升级 | 现有 5 项设施各 3 级，效果递增 | 2 级 ≈1.8× 1 级价、3 级 ≈2.5× 1 级价（沙发 300→540→750） |
 | 消耗品 | 一次性药品/道具，会话中解锁选项或提升治愈率 | 50-200 金 |
 | 慈善活动费 | 善意连接渠道投入（捐图书角/资助讲座/公益宣传，见 §3.6） | 30-150 金/次 |
+| 候诊扩容 | 购置后每日接诊名额 +1（基础 2 + 声望档位，见下文容量规则） | 1200 金/次 |
 
-**节奏**（ADR-010）：玩家单天约赚 500-1500 金；中期以高级设施与慈善活动费为主要消耗口，避免溢出。
+**每日可接诊名额**（P5-6 容量规则）：每日可接诊名额 `todayCapacity(g)`：第 1 天 2 位起，声望 ≥25 / ≥60 各 +1，购置「候诊扩容」+1，上限 5；时段映射 slot 0 清晨 / 1 下午 / 2 傍晚 / 3-4 夜晚。
+
+**节奏**（ADR-010）：玩家单天约赚 800-2200 金（名额上限 5 位时）；中期以高级设施与慈善活动费为主要消耗口，避免溢出。
 
 ### 3.6 发现客户（主动获客，v0.4.0）
 
@@ -326,7 +329,7 @@ pendingArrivals: PendingArrival[];
 **到达时间分布**：今日 50% / 明日 30% / 后日 20%。
 
 **约束**：
-- 已接诊名额满（`slot = MAX_SLOTS`）时，邀约结果到达日若 roll 到「今日」则顺延至次日；
+- 已接诊名额满（`slot = 当日容量 todayCapacity(g)`）时，邀约结果到达日若 roll 到「今日」则顺延至次日；
 - 未邀约的候选仅停留当日，休息日后自动清除（过期不候，消息盒子提示）；
 - 候选客户 `usedSeeds` 去重沿用生成器 `excludeSeeds`，避免与已见剧本重复；
 - 转介渠道的客户可加「声望门槛」与更高基础属性（高质量客户）。
@@ -641,7 +644,7 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 | clinic_day_50 | 五十度秋 | legendary | 50 | `day` |
 | clinic_sanity_keep | 神完气足 | rare | 5 | `stats.sanityStreak`（连续休息后理智≥60） |
 | clinic_upgrade_5 | 锦上添花 | epic | 5 | `clinicUpgrades.length` |
-| clinic_full_day | 门庭若市 | rare | 1 | `slot` 达到 `MAX_SLOTS`（事件钩子） |
+| clinic_full_day | 门庭若市 | rare | 1 | `slot` 达到当日容量上限 5（满负荷日） |
 
 **结局扩展（`ending`）**
 
@@ -708,7 +711,7 @@ interface GameStats {
 | `invite` action | `stats.inviteCount+1`；成功 `acceptCount+1`，婉拒 `rejectCount+1` |
 | `startSession` | 传 `patientId` 给 `onSessionStart`；若 `patientRecords[pid]` 已存在则 `revisitCount+1`；记录危机接诊标记（`waitingDays≥4`） |
 | `restOneDay` | 当日无 abandon 事件 → `noLossDays+1`；理智恢复后更新 `sanityStreak`；末尾调用 `onGameStateSynced` 刷新天数/金钱成就 |
-| `finishSession` | `onSessionEnd` 内：`slot≥MAX_SLOTS` → `clinic_full_day`；危机接诊且治愈 → `ethics_help_desperate`；真相≥95 → `therapy_deep_truth` |
+| `finishSession` | `onSessionEnd` 内：`slot≥当日容量上限 5` → `clinic_full_day`；危机接诊且治愈 → `ethics_help_desperate`；真相≥95 → `therapy_deep_truth` |
 | `finishReturnVisit` | `aftercareCount+1`；`aftercareEndings.push(rv.ending)` |
 | `onGameStateSynced` | 用 `set` 刷新可推导成就（获客/回访/复诊/天数/金钱/结局/成长/隐藏） |
 
@@ -762,6 +765,7 @@ interface GameStats {
 | v1.2.4 | 2026-08-08 | **评审修订（第三轮）**：P5-3 理智完整机制落地（消耗：沉重病例 -10/坏结局 -15/连续不休息第 3 场起 -5；恢复：回访 +10/读信每封 +2/花园待一会 +5 每日一次；归零温情强制休息梦境 +35 恢复）；GameState 新增 sessionSinceRest/gardenDay；清理 sanity"倒闭"旧注释 |
 | v1.2.5 | 2026-08-08 | P5-4：成就描述转向「旅程里程碑」语义（discover_first/5/15/all_channels、therapy_100_patients、clinic_money_100k、growth_skill_8 共 7 个成就的 description 语义化，不再写高频数值肝度目标；name/target/稀有度不变）；§12.3 待修订标注更新（描述已完成，奖励待 P5-5） |
 | v1.2.6 | 2026-08-08 | P5-5：成就奖励情感化（reward 新增 unlock 字段：解锁信件/诊室纪念物/记忆碎片/特殊回访，13 个成就配置；新增 achievementLetters 数据表 6 封信 + decor 3 件纪念物；store onUnlock 发放链路；AchievementEngine 零改动） |
+| v1.2.7 | 2026-08-08 | P5-6：名额提升机制（一天容量 3→动态 2-5：基础 2 + 声望 25/60 各 +1 + 候诊扩容设施 +1；phaseOfSlot 扩 5 档，slot 3-4 切入 night 相位激活夜间分支；queueTarget 改传 GameState；新增候诊扩容设施 1200 金） |
 
 ---
 

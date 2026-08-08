@@ -23,8 +23,8 @@ import {
   expToNextLevel,
   clamp,
   advanceDayState,
+  todayCapacity,
   queueTarget,
-  MAX_SLOTS,
   REPUTATION_LOSS_PER_ABANDON,
   RETURN_VISIT_DELAY,
   resolveDueReturns,
@@ -321,7 +321,7 @@ export const useGameStore = create<GameStore>((set, get) => {
     const g = get().game;
     const added: string[] = [];
     while (
-      serveablePatients(g).length < queueTarget(g.day) &&
+      serveablePatients(g).length < queueTarget(g) &&
       g.generatedScenarios.length < MAX_GENERATED
     ) {
       const { generateScenario: gen } = await import("./data/generator");
@@ -416,7 +416,7 @@ export const useGameStore = create<GameStore>((set, get) => {
 
     startSession: (p: PatientScenario) => {
       const g = get().game;
-      if (g.slot >= MAX_SLOTS) {
+      if (g.slot >= todayCapacity(g)) {
         toast(`今日已接待 ${g.slot} 位客户，名额已满，请先「休息一日」`, "warn");
         playSound("locked");
         return;
@@ -726,7 +726,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         g.stats.acceptCount += 1;
         let offset = arrivalDayOffset();
         // 今日名额已满则顺延至明日
-        if (offset === 0 && g.slot >= MAX_SLOTS) offset = 1;
+        if (offset === 0 && g.slot >= todayCapacity(g)) offset = 1;
         g.pendingArrivals.push({ scenario: cand.scenario, arriveDay: g.day + offset });
         g.messages.unshift({
           id: `invite-ok-${g.day}-${cand.scenario.id}`,
