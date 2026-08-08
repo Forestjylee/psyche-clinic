@@ -87,6 +87,21 @@ describe("DialogueEngine 断点恢复（P2-8）", () => {
     expect(eng.getState()).toEqual(SNAP);
   });
 
+  it("恢复后 start() 仅 enterNode 一次（支撑恢复场景回顾窗不重复追加断点句）", () => {
+    const game = createInitialState();
+    const cb = makeCallbacks();
+    const eng = new DialogueEngine(makeScenario(), game, cb, {
+      nodeId: "mid",
+      state: SNAP,
+      triggeredMemories: [],
+    });
+    eng.start();
+    expect(cb.onNodeEnter).toHaveBeenCalledTimes(1);
+    expect(cb.onNodeEnter).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "mid" })
+    );
+  });
+
   it("restore.nodeId 失效时回退到 startNode", () => {
     const game = createInitialState();
     const cb = makeCallbacks();
