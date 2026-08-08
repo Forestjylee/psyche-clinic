@@ -6,6 +6,70 @@
   background: transparent;
 }
 
+/* —— 灯光呼吸层（P2-4）：半透明渐变叠在 Phaser 画布上（z1），
+   气泡/选项在 z2+ 保持可读；两层平面用 opacity 互叠实现真正的渐变交叉淡入淡出
+   （background-image 渐变不可插值，直接换 class 会瞬切）。 —— */
+.dialogue-light {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.light-plane,
+.light-beam {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.light-plane.on,
+.light-beam.on {
+  opacity: 1;
+}
+/* 共情/平静：暖橙光晕（低对比，不抢对话焦点） */
+.light-plane.light-warm {
+  background:
+    radial-gradient(120% 90% at 72% 18%, rgba(255, 190, 120, 0.16), transparent 58%),
+    linear-gradient(165deg, rgba(255, 176, 102, 0.10), rgba(255, 220, 170, 0.04));
+}
+/* 触及痛点：天色微沉，冷灰蓝降饱和 */
+.light-plane.light-dim {
+  background:
+    radial-gradient(130% 100% at 50% 68%, rgba(46, 58, 84, 0.20), transparent 62%),
+    linear-gradient(180deg, rgba(66, 80, 110, 0.14), rgba(34, 42, 64, 0.22));
+}
+/* 真相揭开：一束光从窗侧（左上）斜透入，柔光柱 + 轻微呼吸 */
+.light-beam::after {
+  content: "";
+  position: absolute;
+  top: -25%;
+  left: -12%;
+  width: 46%;
+  height: 170%;
+  transform: rotate(24deg);
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 238, 196, 0.10) 38%,
+    rgba(255, 250, 228, 0.22) 50%,
+    rgba(255, 238, 196, 0.10) 62%,
+    transparent 100%
+  );
+  filter: blur(7px);
+  animation: beam-breathe 4s ease-in-out infinite;
+}
+@keyframes beam-breathe {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.95; }
+}
+/* 尊重系统减弱动效（对齐 P1）：灯光切换立即完成，光束不再呼吸 */
+@media (prefers-reduced-motion: reduce) {
+  .light-plane,
+  .light-beam { transition: none; }
+  .light-beam::after { animation: none; opacity: 0.65; }
+}
+
 /* FIT 对齐覆盖层：与 Phaser 画布显示区域精确同框。
    场景盒 = .scene 的 inset:64px 0 0 0（宽 100vw、高 100vh-64px），
    取其中最大 16:9 居中矩形（等价 Phaser FIT 的 scale=min(w/960,h/540)）。

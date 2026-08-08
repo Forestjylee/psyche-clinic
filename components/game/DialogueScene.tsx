@@ -143,6 +143,12 @@ export function DialogueScene() {
   const emoColor = emotionColors[emotion];
   const palette = currentPatient.palette;
 
+  // —— 灯光呼吸层（P2-4）：共情/平静走暖橙，触及痛点走冷灰蓝；
+  // 真相 ≥60 视为「真相揭开」状态，持续打出一束光（flashback 浮层 z90 会盖住瞬时光束，故不用其作信号） ——
+  const warmEmotions: PatientEmotion[] = ["calm", "happy", "neutral"];
+  const lightTone = warmEmotions.includes(emotion) ? "light-warm" : "light-dim";
+  const revealTruth = !!pState && pState.truth >= 60;
+
   // 当前句定位：narration 走顶部旁白，patient/doctor 走各自气泡锚点
   const sp = node.speaker;
   const isNarration = sp === "narration";
@@ -154,6 +160,13 @@ export function DialogueScene() {
     <div className="scene dialogue-scene">
       {/* 底层诊室房间 + 医生坐像（Phaser FIT 铺满） */}
       <ClinicRoomCanvas />
+
+      {/* 灯光呼吸层：半透明渐变叠在画布上（z1，气泡 z2 之上保持可读），随 emotion 切换色调 */}
+      <div className="dialogue-light" aria-hidden="true">
+        <div className={`light-plane light-warm ${lightTone === "light-warm" ? "on" : ""}`} />
+        <div className={`light-plane light-dim ${lightTone === "light-dim" ? "on" : ""}`} />
+        <div className={`light-beam ${revealTruth ? "on" : ""}`} />
+      </div>
 
       {/* FIT 对齐覆盖层：与 Phaser 画布显示区域精确同框（960×540 等比居中） */}
       <div className="clinic-stage">
