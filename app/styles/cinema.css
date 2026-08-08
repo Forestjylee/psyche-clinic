@@ -91,29 +91,8 @@
 }
 .scene-veil.show { opacity: 1; }
 
-/* 患者立绘舞台微微浮动光斑，增加「活着」的感觉 */
-.patient-stage-bg::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.04), transparent 40%);
-  animation: stage-drift 14s ease-in-out infinite alternate;
-}
-@keyframes stage-drift {
-  from { transform: translate(-6%, -4%); }
-  to   { transform: translate(6%, 4%); }
-}
-
 /* ========== 响应式 ========== */
 @media (max-width: 900px) {
-  .dialogue-scene {
-    grid-template-columns: 1fr;
-    grid-template-rows: 38% 62%;
-  }
-  .patient-stage {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
   .clinic-body { grid-template-columns: 1fr; }
   .clinic-header { flex-direction: column; align-items: flex-start; }
   .title-main { font-size: 42px; letter-spacing: 8px; }

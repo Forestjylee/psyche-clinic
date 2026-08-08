@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
 import { DialogueEngine } from "@/lib/engine/DialogueEngine";
@@ -9,9 +10,35 @@ import { TypewriterText } from "./TypewriterText";
 import { TermText } from "./PsychTermSpan";
 import { emotionColors, emotionLabels } from "./constants";
 import { ChibiCharacter } from "./ChibiCharacter";
+import { CLINIC_LAYOUT } from "./phaser/clinic/clinicLayout";
 
-/** 聊天区一条消息（旁白独立走顶部，不入历史） */
+/** 诊室 Phaser 画布（ClinicScene 底层房间 + 医生；ssr:false 动态挂载）。
+ *  Promise.all 同时取 GameCanvas 与 ClinicScene，闭包注入 scenes，
+ *  避免在客户端组件静态引入 Phaser（服务端渲染会崩溃）。 */
+const ClinicRoomCanvas = dynamic(
+  () =>
+    Promise.all([
+      import("./phaser/GameCanvas"),
+      import("./phaser/clinic/ClinicScene"),
+    ]).then(([canvas, clinic]) => {
+      const GameCanvasComp = canvas.GameCanvas;
+      const ClinicSceneComp = clinic.ClinicScene;
+      const ClinicRoom = () => <GameCanvasComp scenes={[ClinicSceneComp]} />;
+      return ClinicRoom;
+    }),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="phaser-canvas phaser-loading">诊室准备中…</div>
+    ),
+  }
+);
+
+/** 一句话记录（旁白独立走顶部，不入历史；P2-6 回顾窗用） */
 type Line = { id: string; speaker: "patient" | "doctor"; text: string };
+
+/** 逻辑坐标 → 覆盖层百分比（960×540 → 100%） */
+const logiPct = (v: number, total: number) => `${(v / total) * 100}%`;
 
 export function DialogueScene() {
   const {
@@ -24,11 +51,11 @@ export function DialogueScene() {
   } = useGame();
 
   const engineRef = useRef<DialogueEngine | null>(null);
-  const chatRef = useRef<HTMLDivElement | null>(null);
   const [node, setNode] = useState<DialogueNode | null>(null);
   const [pState, setPState] = useState<PatientState | null>(null);
   const [emotion, setEmotion] = useState<PatientEmotion>("neutral");
   const [flashback, setFlashback] = useState<MemoryFragment | null>(null);
+  // 保留但不滚动渲染：P2-6 回顾窗需要完整会话记录
   const [history, setHistory] = useState<Line[]>([]);
 
   useEffect(() => {
@@ -42,7 +69,7 @@ export function DialogueScene() {
       },
       onNodeEnter: (n) => {
         setNode(n);
-        // 旁白走顶部展示，不入左右聊天流
+        // 旁白走顶部展示，不入历史
         const sp = n.speaker;
         if (sp === "patient" || sp === "doctor") {
           setHistory((h) => [
@@ -75,12 +102,6 @@ export function DialogueScene() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPatient]);
 
-  // 聊天区自动滚动到底
-  useEffect(() => {
-    const el = chatRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [history]);
-
   const dismissFlashback = () => setFlashback(null);
 
   if (!currentPatient || !node) return null;
@@ -111,7 +132,7 @@ export function DialogueScene() {
       return;
     }
     playSound("click");
-    // 玩家选择的发言进入右侧气泡，然后推进剧情
+    // 玩家选择的发言进入历史（P2-6 回顾窗用），然后推进剧情
     setHistory((h) => [
       ...h,
       { id: `player-${h.length}`, speaker: "doctor", text: c.text },
@@ -122,87 +143,73 @@ export function DialogueScene() {
   const emoColor = emotionColors[emotion];
   const palette = currentPatient.palette;
 
+  // 当前句定位：narration 走顶部旁白，patient/doctor 走各自气泡锚点
+  const sp = node.speaker;
+  const isNarration = sp === "narration";
+  const bubbleAnchor =
+    sp === "patient" ? CLINIC_LAYOUT.bubbleAnchor.patient : CLINIC_LAYOUT.bubbleAnchor.doctor;
+  const bubbleName = sp === "patient" ? currentPatient.name : "你";
+
   return (
     <div className="scene dialogue-scene">
-      <div className="dialogue-narration">
-        {node.speaker === "narration" ? (
-          <TypewriterText key={node.id} text={node.text} />
+      {/* 底层诊室房间 + 医生坐像（Phaser FIT 铺满） */}
+      <ClinicRoomCanvas />
+
+      {/* FIT 对齐覆盖层：与 Phaser 画布显示区域精确同框（960×540 等比居中） */}
+      <div className="clinic-stage">
+        {/* 患者立绘 + 姓名/情绪 tag（emotion 驱动，只走 React） */}
+        <div
+          className="patient-figure"
+          style={{
+            left: logiPct(CLINIC_LAYOUT.patientPos.x, CLINIC_LAYOUT.width),
+            top: logiPct(CLINIC_LAYOUT.patientPos.y, CLINIC_LAYOUT.height),
+          }}
+        >
+          <ChibiCharacter
+            palette={palette}
+            emotion={emotion}
+            size="lg"
+            className="patient-chibi"
+          />
+          <div className="patient-chip">
+            <span className="patient-chip-name">{currentPatient.name}</span>
+            <span className="patient-chip-emo" style={{ color: emoColor }}>
+              {emotionLabels[emotion]}
+            </span>
+          </div>
+        </div>
+
+        {/* 当前句：narration 顶部旁白 / patient·doctor 面对面气泡（换句重挂载打字） */}
+        {isNarration ? (
+          <div className="dialogue-narration" key={node.id}>
+            <TypewriterText text={node.text} />
+          </div>
         ) : (
-          <span className="dialogue-narration-deco">✦</span>
+          <div
+            key={node.id}
+            className={`speak-bubble ${sp}`}
+            style={{
+              left: logiPct(bubbleAnchor.x, CLINIC_LAYOUT.width),
+              top: logiPct(bubbleAnchor.y, CLINIC_LAYOUT.height),
+            }}
+          >
+            <span className="bubble-name">{bubbleName}</span>
+            <TypewriterText text={node.text} />
+          </div>
         )}
       </div>
 
-      <div className="dialogue-main">
-        {/* 左栏：患者立绘 + 状态 */}
-        <div className="patient-stage">
-          <div
-            className="patient-stage-bg"
-            style={
-              {
-                "--stage-color": palette.fog,
-                background: `linear-gradient(180deg, ${palette.fog}1c 0%, var(--bg-panel) 55%, var(--bg-panel-2) 100%)`,
-              } as React.CSSProperties
-            }
-          />
-          <div className="patient-figure">
-            <ChibiCharacter
-              palette={palette}
-              emotion={emotion}
-              size="xl"
-              className="patient-chibi"
-            />
-            <div className="patient-name-label">{currentPatient.name}</div>
-            <div className="patient-emotion-tag" style={{ color: emoColor }}>
-              {emotionLabels[emotion]}
-            </div>
-          </div>
-          {pState ? (
-            <div className="patient-status">
-              <StatusRow label="信任" value={pState.trust} color="var(--good)" />
-              <StatusRow label="防御" value={pState.defense} color="var(--bad)" />
-              <StatusRow label="心情" value={pState.mood} color="var(--accent)" />
-              <StatusRow label="真相" value={pState.truth} color="var(--truth)" />
-            </div>
-          ) : null}
+      {/* 角落四维（紧凑小尺寸；P2-5 再做淡化打磨） */}
+      {pState ? (
+        <div className="corner-stats">
+          <StatusRow label="信任" value={pState.trust} color="var(--good)" />
+          <StatusRow label="防御" value={pState.defense} color="var(--bad)" />
+          <StatusRow label="心情" value={pState.mood} color="var(--accent)" />
+          <StatusRow label="真相" value={pState.truth} color="var(--truth)" />
         </div>
+      ) : null}
 
-        {/* 聊天区：患者消息靠左，玩家消息靠右 */}
-        <div className="chat-area" ref={chatRef}>
-          {history.length === 0 ? (
-            <div className="chat-empty">……</div>
-          ) : (
-            history.map((line, i) => {
-              const isLast = i === history.length - 1;
-              const isPatient = line.speaker === "patient";
-              return (
-                <div
-                  key={line.id}
-                  className={`chat-line ${isPatient ? "chat-patient" : "chat-doctor"}`}
-                >
-                  {isPatient && (
-                    <div
-                      className="chat-avatar patient"
-                      style={{ background: `linear-gradient(150deg, ${palette.primary}, ${palette.secondary})` }}
-                    >
-                      {currentPatient.name.slice(0, 1)}
-                    </div>
-                  )}
-                  <div className={`chat-bubble ${isPatient ? "patient" : "doctor"}`}>
-                    {isLast ? (
-                      <TypewriterText key={line.id} text={line.text} />
-                    ) : (
-                      <div className="dialogue-text">{line.text}</div>
-                    )}
-                  </div>
-                  {!isPatient && <div className="chat-avatar doctor">你</div>}
-                </div>
-              );
-            })
-          )}
-        </div>
-      </div>
-
-      {/* 底部：候选对话 */}
+      {/* 底部：候选对话 / 继续 */}
       <div className="dialogue-options">
         {node.isEnding ? null : node.choices && node.choices.length > 0 ? (
           node.choices.map((c) => {
