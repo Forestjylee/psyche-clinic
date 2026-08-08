@@ -21,6 +21,13 @@
   height: min(calc(100vh - 64px), calc(100vw * 9 / 16));
   container-type: size;
   z-index: 2;
+  /* 覆盖层本身不吞点击，透传给底层 Phaser 画布；子元素再恢复 */
+  pointer-events: none;
+}
+.clinic-stage .speak-bubble,
+.clinic-stage .dialogue-narration,
+.clinic-stage .patient-figure {
+  pointer-events: auto;
 }
 
 /* —— 患者立绘（定位 CLINIC_LAYOUT.patientPos，emotion 只走 React） —— */
