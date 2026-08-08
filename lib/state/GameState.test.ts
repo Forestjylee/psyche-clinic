@@ -6,8 +6,11 @@ import {
   advanceDayState,
   FOLLOW_UP_CHANCE,
   REPUTATION_LOSS_PER_ABANDON,
+  firstSessionDone,
+  clampFirstSessionEnding,
 } from "./GameState";
 import type { GameState, EndingType, PrologueChoice } from "../types";
+import { allPatients, GUIDED_PATIENT_ID } from "../data/patients";
 
 const opts = { maxFollowUps: 2, graceDays: 5 };
 
@@ -282,5 +285,69 @@ describe("advanceDayState 复诊集成", () => {
     expect(g.discharged).toContain("p1");
     expect(g.doctor.reputation).toBe(10 - REPUTATION_LOSS_PER_ABANDON);
     expect(events).toContainEqual({ type: "abandonFollowUp", patientId: "p1" });
+  });
+});
+
+describe("firstSessionDone 首诊完成判定（P4-5）", () => {
+  it("patientRecords 为空 → false", () => {
+    const g = createInitialState();
+    expect(firstSessionDone(g)).toBe(false);
+  });
+  it("有一条患者记录 → true", () => {
+    const g = createInitialState();
+    g.patientRecords = { xiao_bei: "cure" };
+    expect(firstSessionDone(g)).toBe(true);
+  });
+});
+
+describe("clampFirstSessionEnding 首诊结局 clamp（P4-5）", () => {
+  it("首诊未完成 + worsen → acceptance", () => {
+    const g = createInitialState();
+    expect(clampFirstSessionEnding(g, "worsen")).toBe("acceptance");
+  });
+  it("首诊未完成 + tragic → acceptance", () => {
+    const g = createInitialState();
+    expect(clampFirstSessionEnding(g, "tragic")).toBe("acceptance");
+  });
+  it("首诊未完成 + cure → cure（原样，不误伤正常结局）", () => {
+    const g = createInitialState();
+    expect(clampFirstSessionEnding(g, "cure")).toBe("cure");
+  });
+  it("首诊已完成 + worsen → worsen（原样，不影响后续诊疗自由度）", () => {
+    const g = createInitialState();
+    g.patientRecords = { xiao_bei: "cure" };
+    expect(clampFirstSessionEnding(g, "worsen")).toBe("worsen");
+  });
+});
+
+describe("引导患者剧本无坏结局（P4-5 首诊不可选恶化分支）", () => {
+  it("GUIDED_PATIENT_ID 存在于 allPatients 首位，requireReputation 为 0", () => {
+    const guided = allPatients.find((p) => p.id === GUIDED_PATIENT_ID);
+    expect(guided).toBeDefined();
+    expect(allPatients[0].id).toBe(GUIDED_PATIENT_ID);
+    expect(guided!.requireReputation).toBe(0);
+    expect(guided!.difficulty).toBe("简单");
+  });
+  it("对话图所有结局节点类型 ⊆ {cure, acceptance}，且 cure / acceptance 两种结局都存在", () => {
+    const guided = allPatients.find((p) => p.id === GUIDED_PATIENT_ID)!;
+    const endingTypes = Object.values(guided.dialogues)
+      .filter((n) => n.isEnding)
+      .map((n) => n.endingType);
+    expect(endingTypes.length).toBeGreaterThan(0);
+    for (const t of endingTypes) {
+      expect(t === "cure" || t === "acceptance").toBe(true);
+    }
+    expect(endingTypes).toContain("cure");
+    expect(endingTypes).toContain("acceptance");
+  });
+  it("对话图所有选项 next 均指向存在的节点（无死链）", () => {
+    const guided = allPatients.find((p) => p.id === GUIDED_PATIENT_ID)!;
+    const nodeIds = new Set(Object.keys(guided.dialogues));
+    for (const n of Object.values(guided.dialogues)) {
+      if (n.autoNext) expect(nodeIds.has(n.autoNext)).toBe(true);
+      for (const c of n.choices ?? []) {
+        expect(nodeIds.has(c.next ?? "")).toBe(true);
+      }
+    }
   });
 });

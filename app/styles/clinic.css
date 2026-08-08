@@ -311,6 +311,21 @@
 }
 .patient-locked-tag::before { content: "🔒"; font-size: 11px; }
 
+/* 引导患者（第一位来访者）标记：纸木风暖色小签 */
+.patient-guide-tag {
+  font-size: 11px;
+  color: #8a5a2a;
+  background: linear-gradient(180deg, #fdf3e0, #f7e6c8);
+  border: 1px solid #e7c894;
+  border-radius: 999px;
+  padding: 1px 9px;
+  margin-top: 6px;
+  display: inline-block;
+  width: fit-content;
+  letter-spacing: 0.5px;
+}
+.patient-guide-tag::before { content: "✿ "; }
+
 .patient-completed-tag {
   font-size: 12px;
   color: var(--good);

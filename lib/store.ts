@@ -28,8 +28,10 @@ import {
   REPUTATION_LOSS_PER_ABANDON,
   RETURN_VISIT_DELAY,
   resolveDueReturns,
+  firstSessionDone,
+  clampFirstSessionEnding,
 } from "./state/GameState";
-import { allPatients } from "./data/patients";
+import { allPatients, GUIDED_PATIENT_ID } from "./data/patients";
 import { AchievementEngine } from "./engine/AchievementEngine";
 import { DialogueEngine } from "./engine/DialogueEngine";
 import { allSkills, allClinicUpgrades } from "./data/skills";
@@ -323,6 +325,13 @@ export const useGameStore = create<GameStore>((set, get) => {
       const g = get().game;
       if (g.slot >= MAX_SLOTS) {
         toast(`今日已接待 ${g.slot} 位客户，名额已满，请先「休息一日」`, "warn");
+        playSound("locked");
+        return;
+      }
+      // 首诊机制保障（P4-5）：首诊完成前仅引导患者可接诊，其他患者锁定。
+      // ClinicHall 已做卡片锁定，此处兜底拦截其他路径误入（引导患者自己永远可点）。
+      if (p.id !== GUIDED_PATIENT_ID && !firstSessionDone(g)) {
+        toast("先见见今天的第一位来访者", "warn");
         playSound("locked");
         return;
       }
@@ -671,6 +680,15 @@ export const useGameStore = create<GameStore>((set, get) => {
       lastState: PatientState
     ) => {
       const g = get().game;
+      // 首诊机制保障（P4-5）：玩家第一次接诊结局 clamp 到治愈/接纳（PRD 场景1）。
+      // 放在最顶部（activeSession 清断点之前）→ 后续 patientRecords/generateLetter/endingData/音效
+      // 全部用 clamp 后的值，呈现一致。引导剧本本身无坏结局，此处是双保险兜底。
+      const clamped = clampFirstSessionEnding(g, ending);
+      if (clamped !== ending) {
+        ending = clamped;
+        title = "接纳结局 · 被认真听见";
+        text = "这场对话没有解开全部心结，但你们一起看见了此刻的他。他走的时候说，下次还来。有些伤口不必急着愈合——被认真听见，就已经是很大的一步。";
+      }
       // 结案清断点：仅清「本会话」的断点（activeSession 若指向其他已暂停患者则保留——暂停 A 后开诊 B 并结案，A 的进度不丢）
       if (g.activeSession?.patientId === patientId) g.activeSession = null;
       // 应用奖励

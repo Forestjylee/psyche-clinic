@@ -283,6 +283,32 @@ export function clamp(value: number, min = 0, max = 100): number {
 }
 
 // ============================================================
+// 首诊机制保障（P4-5）：玩家第一次接诊必须是「成功、温暖、有意义」的
+// 纯函数，只依赖 patientRecords 参数，不 import lib/data（保持数据层序）
+// ============================================================
+
+/** 首诊是否已完成：任何患者完成过一次接诊即首诊完成（暂停断点 activeSession 不计入） */
+export function firstSessionDone(
+  g: Pick<GameState, "patientRecords">
+): boolean {
+  return Object.keys(g.patientRecords).length > 0;
+}
+
+/**
+ * 首诊结局 clamp：首诊未完成时，恶化/悲剧结局改判为「接纳」（PRD 场景1），
+ * 保证第一次体验是成功、温暖的；首诊完成后原样返回，不影响后续诊疗自由度。
+ */
+export function clampFirstSessionEnding(
+  g: Pick<GameState, "patientRecords">,
+  ending: EndingType
+): EndingType {
+  if (!firstSessionDone(g) && (ending === "worsen" || ending === "tragic")) {
+    return "acceptance";
+  }
+  return ending;
+}
+
+// ============================================================
 // 时间系统：时段换算
 // ============================================================
 const PHASE_LABEL: Record<TimePhase, string> = {
