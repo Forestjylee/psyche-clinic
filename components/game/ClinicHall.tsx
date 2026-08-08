@@ -32,9 +32,12 @@ export function ClinicHall() {
   );
   // 首诊机制保障（P4-5）：任何患者完成一次接诊即首诊完成；完成前除引导患者外全部锁定
   const firstUnlocked = firstSessionDone(game);
-  // 引导患者锁定：首诊未完成时，非引导患者不可接诊（day-1 队列锁定）
+  // 有断点的患者（activeSession）：即使今日已接诊也保留在清单，供「继续上次」
+  const resumableId = game.activeSession?.patientId ?? null;
+  // 引导患者锁定：首诊未完成时，非引导患者不可接诊（day-1 队列锁定）；
+  // 断点患者豁免（评审修复）：可正常「继续上次」，不影响首诊锁定（断点只能来自已开始的会话）
   const guidedLocked = (p: (typeof allAvailable)[number]) =>
-    p.id !== GUIDED_PATIENT_ID && !firstUnlocked;
+    p.id !== GUIDED_PATIENT_ID && !firstUnlocked && resumableId !== p.id;
   // 可对话：未完成且声望已解锁、且未被首诊锁定，或治愈回访已到访（探望非治疗）
   const canTalk = (p: (typeof allAvailable)[number]) => {
     if (!game.patientRecords[p.id]) {
@@ -45,8 +48,6 @@ export function ClinicHall() {
     }
     return !!game.returnVisits[p.id]?.arrived && !game.returnVisits[p.id]?.seen;
   };
-  // 有断点的患者（activeSession）：即使今日已接诊也保留在清单，供「继续上次」
-  const resumableId = game.activeSession?.patientId ?? null;
   // 首页清单：今日已接诊的客户隐藏（次日恢复，断点患者除外）；可对话的客户优先排顶部
   const sortedAvailable = allAvailable
     .filter((p) => resumableId === p.id || !game.todayServed.includes(p.id))

@@ -329,8 +329,13 @@ export const useGameStore = create<GameStore>((set, get) => {
         return;
       }
       // 首诊机制保障（P4-5）：首诊完成前仅引导患者可接诊，其他患者锁定。
-      // ClinicHall 已做卡片锁定，此处兜底拦截其他路径误入（引导患者自己永远可点）。
-      if (p.id !== GUIDED_PATIENT_ID && !firstSessionDone(g)) {
+      // ClinicHall 已做卡片锁定，此处兜底拦截其他路径误入（引导患者自己永远可点）；
+      // 断点患者豁免（评审修复）：可「继续上次」恢复，不影响首诊锁定（断点只能来自已开始的会话）。
+      if (
+        p.id !== GUIDED_PATIENT_ID &&
+        !firstSessionDone(g) &&
+        g.activeSession?.patientId !== p.id
+      ) {
         toast("先见见今天的第一位来访者", "warn");
         playSound("locked");
         return;
