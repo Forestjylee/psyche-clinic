@@ -561,3 +561,29 @@ describe("引导患者剧本无坏结局（P4-5 首诊不可选恶化分支）",
     }
   });
 });
+
+describe("P6-1 技能 id 迁移（旧档兼容）", () => {
+  it("旧存档旧技能 id 全部映射为新能力 id", () => {
+    const legacy = { ...createInitialState(), skills: ["cbt_basic", "freud_dream", "hypnosis_basic", "pharma_basic", "new_drug"] };
+    expect(migrateGameState(legacy).skills).toEqual([
+      "see_through_defense", "make_ta_safe", "guide_firmly", "hold_steady", "another_way",
+    ]);
+  });
+  it("已迁移的新存档保持原样（幂等）", () => {
+    const fresh = { ...createInitialState(), skills: ["see_through_defense", "hold_silence"] };
+    expect(migrateGameState(fresh).skills).toEqual(["see_through_defense", "hold_silence"]);
+  });
+  it("混合存档（部分旧部分新）只迁移旧 id", () => {
+    const mix = { ...createInitialState(), skills: ["cbt_basic", "hold_silence", "exposure_therapy"] };
+    expect(migrateGameState(mix).skills).toEqual(["see_through_defense", "hold_silence", "face_fear"]);
+  });
+  it("未知 id 保留原样（不丢档）", () => {
+    const g = { ...createInitialState(), skills: ["future_skill", "cbt_basic"] };
+    expect(migrateGameState(g).skills).toEqual(["future_skill", "see_through_defense"]);
+  });
+  it("旧存档缺失 skills 字段时补齐为空数组", () => {
+    const legacy = { ...createInitialState() } as Partial<GameState>;
+    delete legacy.skills;
+    expect(migrateGameState(legacy as GameState).skills).toEqual([]);
+  });
+});

@@ -6,6 +6,7 @@ import type {
   EndingType,
 } from "../types";
 import { saveGameState, loadGameState, clearGameState } from "./Storage";
+import { SKILL_ID_MIGRATIONS } from "../data/skills";
 
 // ============================================================
 // 时间系统常量
@@ -226,6 +227,9 @@ export function migrateGameState(data: GameState): GameState {
       sanityStreak: 0,
     };
   }
+  // 技能（P6-1）：旧技能 id → 新能力 id 映射迁移，防技能引用悬空（PRD §7 不丢档）
+  if (!Array.isArray(data.skills)) data.skills = [];
+  else data.skills = data.skills.map((s) => SKILL_ID_MIGRATIONS[s] ?? s);
   return data;
 }
 
