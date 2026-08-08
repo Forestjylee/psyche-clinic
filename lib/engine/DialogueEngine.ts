@@ -384,6 +384,22 @@ export class DialogueEngine {
     return Array.from(this.triggeredMemories);
   }
 
+  /** 断点恢复定位（P2 补轮节点兼容，纯新增）：最低轮次保护的补轮节点由 buildPadNode
+   * 动态生成（`_pad_${round}` 患者独白 / `_pad_c_${round}` 医生二选一），不落 scenario.dialogues
+   * 表，直接以该 id 作为断点恢复会回退 startNode 从头重播（且重走选择会重复叠加效果）。
+   * 这里将补轮节点映射回其导向的真实结局节点：恢复后 enterNode(结局) 因 state.round < minRounds
+   * 自动重建同一补轮，进度等价。excludePrefixes 供快照层过滤恢复后会重建的 history 行。 */
+  getResumeInfo(): { nodeId: string; excludePrefixes: string[] } {
+    const id = this.currentNode.id;
+    if (id.startsWith("_pad_")) {
+      // _pad_${round}：选项内嵌在 _padChoice；_pad_c_${round}：选项在自身。二者 choices 均指向结局节点。
+      const pad = this.currentNode as unknown as { _padChoice?: DialogueNode };
+      const endingId = (pad._padChoice ?? this.currentNode).choices?.[0]?.next;
+      if (endingId) return { nodeId: endingId, excludePrefixes: ["_pad_"] };
+    }
+    return { nodeId: id, excludePrefixes: [] };
+  }
+
   /** 生成结局信件（写入消息盒子） */
   static generateLetter(
     scenario: PatientScenario,

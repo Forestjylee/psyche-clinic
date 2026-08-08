@@ -137,12 +137,16 @@ export function DialogueScene() {
   const snapshotSession = (): ActiveSession | null => {
     const eng = engineRef.current;
     if (!eng || !currentPatient) return null;
-    const nodeId = eng.getCurrentNode().id;
-    // 快照排除「当前节点行」：该行在恢复后 start() 首次 enterNode 时会重新追加。
-    // 若保留，恢复后回顾窗历史会重复断点节点当前句（评审缺陷修复，方案 B）；
-    // 排除后无论暂停时序如何，恢复历史都恰好含断点句一次。
+    // 断点定位经 getResumeInfo()：补轮节点（_pad_*）不落剧本表，映射回其导向的真实结局节点，
+    // 恢复后引擎按 state.round 自动重建补轮（最终评审 I-1）。普通节点即自身 id。
+    const info = eng.getResumeInfo();
+    const nodeId = info.nodeId;
+    // 快照排除「恢复后会重建的行」：断点节点当前句（恢复后 start() 首次 enterNode 重新追加，
+    // 方案 B 防重复）+ 补轮前缀行（恢复后 buildPadNode 重建补轮独白/二选一会重新追加）。
     const historyBeforeNode = history.filter(
-      (l) => !l.id.startsWith(`${nodeId}-`)
+      (l) =>
+        !info.excludePrefixes.some((p) => l.id.startsWith(p)) &&
+        !l.id.startsWith(`${nodeId}-`)
     );
     return {
       patientId: currentPatient.id,
