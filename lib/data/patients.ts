@@ -540,11 +540,11 @@ export const patientB: PatientScenario = {
           requireSkill: "hold_through_crisis",
           effect: { trust: 20, truth: 40, doctorReputation: 5, doctorExp: 50 },
           next: "b_end_hidden",
-          hint: "需要技能：危机干预",
+          hint: "需要技能：在崩溃边缘陪住 ta",
         },
         {
           id: "b14b",
-          text: "「我建议您还是住院观察一段时间。幻觉史不算短，稳妥起见，接受系统治疗最保险。」",
+          text: "「我建议您还是住院观察一段时间。幻觉史不算短，稳妥起见，接受更全面专业的治疗最保险。」",
           kind: "confront",
           effect: { trust: -18, defense: 20, mood: -12 },
           next: "b_end_worsen",
@@ -641,7 +641,7 @@ export const patientC: PatientScenario = {
         },
         {
           id: "c2",
-          text: "「失眠很常见。我给你开点助眠药，先让你能睡。」",
+          text: "「失眠很常见。我先开点药，让你能睡。」",
           kind: "prescribe",
           effect: { mood: 10, doctorMoney: 50 },
           next: "c_p2_med",

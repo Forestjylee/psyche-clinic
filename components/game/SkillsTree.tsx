@@ -204,11 +204,11 @@ export function SkillsTree() {
       </button>
       <h2>技 能 树</h2>
       <p className="subtitle">
-        通过接诊积累经验，习得不同流派的诊疗技艺。当前 EXP：{game.doctor.exp} /{" "}
+        通过接诊积累经验，学会不同的倾听与陪伴方式。当前 EXP：{game.doctor.exp} /{" "}
         {expToNext(game.doctor.level)}
       </p>
 
-      {/* 流派单选：先选流派，再展示对应技能树 */}
+      {/* 陪伴风格单选：先选风格，再展示对应技能树 */}
       <div className="tech-school-picker">
         {schools.map((s) => {
           const skills = allSkills.filter((x) => x.school === s);
