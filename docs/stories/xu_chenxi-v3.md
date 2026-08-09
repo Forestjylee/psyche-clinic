@@ -455,6 +455,7 @@
   id: "xc1_out",
   speaker: "narration",
   text: "第一次会谈结束。许晨曦起身时，把手机塞进包里，又掏出来看了一眼屏幕——还是那个育儿视频。她按灭屏幕，声音很轻：『……下次，我还来。』她在门口站了两秒，才转身走出去。",
+  beatEnd: { resumeNode: "xc2_start" },
   autoNext: "xc2_start",
 }
 ```
@@ -850,6 +851,7 @@
   id: "xc2_out",
   speaker: "narration",
   text: "第二次会谈结束。许晨曦握着保温杯，在门口停了一会儿。她说：『医生，我回去以后，想试着跟我先生说一句实话——那天晚上我不是没事，我是很难过。』她说完，自己先笑了一下，眼眶却红了。",
+  beatEnd: { resumeNode: "xc3_start" },
   autoNext: "xc3_start",
 }
 ```
@@ -1245,6 +1247,7 @@
   id: "xc3_out",
   speaker: "narration",
   text: "第三次会谈结束。许晨曦走到门口，又折回来，把保温杯放下，从里面倒出一点水，说：『医生，这是孩子今天喝剩的。我忽然觉得，连这点剩水，都比我考过的所有试，更有温度。』她说完，自己笑了。",
+  beatEnd: { resumeNode: "xc4_start" },
   autoNext: "xc4_start",
 }
 ```
@@ -1616,6 +1619,7 @@
   id: "xc4_out",
   speaker: "narration",
   text: "第四次会谈结束。许晨曦没有立刻走。她看着窗外，轻声说：『医生，我想回家，好好抱抱我儿子。抱他的时候，我不想再数他够不够好，就想抱抱他。』她说完，自己先笑出了声，那笑声里，带着一点从没有过的轻。",
+  beatEnd: { resumeNode: "xc5_start" },
   autoNext: "xc5_start",
 }
 ```

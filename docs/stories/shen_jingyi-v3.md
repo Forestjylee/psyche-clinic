@@ -534,6 +534,7 @@
   id: "sj1_out",
   speaker: "narration",
   text: "她走后，你翻回体检报告。转诊单上，是周倩签的名。备注写着：「老同学，劝了三年，今年她终于松口了。她先生有点问题，你们别让她一个人扛。」你合上单子。窗外的天快黑了。",
+  beatEnd: { resumeNode: "sj2_start" },
   autoNext: "sj2_start",
 }
 ```
@@ -976,6 +977,7 @@
   id: "sj2_out",
   speaker: "narration",
   text: "她走后，你在桌上发现一枚掉落的耳钉。银色的，很素，像是戴了很多年。你没有追出去。第二次会谈，她把「玲玲」两个字，从口袋里掏了出来。你猜，下一次她来，会带着那句「从小就」来。",
+  beatEnd: { resumeNode: "sj3_start" },
   autoNext: "sj3_start",
 }
 ```
@@ -1442,6 +1444,7 @@
   id: "sj3_out",
   speaker: "narration",
   text: "她走后，你拿起那枚银耳钉。素得不能再素，却在她母亲和她之间，传了一辈子。你想起她说的那句——「我妈说的那些话，是怎么长进我骨头里的」。下一次来，她会带着七岁那个夏天来。",
+  beatEnd: { resumeNode: "sj4_start" },
   autoNext: "sj4_start",
 }
 ```
@@ -1908,6 +1911,7 @@
   id: "sj4_out",
   speaker: "narration",
   text: "她走出门，腰背还是直，但那根绷着的弦，好像松了一点点。你看着她的背影，想起那个七岁夏天，蹲在灶台边给妈妈递糖的女孩。她把那件事记了三十五年。现在，她终于肯把它说出来了。",
+  beatEnd: { resumeNode: "sj5_start" },
   autoNext: "sj5_start",
 }
 ```
@@ -2316,6 +2320,7 @@
   id: "sj5_out",
   speaker: "narration",
   text: "她走后，你把桌上那枚银色耳钉收进抽屉。你知道，下一次她来，会带着一个决定来。这个决定，不是为了丈夫，不是为了体面，不是为了任何人——是为了沈静宜自己。你等着她。",
+  beatEnd: { resumeNode: "sj6_start" },
   autoNext: "sj6_start",
 }
 ```

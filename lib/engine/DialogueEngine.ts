@@ -46,6 +46,12 @@ export interface SessionCallbacks {
   onComboTrigger?: (comboCount: number) => void;
   /** 真相揭示到阈值时触发记忆碎片闪回 */
   onMemoryTrigger?: (fragment: MemoryFragment) => void;
+  /**
+   * 节拍边界（治疗分期复诊）：当前节点是节拍结束（患者离开），玩家点击继续后触发。
+   * resumeNode 为下一节拍起始节点，复诊到访后从它恢复引擎。
+   * 区别于 onEnding（治疗结束）：此回调不会结案，只暂停本阶段。
+   */
+  onBeatEnd?: (resumeNode: string) => void;
 }
 
 export class DialogueEngine {
@@ -150,6 +156,12 @@ export class DialogueEngine {
       this.enterNode(pad._padChoice);
       return;
     }
+    // 节拍边界：患者离开，本阶段结束——不走 autoNext（保留的 autoNext 字段作数据兜底），
+    // 触发节拍结束事件，由 store 安排 N 天后复诊。
+    if (this.currentNode.beatEnd) {
+      this.callbacks.onBeatEnd?.(this.currentNode.beatEnd.resumeNode);
+      return;
+    }
     if (this.currentNode.autoNext) {
       const next = this.scenario.dialogues[this.currentNode.autoNext];
       if (next) this.enterNode(next);
@@ -161,10 +173,6 @@ export class DialogueEngine {
     // 1. 检查条件
     if (!this.meetsRequirement(choice)) {
       this.callbacks.onFloatingText("条件不满足", "warn");
-      return;
-    }
-    if (choice.requireSkill && !this.game.skills.includes(choice.requireSkill)) {
-      this.callbacks.onFloatingText("需要对应技能", "warn");
       return;
     }
 

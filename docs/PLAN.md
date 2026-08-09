@@ -21,7 +21,7 @@
 | P3 | 患者档案图鉴 | §5.3 / 场景4 | 全新 | 📋 待启 |
 | P4 | 序章交互化 + 边做边学 | §5.2 / 场景0·1 | 中改 | 📋 待启 |
 | P5 | 其余调整 | 场景3/6/7 | 中小改 | 📋 待启 |
-| P6 | 技能树语义重构 + 话术去术语化（评审 P0） | §1.2 / 场景5 | 数据层大改 | 📋 待启 |
+| P6 | 技能树语义重构 + 话术去术语化（评审 P0） | §1.2 / 场景5 | 数据层大改 | 🗑 已下线（v2.5.0 整体删除技能树，语义重构随之下线） |
 
 > **排序原则**：PRD 界面重心 = 叙事层 > 档案图鉴 > 经营层，但 P1 首页经营面板**先行**——它是玩家每天打开就面对的第一屏，所有叙事内容都从这页进入，改动明确、收益直接。
 
@@ -195,6 +195,10 @@
 | 2026-08-08 | 文档治理 | 主 PRD 全量重构 v1.0.0；kairosoft 专项文档作废删除；主 SPEC v1.2.0；本文档 v2.0.0 |
 | 2026-08-09 | 首页回归全 React | 移除大厅画布与「预约清单」弹层，预约全列表直放首页（React 清晰卡片）；去重（个人成长 6 入口/发现客户交底部栏）；诊所状态精简卡+花园入口；装修模式降级；对话候选选项区/气泡锚点防遮挡调整（SPEC v1.4.0 / PLAN v2.2.0） |
 | 2026-08-09 | 患者池动态化+生成系统下线 | 剧本池 glob 自动收集（新剧本入目录即进池）；难度按轮次重标（lin_xiao 长档→困难、短档→简单）；患者逐日随机到达（难度分桶递进、引导患者首日）；成就去患者化（碎片→通用纪念物、回访→动态已治愈患者）；生成器下线、发现客户改手写池候选；旧剧本 chen_lo/zhou_mingyuan 下线（SPEC v1.5.0 / PLAN v2.3.0） |
+| 2026-08-09 | 治疗分期复诊（节拍断拍） | 节拍与节拍之间隔一段时间：节拍结束患者离开，1~3 天后复诊到访再开启下一节拍。`beatEnd` 节拍边界标记（引擎优先于 autoNext、不结案）+ `onBeatEnd` 回调；GameState `treatmentStages`（每患者节拍进度快照）+ `store.completeBeat`（写记录/耗名额/清断点）+ `restOneDay` 到期到访 + `finishSession` 清理；DialogueScene 复诊恢复、ClinicHall/Tracking 复诊卡；确定性测试 `lib/state/treatmentStages.test.ts` 15 例（SPEC v1.6.0 / PLAN v2.4.0） |
+| 2026-08-09 | 技能树系统下线 | 删除技能树（allSkills/SkillsTree/learnSkill/skills 场景与字段/requireSkill/成长成就 growth_skill_6、growth_skill_8）；Skill/SkillSchool 类型移除；旧档 skills 迁移逻辑删除；DialogueScene/DialogueEngine 技能门槛死代码清理；诊所升级 allClinicUpgrades 独立保留。剧本零 requireSkill 引用（grep 验证），删除无行为变更（SPEC v1.7.0 / PLAN v2.5.0） |
+| 2026-08-09 | 多槽位存档+本地账号+反馈入口 | HUD 反馈按钮+内置弹窗存本地草稿；Storage 多槽位存档（槽索引+每槽独立 key，旧单档自动迁移槽 1）；本地账号（昵称+自动用户 id，存档打归属标记）；store 槽感知（新游戏新槽/覆盖、继续选槽、删除同步 hasSave、所有保存落盘当前槽）；TitleScreen 注册/切换昵称+存档列表弹窗（云端置灰、可删除）；`window.setTimeout`→`setTimeout`。测试 Storage 14 例 + store.slot 7 例（SPEC v1.8.0 / PLAN v2.6.0） |
+| 2026-08-09 | 昵称全局唯一（永久保留） | Storage 新增昵称登记表 `ps.usernames.v1`（昵称→用户 id，永久保留，注册过的昵称不可再注册，换昵称旧名仍占用）；`registerUser` 返回 RegisterOutcome（ok/duplicate/invalid）；`ensureNicknameRegistered` 存量账号补登；store register 透传结果 + init 补登；TitleScreen 冲突提示。测试 Storage 15 例 + store.slot 8 例（SPEC v1.8.1 / PLAN v2.6.1） |
 
 ---
 
@@ -205,6 +209,10 @@
 | v2.1.0 | 2026-08-08 | **评审修订**：落实专家评审 + 用户四项拍板。P2 新增 P2-8 会话断点快照（断点续接落库）+ 响应式/遮挡验收；P3-1 新增 `unlockedFragments` 碎片落库；P4-4 对话玩法速览改「帮助」入口可回看；P4-5 第一位患者机制保障（day-1 队列锁定 + 首诊结局 clamp）；P5-2 慈善获客语义改低额慈善活动费、P5-3 理智扩为完整闭环、P5-4/P5-5 成就拆分两步、P5-6 名额提升机制；**新增 P6 技能树语义重构 + 话术去术语化（评审 P0）**；P1-2 改核对性任务 |
 | v2.2.0 | 2026-08-09 | **首页回归全 React（SPEC §15 v1.4.0）**：P1 新增 P1-6——移除 Phaser 大厅画布与「预约清单」弹层，预约全列表直放首页；去重（个人成长 6 入口/发现客户交底部栏）；保留诊所状态精简卡+花园入口；装修模式降级（拖动落格失效，外观/摆放保留在升级面板）；对话候选选项区 max-height 46%→34%、气泡锚点 y 250→190 防遮挡 |
 | v2.3.0 | 2026-08-09 | **患者池动态化 + 逐日随机到达 + 成就去患者化 + 生成系统下线（SPEC §13 v1.5.0）**：patients.ts 患者池由 `scripts/scan-patients.mjs`（predev/pretest/prebuild 钩子）扫描 `lib/data/patients/` 生成聚合索引自动收集（新剧本入目录即进池，不写死患者数）；难度按档位/轮次重标（短→简单 / 中→普通 / 长→困难，lin_xiao→困难）；GameState 新增 `arrivedPatients` 患者逐日随机到达（难度分桶递进、引导患者首日）；成就碎片奖励改通用纪念物、回访奖励改动态已治愈患者；生成器（generator/sceneBuilder/truths/seeds/Generator）下线、发现客户改从手写池选候选；旧剧本下线 chen_lo/zhou_mingyuan（chen_mo 保留） |
+| v2.4.0 | 2026-08-09 | **治疗分期复诊·节拍断拍（SPEC §16 v1.6.0）**：节拍结束患者离开，1~3 天后复诊到访再开下一节拍。DialogueNode `beatEnd?: {resumeNode}` 边界标记 + `DialogueEngine.continue()` 优先触发 `onBeatEnd`（不结案）；GameState `treatmentStages`（stage/resumeNode/patientState/triggeredMemories/dueDay/arrived）+ `completeBeat`（写记录/耗名额/清断点）+ `restOneDay` 到期到访（治疗中不推进 waitingDays）+ `finishSession` 清理；DialogueScene 复诊恢复（activeSession 断点 > treatmentStages 复诊）、ClinicHall/Tracking 复诊卡；lin_xiao 长档 5 处边界标记；测试 `lib/state/treatmentStages.test.ts` 15 例。其余剧本 beatEnd 标记与转换器支持按节拍制约定补齐 |
+| v2.5.0 | 2026-08-09 | **技能树系统下线（SPEC §13 v1.7.0）**：删除技能树（allSkills/SkillsTree/learnSkill/skills 场景与字段/requireSkill/成长成就 growth_skill_6、growth_skill_8）；Skill/SkillSchool 类型移除；旧档 skills 迁移逻辑删除；DialogueScene/DialogueEngine 技能门槛死代码清理；诊所升级 allClinicUpgrades 独立保留。剧本零 requireSkill 引用（grep 验证），删除无行为变更 |
+| v2.6.0 | 2026-08-09 | **多槽位存档 + 本地账号 + HUD 反馈入口（SPEC §13 v1.8.0）**：HUD 新增「反馈」按钮（内置弹窗，bug/建议/其他，存本地草稿）；Storage 槽位系统（槽索引 `ps.saveIdx.v1` + 每槽独立 key `ps.slot.<id>`，元信息含天数/等级/金钱/时间/来源 local\|cloud/归属；saveSlot/loadSlot/deleteSlot/listSlots/nextSlotId；旧单档 `ps.save.v1` 自动迁移槽位 1）；本地账号 `ps.user.v1`（自动生成用户 id + 昵称，存档打归属标记，云端区分用户预留）；store 槽感知（activeSlotId/saveSlots/currentUser；newGame 缺省新槽/指定覆盖、continueGame(slotId)、deleteSlot 删光同步 hasSave、commit/saveNow/pauseSession/backToTitle/enterClinic 落盘当前槽）；TitleScreen 注册/切换昵称入口 + 存档列表弹窗（诊所名/天数/等级/金钱/时间/归属/来源，云端置灰，可删除）；`window.setTimeout`→`setTimeout`（SSR 安全）。测试 Storage 14 例 + store.slot 7 例 |
+| v2.6.1 | 2026-08-09 | **昵称全局唯一·永久保留（SPEC §13 v1.8.1）**：Storage 新增昵称登记表 `ps.usernames.v1`（昵称→用户 id，永久保留，本地任何账号注册过的昵称均不可再注册，换昵称后旧昵称仍被占用，为云端后台按昵称区分用户铺路）；`registerUser` 返回 `RegisterOutcome`（ok/duplicate/invalid，重名不落盘）；`ensureNicknameRegistered` 存量账号昵称补登（老数据升级）；store `register` 透传结果对象 + init 补登；TitleScreen 注册/切换昵称冲突提示「该昵称已被使用，永久保留，换一个吧」。测试 Storage 15 例 + store.slot 8 例 |
 | v2.1.2 | 2026-08-08 | **评审修订（第三轮）**：头部配套文档版本号同步；P5-6 明确第 4-5 名额切入 `night` 相位（激活现有夜间分支，用户确认）；P4-6 语义写透（=敏感结局演出自动简短呈现，非悲剧不出现，与 `SENSITIVE_ENDINGS` 对齐）；P6-1 注明新 id 与 P6-3 迁移映射表同步定义 |
 | v2.1.1 | 2026-08-08 | **评审修订（第二轮）**：P5-2 增补同步 SPEC §3.5/§3.6 慈善语义；P5-6 增补时段映射/金钱节奏/单日时长下游承接；P6 新增 P6-3 旧档技能 id 迁移 + §9 维护原则例外声明；P4 新增 P4-6 标题屏「跳过悲剧演出」偏好接入；P4-5 措辞对齐 P5-6 首日 2 名额；P5-4 反向引用 SPEC §12.3 |
 | v2.0.0 | 2026-08-08 | **全量重写**：承接新主 PRD v1.0.0，界面实施优先级 P1-P5（首页经营面板/对话场景化/档案图鉴/序章交互化+边做边学/其余调整）；kairosoft 专项 PLAN 作废删除；完成记录补充界面重构 M1/M2 |

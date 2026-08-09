@@ -4,10 +4,12 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useGame } from "@/lib/hooks/useGame";
 import { slotPhaseLabel, isNightSlot, todayCapacity } from "@/lib/state/GameState";
+import { FeedbackDialog } from "./FeedbackDialog";
 
 export function HUD() {
   const { game, scene, expToNext, toggleMute, muted, saveNow, backToTitle, playSound } = useGame();
   const [confirmExit, setConfirmExit] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   if (scene === "title") return null;
   const d = game.doctor;
   const sanColor = d.sanity > 60 ? "var(--good)" : d.sanity > 30 ? "var(--warn)" : "var(--bad)";
@@ -159,6 +161,16 @@ export function HUD() {
           className="hud-action-btn ghost"
           onClick={() => {
             playSound("click");
+            setShowFeedback(true);
+          }}
+          title="问题反馈"
+        >
+          反馈
+        </button>
+        <button
+          className="hud-action-btn ghost"
+          onClick={() => {
+            playSound("click");
             setConfirmExit(true);
           }}
           title="退出游戏，返回标题"
@@ -203,6 +215,12 @@ export function HUD() {
                 </div>
               </div>
             </div>,
+            document.body
+          )
+        : null}
+      {showFeedback
+        ? createPortal(
+            <FeedbackDialog onClose={() => setShowFeedback(false)} />,
             document.body
           )
         : null}

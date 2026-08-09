@@ -481,6 +481,7 @@
   id: "bl1_out",
   speaker: "narration",
   text: "白兰起身时，把那张报告单又折了一遍，放进包里。走到门口她回头：「医生，我下回……还能来吗？」问完她自己先笑了，「我这是怎么了，还要人批准。」",
+  beatEnd: { resumeNode: "bl2_start" },
   autoNext: "bl2_start",
 }
 ```
@@ -863,6 +864,7 @@
   id: "bl2_out",
   speaker: "narration",
   text: "白兰离开时，把手机里病友群的消息又翻了一遍，停在「恭喜」两个字上。她在后面删掉了一行没发出去的字。走出门时，她回头说了句：「医生，麻烦您了。」",
+  beatEnd: { resumeNode: "bl3_start" },
   autoNext: "bl3_start",
 }
 ```
@@ -1245,6 +1247,7 @@
   id: "bl3_out",
   speaker: "narration",
   text: "白兰走的时候，把那本留言册紧紧抱在怀里。她在门口站了很久，像在把「写诗的白兰」这个名字，在心里念了又念。转身下楼时，她的背挺得比来时直了一些。",
+  beatEnd: { resumeNode: "bl4_start" },
   autoNext: "bl4_start",
 }
 ```
@@ -1605,6 +1608,7 @@
   id: "bl4_out",
   speaker: "narration",
   text: "白兰走的时候，把那张纸条小心地放回贴身口袋。她走到门口，停了一下，回头说：「医生，我下次带她来。您……得陪着我。」说完自己先笑了，眼睛却是湿的。",
+  beatEnd: { resumeNode: "bl5_start" },
   autoNext: "bl5_start",
 }
 ```

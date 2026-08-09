@@ -314,6 +314,7 @@
   id: "ly1_out",
   speaker: "narration",
   text: "第一次会谈结束，陆云馨离开前，在门口停了一下。「……医生，下次还是这个点吗？」她问得很认真，像在确认一个排期。她丈夫在走廊尽头等她，两人并肩走出去，谁都没说话。",
+  beatEnd: { resumeNode: "ly2_start" },
   autoNext: "ly2_start",
 }
 ```
@@ -588,6 +589,7 @@
   id: "ly2_out",
   speaker: "narration",
   text: "第二次会谈结束时，陆云馨把手机收进包里，站起来。走到门口，她回头说：「医生，我女儿画的画，我下次带过来。她七岁那年画的，我一直留着。」她的语气很轻，像在说一件很久远的事。",
+  beatEnd: { resumeNode: "ly3_start" },
   autoNext: "ly3_start",
 }
 ```
@@ -852,6 +854,7 @@
   id: "ly3_out",
   speaker: "narration",
   text: "第三次会谈结束，陆云馨把那张画小心地折好，放回信封。走到门口，她回头说：「医生，我女儿画的那个小女孩，跟我画的，真的一模一样。我以前没发现。现在看见了，心里反而，松了一点。」",
+  beatEnd: { resumeNode: "ly4_start" },
   autoNext: "ly4_start",
 }
 ```

@@ -45,9 +45,16 @@ export function ClinicHall() {
   const isReturning = (p: (typeof allAvailable)[number]) =>
     !!game.returnVisits[p.id]?.arrived && !game.returnVisits[p.id]?.seen;
   const isResuming = (p: (typeof allAvailable)[number]) => resumableId === p.id;
-  // 今日已接诊的客户隐藏（次日恢复，断点患者除外）
+  // 治疗分期复诊（节拍断拍）：节拍结束患者离开，复诊到访前从大厅隐藏；到访后显示复诊卡
+  const treatment = (p: (typeof allAvailable)[number]) =>
+    game.treatmentStages[p.id];
+  const waitingVisit = (p: (typeof allAvailable)[number]) =>
+    !!treatment(p) && !treatment(p)!.arrived;
+  const visitDue = (p: (typeof allAvailable)[number]) =>
+    !!treatment(p) && treatment(p)!.arrived;
+  // 今日已接诊的客户隐藏（次日恢复，断点患者除外）；等待复诊的患者始终隐藏（未到访不打扰）
   const notServed = (p: (typeof allAvailable)[number]) =>
-    isResuming(p) || !game.todayServed.includes(p.id);
+    isResuming(p) || (!game.todayServed.includes(p.id) && !waitingVisit(p));
 
   // 主清单「今日预约」：断点患者 + 未完成 + 回访探望；可对话的客户优先排顶部
   // （断点患者恒在主清单「继续上次」，即使其 patientRecords 已有记录）
@@ -150,6 +157,10 @@ export function ClinicHall() {
           ) : null}
           {resuming ? (
             <div className="patient-resume-tag">⏸ 上次对话未完成 · 点击继续</div>
+          ) : visitDue(p) ? (
+            <div className="patient-return-tag">
+              ✚ 复诊 · 上次谈到第 {treatment(p)!.stage} 次会谈，点击继续
+            </div>
           ) : returning ? (
             <div className="patient-return-tag">✿ 他来看你了 · 点击探望</div>
           ) : servedToday ? (
@@ -184,7 +195,6 @@ export function ClinicHall() {
         </div>
         <div className="clinic-header-right">
           <StatChip val={Object.keys(game.patientRecords).length} label="已接待" />
-          <StatChip val={game.skills.length} label="技能" />
           <StatChip val={game.clinicUpgrades.length} label="设施" />
         </div>
       </div>

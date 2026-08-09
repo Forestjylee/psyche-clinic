@@ -358,6 +358,7 @@
   id: "lg1_out",
   speaker: "narration",
   text: "第一次会谈结束。刘国强起身时，手机响了，是医院护士台的电话。他接起来，声音立刻变了，又稳又低：「行，我马上回去。」挂了电话，他冲你点了下头，三步并两步走了。背影还是那么硬，可你看见他握着手机的手，一直在抖。",
+  beatEnd: { resumeNode: "lg2_start" },
   autoNext: "lg2_start",
 }
 ```
@@ -621,6 +622,7 @@
   id: "lg2_out",
   speaker: "narration",
   text: "第二次会谈，刘国强走的时候，在门口停了停。他说：「医生，我明天要去跟我爸谈手术的事。我得跟他商量。」这是他第一次说「商量」——从前，他只会听安排。",
+  beatEnd: { resumeNode: "lg3_start" },
   autoNext: "lg3_start",
 }
 ```
@@ -874,6 +876,7 @@
   id: "lg3_out",
   speaker: "narration",
   text: "第三次会谈结束。刘国强在门口站了很久，最后说：「医生，我明儿去跟我爸说说话。」你点头。他走了两步，又回头：「他说不定会嫌我烦。」你看见他笑了一下——那大概是他这些天，第一个不是硬撑出来的笑。",
+  beatEnd: { resumeNode: "lg4_start" },
   autoNext: "lg4_start",
 }
 ```

@@ -401,16 +401,6 @@ export const allAchievements: Achievement[] = [
     reward: { exp: 350, money: 1200 },
   },
   {
-    id: "growth_skill_6",
-    name: "博采众长",
-    description: "同时解锁 6 项或以上技能。",
-    category: "growth",
-    rarity: "epic",
-    target: 6,
-    icon: "✵",
-    reward: { exp: 200, reputation: 6 },
-  },
-  {
     id: "growth_level_30",
     name: "医者仁心",
     description: "医生等级达到 Lv.30。",
@@ -429,16 +419,6 @@ export const allAchievements: Achievement[] = [
     target: 95,
     icon: "✪",
     reward: { exp: 800, money: 3000, sanity: 10 },
-  },
-  {
-    id: "growth_skill_8",
-    name: "学贯中西",
-    description: "你学过的每一种方法，都曾让一双手重新握紧希望。",
-    category: "growth",
-    rarity: "legendary",
-    target: 8,
-    icon: "✺",
-    reward: { exp: 500, reputation: 15 },
   },
 
   // ---------------- 诊所经营类 4 个 ----------------

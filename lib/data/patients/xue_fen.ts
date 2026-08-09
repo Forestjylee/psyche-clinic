@@ -243,6 +243,7 @@ export const patient: PatientScenario = {
   id: "xf1_out",
   speaker: "narration",
   text: "第一次会谈结束。薛芬站起来，又回头看了一眼那杯没喝完的茶。「医生，我要是下礼拜还来，是不是就说明我……真的有问题？」她问得很小声，像怕惊着谁。",
+  beatEnd: { resumeNode: "xf2_start" },
   autoNext: "xf2_start",
 },
   xf2_start: {
@@ -431,6 +432,7 @@ export const patient: PatientScenario = {
   id: "xf2_out",
   speaker: "narration",
   text: "第二次会谈结束。薛芬在门口站了一会儿，忽然说：「我闺女昨晚跟我说，她听见我在梦里喊。喊的什么，我自己也不记得。」她说着笑了一下，笑得有点空。",
+  beatEnd: { resumeNode: "xf3_start" },
   autoNext: "xf3_start",
 },
   xf3_start: {
@@ -620,6 +622,7 @@ export const patient: PatientScenario = {
   id: "xf3_out",
   speaker: "narration",
   text: "第三次会谈结束。薛芬没有立刻走，站在窗边看了很久楼下的操场。「我以前总觉得，当老师得端着。现在我想，端了二十多年，也该让学生看看，老师也会累、也会不高兴了。」",
+  beatEnd: { resumeNode: "xf4_start" },
   autoNext: "xf4_start",
 },
   xf4_start: {

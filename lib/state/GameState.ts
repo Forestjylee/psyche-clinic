@@ -6,8 +6,18 @@ import type {
   EndingType,
   PatientScenario,
 } from "../types";
-import { saveGameState, loadGameState, clearGameState } from "./Storage";
-import { SKILL_ID_MIGRATIONS } from "../data/skills";
+import {
+  saveGameState,
+  loadGameState,
+  clearGameState,
+  saveSlot,
+  loadSlot,
+  deleteSlot,
+  listSlots,
+  nextSlotId,
+  migrateLegacySave,
+} from "./Storage";
+import type { SaveSlotMeta } from "./Storage";
 import { allPatients, GUIDED_PATIENT_ID } from "../data/patients";
 
 // ============================================================
@@ -50,6 +60,23 @@ export function resolveDueReturns(
     if (!rv.arrived && rv.dueDay <= g.day) {
       rv.arrived = true;
       arrived.push({ patientId: pid, ending: rv.ending });
+    }
+  }
+  return arrived;
+}
+
+/**
+ * 治疗分期复诊（节拍断拍，SPEC v1.6.x）：日终推进后结算治疗中患者的复诊到访。
+ * dueDay 到期的治疗中患者标记 arrived=true（进入大厅可继续下一节拍），
+ * 返回本次到访的患者 id 列表，由调用方写通知消息。
+ * 纯函数（原地修改 g.treatmentStages）。
+ */
+export function resolveDueTreatmentVisits(g: GameState): string[] {
+  const arrived: string[] = [];
+  for (const [pid, t] of Object.entries(g.treatmentStages)) {
+    if (!t.arrived && t.dueDay <= g.day) {
+      t.arrived = true;
+      arrived.push(pid);
     }
   }
   return arrived;
@@ -143,7 +170,6 @@ export function createInitialState(): GameState {
       exp: 0,
       level: 1,
     },
-    skills: [],
     clinicUpgrades: [],
     patientRecords: {},
     day: 1,
@@ -158,6 +184,7 @@ export function createInitialState(): GameState {
     messages: [],
     arrivedPatients: [GUIDED_PATIENT_ID],
     returnVisits: {},
+    treatmentStages: {},
     discoveryCandidates: [],
     pendingArrivals: [],
     facilityPositions: {},
@@ -195,6 +222,8 @@ export function migrateGameState(data: GameState): GameState {
   if (!Array.isArray(data.todayFollowUps)) data.todayFollowUps = [];
   if (!data.followUpIdleDays) data.followUpIdleDays = {};
   if (!data.returnVisits) data.returnVisits = {};
+  // 治疗分期复诊（SPEC v1.6.x）：旧存档无此机制，补默认空（治疗中患者保持一次性会话）
+  if (!data.treatmentStages) data.treatmentStages = {};
   // 发现客户：候选与待到达队列（旧存档补默认空）
   if (!Array.isArray(data.discoveryCandidates)) data.discoveryCandidates = [];
   if (!Array.isArray(data.pendingArrivals)) data.pendingArrivals = [];
@@ -235,15 +264,11 @@ export function migrateGameState(data: GameState): GameState {
       sanityStreak: 0,
     };
   }
-  // 技能（P6-1）：旧技能 id → 新能力 id 映射迁移，防技能引用悬空（PRD §7 不丢档）
-  if (!Array.isArray(data.skills)) data.skills = [];
-  else data.skills = data.skills.map((s) => SKILL_ID_MIGRATIONS[s] ?? s);
   return data;
 }
 
-export function loadGame(): GameState | null {
-  const data = loadGameState<GameState>();
-  if (!data) return null;
+/** 清洗/修复存档数据（简单校验 + 旧字段兼容 + 经验结算修复），返回可用的 GameState 或 null */
+export function sanitizeGameState(data: GameState): GameState | null {
   // 简单校验
   if (!data.doctor || typeof data.doctor.reputation !== "number") return null;
   // 兼容旧存档（时间系统字段）
@@ -274,12 +299,64 @@ export function loadGame(): GameState | null {
   return migrateGameState(data);
 }
 
+/** 旧单档入口（迁移前兼容；新代码应走槽位 loadSlotGame/continueGame） */
+export function loadGame(): GameState | null {
+  const data = loadGameState<GameState>();
+  if (!data) return null;
+  return sanitizeGameState(data);
+}
+
+/** 旧单档入口（迁移前兼容） */
 export function saveGame(state: GameState): boolean {
   return saveGameState(state);
 }
 
+/** 旧单档清档（迁移前兼容） */
 export function clearSave(): boolean {
   return clearGameState();
+}
+
+// ---------- 多槽位存档（v1.8）----------
+
+/** 列出所有槽位元信息（按更新时间倒序） */
+export function listSaveSlots(): SaveSlotMeta[] {
+  return listSlots();
+}
+
+/** 保存到指定槽（元信息 clinicName/day/level/money 从 state 提取，归属取当前账号） */
+export function saveGameToSlot(
+  id: string,
+  state: GameState,
+  profile?: { id: string; name: string }
+): boolean {
+  return saveSlot(id, state, {
+    clinicName: state.clinicName,
+    day: state.day,
+    level: state.doctor.level,
+    money: state.doctor.money,
+  }, profile);
+}
+
+/** 读指定槽，清洗后返回可用 GameState（损坏返回 null） */
+export function loadGameFromSlot(id: string): GameState | null {
+  const data = loadSlot<GameState>(id);
+  if (!data) return null;
+  return sanitizeGameState(data.state);
+}
+
+/** 删除指定槽 */
+export function deleteSaveSlot(id: string): boolean {
+  return deleteSlot(id);
+}
+
+/** 下一个可用槽位 id */
+export function nextSaveSlotId(): string {
+  return nextSlotId();
+}
+
+/** 旧单档迁移为槽位 1；返回槽位 id 或 null */
+export function migrateLegacySaveToSlot(): string | null {
+  return migrateLegacySave<GameState>();
 }
 
 /** 医生升级所需经验 */

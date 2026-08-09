@@ -35,19 +35,31 @@ export function walkScenario(scenario: PatientScenario, pick: WalkPick): WalkRes
   const game = createInitialState();
   const memories: string[] = [];
   let ending: EndingType = "cure";
-  const eng = new DialogueEngine(scenario, game, {
+  const callbacks = {
     onStateChange: noop,
     onNodeEnter: noop,
     onFloatingText: noop,
-    onMemoryTrigger: (f) => memories.push(f.id),
-    onEnding: (e) => (ending = e),
-  });
+    onMemoryTrigger: (f: { id: string }) => memories.push(f.id),
+    onEnding: (e: EndingType) => (ending = e),
+  };
+  let eng = new DialogueEngine(scenario, game, callbacks);
   eng.start();
   const seen = new Set<string>();
   let guard = 0;
   while (guard++ < 500) {
     const node = eng.getCurrentNode();
     if (node.isEnding) break;
+    // 节拍边界（beatEnd，治疗分期复诊）：患者离开诊室，跨节拍从下一节拍起始节点继续
+    // （走线验收把「复诊到访」抽象为直接跳到 resumeNode，保留四维状态与已触发碎片）
+    if (node.beatEnd) {
+      eng = new DialogueEngine(scenario, game, callbacks, {
+        nodeId: node.beatEnd.resumeNode,
+        state: eng.getState(),
+        triggeredMemories: eng.getTriggeredMemories(),
+      });
+      eng.start();
+      continue;
+    }
     if (node.choices && node.choices.length > 0) {
       // 过滤不可选选项（与引擎 meetsRequirement 同款判定，供策略只看到可选项）
       const choices = node.choices.filter((c) => {

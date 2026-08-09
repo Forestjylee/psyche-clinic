@@ -479,6 +479,7 @@
   id: "zh1_out",
   speaker: "narration",
   text: "赵海峰离开诊室，妻子在走廊尽头站起来迎他。他没像来时那样把背包抱在胸前，而是让它垂在身侧。走出门前，他回头看了你一眼，像在确认一件还没说出口的事。",
+  beatEnd: { resumeNode: "zh2_start" },
   autoNext: "zh2_start",
 }
 ```
@@ -838,6 +839,7 @@
   id: "zh2_out",
   speaker: "narration",
   text: "赵海峰走的时候，背包背在肩上，步子比上周沉，但背没那么佝了。他在门口停了一下，没回头，像是在心里把一句话按了下去。",
+  beatEnd: { resumeNode: "zh3_start" },
   autoNext: "zh3_start",
 }
 ```
@@ -1197,6 +1199,7 @@
   id: "zh3_out",
   speaker: "narration",
   text: "赵海峰走的时候，在门口站了一会儿，像是在掂量心里那个等式的分量。他没有立刻把背包抱回胸前，而是让它停在肩上。",
+  beatEnd: { resumeNode: "zh4_start" },
   autoNext: "zh4_start",
 }
 ```
@@ -1533,6 +1536,7 @@
   id: "zh4_out",
   speaker: "narration",
   text: "赵海峰走的时候，脚步比来时轻。他在门口回头说了一句：「医生，我昨晚冲闺女吼完，蹲下来跟她说了句对不起。她抱着我哭了。」你说，他第一次会蹲下来了。",
+  beatEnd: { resumeNode: "zh5_start" },
   autoNext: "zh5_start",
 }
 ```

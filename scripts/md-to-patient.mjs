@@ -250,6 +250,40 @@ function main() {
     }
   }
 
+  // 4.5 节拍边界 beatEnd 校验（治疗分期复诊，SPEC v1.6.0）
+  const metaComments = parseMetaComments(metaBlock.code);
+  const tier = metaComments.tier ?? "未知档位";
+  const BEATS_BY_TIER = { 短: 4, 中: 5, 长: 6 };
+  const beats = BEATS_BY_TIER[tier];
+  const beatEndNodes = [];
+  for (let i = 0; i < dialogs.length; i++) {
+    const d = dialogs[i];
+    if (!/beatEnd\s*:/.test(d.code)) continue;
+    beatEndNodes.push(ids[i]);
+    const speaker = field(d.code, "speaker");
+    if (speaker !== "narration") {
+      console.error(`节拍边界节点 ${ids[i]}（第 ${d.startLine} 行）speaker 必须是 narration（患者离开），实际 ${speaker}`);
+      process.exit(1);
+    }
+    if (/isEnding\s*:\s*true/.test(d.code)) {
+      console.error(`节拍边界节点 ${ids[i]}（第 ${d.startLine} 行）是结局节点（isEnding），不应加 beatEnd（末节拍走正常结局）`);
+      process.exit(1);
+    }
+    const rn = d.code.match(/resumeNode\s*:\s*["'`]([^"'`]+)["'`]/);
+    if (!rn) {
+      console.error(`节拍边界节点 ${ids[i]}（第 ${d.startLine} 行）缺少 beatEnd.resumeNode`);
+      process.exit(1);
+    }
+    if (!idSet.has(rn[1])) {
+      console.error(`节拍边界节点 ${ids[i]}（第 ${d.startLine} 行）beatEnd.resumeNode "${rn[1]}" 悬空`);
+      process.exit(1);
+    }
+  }
+  if (beats !== undefined && beatEndNodes.length !== beats - 1) {
+    console.error(`${tier}档（${beats} 节拍）节拍边界数应为 ${beats - 1}（节拍数-1），实际 ${beatEndNodes.length} 处 beatEnd`);
+    process.exit(1);
+  }
+
   // 5. 时间词
   const timeHits = checkTimeWords(dialogs);
   if (timeHits.length > 0) {
@@ -322,7 +356,7 @@ export const patient: PatientScenario = {
   const choiceTotal = doctorNodeIds.length;
   console.log(`✓ 生成 ${basename(outFile)}（${outDir}/${sceneId}.ts）`);
   console.log(`  ts-meta 场景 id: ${sceneId}  节点: ${dialogs.length} 个（医生节点 ${choiceTotal} 个）`);
-  console.log(`  结构校验通过：id 唯一 / startNode 存在 / 引用无悬空 / 结局字段齐备 / 患者口述零叙事时间词`);
+  console.log(`  结构校验通过：id 唯一 / startNode 存在 / 引用无悬空 / 结局字段齐备 / 患者口述零叙事时间词 / 节拍边界 beatEnd 齐备`);
   if (withWalk && testFile) console.log(`✓ 生成 ${basename(testFile)}（--walk 走线验收测试）`);
   console.log(`  tsc --noEmit 通过`);
 }

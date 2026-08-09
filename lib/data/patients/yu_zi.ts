@@ -211,6 +211,7 @@ export const patient: PatientScenario = {
   id: "yz1_out",
   speaker: "narration",
   text: "第一次会谈结束。鱼子站起来，把那卷没拆的快递留在椅子上，又回头拿起来，抱在怀里。走到门口，她说了句：『医生，这屋里有人听我说话，感觉挺怪的。……改天，我还来。』",
+  beatEnd: { resumeNode: "yz2_start" },
   autoNext: "yz2_start",
 },
   yz2_start: {
@@ -392,6 +393,7 @@ export const patient: PatientScenario = {
   id: "yz2_out",
   speaker: "narration",
   text: "第二次会谈结束。鱼子在门口站了一会儿，回头说：『医生，我改天想去趟它常晒太阳的那个公园。以前每个周末，我都带它去。我想去看看，一个人去，是什么感觉。』",
+  beatEnd: { resumeNode: "yz3_start" },
   autoNext: "yz3_start",
 },
   yz3_start: {
@@ -574,6 +576,7 @@ export const patient: PatientScenario = {
   id: "yz3_out",
   speaker: "narration",
   text: "第三次会谈结束。鱼子走到门口，又折回来，说：『医生，我一直以为我是在等它回来。今天我才觉得，我可能是……在等人知道，我一直是一个人。』她说完，自己先愣了愣，然后笑了笑，走了。",
+  beatEnd: { resumeNode: "yz4_start" },
   autoNext: "yz4_start",
 },
   yz3_w01: {

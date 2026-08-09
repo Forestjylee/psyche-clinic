@@ -314,6 +314,7 @@
   id: "jy1_out",
   speaker: "narration",
   text: "第一次会谈结束，江宇离开前，在门口停了一下，理了理西装的领子。「……下次还是这个点吗？」他问得认真，像在确认一个会议排期。",
+  beatEnd: { resumeNode: "jy2_start" },
   autoNext: "jy2_start",
 }
 ```
@@ -588,6 +589,7 @@
   id: "jy2_out",
   speaker: "narration",
   text: "第二次会谈结束时，江宇没有立刻起身。他盯着窗外看了很久。「我每天去的那家咖啡馆，」他忽然说，「墙上有个洞，我都盯了三个月了，今天才看清它是个钉子眼。」",
+  beatEnd: { resumeNode: "jy3_start" },
   autoNext: "jy3_start",
 }
 ```
@@ -852,6 +854,7 @@
   id: "jy3_out",
   speaker: "narration",
   text: "第三次会谈结束。江宇起身时，第一次没理西装领子。他走到门口，回头看了一眼那把椅子。「这椅子，」他说，「比咖啡馆那个好坐。我下次……能不穿西装来吗？」",
+  beatEnd: { resumeNode: "jy4_start" },
   autoNext: "jy4_start",
 }
 ```

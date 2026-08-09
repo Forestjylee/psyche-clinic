@@ -171,7 +171,6 @@ export class AchievementEngine {
     this.set("growth_level_20", game.doctor.level);
     this.set("growth_rep_50", game.doctor.reputation);
     this.set("growth_rep_80", game.doctor.reputation);
-    this.set("growth_skill_6", game.skills.length);
     this.set("clinic_money_10k", game.doctor.money);
     this.set("clinic_money_50k", game.doctor.money);
     this.set("clinic_upgrade_3", game.clinicUpgrades.length);
@@ -247,7 +246,6 @@ export class AchievementEngine {
     // 成长扩展
     this.set("growth_level_30", game.doctor.level);
     this.set("growth_rep_95", game.doctor.reputation);
-    this.set("growth_skill_8", game.skills.length);
     // 隐藏扩展
     this.set("secret_letters_30", game.messages.filter((m) => m.kind === "letter").length);
     this.set("secret_no_loss_15", game.stats.noLossDays);

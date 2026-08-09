@@ -16,7 +16,7 @@ import {
 } from "./GameState";
 import type { GameState, EndingType, PrologueChoice } from "../types";
 import { allPatients, GUIDED_PATIENT_ID } from "../data/patients";
-import { allClinicUpgrades } from "../data/skills";
+import { allClinicUpgrades } from "../data/clinicUpgrades";
 import { DECOR_DEFS } from "../data/decor";
 
 const opts = { maxFollowUps: 2, graceDays: 5 };
@@ -57,7 +57,6 @@ describe("prologueChoice 序章开场选择（P4-1）", () => {
     expect(migrateGameState(g).prologueChoice).toBe("heartbreak");
     const legacy = {
       doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
-      skills: [],
       clinicUpgrades: [],
       patientRecords: {},
       day: 1,
@@ -86,7 +85,6 @@ describe("prologuePassed 序章已通过标记（P4-3）", () => {
     expect(migrateGameState(g).prologuePassed).toBe(true);
     const legacy = {
       doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
-      skills: [],
       clinicUpgrades: [],
       patientRecords: {},
       day: 1,
@@ -108,7 +106,6 @@ describe("unlockedFragments 档案图鉴字段默认值（P3-1）", () => {
   it("旧存档缺少 unlockedFragments 时 migrate 补齐为 {}", () => {
     const legacy = {
       doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
-      skills: [],
       clinicUpgrades: [],
       patientRecords: {},
       day: 1,
@@ -137,7 +134,6 @@ describe("activeSession 会话断点默认值（P2-8）", () => {
   it("旧存档缺少 activeSession 时 migrate 补齐为 null", () => {
     const legacy = {
       doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
-      skills: [],
       clinicUpgrades: [],
       patientRecords: {},
       day: 1,
@@ -168,7 +164,6 @@ describe("migrateGameState 旧存档兼容", () => {
   it("旧存档缺少复诊字段时补齐默认值", () => {
     const legacy = {
       doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
-      skills: [],
       clinicUpgrades: [],
       patientRecords: {},
       day: 1,
@@ -333,7 +328,6 @@ describe("P5-1 装饰字段默认值（装修=记忆的陈列馆）", () => {
   it("旧存档缺少装饰字段时 migrate 补齐默认值", () => {
     const legacy = {
       doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
-      skills: [],
       clinicUpgrades: [],
       patientRecords: {},
       day: 1,
@@ -437,7 +431,6 @@ describe("P5-3 理智字段默认值（理智完整机制）", () => {
   it("旧存档缺少理智字段时 migrate 补齐为 0", () => {
     const legacy = {
       doctor: { reputation: 10, sanity: 100, money: 500, exp: 0, level: 1 },
-      skills: [],
       clinicUpgrades: [],
       patientRecords: {},
       day: 1,
@@ -553,32 +546,6 @@ describe("引导患者剧本无坏结局（P4-5 首诊不可选恶化分支）",
         expect(nodeIds.has(c.next ?? "")).toBe(true);
       }
     }
-  });
-});
-
-describe("P6-1 技能 id 迁移（旧档兼容）", () => {
-  it("旧存档旧技能 id 全部映射为新能力 id", () => {
-    const legacy = { ...createInitialState(), skills: ["cbt_basic", "freud_dream", "hypnosis_basic", "pharma_basic", "new_drug"] };
-    expect(migrateGameState(legacy).skills).toEqual([
-      "see_through_defense", "make_ta_safe", "guide_firmly", "hold_steady", "another_way",
-    ]);
-  });
-  it("已迁移的新存档保持原样（幂等）", () => {
-    const fresh = { ...createInitialState(), skills: ["see_through_defense", "hold_silence"] };
-    expect(migrateGameState(fresh).skills).toEqual(["see_through_defense", "hold_silence"]);
-  });
-  it("混合存档（部分旧部分新）只迁移旧 id", () => {
-    const mix = { ...createInitialState(), skills: ["cbt_basic", "hold_silence", "exposure_therapy"] };
-    expect(migrateGameState(mix).skills).toEqual(["see_through_defense", "hold_silence", "face_fear"]);
-  });
-  it("未知 id 保留原样（不丢档）", () => {
-    const g = { ...createInitialState(), skills: ["future_skill", "cbt_basic"] };
-    expect(migrateGameState(g).skills).toEqual(["future_skill", "see_through_defense"]);
-  });
-  it("旧存档缺失 skills 字段时补齐为空数组", () => {
-    const legacy = { ...createInitialState() } as Partial<GameState>;
-    delete legacy.skills;
-    expect(migrateGameState(legacy as GameState).skills).toEqual([]);
   });
 });
 

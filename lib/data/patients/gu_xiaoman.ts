@@ -227,6 +227,7 @@ export const patient: PatientScenario = {
   id: "gx1_out",
   speaker: "narration",
   text: "第一次会谈结束。顾小满起身时，动作很轻，像怕压坏什么。她走到门口，回过头，犹豫了一下：「……医生，我下周还能来吗？我就是……觉得跟您说这些，比跟谁说都松快。」",
+  beatEnd: { resumeNode: "gx2_start" },
   autoNext: "gx2_start",
 },
   gx2_start: {
@@ -416,6 +417,7 @@ export const patient: PatientScenario = {
   id: "gx2_out",
   speaker: "narration",
   text: "第二次会谈结束。顾小满没急着走，她低头看了看自己的手，忽然说：「医生，我好像好久没好好看过自己的手了。」她张开十指，在灯光下看了很久，像在看一个陌生人的。",
+  beatEnd: { resumeNode: "gx3_start" },
   autoNext: "gx3_start",
 },
   gx3_start: {
@@ -606,6 +608,7 @@ export const patient: PatientScenario = {
   id: "gx3_out",
   speaker: "narration",
   text: "第三次会谈结束。顾小满走之前，在门口停了一下，忽然笑了：「医生，我今天进来的时候，没先摸肋骨。我是走楼梯上来的，六层。好像也没那么累。」",
+  beatEnd: { resumeNode: "gx4_start" },
   autoNext: "gx4_start",
 },
   gx3_w01: {

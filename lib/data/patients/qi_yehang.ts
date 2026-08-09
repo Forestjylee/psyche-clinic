@@ -318,6 +318,7 @@ export const patient: PatientScenario = {
   id: "qyh1_out",
   speaker: "narration",
   text: "他起身，把那本压在兜里的手松开，走到门口，又停住，没回头：「医生，我今天回去，试着不翻那本病历。」他走了。你看着他的背影，白大褂在走廊灯光里，洗得发白，像穿了十年的一层壳。",
+  beatEnd: { resumeNode: "qyh2_start" },
   autoNext: "qyh2_start",
 },
   qyh2_start: {
@@ -618,6 +619,7 @@ export const patient: PatientScenario = {
   id: "qyh2_out",
   speaker: "narration",
   text: "他起身，走到门口，回头看了你一眼：「医生，你说『记住他，比回放更接近想念他』——我回去试试。」他走后，你注意到沙发上，他坐过的地方，有一小块被捏皱的衣角。他把那颗心，也捏了一路。",
+  beatEnd: { resumeNode: "qyh3_start" },
   autoNext: "qyh3_start",
 },
   qyh3_start: {
@@ -911,6 +913,7 @@ export const patient: PatientScenario = {
   id: "qyh3_out",
   speaker: "narration",
   text: "他临走前，把那副听诊器从布包里拿出来，看了看，又收回去。他说：「医生，这副听诊器，我先不拿进手术室。等我哪天能跟它坦然相处了，再带。」他走了。走廊里的灯，把他影子拉得很长，像一个人扛着一整段童年。",
+  beatEnd: { resumeNode: "qyh4_start" },
   autoNext: "qyh4_start",
 },
   qyh4_start: {
@@ -1220,6 +1223,7 @@ export const patient: PatientScenario = {
   id: "qyh4_out",
   speaker: "narration",
   text: "他站起身，把父亲那张旧照片小心地收进口袋。走到门口，他回头，声音很稳：「医生，下周我带他来。不管他怎么说，我都要把这句话说完。」他走了。你看了一眼窗外，天快黑了。那个扛着一整段童年的人，第一次，想把它放下来。",
+  beatEnd: { resumeNode: "qyh5_start" },
   autoNext: "qyh5_start",
 },
   qyh5_start: {
@@ -1526,6 +1530,7 @@ export const patient: PatientScenario = {
   id: "qyh5_out",
   speaker: "narration",
   text: "那天他走的时候，在门口站了很久。你看见他抬起手，像是要看自己的手，又慢慢放了下来。他没回头，说：「医生，我今晚，去给周航上柱香。」他走了。你发现他坐过的沙发上，有一串握拳松开后的印子——那是他把三十八年的紧，松开了。",
+  beatEnd: { resumeNode: "qyh6_start" },
   autoNext: "qyh6_start",
 },
   qyh6_start: {

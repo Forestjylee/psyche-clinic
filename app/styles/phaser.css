@@ -124,9 +124,6 @@
 .bb-badge-red {
   background: #e0564a;
 }
-.bb-badge-lv {
-  background: var(--accent-2);
-}
 .bb-badge-ach {
   background: var(--gold);
   color: #3a2a10;

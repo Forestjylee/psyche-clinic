@@ -19,6 +19,12 @@ import {
   loadGame,
   saveGame,
   clearSave,
+  saveGameToSlot,
+  loadGameFromSlot,
+  deleteSaveSlot,
+  listSaveSlots,
+  nextSaveSlotId,
+  migrateLegacySaveToSlot,
   applyExp,
   expToNextLevel,
   clamp,
@@ -29,14 +35,23 @@ import {
   REPUTATION_LOSS_PER_ABANDON,
   RETURN_VISIT_DELAY,
   resolveDueReturns,
+  resolveDueTreatmentVisits,
   firstSessionDone,
   clampFirstSessionEnding,
 } from "./state/GameState";
+import {
+  loadUser,
+  registerUser,
+  hasUser,
+  ensureNicknameRegistered,
+  clearUser as clearStoredUser,
+} from "./state/Storage";
+import type { SaveSlotMeta, UserProfile, RegisterOutcome } from "./state/Storage";
 import { allPatients, GUIDED_PATIENT_ID } from "./data/patients";
 import { AchievementEngine } from "./engine/AchievementEngine";
 import { DialogueEngine } from "./engine/DialogueEngine";
 import { pickReturnVisitPatient } from "./engine/returnVisit";
-import { allSkills, allClinicUpgrades } from "./data/skills";
+import { allClinicUpgrades } from "./data/clinicUpgrades";
 import {
   decorById,
   flowerForPatient,
@@ -55,7 +70,6 @@ export type Scene =
   | "title"
   | "clinic"
   | "dialogue"
-  | "skills"
   | "clinic_upgrades"
   | "letters"
   | "tracking"
@@ -120,6 +134,12 @@ export interface GameStore {
   scene: Scene;
   hydrated: boolean;
   hasSave: boolean;
+  /** 当前激活的存档槽位 id（新游戏分配、继续游戏选定；null = 未在档） */
+  activeSlotId: string | null;
+  /** 所有存档槽位元信息（TitleScreen 存档列表用） */
+  saveSlots: SaveSlotMeta[];
+  /** 当前本地账号（未注册为 null） */
+  currentUser: UserProfile | null;
   muted: boolean;
   toasts: ToastItem[];
   floatingTexts: FloatingItem[];
@@ -137,9 +157,17 @@ export interface GameStore {
   restDreamVisible: boolean;
   // —— 初始化（App 挂载时调用一次）——
   init: () => void;
+  // —— 账号（本地轻量：昵称 + 自动生成用户 ID，区分不同用户存档）——
+  register: (name: string) => RegisterOutcome;
+  clearUser: () => void;
+  // —— 存档槽位 ——
+  /** 开始新游戏：分配新槽（slotId 缺省）或覆盖指定槽；成功后进入 clinic */
+  newGame: (clinicName?: string, slotId?: string) => void;
+  /** 继续游戏：从指定槽读取存档进入 */
+  continueGame: (slotId: string) => void;
+  /** 删除指定槽位 */
+  deleteSlot: (slotId: string) => void;
   // —— 场景切换 ——
-  newGame: (clinicName?: string) => void;
-  continueGame: () => void;
   backToTitle: () => void;
   enterClinic: () => void;
   setScene: (s: Scene) => void;
@@ -150,7 +178,6 @@ export interface GameStore {
   spendTimeInGarden: () => void;
   /** P5-3 归零梦境收尾：梦里见到帮助过的人，醒后理智部分恢复 */
   dismissRestDream: () => void;
-  learnSkill: (id: string) => void;
   buyUpgrade: (id: string) => void;
   /** 装修模式：保存设施摆放位置（仅视觉） */
   setFacilityPosition: (id: string, x: number, y: number) => void;
@@ -173,6 +200,14 @@ export interface GameStore {
     reward: ChoiceEffect | undefined,
     patientId: string,
     lastState: PatientState
+  ) => void;
+  /** 治疗分期复诊（节拍断拍）：节拍边界结束，患者离开诊室，1~3 天后复诊到访。
+   *  记录下一节拍恢复点（resumeNode + 患者状态 + 已触发碎片），消耗当日名额，回大厅。 */
+  completeBeat: (
+    patientId: string,
+    resumeNode: string,
+    lastState: PatientState,
+    triggeredMemories: string[]
   ) => void;
   // —— 会话断点（P2-8）——
   /** 对话进行中持续更新草稿到 game.activeSession（仅草稿，随 saveGame 落盘） */
@@ -201,10 +236,19 @@ export interface GameStore {
 }
 
 export const useGameStore = create<GameStore>((set, get) => {
-  /** 提交：持久化 + 触发重渲染（原地修改后用浅拷贝制造新引用） */
+  /** 刷新存档槽位列表（TitleScreen / 删除后同步） */
+  const refreshSaveSlots = () => set({ saveSlots: listSaveSlots() });
+
+  /** 提交：持久化到当前槽 + 触发重渲染（原地修改后用浅拷贝制造新引用） */
   const commit = () => {
-    saveGame(get().game);
-    set({ game: { ...get().game } });
+    const slotId = get().activeSlotId;
+    const g = get().game;
+    if (slotId) {
+      saveGameToSlot(slotId, g, get().currentUser ?? undefined);
+    } else {
+      saveGame(g); // 未进槽（如 init 阶段成就回调）回退旧单档，不丢
+    }
+    set({ game: { ...g } });
   };
 
   const playSound = (name: SoundName) => {
@@ -216,7 +260,7 @@ export const useGameStore = create<GameStore>((set, get) => {
   const toast = (msg: string, kind: "info" | "ok" | "warn" = "info") => {
     const id = ++toastId;
     set((st) => ({ toasts: [...st.toasts, { id, msg, kind }] }));
-    window.setTimeout(() => {
+    setTimeout(() => {
       set((st) => ({ toasts: st.toasts.filter((x) => x.id !== id) }));
     }, kind === "warn" ? 4200 : 2400);
   };
@@ -334,6 +378,9 @@ export const useGameStore = create<GameStore>((set, get) => {
     scene: "title",
     hydrated: false,
     hasSave: false,
+    activeSlotId: null,
+    saveSlots: [],
+    currentUser: null,
     muted: false,
     toasts: [],
     floatingTexts: [],
@@ -346,6 +393,22 @@ export const useGameStore = create<GameStore>((set, get) => {
     restDreamPending: false,
     restDreamVisible: false,
 
+    register: (name: string) => {
+      const trimmed = name.trim();
+      if (!trimmed) return { status: "invalid" };
+      const res = registerUser(trimmed);
+      if (res.status === "ok") {
+        set({ currentUser: res.profile });
+        playSound("page");
+      }
+      return res;
+    },
+
+    clearUser: () => {
+      clearStoredUser();
+      set({ currentUser: null });
+    },
+
     init: () => {
       const eng = new AchievementEngine(get().game, (a) => {
         applyAchievementUnlock(a);
@@ -353,7 +416,25 @@ export const useGameStore = create<GameStore>((set, get) => {
         commit();
       });
       eng.setDynamicTargets({ allClinicUpgradesCount: allClinicUpgrades.length });
-      set({ achievementEngine: eng, hydrated: true, hasSave: loadGame() !== null });
+      // 本地账号 + 槽位初始化
+      const user = loadUser();
+      // 存量账号昵称补登进登记表（昵称永久唯一；老数据无登记表时防丢）
+      if (user) ensureNicknameRegistered(user);
+      const slots = listSaveSlots();
+      // 旧单档迁移：无槽索引但有旧单档时迁移为槽 1
+      let migratedId: string | null = null;
+      if (slots.length === 0) {
+        migratedId = migrateLegacySaveToSlot();
+      }
+      const finalSlots = listSaveSlots();
+      set({
+        achievementEngine: eng,
+        hydrated: true,
+        currentUser: user,
+        saveSlots: finalSlots,
+        hasSave: finalSlots.length > 0 || migratedId !== null,
+        activeSlotId: finalSlots.length > 0 ? finalSlots[0].id : null,
+      });
       // 读取静音偏好
       try {
         const m = window.localStorage.getItem("ps.muted") === "1";
@@ -364,35 +445,62 @@ export const useGameStore = create<GameStore>((set, get) => {
       }
     },
 
-    newGame: (clinicName?: string) => {
-      clearSave();
+    newGame: (clinicName?: string, slotId?: string) => {
       const g = createInitialState();
       if (clinicName && clinicName.trim()) {
         g.clinicName = clinicName.trim();
       }
+      // 指定槽则覆盖（玩家从存档列表选「覆盖」）；否则分配新槽
+      const id = slotId ?? nextSaveSlotId();
       get().achievementEngine?.onGameStateSynced(g);
-      set({ game: g, scene: "clinic", prologueVisible: true });
-      saveGame(g);
+      saveGameToSlot(id, g, get().currentUser ?? undefined);
+      set({ game: g, scene: "clinic", prologueVisible: true, activeSlotId: id, hasSave: true });
+      refreshSaveSlots();
       playSound("page");
     },
 
-    continueGame: () => {
-      const s = loadGame();
+    continueGame: (slotId: string) => {
+      const s = loadGameFromSlot(slotId);
       if (s) {
         get().achievementEngine?.onGameStateSynced(s);
-        set({ game: s, scene: "clinic", prologueVisible: false });
+        set({ game: s, scene: "clinic", prologueVisible: false, activeSlotId: slotId, hasSave: true });
         playSound("page");
       }
     },
 
+    deleteSlot: (slotId: string) => {
+      deleteSaveSlot(slotId);
+      const remaining = listSaveSlots();
+      const wasActive = get().activeSlotId === slotId;
+      // 删除当前槽 → 回到标题且清空活动槽；同时按剩余槽数刷新 hasSave（删光后「继续游戏」隐藏）
+      set({
+        saveSlots: remaining,
+        hasSave: remaining.length > 0,
+        ...(wasActive ? { activeSlotId: null, game: createInitialState() } : {}),
+      });
+      playSound("click");
+    },
+
     backToTitle: () => {
-      saveGame(get().game);
+      const slotId = get().activeSlotId;
+      if (slotId) {
+        saveGameToSlot(slotId, get().game, get().currentUser ?? undefined);
+        refreshSaveSlots();
+      } else {
+        saveGame(get().game);
+      }
       set({ hasSave: true, scene: "title" });
       playSound("page");
     },
 
     enterClinic: () => {
-      saveGame(get().game);
+      const slotId = get().activeSlotId;
+      if (slotId) {
+        saveGameToSlot(slotId, get().game, get().currentUser ?? undefined);
+        refreshSaveSlots();
+      } else {
+        saveGame(get().game);
+      }
       set({ hasSave: true, scene: "clinic" });
     },
 
@@ -431,10 +539,12 @@ export const useGameStore = create<GameStore>((set, get) => {
 
     restOneDay: async () => {
       const g = get().game;
-      // 日终：重置名额 + 患者等待天数推进（恶化/放弃）——仅推进已到达候诊的手写患者
+      // 日终：重置名额 + 患者等待天数推进（恶化/放弃）——仅推进已到达候诊、且未在治疗期（等待复诊）的手写患者
       const events = advanceDayState(
         g,
-        serveablePatients(g).filter((p) => g.arrivedPatients.includes(p.id))
+        serveablePatients(g).filter(
+          (p) => g.arrivedPatients.includes(p.id) && !g.treatmentStages[p.id]
+        )
       );
       g.day += 1;
       // 治愈回访到达：写入回访信（温暖闭环，非治疗）
@@ -450,6 +560,20 @@ export const useGameStore = create<GameStore>((set, get) => {
           read: false,
           patientName: name,
           tone: "thanks",
+        });
+      }
+      // 治疗分期复诊（节拍断拍）：到期的治疗中患者复诊到访，进入大厅可继续下一节拍
+      for (const pid of resolveDueTreatmentVisits(g)) {
+        const p = scenarioById(g, pid);
+        const name = p?.name ?? pid;
+        g.messages.unshift({
+          id: `treat-visit-${g.day}-${pid}`,
+          kind: "notice",
+          title: `${name} 复诊到访`,
+          body: `${name} 今天来诊所复诊，想继续上次没谈完的话题。已加入今日预约清单。`,
+          day: g.day,
+          read: false,
+          patientName: name,
         });
       }
       // 发现客户：到期的已邀约客户标记到达（arrivedPatients）；未邀约候选过期清除
@@ -549,19 +673,6 @@ export const useGameStore = create<GameStore>((set, get) => {
       }
       // 候诊区补充新到达患者（难度分桶随机补足）
       replenishQueue();
-    },
-
-    learnSkill: (id: string) => {
-      const g = get().game;
-      const skill = allSkills.find((s) => s.id === id);
-      if (!skill) return;
-      if (g.doctor.exp >= skill.cost) {
-        g.doctor.exp -= skill.cost;
-        g.skills.push(skill.id);
-        commit();
-        playSound("click");
-        toast(`习得技能：${skill.name}`);
-      }
     },
 
     buyUpgrade: (id: string) => {
@@ -757,7 +868,13 @@ export const useGameStore = create<GameStore>((set, get) => {
     },
 
     saveNow: () => {
-      saveGame(get().game);
+      const slotId = get().activeSlotId;
+      if (slotId) {
+        saveGameToSlot(slotId, get().game, get().currentUser ?? undefined);
+        refreshSaveSlots();
+      } else {
+        saveGame(get().game);
+      }
       set({ hasSave: true });
       toast("游戏已保存");
       playSound("click");
@@ -775,7 +892,13 @@ export const useGameStore = create<GameStore>((set, get) => {
         toast("还没有可保存的会话进度", "warn");
         return;
       }
-      saveGame(g);
+      const slotId = get().activeSlotId;
+      if (slotId) {
+        saveGameToSlot(slotId, g, get().currentUser ?? undefined);
+        refreshSaveSlots();
+      } else {
+        saveGame(g);
+      }
       set({ hasSave: true, currentPatient: null, scene: "clinic" });
       playSound("page");
       toast("已保存会话进度，可在预约清单继续", "ok");
@@ -805,6 +928,36 @@ export const useGameStore = create<GameStore>((set, get) => {
         }
       }
       commit();
+    },
+
+    completeBeat: (
+      patientId: string,
+      resumeNode: string,
+      lastState: PatientState,
+      triggeredMemories: string[]
+    ) => {
+      const g = get().game;
+      const prev = g.treatmentStages[patientId];
+      // 复诊间隔 1~3 天随机（节拍与节拍之间隔一段时间，玩家已确认）
+      const delay = 1 + Math.floor(Math.random() * 3);
+      g.treatmentStages[patientId] = {
+        stage: (prev?.stage ?? 0) + 1,
+        resumeNode,
+        patientState: lastState,
+        triggeredMemories,
+        dueDay: g.day + delay,
+        arrived: false,
+      };
+      // 消耗当日名额：节拍复诊同一次正常接诊（玩家已确认）
+      g.slot += 1;
+      // 清断点：节拍结束回大厅，本患者不再显示「继续上次」（复诊到访前由 treatmentStages 隐藏）
+      if (g.activeSession?.patientId === patientId) g.activeSession = null;
+      get().achievementEngine?.onGameStateSynced(g);
+      commit();
+      const p = scenarioById(g, patientId);
+      set({ currentPatient: null, scene: "clinic" });
+      toast(`${p?.name ?? "患者"} 本次会谈结束，${delay} 天后再来复诊。`, "ok");
+      playSound("page");
     },
 
     finishSession: (
@@ -855,6 +1008,8 @@ export const useGameStore = create<GameStore>((set, get) => {
       }
       // 记录结局
       g.patientRecords[patientId] = ending;
+      // 治疗分期复诊：走到结局结算，清理节拍进度（治疗完成，不再等待复诊）
+      delete g.treatmentStages[patientId];
       // 治愈/接纳/觉醒结局：登记 N 天后回访探望（温暖闭环）
       if (ending === "cure" || ending === "acceptance" || ending === "awakening") {
         g.returnVisits[patientId] = {

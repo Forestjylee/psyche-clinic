@@ -555,6 +555,7 @@ export const patientA: PatientScenario = {
       id: "l1_out",
       speaker: "narration",
       text: "她起身，把书包拿起来，又摆了一次才背好。走到门口，她回头看了你一眼，像有话要说，最后还是只说了一句：「那……我下周还来吗？」没等你回答，她就走了。你注意到她左手手背上，几点发白的旧印子。",
+      beatEnd: { resumeNode: "l2_start" },
       autoNext: "l2_start",
     },
     l2_start: {
@@ -1088,6 +1089,7 @@ export const patientA: PatientScenario = {
       id: "l2_out",
       speaker: "narration",
       text: "你送她出门。她走出几步，又折回来：「医生，要是……我弟真的挨打了，我还能来找您吗？」说完没等你回答，就跑走了，书包在背上拍打着。",
+      beatEnd: { resumeNode: "l3_start" },
       autoNext: "l3_start",
     },
     l3_start: {
@@ -1622,6 +1624,7 @@ export const patientA: PatientScenario = {
       id: "l3_out",
       speaker: "narration",
       text: "那天她说了很多。走的时候，她站起来，书包忘了拿，又折回来拿。到门口，她回头看了你一眼，那一眼很轻，像在确认什么，又像在告别什么。你看着她走进走廊尽头的黄昏里。",
+      beatEnd: { resumeNode: "l4_start" },
       autoNext: "l4_start",
     },
     l4_start: {
@@ -2139,6 +2142,7 @@ export const patientA: PatientScenario = {
       id: "l4_out",
       speaker: "narration",
       text: "那天她走的时候，把那幅画留在了你桌上，说：「放您这儿吧，放家里我怕丢了。」你看着她走出去。黄昏从窗里照进来，落在那幅画上，画里的人还在笑着。",
+      beatEnd: { resumeNode: "l5_start" },
       autoNext: "l5_start",
     },
     l5_start: {
@@ -2590,6 +2594,7 @@ export const patientA: PatientScenario = {
       id: "l5_out",
       speaker: "narration",
       text: "那天她离开时，在门口站了很久。你看见她抬起手，像是要去掐手背，又慢慢放了下来。她没回头，说：「医生，我明天还来。」她走后，你发现桌上那幅画被翻了一面。背面写着一行很轻的铅笔字：「我好像，没那么想掐了。」",
+      beatEnd: { resumeNode: "l6_start" },
       autoNext: "l6_start",
     },
     l6_start: {

@@ -454,6 +454,7 @@
   id: "zmy1_out",
   speaker: "narration",
   text: "周曼云起身时，把椅子轻轻推回原位，又对着手机屏幕照了照自己，像是确认妆容有没有花。走到门口她停了一下，没回头：「……我今天话有点多。对不起。」",
+  beatEnd: { resumeNode: "zmy2_start" },
   autoNext: "zmy2_start",
 }
 ```
@@ -849,6 +850,7 @@
   id: "zmy2_out",
   speaker: "narration",
   text: "周曼云走的时候，在门口停了一下，回头说：「我昨天路过一家花店，站了很久。我以前挺爱养花的，搬家以后就没养了。我那天想，要不要再买一盆。」",
+  beatEnd: { resumeNode: "zmy3_start" },
   autoNext: "zmy3_start",
 }
 ```
@@ -1244,6 +1246,7 @@
   id: "zmy3_out",
   speaker: "narration",
   text: "周曼云走的时候，把多肉抱在怀里，像抱着一个刚领回来的孩子。她没回头，但声音里有一丝从未有过的软：「它要是不好养，我就再买一盆。我就不信，我养不好一件自己喜欢的东西。」",
+  beatEnd: { resumeNode: "zmy4_start" },
   autoNext: "zmy4_start",
 }
 ```
@@ -1615,6 +1618,7 @@
   id: "zmy4_out",
   speaker: "narration",
   text: "周曼云走的时候，把那盆多肉放在窗台上晒了晒，又抱回来。她说：「我昨晚把它从客厅挪到床头了。医生说植物得晒太阳，可我想让它陪着我睡。」她笑了笑，「我是不是，开始把它当回事了？」",
+  beatEnd: { resumeNode: "zmy5_start" },
   autoNext: "zmy5_start",
 }
 ```

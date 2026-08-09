@@ -11,7 +11,6 @@ import { AchievementUnlockToast } from "./AchievementUnlockToast";
 import { TitleScreen } from "./TitleScreen";
 import { ClinicHallScene } from "./ClinicHallScene";
 import { DialogueScene } from "./DialogueScene";
-import { SkillsTree } from "./SkillsTree";
 import { ClinicUpgrades } from "./ClinicUpgrades";
 import { MessageBox } from "./MessageBox";
 import { Tracking } from "./Tracking";
@@ -59,7 +58,6 @@ export function GameApp() {
         {scene === "title" ? <TitleScreen /> : null}
         {scene === "clinic" ? <ClinicHallScene /> : null}
         {scene === "dialogue" ? <DialogueScene /> : null}
-        {scene === "skills" ? <SkillsTree /> : null}
         {scene === "clinic_upgrades" ? <ClinicUpgrades /> : null}
         {scene === "letters" ? <MessageBox /> : null}
         {scene === "tracking" ? <Tracking /> : null}

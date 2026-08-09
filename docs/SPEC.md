@@ -706,6 +706,10 @@ interface GameStats {
 | v1.4.0 | 2026-08-09 | **首页回归全 React（§15）**：移除 Phaser 大厅画布与「预约清单」弹层，预约全列表直放首页；去重（个人成长 6 入口/发现客户交底部栏）；保留诊所状态精简卡；装修模式降级（拖动落格失效，外观/摆放仍在升级面板管理）；对话候选选项区 max-height 46%→34%、气泡锚点上移至 y=190（防遮挡） |
 | v1.5.0 | 2026-08-09 | **患者池动态化 + 逐日随机到达 + 成就去患者化 + 生成系统下线**：① patients.ts 患者池自动收集：`scripts/scan-patients.mjs`（predev/pretest/prebuild 钩子）扫描 `lib/data/patients/` 生成显式模块映射 `index.generated.ts`，新剧本入目录即进池（不写死患者数）；不用 `import.meta.glob`——它是 Vite 特性，Next.js(webpack) 浏览器端会抛 `{}.glob is not a function`；② 难度按档位/轮次重标（短→简单 / 中→普通 / 长→困难，lin_xiao 长档→困难）；③ GameState 新增 `arrivedPatients`，患者逐日随机到达（难度分桶递进：简单常开 / 普通声望≥25或day≥3 / 困难声望≥60或day≥6，引导患者小北首日已在场）；④ 成就去患者化：碎片奖励改通用纪念物、回访奖励改动态已治愈患者；⑤ 生成器（generator/sceneBuilder/truths/seeds/Generator）下线，发现客户改从手写池选候选；⑥ 旧剧本下线 chen_lo / zhou_mingyuan（chen_mo 保留） |
 | v1.5.1 | 2026-08-09 | **候诊大厅清单拆分（§15.1）**：已完成且可重新接诊的患者（`patientRecords` 有结局、非回访探望、今日未接诊）从「今日预约」移出，单独成「已完成 · 可重新接诊」区块（受控高度滚动、为空隐藏）；回访探望与断点患者仍保留在主清单。改 `components/game/ClinicHall.tsx`（`isCompleted / isReturning / isResuming` 分类 + 共用卡片渲染函数）与 `app/styles/clinic.css`（`.today-section` 占满 / `.completed-section` max-height 34%） |
+| v1.6.0 | 2026-08-09 | **治疗分期复诊（§16，节拍断拍）**：节拍与节拍之间隔一段时间——节拍结束患者离开诊所，1~3 天后复诊到访再开启下一节拍。`DialogueNode` 新增 `beatEnd?: { resumeNode }` 节拍边界标记（narration 离开节点），`DialogueEngine.continue()` 优先触发 `onBeatEnd(resumeNode)`（不结案）；GameState 新增 `treatmentStages`（每患者一条：已完节拍数 / 恢复节点 / 四维状态快照 / 记忆碎片 / dueDay / arrived），`store.completeBeat` 写记录 + 消耗当日名额 + 清断点，`restOneDay` 到期复诊到访（写 notice，治疗中患者不推进 waitingDays），`finishSession` 结局结算清理；`DialogueScene` 复诊到访从 resumeNode 恢复引擎；`ClinicHall`/`Tracking` 复诊卡与待复诊状态。测试 `lib/state/treatmentStages.test.ts`（15 例：纯函数结算 / completeBeat / 到访 / 清理 / 迁移 / 引擎回调） |
+| v1.7.0 | 2026-08-09 | **技能树系统下线**：删除技能树（`allSkills`/`SkillsTree`/`learnSkill`/`skills` 场景与字段/`requireSkill`/成长成就 `growth_skill_6`、`growth_skill_8`）；`Skill`/`SkillSchool` 类型移除；旧档 `skills` 字段迁移逻辑移除（技能树删除后无意义）；`DialogueScene`/`DialogueEngine` 的技能门槛死代码清理；诊所升级 `allClinicUpgrades` 独立保留不受影响。剧本不依赖 `requireSkill`（grep 验证零引用），删除无行为变更 |
+| v1.8.0 | 2026-08-09 | **多槽位存档 + 本地账号 + HUD 反馈入口**：① **HUD 反馈入口**：HUD 新增「反馈」按钮，内置弹窗提交（bug/建议/其他三类型，600 字上限），存本地草稿 `ps.feedback.v1`（`components/game/FeedbackDialog.tsx`）；② **多槽位存档（Storage §6.1 重写）**：槽索引 `ps.saveIdx.v1`（`Record<slotId, SaveSlotMeta>`）+ 每槽独立 key `ps.slot.<id>`，元信息含诊所名/天数/等级/金钱/更新时间/来源(`source: "local"\|"cloud"`，云端预留置灰)/归属用户；`saveSlot`/`loadSlot`/`deleteSlot`/`listSlots`(按 updatedAt 倒序)/`nextSlotId`；旧单档 `ps.save.v1` 首次迁移为槽位 1 并清旧档（`migrateLegacySave`）；③ **本地账号**：`ps.user.v1` 存 `UserProfile`（自动生成 `u_<time36>_<rand36>` id + 昵称，复用旧 id），存档元信息打 userId/userName 归属标记，为云端后台区分用户预留；④ **store 槽感知**：`activeSlotId`/`saveSlots`/`currentUser`，`newGame(clinicName?, slotId?)`（缺省分配新槽，指定覆盖）、`continueGame(slotId)`、`deleteSlot`（删光后 `hasSave` 同步为 false）、`commit`/`saveNow`/`pauseSession`/`backToTitle`/`enterClinic` 全部落盘当前槽；⑤ **TitleScreen 改造**：注册/切换昵称入口 + 存档列表弹窗（诊所名/天数/等级/金钱/时间/归属/来源，云端置灰，可删除两态确认，新游戏可选新建槽或覆盖已有槽）；⑥ `window.setTimeout`→全局 `setTimeout`（SSR 安全）。测试 `lib/state/Storage.test.ts`（14 例）+ `lib/store.slot.test.ts`（7 例） |
+| v1.8.1 | 2026-08-09 | **昵称全局唯一（永久保留）**：Storage 新增昵称登记表 `ps.usernames.v1`（昵称→用户 id，**永久保留**——本地任何账号注册过的昵称都不再允许注册，换昵称后旧昵称仍被占用），为云端后台按昵称区分用户铺路；`registerUser` 改为返回 `RegisterOutcome`（`ok`/`duplicate`/`invalid`），重名返回 `duplicate` 且不落盘；新增 `ensureNicknameRegistered`（存量账号昵称补登登记表，老数据升级不冲突）；store `register` 透传结果对象 + `init` 时对已有账号补登；TitleScreen 注册/切换昵称显示冲突提示「该昵称已被使用，永久保留，换一个吧」。测试 Storage +1（永久唯一/换昵称旧名占用/补登）+ store.slot +1（duplicate 且当前账号不变） |
 
 ---
 
@@ -816,3 +820,46 @@ interface GameStats {
 
 - 数据层 / 对话引擎 / 成就引擎 / 存储层零改动
 - `GameCanvas.tsx` 保留（对话场景 `ClinicRoomCanvas` 仍依赖）；`phaser/hall/*`、`draw/Furniture.ts`、`draw/Decor.ts` 首页不再引用（留待后续清理）
+
+---
+
+## 16. 治疗分期复诊 · 节拍断拍（v1.6.0）
+
+> 用户决策（2026-08-09）：节拍与节拍之间隔一段时间——一个节拍结束后患者离开诊所，等 1~3 天后复诊到访，再开启下一节拍。复诊消耗当日名额。
+
+### 16.1 节拍边界标记（剧本层）
+
+- 节拍制剧本（短 4 节拍 / 中 5 节拍 / 长 6 节拍）的每个节拍结束处是「narration 患者离开」节点，语义上患者离开诊室。
+- 此类节点加机器标记 `beatEnd: { resumeNode }`，`resumeNode` 指向下一节拍起始节点（`X2_start` / `X3_start` …）。
+- **边界数 = 档位节拍数 − 1**（短 3 处 / 中 4 处 / 长 5 处）；末节拍结束走正常结局（`isEnding`），无 beatEnd。
+- `autoNext` 保留作兜底：引擎优先判 `beatEnd`，其次 `autoNext`。
+- 无节拍的引导剧本（小北）不标记。
+
+### 16.2 引擎契约
+
+- `DialogueNode` 新增可选 `beatEnd?: { resumeNode: string }`。
+- `DialogueEngine.continue()` 在 `_padChoice` 之后、`autoNext` 之前检查 `currentNode.beatEnd`：命中则调 `callbacks.onBeatEnd(resumeNode)` 并返回（**不结案、不触发 onEnding**）。
+- `SessionCallbacks.onBeatEnd?: (resumeNode) => void`。
+
+### 16.3 状态流（GameState / store）
+
+- GameState 新增 `treatmentStages: Record<patientId, TreatmentStage>`：`stage`（已完节拍数）/ `resumeNode`（下一节拍起始节点）/ `patientState`（四维快照，跨节拍延续）/ `triggeredMemories` / `dueDay`（复诊到访日）/ `arrived`。`createInitialState` 空对象、`migrateGameState` 旧档补齐。
+- `store.completeBeat(patientId, resumeNode, lastState, triggeredMemories)`（`DialogueScene` 的 `onBeatEnd` 回调调用）：
+  - 写/更新 `treatmentStages[patientId]`（`stage+1`、`dueDay = day + 1~3 随机`、`arrived=false`）
+  - **消耗当日名额**：`g.slot += 1`
+  - 清断点：`activeSession` 指向该患者时置空（复诊由 treatmentStages 承接，避免大厅误显「继续上次」）
+  - 回大厅（`scene="clinic"`、`currentPatient=null`）+ toast 提示复诊天数
+- `restOneDay`：
+  - `advanceDayState` 的推进患者过滤治疗中（等待复诊）患者——**不推进 waitingDays / 不催诊 / 不放弃**
+  - 日终 `resolveDueTreatmentVisits(g)`：`dueDay <= day` 的标记 `arrived=true` 并写「xx 复诊到访」notice，患者进入大厅可继续
+- `finishSession`：结局结算时 `delete treatmentStages[patientId]`（治疗完成，不再等待复诊）。
+
+### 16.4 呈现层
+
+- `DialogueScene`：进入时若 `treatmentStages[currentPatient.id].arrived`（非断点恢复）则从 `resumeNode` 恢复引擎；`onBeatEnd` 回调触发 `completeBeat`。节拍边界节点是 narration（无选项），天然复用「继 续 ▸」按钮交互。
+- `ClinicHall`：等待复诊（未到访）患者从大厅隐藏（不打扰）；到访后显示复诊卡「✚ 复诊 · 上次谈到第 N 次会谈，点击继续」。
+- `Tracking`：治疗中未到访显示「治疗中 · 已完成 N 次会谈，待复诊」且按钮禁用；到访后「✚ 复诊到访 · 可继续会谈」。
+
+### 16.5 恢复优先级
+
+复诊到访继续 vs 断点恢复：`activeSession` 断点优先（玩家主动离开会话），其次治疗复诊到访。`completeBeat` 已清掉节拍结束产生的断点，两者不冲突。

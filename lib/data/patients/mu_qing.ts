@@ -282,6 +282,7 @@ export const patient: PatientScenario = {
   id: "mq1_out",
   speaker: "narration",
   text: "穆青起身时，习惯性地把包带理了理，又把椅子推回原位——动作利落得像在收尾一场离职面谈。走到门口她停了一下，没回头：「……谢谢您没催我。」",
+  beatEnd: { resumeNode: "mq2_start" },
   autoNext: "mq2_start",
 },
   mq2_start: {
@@ -536,6 +537,7 @@ export const patient: PatientScenario = {
   id: "mq2_out",
   speaker: "narration",
   text: "穆青这次没有立刻起身。她盯着自己交叠的双手看了一会儿，轻声说：「我以前觉得，我爸是爸，我是我。这两件事，好像不是两件事了。」出门时，她的背比上次直了一些，但走到门口又习惯性地缩了回去。",
+  beatEnd: { resumeNode: "mq3_start" },
   autoNext: "mq3_start",
 },
   mq3_start: {
@@ -782,6 +784,7 @@ export const patient: PatientScenario = {
   id: "mq3_out",
   speaker: "narration",
   text: "第三次会谈结束，穆青没有立刻走。她低头看着自己的手，轻声说：「我以前以为，我是替我爸活。现在才觉得，我把他没走完的路，原封不动走了一遍。」这次出门，她在门口深吸了一口气，背没有再缩。",
+  beatEnd: { resumeNode: "mq4_start" },
   autoNext: "mq4_start",
 },
   mq4_start: {
@@ -1020,6 +1023,7 @@ export const patient: PatientScenario = {
   id: "mq4_out",
   speaker: "narration",
   text: "穆青把那张折成四折的纸，重新塞回包里。这次她没有攥紧，而是轻轻放进去。出门时，她在门口停了一下，回头说：「医生，我今晚，不坐床沿了。」",
+  beatEnd: { resumeNode: "mq5_start" },
   autoNext: "mq5_start",
 },
   mq5_start: {

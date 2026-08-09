@@ -204,6 +204,7 @@ export const patient: PatientScenario = {
   id: "cm1_out",
   speaker: "narration",
   text: "第一次会谈结束，陈默离开前，在门口停了一下。「……下次还是这个点吗？」他问得认真，像在确认一个项目排期。",
+  beatEnd: { resumeNode: "cm2_start" },
   autoNext: "cm2_start",
 },
   cm1_r01: {
@@ -384,6 +385,7 @@ export const patient: PatientScenario = {
   id: "cm2_out",
   speaker: "narration",
   text: "第二次会谈结束时，陈默没有立刻起身。他盯着窗外的树看了一会儿。「那棵树的叶子，黄了。」他说，「我以前都没发现，楼底下有棵树。」",
+  beatEnd: { resumeNode: "cm3_start" },
   autoNext: "cm3_start",
 },
   cm3_start: {
@@ -558,6 +560,7 @@ export const patient: PatientScenario = {
   id: "cm3_out",
   speaker: "narration",
   text: "第三次会谈结束。陈默第一次没在门口多站，他转身时，你看见他后背的衬衫不再绷得那么紧了。",
+  beatEnd: { resumeNode: "cm4_start" },
   autoNext: "cm4_start",
 },
   cm3_w01: {

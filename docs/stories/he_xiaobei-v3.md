@@ -386,6 +386,7 @@
   id: "hxb1_out",
   speaker: "narration",
   text: "第一次会谈结束。贺小北走到门口，又停住，回头说：「那个会，要是讲完没事，我……我回头跟您说。」他讲得慢，但一个字一个字，说得挺稳。",
+  beatEnd: { resumeNode: "hxb2_start" },
   autoNext: "hxb2_start",
 }
 ```
@@ -684,6 +685,7 @@
   id: "hxb2_out",
   speaker: "narration",
   text: "第二次会谈结束，贺小北没急着走。他站在门口，忽然开口，用带着乡音的普通话问：「医生，您说，我要是哪天跟人说一句家乡话，会丢脸吗？」",
+  beatEnd: { resumeNode: "hxb3_start" },
   autoNext: "hxb3_start",
 }
 ```
@@ -972,6 +974,7 @@
   id: "hxb3_out",
   speaker: "narration",
   text: "第三次会谈结束。贺小北走前，把笔记本摊开给你看了一眼——姐姐写的那页字旁边，他用铅笔添了一行：「我姐那扇门，我替她开回来了。」",
+  beatEnd: { resumeNode: "hxb4_start" },
   autoNext: "hxb4_start",
 }
 ```

@@ -323,6 +323,7 @@
   id: "tz1_out",
   speaker: "narration",
   text: "第一次会谈结束，唐致远起身时，把公文包提起来又放下。「……下次，还是这个点？」他问得认真，像在确认一个会议排期。",
+  beatEnd: { resumeNode: "tz2_start" },
   autoNext: "tz2_start",
 }
 ```
@@ -597,6 +598,7 @@
   id: "tz2_out",
   speaker: "narration",
   text: "第二次会谈结束，唐致远没有急着起身。他盯着窗外那棵梧桐看了一会儿。「那棵树，叶子都黄了。」他说，「我在这楼里上了四十年班，头一回发现，院子里有棵梧桐。」",
+  beatEnd: { resumeNode: "tz3_start" },
   autoNext: "tz3_start",
 }
 ```
@@ -861,6 +863,7 @@
   id: "tz3_out",
   speaker: "narration",
   text: "第三次会谈结束。唐致远起身时，把那支钢笔从外套口袋换到了贴身的内袋里。他转身时，你看见他后背的外套不再绷得那么紧了。",
+  beatEnd: { resumeNode: "tz4_start" },
   autoNext: "tz4_start",
 }
 ```

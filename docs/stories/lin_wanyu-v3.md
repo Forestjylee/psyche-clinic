@@ -479,6 +479,7 @@
   id: "lwy1_out",
   speaker: "narration",
   text: "林晚玉离开时，把那四杯豆浆留在你的桌上，说「同事还在等我，这杯是谢您的」。你看着她小跑着离开的背影，忽然发现——她连一句谢谢，都要用一杯豆浆来还。",
+  beatEnd: { resumeNode: "lwy2_start" },
   autoNext: "lwy2_start",
 }
 ```
@@ -861,6 +862,7 @@
   id: "lwy2_out",
   speaker: "narration",
   text: "林晚玉起身时，把那杯凉透的豆浆又端起来喝了一口，说「不能浪费」。你看着她，忽然想——这个女孩连一杯豆浆都不舍得浪费，却舍得把自己耗干。",
+  beatEnd: { resumeNode: "lwy3_start" },
   autoNext: "lwy3_start",
 }
 ```
@@ -1231,6 +1233,7 @@
   id: "lwy3_out",
   speaker: "narration",
   text: "林晚玉走的时候，把那本旧日记本留在了桌上，说「先放您这儿，等我不怕了，再拿回去」。你翻开那页，看见八岁的她，字迹歪歪扭扭，写着一个怕字。",
+  beatEnd: { resumeNode: "lwy4_start" },
   autoNext: "lwy4_start",
 }
 ```
@@ -1602,6 +1605,7 @@
   id: "lwy4_out",
   speaker: "narration",
   text: "林晚玉走到门口，回头说：「医生，我刚才在镜子里，认出她是谁了。她是林晚玉。三十五岁，学会说『不』的第一天。」她说完，自己先笑了。",
+  beatEnd: { resumeNode: "lwy5_start" },
   autoNext: "lwy5_start",
 }
 ```

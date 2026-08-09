@@ -454,6 +454,7 @@
   id: "tj1_out",
   speaker: "narration",
   text: "第一次会谈快结束时，唐建国的手机震了一下。他猛地抓起来看了一眼，又若无其事地放下，冲你笑了笑：「催……哦，不是，外卖的单子。」他起身时，把矿泉水瓶捏扁了，攥在手里。",
+  beatEnd: { resumeNode: "tj2_start" },
   autoNext: "tj2_start",
 }
 ```
@@ -825,6 +826,7 @@
   id: "tj2_out",
   speaker: "narration",
   text: "唐建国起身时，把手机翻过来看了一眼——他姐又打来了。他盯着屏幕看了几秒，这一次，他按下了接听键。他没说话，只是听。你看见他攥着手机的手，慢慢松开了。",
+  beatEnd: { resumeNode: "tj3_start" },
   autoNext: "tj3_start",
 }
 ```
@@ -1196,6 +1198,7 @@
   id: "tj3_out",
   speaker: "narration",
   text: "唐建国这周走的时候，把手机留在了桌上，又折回来拿。他攥着手机，跟你说：「我妹的成绩快出来了。出成绩那天，我可能……会请假不来。您别担心，我不是不想来，我是怕电话一来，我绷不住。」",
+  beatEnd: { resumeNode: "tj4_start" },
   autoNext: "tj4_start",
 }
 ```
@@ -1568,6 +1571,7 @@
   id: "tj4_out",
   speaker: "narration",
   text: "唐建国起身时，眼睛红着，但背挺直了些。他走到门口，忽然回头，声音有点抖：「医生，您说，我说实话，他们会不会觉得，我这儿子，白养了？」你没答，他也没等你答。他推门出去，掏出手机，拨了个号码。你听见他说：「妈，我周末回家，有点事，想跟您说。」",
+  beatEnd: { resumeNode: "tj5_start" },
   autoNext: "tj5_start",
 }
 ```

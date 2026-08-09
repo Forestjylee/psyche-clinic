@@ -54,8 +54,6 @@ export interface DialogueChoice {
   next?: string;
   /** 显示该选项所需的条件（如信任值门槛） */
   require?: ChoiceRequirement;
-  /** 该选项所需的技能 id */
-  requireSkill?: string;
   /** 选项提示文字（如“需要信任≥40”） */
   hint?: string;
 }
@@ -102,6 +100,13 @@ export interface DialogueNode {
   endingText?: string;
   /** 结局奖励 */
   endingReward?: ChoiceEffect;
+  /**
+   * 节拍边界（治疗分期复诊，SPEC v1.6.x）：本节点是当前节拍结束。
+   * 必须是 narration「患者离开」节点；玩家点击继续后触发节拍结束事件，
+   * 患者离开诊室，N 天（1~3 随机）后复诊到访，从 resumeNode 继续下一节拍。
+   * 节拍边界数 = 档位节拍数 - 1（短 3 / 中 4 / 长 5）；引导患者（小北）无节拍不标记。
+   */
+  beatEnd?: { resumeNode: string };
 }
 
 export type PatientEmotion =
@@ -201,26 +206,6 @@ export interface PatientPalette {
   bright: string;
 }
 
-/** 技能 */
-export interface Skill {
-  id: string;
-  name: string;
-  description: string;
-  /** 陪伴风格 */
-  school: SkillSchool;
-  /** 消耗经验 */
-  cost: number;
-  /** 前置技能 */
-  requires?: string;
-  /** 已解锁 */
-  unlocked?: boolean;
-}
-
-export type SkillSchool =
-  | "gentle" // 更温柔 · 接住与安抚
-  | "sharp" // 更敏锐 · 看清与直面
-  | "firm"; // 更坚定 · 方向与托底
-
 /** 诊所升级项 */
 export interface ClinicUpgrade {
   id: string;
@@ -258,6 +243,26 @@ export interface ActiveSession {
   triggeredMemories: string[];
 }
 
+/**
+ * 治疗分期复诊（节拍断拍，SPEC v1.6.x）：患者治疗中，节拍间离开诊室，
+ * 1~3 天后复诊到访，从下一节拍继续。一个患者在治疗中至多一条记录；
+ * 走到结局结算（finishSession）时清理。
+ */
+export interface TreatmentStage {
+  /** 已完成的节拍数（第 N 次会谈已结束，下一次为第 N+1 次） */
+  stage: number;
+  /** 下一节拍起始节点 id（复诊到访后从它恢复引擎） */
+  resumeNode: string;
+  /** 节拍间保留的患者四维状态（数值曲线跨节拍延续） */
+  patientState: PatientState;
+  /** 已触发的记忆碎片 id（复诊后不重复闪回） */
+  triggeredMemories: string[];
+  /** 复诊到访日（game.day >= dueDay 时到访进入大厅） */
+  dueDay: number;
+  /** 复诊是否已到访（到访后显示在大厅，可点击继续） */
+  arrived: boolean;
+}
+
 /** 序章「离开城市的原因」选择（P4-1：影响叙事不影响数值） */
 export type PrologueChoice = "burnout" | "witness" | "breath" | "heartbreak";
 
@@ -270,8 +275,6 @@ export interface GameState {
   /** 序章已通过标记（P4-3：完成或跳过序章后落档 true，防重复进入；可选字段，旧档兼容） */
   prologuePassed?: boolean;
   doctor: DoctorStats;
-  /** 已解锁技能 id */
-  skills: string[];
   /** 诊所升级 id */
   clinicUpgrades: string[];
   /** 已完成患者 id -> 结局 */
@@ -303,6 +306,8 @@ export interface GameState {
     string,
     { ending: EndingType; dueDay: number; arrived: boolean; seen: boolean }
   >;
+  /** 治疗分期复诊：patientId -> 节拍间进度（治疗中，节拍结束后 N 天复诊） */
+  treatmentStages: Record<string, TreatmentStage>;
   /** 已发现、待决定是否邀约的候选客户 */
   discoveryCandidates: DiscoveryCandidate[];
   /** 已接受邀约、等待到达的客户（到期进入预约清单） */

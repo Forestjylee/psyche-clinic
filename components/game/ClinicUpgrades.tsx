@@ -1,7 +1,7 @@
 "use client";
 
 import { useGame } from "@/lib/hooks/useGame";
-import { allClinicUpgrades } from "@/lib/data/skills";
+import { allClinicUpgrades } from "@/lib/data/clinicUpgrades";
 import { decorById, variantForUpgrade } from "@/lib/data/decor";
 
 /** 升级面板（独立 scene="clinic_upgrades"，SPEC §15 v1.4.0）：

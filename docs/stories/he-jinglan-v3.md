@@ -324,6 +324,7 @@
   id: "hj1_out",
   speaker: "narration",
   text: "第一次会谈结束。何静兰在门口停了一下，回头看了你一眼，像想说什么，最后只点了点头：「那我走了。」她走得很直，像怕被人看见背影。",
+  beatEnd: { resumeNode: "hj2_start" },
   autoNext: "hj2_start",
 }
 ```
@@ -598,6 +599,7 @@
   id: "hj2_out",
   speaker: "narration",
   text: "第二次会谈结束时，何静兰没有马上起身。她看着自己的手，轻声说：「我以前当老师，教孩子写字，说『一笔一划要写清楚』。可我自己心里，有句话糊了一年，没写清楚过。」",
+  beatEnd: { resumeNode: "hj3_start" },
   autoNext: "hj3_start",
 }
 ```
@@ -861,6 +863,7 @@
   id: "hj3_out",
   speaker: "narration",
   text: "第三次会谈结束。何静兰走的时候，在门口站了一会儿，轻声说：「医生，我这一年，好像一直在等一个人跟我说一句『你不怪自己了』。今天你说的『他不忍心』，离那句话近了一点。」",
+  beatEnd: { resumeNode: "hj4_start" },
   autoNext: "hj4_start",
 }
 ```

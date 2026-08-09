@@ -13,7 +13,6 @@ import type {
   MemoryFragment,
   ActiveSession,
 } from "@/lib/types";
-import { allSkills } from "@/lib/data/skills";
 import { TypewriterText } from "./TypewriterText";
 import { TermText } from "./PsychTermSpan";
 import { emotionColors, emotionLabels } from "./constants";
@@ -56,6 +55,7 @@ export function DialogueScene() {
     currentPatient,
     achievementEngine,
     finishSession,
+    completeBeat,
     pushFloating,
     playSound,
     unlockFragment,
@@ -93,6 +93,10 @@ export function DialogueScene() {
     const activeSession = game.activeSession;
     const resuming =
       activeSession != null && activeSession.patientId === currentPatient.id;
+    // 治疗分期复诊（节拍断拍）：患者复诊到访，从上一节拍结束处继续下一节拍。
+    // 优先级低于断点恢复（节拍中途暂停过则按断点恢复）；历史跨天不重放（属于上一节拍）。
+    const treat = game.treatmentStages[currentPatient.id];
+    const beatResuming = !resuming && treat != null && treat.arrived;
     if (resuming && activeSession) {
       setHistory(
         activeSession.history.map((l, i) => ({
@@ -144,6 +148,16 @@ export function DialogueScene() {
           const s = eng.getState();
           finishSession(ending, title, text, reward, currentPatient.id, s);
         },
+        // 节拍边界：患者离开，本阶段结束——保存进度并安排复诊（区别于 onEnding 结案）
+        onBeatEnd: (resumeNode) => {
+          const s = eng.getState();
+          completeBeat(
+            currentPatient.id,
+            resumeNode,
+            s,
+            eng.getTriggeredMemories()
+          );
+        },
       },
       resuming && activeSession
         ? {
@@ -151,7 +165,13 @@ export function DialogueScene() {
             state: activeSession.patientState,
             triggeredMemories: activeSession.triggeredMemories,
           }
-        : undefined
+        : beatResuming && treat
+          ? {
+              nodeId: treat.resumeNode,
+              state: treat.patientState,
+              triggeredMemories: treat.triggeredMemories,
+            }
+          : undefined
     );
     engineRef.current = eng;
     eng.start();
@@ -228,8 +248,7 @@ export function DialogueScene() {
       else if (c.require.mood !== undefined && s.mood < c.require.mood) meets = false;
       else if (c.require.truth !== undefined && s.truth < c.require.truth) meets = false;
     }
-    const hasSkill = !c.requireSkill || game.skills.includes(c.requireSkill);
-    return !meets || !hasSkill;
+    return !meets;
   };
 
   // 共情教学：node 换了重算——未教过且本节点含「未锁定」共情选项时，提示第一个共情选项。
@@ -366,8 +385,7 @@ export function DialogueScene() {
     const c = node.choices?.find((x) => x.id === choiceId);
     if (!c) return;
     const meets = meetsRequirement(c.require);
-    const hasSkill = !c.requireSkill || game.skills.includes(c.requireSkill);
-    if (!meets || !hasSkill) {
+    if (!meets) {
       playSound("locked");
       return;
     }
@@ -570,15 +588,7 @@ export function DialogueScene() {
         {node.isEnding ? null : node.choices && node.choices.length > 0 ? (
           node.choices.map((c) => {
             const locked = isChoiceLocked(c);
-            const hasSkill = !c.requireSkill || game.skills.includes(c.requireSkill);
-            const skillName = c.requireSkill
-              ? allSkills.find((s) => s.id === c.requireSkill)?.name
-              : null;
-            const hint = c.hint
-              ? c.hint
-              : skillName && !hasSkill
-              ? `需要技能：${skillName}`
-              : "";
+            const hint = c.hint ?? "";
             return (
               <button
                 key={c.id}

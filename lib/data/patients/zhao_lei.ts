@@ -256,6 +256,7 @@ export const patient: PatientScenario = {
   id: "zl_out",
   speaker: "narration",
   text: "他起身时，妻子也跟着站起来。他走出门，妻子在后面跟着，两人没说话。你注意到他右手一直攥着口袋里的手机，指节发白——不是在刷，是在攥着，像攥着一根绳子。",
+  beatEnd: { resumeNode: "zl2_start" },
   autoNext: "zl2_start",
 },
   zl2_start: {
@@ -466,6 +467,7 @@ export const patient: PatientScenario = {
   id: "zl2_out",
   speaker: "narration",
   text: "他走的时候在门口停了一下，回头看了你一眼。他嘴唇动了动，像是想说什么，最后只说了句「下次见」。他走的时候，手没再攥着手机，插在裤兜里，空着。",
+  beatEnd: { resumeNode: "zl3_start" },
   autoNext: "zl3_start",
 },
   zl3_start: {
@@ -669,6 +671,7 @@ export const patient: PatientScenario = {
   id: "zl3_out",
   speaker: "narration",
   text: "他走的时候在门口站了一会儿，没有像之前那样急着走。他回过头，看了你一眼，嘴角动了一下，像是想笑，最后还是没笑出来。他走的时候，手插在裤兜里，没碰手机。",
+  beatEnd: { resumeNode: "zl4_start" },
   autoNext: "zl4_start",
 },
   zl3_w1: {

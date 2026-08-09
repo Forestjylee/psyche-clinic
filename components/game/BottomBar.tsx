@@ -39,15 +39,6 @@ export function BottomBar() {
     title: string;
   }[] = [
     {
-      key: "skills",
-      icon: "⚕",
-      label: "技能",
-      badge: `Lv.${game.doctor.level}`,
-      badgeClass: "bb-badge-lv",
-      onClick: () => go("skills"),
-      title: "技能树",
-    },
-    {
       key: "clinic_upgrades",
       icon: "🏗",
       label: "升级",

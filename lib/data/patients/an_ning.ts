@@ -218,6 +218,7 @@ export const patient: PatientScenario = {
   id: "an1_out",
   speaker: "narration",
   text: "第一次会谈结束。安宁在门口站了一会儿，把手机从兜里掏出来，看一眼又放回去。「……我朋友还在等我。」她像是说给你听，又像是说给自己听。",
+  beatEnd: { resumeNode: "an2_start" },
   autoNext: "an2_start",
 },
   an2_start: {
@@ -431,6 +432,7 @@ export const patient: PatientScenario = {
   id: "an2_out",
   speaker: "narration",
   text: "第二次会谈结束时，安宁把手机从抽屉里拿出来，没开机，捏在手里看了很久。「我想过把它扔了。」她说，「可那里面，存着我自己跟自己说的那些话。」你看着她，觉得她开始分清，哪些是骗局，哪些是她自己的真心。",
+  beatEnd: { resumeNode: "an3_start" },
   autoNext: "an3_start",
 },
   an3_start: {
@@ -644,6 +646,7 @@ export const patient: PatientScenario = {
   id: "an3_out",
   speaker: "narration",
   text: "第三次会谈，安宁离开时站在门口没走。她转过身，声音有点抖：「医生，我下回……能带我闺蜜一起来吗？我想跟她说声谢谢，也想跟她说声对不起，没听她的话。」你说当然可以。她笑了一下，眼眶是红的，但这次没有躲。",
+  beatEnd: { resumeNode: "an4_start" },
   autoNext: "an4_start",
 },
   an3_w01: {

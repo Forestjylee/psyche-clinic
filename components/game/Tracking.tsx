@@ -51,6 +51,8 @@ export function Tracking() {
             const locked = p.requireReputation
               ? game.doctor.reputation < p.requireReputation
               : false;
+            const treatment = game.treatmentStages[p.id];
+            const treating = !!treatment;
             const waitDays = game.waitingDays[p.id] ?? 0;
             const severity =
               waitDays >= WARN_DAY
@@ -72,23 +74,31 @@ export function Tracking() {
                   </div>
                   <div className="tracking-title">{p.title}</div>
                   <div className="tracking-status">
-                    <span
-                      className={`patient-wait-tag ${
-                        severity === "critical"
-                          ? "critical"
+                    {treating ? (
+                      <span className="patient-wait-tag">
+                        {treatment!.arrived
+                          ? "✚ 复诊到访 · 可继续会谈"
+                          : `治疗中 · 已完成 ${treatment!.stage} 次会谈，待复诊`}
+                      </span>
+                    ) : (
+                      <span
+                        className={`patient-wait-tag ${
+                          severity === "critical"
+                            ? "critical"
+                            : severity === "decaying"
+                            ? "decaying"
+                            : ""
+                        }`}
+                      >
+                        {severity === "critical"
+                          ? `⚠ 病情严重 · 已等待 ${waitDays} 天`
                           : severity === "decaying"
-                          ? "decaying"
-                          : ""
-                      }`}
-                    >
-                      {severity === "critical"
-                        ? `⚠ 病情严重 · 已等待 ${waitDays} 天`
-                        : severity === "decaying"
-                        ? `病情加重 · 已等待 ${waitDays} 天`
-                        : waitDays > 0
-                        ? `已等待 ${waitDays} 天`
-                        : "等待接诊"}
-                    </span>
+                          ? `病情加重 · 已等待 ${waitDays} 天`
+                          : waitDays > 0
+                          ? `已等待 ${waitDays} 天`
+                          : "等待接诊"}
+                      </span>
+                    )}
                     {locked ? (
                       <span className="patient-locked-tag">
                         需声望 {p.requireReputation}
@@ -98,12 +108,13 @@ export function Tracking() {
                 </div>
                 <button
                   className="tracking-act"
-                  disabled={locked}
+                  disabled={locked || (treating && !treatment!.arrived)}
                   onClick={() => {
-                    if (!locked) startSession(p);
+                    if (!locked && !(treating && !treatment!.arrived))
+                      startSession(p);
                   }}
                 >
-                  去接诊
+                  {treating && !treatment!.arrived ? "待复诊" : "去接诊"}
                 </button>
               </div>
             );

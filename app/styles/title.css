@@ -222,3 +222,184 @@
   text-shadow: 0 1px 3px rgba(255, 252, 240, 0.9), 0 0 20px rgba(255, 235, 200, 0.5);
 }
 
+/* 标题屏 · 本地账号（昵称归属，区分不同玩家存档） */
+.title-account {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+}
+.title-account-label {
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+.title-account-btn {
+  background: var(--bg-panel);
+  border: 1px dashed var(--border-soft);
+  color: var(--text-muted);
+  padding: 4px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.title-account-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  border-style: solid;
+}
+
+/* 标题屏 · 存档槽位选择弹窗 */
+.slots-panel {
+  max-width: 540px;
+  width: 100%;
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  padding: 24px 26px 20px;
+  box-shadow: var(--shadow-deep), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+.slots-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 2px 4px;
+  min-height: 0;
+}
+.slots-empty {
+  padding: 28px 12px;
+  color: var(--text-dim);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.slot-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.slot-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 14px rgba(90, 70, 40, 0.12);
+}
+.slot-card.cloud {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.slot-card.cloud:hover {
+  border-color: var(--border-soft);
+  transform: none;
+}
+.slot-card.deleting {
+  border-color: var(--accent-2);
+  background: rgba(232, 139, 106, 0.08);
+}
+.slot-info {
+  flex: 1;
+  min-width: 0;
+}
+.slot-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.slot-meta {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+.slot-meta b {
+  color: var(--text);
+  font-weight: 700;
+}
+.slot-owner {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.slot-tag {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+  background: rgba(246, 165, 92, 0.16);
+  border: 1px solid rgba(246, 165, 92, 0.4);
+  color: var(--accent);
+  white-space: nowrap;
+}
+.slot-tag.local {
+  background: rgba(104, 186, 148, 0.14);
+  border-color: rgba(104, 186, 148, 0.4);
+  color: var(--good);
+}
+.slot-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.slot-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.slot-del {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: none;
+  border: 1px solid transparent;
+  padding: 3px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.slot-del:hover {
+  color: var(--accent-2);
+  border-color: rgba(232, 139, 106, 0.5);
+}
+.slot-del.armed {
+  color: #fff;
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  font-weight: 700;
+}
+.slots-actions {
+  margin-top: 14px;
+}
+.slots-new {
+  width: 100%;
+  padding: 12px;
+}
+.slots-close {
+  margin-top: 10px;
+}
+
+

@@ -256,6 +256,7 @@ export const patient: PatientScenario = {
   id: "sn_out",
   speaker: "narration",
   text: "她起身，走到门口停了很久，像在确认走廊里有没有人。最后她侧着身子挤出门，轻得没有声音。你注意到她左手食指的指甲边缘，翻着一圈粉白的死皮。",
+  beatEnd: { resumeNode: "sn2_start" },
   autoNext: "sn2_start",
 },
   sn2_start: {
@@ -466,6 +467,7 @@ export const patient: PatientScenario = {
   id: "sn2_out",
   speaker: "narration",
   text: "她走的时候，把那杯捏变形的奶茶杯带走了。走到门口，她回头看了你一眼，嘴唇动了动，像是想说什么，最后还是没开口。走廊里很安静，她的脚步声很轻，轻得像怕惊动什么。",
+  beatEnd: { resumeNode: "sn3_start" },
   autoNext: "sn3_start",
 },
   sn3_start: {
@@ -669,6 +671,7 @@ export const patient: PatientScenario = {
   id: "sn3_out",
   speaker: "narration",
   text: "她走的时候在门口站了一会儿，没有像之前那样侧着身子。她正对着门，深吸了一口气，才走出去。你看见她左手攥成拳，指甲掐进掌心——不是在抠，是在忍着不抠。",
+  beatEnd: { resumeNode: "sn4_start" },
   autoNext: "sn4_start",
 },
   sn3_w1: {

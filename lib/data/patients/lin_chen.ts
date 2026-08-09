@@ -204,6 +204,7 @@ export const patient: PatientScenario = {
   id: "lc1_out",
   speaker: "narration",
   text: "林晨走的时候，把那支笔攥得紧紧的。到门口她停了一下，回头问：「医生，我下周还能来吗？」没等你回答，她就走了。你注意到她手背因为攥笔攥得太紧，勒出了一道白印。",
+  beatEnd: { resumeNode: "lc2_start" },
   autoNext: "lc2_start",
 },
   lc1_r01: {
@@ -384,6 +385,7 @@ export const patient: PatientScenario = {
   id: "lc2_out",
   speaker: "narration",
   text: "林晨走的时候，在门口站了一会儿。她说：「医生，我回去会试着……不学那么晚。」你看着她离开，校服后背绷得很紧，像在扛着什么看不见的东西。",
+  beatEnd: { resumeNode: "lc3_start" },
   autoNext: "lc3_start",
 },
   lc2_r01: {
@@ -565,6 +567,7 @@ export const patient: PatientScenario = {
   id: "lc3_out",
   speaker: "narration",
   text: "林晨走的时候，在门口站了很久。她回头看了你一眼，那一眼比前两次都轻。她说：「医生，我回去……会试着画一笔。」你看着她离开，校服后背没那么绷了。",
+  beatEnd: { resumeNode: "lc4_start" },
   autoNext: "lc4_start",
 },
   lc3_r01: {

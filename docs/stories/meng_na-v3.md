@@ -356,6 +356,7 @@
   id: "mn1_out",
   speaker: "narration",
   text: "第一次会谈结束。孟娜起身时又看了一眼手机，没有新消息。她苦笑着说：「他爸那边明天来谈抚养安排的事，我今晚怕是又睡不着了。」",
+  beatEnd: { resumeNode: "mn2_start" },
   autoNext: "mn2_start",
 }
 ```
@@ -623,6 +624,7 @@
   id: "mn2_out",
   speaker: "narration",
   text: "第二次会谈结束。孟娜站起身，又坐下，说：「我今天说的这些，我从没跟别人讲过。我姐都不知道。我总觉得，说出来显得我矫情。可那三年，明明是我心里最大的一根刺。」",
+  beatEnd: { resumeNode: "mn3_start" },
   autoNext: "mn3_start",
 }
 ```
@@ -889,6 +891,7 @@
   id: "mn3_out",
   speaker: "narration",
   text: "第三次会谈结束。孟娜临走前说：「我以前觉得，我这么拼命，是为了儿子好。今天我才发现，我也是在等一个人，跟我说『你不会被送走』。」她顿了顿，「医生，你说，我能不能当那个，对我自己说这句话的人？」",
+  beatEnd: { resumeNode: "mn4_start" },
   autoNext: "mn4_start",
 }
 ```
