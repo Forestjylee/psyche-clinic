@@ -10,6 +10,8 @@ export const CLINIC_LAYOUT = {
    *  v1.4.0：y 250→190 上移到场景上部，避让底部候选选项区（max-height 34%），防遮挡 */
   bubbleAnchor: {
     doctor: { x: 300, y: 190 },
-    patient: { x: 660, y: 190 },
+    /* 患者气泡加宽后右缘更靠立绘，锚点左移到 580 使加宽后的气泡完整落在舞台内（移动端 300px 宽）
+      而不向右溢出；tail 仍在右侧指向立绘方向 */
+    patient: { x: 580, y: 190 },
   },
 } as const;

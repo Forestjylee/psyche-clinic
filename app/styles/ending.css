@@ -10,6 +10,7 @@
   align-items: center;
   justify-content: center;
   padding: 40px;
+  overflow-y: auto;
   animation: fadeIn 0.8s ease;
 }
 
@@ -21,8 +22,7 @@
 .ending-card {
   max-width: 600px;
   width: 100%;
-  max-height: calc(100vh - 80px);
-  overflow-y: auto;
+  margin: auto; /* 高度随内容自适应（不再卡内滚动，线框完整圈住全部内容）；超高时整层滚动 */
   background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
   border: 1px solid var(--border-soft);
   border-radius: 20px;

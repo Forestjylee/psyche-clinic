@@ -116,7 +116,7 @@
   border: 1px solid var(--paper-border);
   border-radius: 999px;
   box-shadow: var(--shadow-paper);
-  font-size: 1.6cqw;
+  font-size: clamp(12px, 1.6cqw, 15px);
   line-height: 1.2;
 }
 .patient-figure .patient-chip-name {
@@ -137,7 +137,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5cqh;
-  max-width: 32cqw;
+  max-width: clamp(260px, 32cqw, 360px);
   padding: 1.3cqw 2cqw;
   background: linear-gradient(165deg, #fffdf6, #fcf4e3);
   border: 2px solid var(--paper-border);
@@ -150,7 +150,7 @@
   to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 .speak-bubble .bubble-name {
-  font-size: 1.35cqw;
+  font-size: clamp(12px, 1.35cqw, 14px);
   font-weight: 700;
   letter-spacing: 1px;
   color: #8a6a3f;
@@ -166,7 +166,7 @@
   vertical-align: -0.1cqw;
 }
 .speak-bubble .dialogue-text {
-  font-size: 1.9cqw;
+  font-size: clamp(15px, 1.9cqw, 20px);
   line-height: 1.75;
   color: var(--ink);
   text-shadow: none;
@@ -191,6 +191,15 @@
 .speak-bubble.doctor::before { left: -1.5cqw; border-right: 1.8cqw solid var(--paper-border); }
 .speak-bubble.doctor::after  { left: -1.15cqw; border-right: 1.35cqw solid #fcf4e3; }
 
+/* 患者气泡横向延伸（v1.9.1）：患者长句常比玩家多，加宽气泡减少换行、气泡更矮，
+   不易垂直到达底部候选选项区；锚点已随 bubbleAnchor.patient 左移，加宽后完整落在舞台内。
+   注意：absolute+left 锚定的气泡宽度默认被 shrink-to-fit 约束为「舞台宽-left」（右侧患者仅剩
+   156px），max-width 形同虚设——用 width:max-content 让气泡按 max-width 上限横向铺开 */
+.speak-bubble.patient {
+  width: max-content;
+  max-width: clamp(300px, 40cqw, 440px);
+}
+
 /* —— 顶部旁白：软气泡横条，居中于阶段上方 —— */
 .dialogue-narration {
   position: absolute;
@@ -208,7 +217,7 @@
 .dialogue-narration .dialogue-text {
   font-family: var(--font-sans);
   font-style: italic;
-  font-size: 1.7cqw;
+  font-size: clamp(14px, 1.7cqw, 18px);
   letter-spacing: 2px;
   color: #6b5a3e;
   margin: 0;
@@ -492,7 +501,7 @@
 /* 窄视口：角落四维收起，给气泡与选项更多空间（P2 验收标准 1 基础不遮挡） */
 @media (max-width: 720px), (max-height: 520px) {
   .corner-stats { display: none; }
-  .patient-figure .patient-chip { font-size: 1.4cqw; padding: 0.5cqw 1.3cqw; }
+  .patient-figure .patient-chip { font-size: clamp(12px, 1.4cqw, 14px); padding: 0.5cqw 1.3cqw; }
 }
 
 /* —— 右上角「回顾」+「暂停」按钮 + 本场对话回顾窗（P2-6 回顾 / P2-8 断点，纸木质浮层） —— */

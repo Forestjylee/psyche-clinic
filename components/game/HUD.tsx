@@ -10,6 +10,7 @@ export function HUD() {
   const { game, scene, expToNext, toggleMute, muted, saveNow, backToTitle, playSound } = useGame();
   const [confirmExit, setConfirmExit] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [hudMore, setHudMore] = useState(false);
   if (scene === "title") return null;
   const d = game.doctor;
   const sanColor = d.sanity > 60 ? "var(--good)" : d.sanity > 30 ? "var(--warn)" : "var(--bad)";
@@ -21,7 +22,7 @@ export function HUD() {
   const slotsFull = game.slot >= todayCapacity(game);
 
   return (
-    <div className="hud">
+    <div className={`hud${hudMore ? " expanded" : ""}`}>
       <div className="hud-brand">
         <div className="hud-emblem" aria-hidden="true">
           <svg viewBox="0 0 48 48" className="hud-emblem-svg">
@@ -43,7 +44,7 @@ export function HUD() {
         <div className="hud-title">{game.clinicName}</div>
       </div>
       <div className="hud-stats">
-        <div className="hud-stat">
+        <div className="hud-stat collapsible">
           <div className="hud-stat-icon lvl">{d.level}</div>
           <div className="hud-stat-body">
             <span className="hud-stat-label">等级</span>
@@ -89,7 +90,7 @@ export function HUD() {
             <span className="hud-tip-line">获得：接诊收费是主要收入，前台助理每日额外进账，完成成就另有奖金。</span>
           </div>
         </div>
-        <div className="hud-stat">
+        <div className="hud-stat collapsible">
           <div className="hud-stat-icon rep">声</div>
           <div className="hud-stat-body">
             <span className="hud-stat-label">声望</span>
@@ -155,7 +156,7 @@ export function HUD() {
           }}
           title="保存游戏进度"
         >
-          💾 保存
+          💾 <span className="hud-btn-text">保存</span>
         </button>
         <button
           className="hud-action-btn ghost"
@@ -165,7 +166,8 @@ export function HUD() {
           }}
           title="问题反馈"
         >
-          反馈
+          <span className="hud-btn-icon">✉</span>
+          <span className="hud-btn-text">反馈</span>
         </button>
         <button
           className="hud-action-btn ghost"
@@ -175,7 +177,21 @@ export function HUD() {
           }}
           title="退出游戏，返回标题"
         >
-          退出
+          <span className="hud-btn-icon">✕</span>
+          <span className="hud-btn-text">退出</span>
+        </button>
+        <button
+          type="button"
+          className={`hud-more-btn${hudMore ? " open" : ""}`}
+          onClick={() => {
+            playSound("click");
+            setHudMore((v) => !v);
+          }}
+          title={hudMore ? "收起资源详情" : "展开等级与声望"}
+          aria-expanded={hudMore}
+        >
+          {hudMore ? "⌃" : "⌄"}
+          <span className="hud-btn-text">{hudMore ? "收起" : "更多"}</span>
         </button>
       </div>
       {confirmExit

@@ -60,9 +60,35 @@
   .hud-action-btn { padding: 4px 9px; font-size: 12px; }
 }
 
-/* 手机竖屏（≤540px）：保留金钱/理智两颗核心胶囊 + 时段 + 保存/退出 */
+/* 手机竖屏（≤540px，iPhone 竖屏）：HUD 单行精简——金钱/理智/时段/按钮图标化，
+   等级(Lv+经验条)/声望 收进「⌄ 更多」折叠面板（.hud-stat.collapsible 默认收起，
+   .hud.expanded 时展开），避免六胶囊横向溢出变形 */
 @media (max-width: 540px) {
-  .hud-stat:has(.hud-stat-icon.lvl),
-  .hud-stat:has(.hud-stat-icon.rep) { display: none; }
+  .hud { height: 56px; padding: 0 8px; gap: 8px; }
+  .hud-stats { gap: 5px; flex-wrap: wrap; }
+  .hud.expanded { height: auto; padding: 6px 8px; }
+  .hud-stat { padding: 4px 8px; gap: 5px; }
+  .hud-stat-icon { width: 22px; height: 22px; font-size: 12px; }
+  .hud-stat-value { font-size: 13px; }
+  .hud-day { padding: 4px 9px; font-size: 12px; }
+  .hud-more-btn { display: flex; }
+  .hud-stat.collapsible { display: none; }
+  .hud.expanded .hud-stat.collapsible { display: flex; }
+  /* 展开态恢复经验/声望进度条（960px 断点默认隐藏了条，仅展示数值文本） */
+  .hud.expanded .hud-stat-bar { display: block; }
+  .hud-btn-text { display: none; }
+
+  /* 首页移动端压缩（v1.9.1）：header 收成单行紧凑栏（h1 缩小、隐藏副标题、chips 瘦身），
+     section-title 与 body 边距收窄，把纵向空间让给「今日预约」清单。
+     flex-direction:row 用 .scene.clinic 提级覆盖 cinema.css 的 max-width:900px column 布局 */
+  .scene.clinic .clinic-header { flex-direction: row; justify-content: space-between; padding: 8px 16px 6px; gap: 10px; align-items: center; }
+  .clinic-header-left h1 { font-size: 17px; letter-spacing: 3px; gap: 8px; margin-bottom: 0; }
+  .clinic-header-left h1::before { height: 20px; }
+  .clinic-header-left p { display: none; }
+  .clinic-stat-chip { min-width: 0; padding: 3px 9px; }
+  .clinic-stat-chip .chip-val { font-size: 15px; }
+  .clinic-stat-chip .chip-label { font-size: 10px; }
+  .clinic-body { padding: 0 16px 80px; gap: 10px; }
+  .section-title { font-size: 13px; letter-spacing: 1.5px; margin-bottom: 8px; }
 }
 

@@ -80,6 +80,41 @@
   color: var(--bad);
 }
 
+/* HUD 移动端按钮图标（桌面显示完整文字，窄屏只留图标） */
+.hud-btn-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+.hud-btn-text {
+  line-height: 1;
+}
+
+/* HUD「更多」折叠按钮：默认隐藏，手机竖屏（≤540px）显示 */
+.hud-more-btn {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 13px;
+  letter-spacing: 1px;
+  transition: all 0.18s;
+}
+.hud-more-btn:hover {
+  background: var(--bg-card-hi);
+  border-color: var(--border-glow);
+  color: var(--text);
+}
+.hud-more-btn.open {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 /* Toast 层（多 toast 堆叠） */
 .toast-layer {
   position: fixed;

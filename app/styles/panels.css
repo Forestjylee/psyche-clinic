@@ -733,7 +733,7 @@
   box-shadow: var(--shadow-paper);
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 1.6cqw;
+  font-size: clamp(12px, 1.6cqw, 15px);
   letter-spacing: 2px;
   color: #6b5a3e;
   text-align: center;
