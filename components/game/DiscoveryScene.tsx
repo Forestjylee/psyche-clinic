@@ -2,6 +2,7 @@
 
 import { useGame } from "@/lib/hooks/useGame";
 import { discoveryChannels } from "@/lib/data/discovery";
+import { allPatients } from "@/lib/data/patients";
 import { ChibiCharacter } from "./ChibiCharacter";
 
 /**
@@ -53,7 +54,7 @@ export function DiscoveryScene() {
                   disabled={locked || !afford}
                   onClick={() => {
                     playSound("click");
-                    void discover(ch.id);
+                    discover(ch.id);
                   }}
                 >
                   {locked ? "声望不足" : afford ? "付出善意" : "金钱不足"}
@@ -75,25 +76,29 @@ export function DiscoveryScene() {
           <div className="empty-state">还没有人找上门。愿意的话，先在上方做一件善事。</div>
         ) : (
           <div className="discover-candidates">
-            {game.discoveryCandidates.map((c) => (
-              <div key={c.id} className="discover-candidate">
-                <div className="discover-candidate-avatar">
-                  <ChibiCharacter palette={c.scenario.palette} size="sm" emotion="neutral" />
+            {game.discoveryCandidates.map((c) => {
+              const p = allPatients.find((x) => x.id === c.patientId);
+              if (!p) return null; // 兜底：患者剧本缺失（理论上不会）
+              return (
+                <div key={c.id} className="discover-candidate">
+                  <div className="discover-candidate-avatar">
+                    <ChibiCharacter palette={p.palette} size="sm" emotion="neutral" />
+                  </div>
+                  <div className="discover-candidate-info">
+                    <div className="discover-candidate-name">{p.name}</div>
+                    <div className="discover-candidate-intro">{p.intro}</div>
+                  </div>
+                  <div className="discover-candidate-actions">
+                    <button className="discover-invite-btn" onClick={() => invite(c.id)}>
+                      联系 ta
+                    </button>
+                    <button className="discover-discard-btn" onClick={() => discardCandidate(c.id)}>
+                      再等等
+                    </button>
+                  </div>
                 </div>
-                <div className="discover-candidate-info">
-                  <div className="discover-candidate-name">{c.scenario.name}</div>
-                  <div className="discover-candidate-intro">{c.scenario.intro}</div>
-                </div>
-                <div className="discover-candidate-actions">
-                  <button className="discover-invite-btn" onClick={() => invite(c.id)}>
-                    联系 ta
-                  </button>
-                  <button className="discover-discard-btn" onClick={() => discardCandidate(c.id)}>
-                    再等等
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

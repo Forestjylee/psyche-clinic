@@ -72,6 +72,8 @@ export type ChoiceKind =
 
 export interface ChoiceRequirement {
   trust?: number;
+  /** 信任上限：信任 ≤ 该值才可选（用于恶化入口——仅失误累积的低信任玩家可见） */
+  trustAtMost?: number;
   defense?: number;
   mood?: number;
   truth?: number;
@@ -151,8 +153,6 @@ export interface PatientScenario {
   difficulty: "简单" | "普通" | "困难";
   /** 记忆碎片：真相揭示到阈值时触发的一次性闪回 */
   memoryFragments?: MemoryFragment[];
-  /** 剧本种子 id（生成池去重用；手写患者无此字段） */
-  seedId?: string;
   /** 是否已完成 */
   completed?: boolean;
   /** 已达成结局 */
@@ -294,12 +294,10 @@ export interface GameState {
   todayFollowUps: string[];
   /** patientId -> 连续未复诊天数（达宽限天数自动离场） */
   followUpIdleDays: Record<string, number>;
+  /** 已到达候诊的手写患者 id（逐日随机到达：难度分桶递进补充，引导患者第一天已在场；接待后不移除） */
+  arrivedPatients: string[];
   /** 消息盒子：统一存放来信 / 病情提醒 / 通知（旧版 letters 会在读档时迁移） */
   messages: GameMessage[];
-  /** 生成器产出的患者剧本（最多保留 N 个） */
-  generatedScenarios: PatientScenario[];
-  /** 已用过的剧本种子 id（生成时排除，池耗尽后重置重洗） */
-  usedSeeds: string[];
   /** 治愈回访计划：patientId -> 回访状态（治愈/接纳/觉醒结局 N 天后探望） */
   returnVisits: Record<
     string,
@@ -377,8 +375,8 @@ export interface DiscoveryChannel {
 /** 发现但未决定是否邀约的候选客户 */
 export interface DiscoveryCandidate {
   id: string;
-  /** 预生成的剧本（接受邀约后随到达日进入预约清单） */
-  scenario: PatientScenario;
+  /** 候选患者 id（从手写患者池随机选，SPEC v1.5.0；接受邀约后随到达日进入预约清单） */
+  patientId: string;
   /** 来源渠道 id */
   channelId: string;
   /** 过期日：休息日过后仍未邀约则自动清除 */
@@ -387,7 +385,8 @@ export interface DiscoveryCandidate {
 
 /** 已接受邀约、等待到达的客户 */
 export interface PendingArrival {
-  scenario: PatientScenario;
+  /** 接受邀约的患者 id */
+  patientId: string;
   /** 计划到达日 */
   arriveDay: number;
 }
@@ -486,7 +485,11 @@ export interface Achievement {
       decor?: string;
       /** 赠予一块记忆碎片（走 unlockFragment 通路） */
       fragment?: { patientId: string; fragmentId: string };
-      /** 触发一位已治愈患者的额外回访（患者未治愈则静默跳过） */
+      /**
+       * 触发一位已治愈患者的额外回访（无合适患者则静默跳过）。
+       * 值 `"auto"`：从已治愈/接纳/觉醒且无待办回访的手写患者中动态选一位（成就去患者化后仅用此值）；
+       * 值为患者 id：指定该患者（仅旧数据兼容，新成就一律 "auto"）。
+       */
       returnVisit?: string;
     };
   };

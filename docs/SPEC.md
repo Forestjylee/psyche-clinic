@@ -2,9 +2,9 @@
 
 | 字段 | 内容 |
 | --- | --- |
-| 文档版本 | v1.3.0 |
+| 文档版本 | v0.5.0 |
 | 维护人 | Psyche Clinic Team |
-| 最后更新 | 2026-08-08 |
+| 最后更新 | 2026-08-07 |
 | 配套文档 | [PRD.md](./PRD.md) · [PLAN.md](./PLAN.md) · [DEPLOYMENT.md](./DEPLOYMENT.md) |
 | 文档目的 | 规定技术栈、目录结构、数据模型、引擎契约与部署架构，作为研发实施的硬约束 |
 
@@ -49,7 +49,6 @@ psyche-clinic-next/
 │       ├── SkillsTree.tsx        # 技能树
 │       ├── ClinicUpgrades.tsx    # 诊所升级
 │       ├── Letters.tsx           # 信件系统
-│       ├── Generator.tsx         # 剧本生成器
 │       ├── HUD.tsx               # 顶部资源 HUD
 │       ├── Overlays.tsx          # 通用遮罩（确认框等）
 │       ├── PsychTermSpan.tsx     # 心理学词条悬停浮窗
@@ -62,9 +61,7 @@ psyche-clinic-next/
 │   ├── audio/
 │   │   └── SoundManager.ts       # Web Audio 封装（BGM/SFX/滤波）
 │   ├── data/                     # 静态内容数据（可被策划单独维护）
-│   │   ├── patients.ts           # 手写患者剧本
-│   │   ├── truths.ts             # 真相库（生成器素材）
-│   │   ├── generator.ts          # 剧本生成器逻辑
+│   │   ├── patients.ts           # 患者剧本聚合入口（scan-patients.mjs 生成索引自动收集 patients/，新剧本入目录即进池）
 │   │   ├── achievements.ts       # 成就定义（38 个）
 │   │   ├── skills.ts             # 技能与诊所升级
 │   │   └── psychTerms.ts         # 心理学词条库
@@ -116,7 +113,7 @@ psyche-clinic-next/
 ```typescript
 interface DoctorStats {
   reputation: number;  // 声望：影响可接诊层级
-  sanity: number;      // 理智（自我关怀资源，非失败条件）：随沉重接诊/坏结局/连续不休息消耗，随休息/回访/读信等温柔方式恢复；归零触发温情强制休息（非倒闭）
+  sanity: number;      // 理智：过低触发幻觉/倒闭
   money: number;       // 金钱：升级诊所/技能
   exp: number;         // 经验：升级技能树
   level: number;       // 等级
@@ -124,7 +121,7 @@ interface DoctorStats {
 
 interface GameState {
   doctor: DoctorStats;
-  skills: string[];                       // 已解锁能力 id
+  skills: string[];                       // 已解锁技能 id
   clinicUpgrades: string[];               // 诊所升级 id
   patientRecords: Record<string, EndingType>;  // 患者 id -> 结局
   day: number;                            // 游戏内日期
@@ -134,20 +131,8 @@ interface GameState {
   abandoned: string[];                    // 已放弃治疗离开的患者 id
   discharged: string[];                   // 已离场患者 id（治愈/接纳/恶化/悲剧：不再复诊）
   followUpCount: Record<string, number>;  // patientId -> 已复诊次数（依赖/隐藏/觉醒/转介复诊）
-  todayFollowUps: string[];               // 今日复诊池命中患者 id
-  followUpIdleDays: Record<string, number>;  // 复诊患者未归天数（满宽限放弃复诊）
   messages: GameMessage[];                // 消息盒子（来信/提醒/通知）
-  generatedScenarios: PatientScenario[];  // 生成器产出（≤5）
-  usedSeeds: string[];                    // 已用剧本 seed 去重
-  returnVisits: Record<string, { ending: EndingType; dueDay: number; arrived: boolean; seen: boolean }>;  // 患者 id -> 回访状态（治愈/接纳/觉醒后探望）
-  discoveryCandidates: DiscoveryCandidate[];  // 发现客户候选（慈善获客）
-  pendingArrivals: PendingArrival[];      // 已邀约待到达的客户
-  facilityPositions: Record<string, FacilityPosition>;  // 设施半自由摆放位置
-  unlockedFragments: Record<string, string[]>;  // (规划，PLAN P3-1) 患者 id -> 已解锁记忆碎片 id（PRD 场景4，碎片驱动完整真相）
-  activeSession?: { patientId: string; nodeId: string; patientState: PatientState; history: string[] };  // (规划，PLAN P2-8) 对话断点快照（PRD 场景2，可无痛中途退出）
-  sessionSinceRest?: number;              // 理智（P5-3）：自上次休息以来连续接诊场次（连续不休息消耗计数）
-  gardenDay?: number;                     // 理智（P5-3）：最近一次「花园待一会」的日期（同日仅一次）
-  stats: GameStats;                       // 累计统计（成就引擎，见 §12.4）
+  arrivedPatients: string[];              // 已到达候诊的手写患者 id（引导患者首日已在场，逐日随机到达补充）
 }
 ```
 
@@ -228,7 +213,14 @@ interface Achievement {
   rarity: AchievementRarity;
   target: number;
   icon: string;
-  reward?: { reputation?: number; sanity?: number; exp?: number; money?: number; };
+  reward?: {
+    reputation?: number; sanity?: number; exp?: number; money?: number;
+    unlock?: {
+      letter?: string;        // 成就纪念信 id（achievementLetters.ts）
+      decor?: string;         // 诊室通用纪念物 id（decor.ts，source.kind==="achievement"，无患者绑定）
+      returnVisit?: "auto";   // 达成时从已治愈患者中动态选一位安排额外回访（无候选则静默跳过）
+    };
+  };
   hidden?: boolean;
 }
 
@@ -273,11 +265,11 @@ interface AchievementProgress {
 1. 清空 `slot` 与 `todayServed`；
 2. 候诊患者 `waitingDays[id] += 1`，触发加重/放弃判定；
 3. 复诊池患者按结局概率 roll：命中→`todayFollowUps`；未命中→`followUpIdleDays`+1、满宽限放弃复诊扣声望离场；
-4. 候诊人数不足 `queueTarget(g)` 时由生成器补充新人。
+4. 候诊人数不足 `queueTarget(day)` 时从手写患者池按难度分桶随机补充到达（简单一直开放；普通需声望 ≥25 或 day≥3；困难需声望 ≥60 或 day≥6），新到达写入消息盒子通知；引导患者（小北）第一天已在场。
 
 ### 3.5 金钱经济系统（诊所经营）
 
-金钱定位为**诊所经营资源**（ADR-008），形成「接诊赚钱 → 升级/采购/善意连接 → 提升经营效率 → 赚更多」循环。
+金钱定位为**诊所经营资源**（ADR-008），形成「接诊赚钱 → 升级/采购/广告 → 提升经营效率 → 赚更多」循环。
 
 **收入**：初诊报酬（简单 150 / 普通 300 / 困难 600）；复诊报酬递减（70% / 40%）；`receptionist` 前台每日 +50。
 
@@ -287,29 +279,26 @@ interface AchievementProgress {
 | --- | --- | --- |
 | 多级设施升级 | 现有 5 项设施各 3 级，效果递增 | 2 级 ≈1.8× 1 级价、3 级 ≈2.5× 1 级价（沙发 300→540→750） |
 | 消耗品 | 一次性药品/道具，会话中解锁选项或提升治愈率 | 50-200 金 |
-| 慈善活动费 | 善意连接渠道投入（捐图书角/资助讲座/公益宣传，见 §3.6） | 30-150 金/次 |
-| 候诊扩容 | 购置后每日接诊名额 +1（基础 2 + 声望档位，见下文容量规则） | 1200 金/次 |
+| 广告拉新 | 提升每日新患者上限 +1 | 300 金/次，持续 3 天 |
 
-**每日可接诊名额**（P5-6 容量规则）：每日可接诊名额 `todayCapacity(g)`：第 1 天 2 位起，声望 ≥25 / ≥60 各 +1，购置「候诊扩容」+1，上限 5；时段映射 slot 0 清晨 / 1 下午 / 2 傍晚 / 3-4 夜晚。
-
-**节奏**（ADR-010）：玩家单天约赚 800-2200 金（名额上限 5 位时）；中期以高级设施与慈善活动费为主要消耗口，避免溢出。
+**节奏**（ADR-010）：玩家单天约赚 500-1500 金；中期以高级设施与广告为主要消耗口，避免溢出。
 
 ### 3.6 发现客户（主动获客，v0.4.0）
 
-**定位**：金钱经济循环的**主动消耗口**。玩家付出低额「慈善活动费」参与善意连接（捐图书角/资助社区讲座/公益宣传/口口相传），让需要的人主动找来，主动决定是否联系；被联系者有概率应约，应约者于今日/明日/后日（概率分布）加入预约清单，形成「善意连接 → 接诊赚钱」的可控循环。替代原「预约客户」按钮语义（被动等客）。
+**定位**：金钱经济循环的**主动消耗口**。玩家花钱通过广告/广播等渠道触达潜在客户，主动决定是否发送邀约；客户有概率接受，接受后于今日/明日/后日（概率分布）加入预约清单，形成「花钱获客 → 接诊赚钱」的可控循环。替代原「预约客户」按钮语义（被动等客）。
 
 **交互流程**：
 1. 首页「预约客户」按钮改名为「发现客户」，点击进入发现页（scene: `discover`）。
-2. 发现页展示连接方式列表，每项标注花费 / 说明 / 预计产出。玩家确认后扣除慈善活动费，生成候选客户（复用剧本生成器 `generateScenario` 产出候选，**不进入预约清单**）。
-3. 候选客户逐一展示，玩家对每位决定「联系 ta」或「再等等」。
+2. 发现页展示获客渠道列表，每渠道标注花费 / 说明 / 预计产出。玩家确认后扣除金钱，从手写未接待患者池随机选候选（**不进入预约清单**，不生成新患者）。
+3. 候选客户逐一展示，玩家对每位决定「发送邀约」或「暂不考虑」。
 4. 邀约判定：接受概率 = 渠道基础接受率 + 声望加成（每 10 点声望 +2%，上限 +20%，clamp）。接受 → 按到达时间分布写入待到达队列；拒绝 → 消息盒子通知（不扣声望）。
-5. 每「休息一日」日终结算时，到达日到期的候选客户加入预约清单（`generatedScenarios`，受 `MAX_GENERATED` 上限约束，满则顺延下一日），并写入消息盒子通知。
+5. 每「休息一日」日终结算时，到达日到期的候选客户标记到达（加入 `arrivedPatients`），并写入消息盒子通知。
 
 **数据模型**：
 
 ```typescript
 interface PendingArrival {
-  scenario: PatientScenario;  // 已生成的剧本，到达时直接进预约清单
+  patientId: string;          // 手写患者 id，到达时标记进入候诊名单
   arriveDay: number;          // 计划到达日（>= day）
 }
 
@@ -321,47 +310,22 @@ pendingArrivals: PendingArrival[];
 
 | id | 名称 | 花费 | 说明 | 预计产出 | 基础接受率 |
 | --- | --- | --- | --- | --- | --- |
-| `flyer` | 捐图书角 | 30 | 社区角落捐建小图书角 | 1 位 | 45% |
-| `radio` | 资助社区讲座 | 80 | 本地讲座，听过的人深夜来电 | 2 位 | 55% |
-| `newspaper` | 公益宣传 | 150 | 参与公益宣传，家属求助 | 2 位 | 65% |
-| `referral` | 治愈者口口相传 | 0（需声望 ≥ 40） | 被治愈者口碑介绍，质量高 | 1 位 | 80% |
+| `flyer` | 传单 | 80 | 街头发放，触达大众 | 1 位 | 45% |
+| `radio` | 广播 | 200 | 本地电台，覆盖面广 | 2 位 | 55% |
+| `newspaper` | 报纸广告 | 380 | 专栏投放，触达中产 | 2 位 | 65% |
+| `referral` | 老客户转介 | 0（需声望 ≥ 40） | 治愈患者口碑介绍，质量高 | 1 位 | 80% |
 
 **到达时间分布**：今日 50% / 明日 30% / 后日 20%。
 
 **约束**：
-- 已接诊名额满（`slot = 当日容量 todayCapacity(g)`）时，邀约结果到达日若 roll 到「今日」则顺延至次日；
+- 已接诊名额满（`slot = MAX_SLOTS`）时，邀约结果到达日若 roll 到「今日」则顺延至次日；
 - 未邀约的候选仅停留当日，休息日后自动清除（过期不候，消息盒子提示）；
-- 候选客户 `usedSeeds` 去重沿用生成器 `excludeSeeds`，避免与已见剧本重复；
+- 候选从手写未接待患者池选择（未到达 / 未接诊 / 未放弃 / 不在候选队列），不重复已出现患者；
 - 转介渠道的客户可加「声望门槛」与更高基础属性（高质量客户）。
 
-**数据流**：发现页 UI → `store.discover(channelId)`（扣金钱、生成候选）→ `store.invite(candidateId)`（判定接受、写 `pendingArrivals` / 通知拒绝）→ `restOneDay`（结算到达：入预约清单 + 消息通知）。
+**数据流**：发现页 UI → `store.discover(channelId)`（扣金钱、从手写池选候选）→ `store.invite(candidateId)`（判定接受、写 `pendingArrivals` / 通知拒绝）→ `restOneDay`（结算到达：标记 arrivedPatients + 消息通知）。
 
 **扩展空间**：渠道为数据表，新增渠道仅追加 `discovery.ts` 数据；接受率/到达分布常量集中于此；后续可扩展「客户质量」（高付出渠道产出高难度/高报酬客户）。
-
-### 3.7 理智（自我关怀资源，P5-3）
-
-理智定位为**自我关怀资源**（非失败条件）：随沉重接诊/坏结局/连续不休息而消耗，通过温柔方式恢复；理智低时是叙事提醒（BGM 变沉、画面变暗、对话里医生也累了），归零不 Game Over，而是触发温情的强制休息场景（PRD 场景6）。
-
-**消耗**（`finishSession` 结算后，非首诊坏结局受 `clampFirstSessionEnding` 约束）：
-
-| 触发 | 数值 | 说明 |
-| --- | --- | --- |
-| 接诊沉重病例 | -10 | 患者等待 ≥4 天（`startSession` 记录危机标记，与成就口径一致） |
-| 坏结局 | -15 | 结局为悲剧 `tragic` / 恶化 `worsen` |
-| 连续不休息 | -5 | 自上次休息第 3 场起每场（仅第 3 场 toast 提醒一次） |
-
-**恢复**：
-
-| 渠道 | 数值 | 说明 |
-| --- | --- | --- |
-| 休息一日 | +15 | 休息室 `rest_room` 升级 +10（合计 25），同时 `sessionSinceRest` 归零 |
-| 治愈回访 | +10 | 「好好告别」结案离场时恢复（`finishReturnVisit`） |
-| 读信 | +2/封 | 打开消息盒子，本次新读的未读来信（`kind === "letter"`）每封 +2（静默） |
-| 花园待一会 | +5 | 每日一次（`gardenDay === day` 时拦截），温柔恢复渠道 |
-
-**归零温情场景**：结算后理智 ≤0 → `restDreamPending`（瞬时状态）→ 结局页关闭（`dismissEnding`）转 `restDreamVisible` → 全屏梦境 overlay（`RestDreamOverlay`，z-index 350）展示帮助过的人（治愈/接纳/觉醒结局患者名签，无则兜底文案）→ 点「慢慢醒过来」（`dismissRestDream`）理智恢复 +35。非 Game Over、非倒闭。
-
-**成就联动**：`stats.sanityStreak`（连续休息后理智≥60 天数）驱动「神完气足」（`clinic_sanity_keep`）；`secret_sanity_zero` 归零成就已有（AchievementEngine 只读）。
 
 ---
 
@@ -598,8 +562,6 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 
 分类分布：获客 9 / 回访 5 / 诊疗扩展 5 / 经营扩展 7 / 结局扩展 7 / 成长 3 / 伦理 4 / 隐藏 4。
 
-> **修订标注（PLAN P5-5）**：成就奖励已情感化落地——关键成就（first 系列 / 七日 / 半月 / 旧雨重逢 / 觉醒 / 转介 / 一针见血 / 温情常在 / 念念不忘 / 故人重逢 / 第一次治愈 / 见众生 / 第一天）新增解锁信件、诊室纪念物、记忆碎片、特殊回访；数值奖励（声望/理智/经验/金钱）保留为成长与经营来源。详情见 §12.6。
-
 **获客（新分类 `discover`，标签「获客」）**
 
 | id | 名称 | 稀有度 | 目标 | 统计源 |
@@ -644,7 +606,7 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 | clinic_day_50 | 五十度秋 | legendary | 50 | `day` |
 | clinic_sanity_keep | 神完气足 | rare | 5 | `stats.sanityStreak`（连续休息后理智≥60） |
 | clinic_upgrade_5 | 锦上添花 | epic | 5 | `clinicUpgrades.length` |
-| clinic_full_day | 门庭若市 | rare | 1 | `slot` 达到当日容量上限 5（满负荷日） |
+| clinic_full_day | 门庭若市 | rare | 1 | `slot` 达到 `MAX_SLOTS`（事件钩子） |
 
 **结局扩展（`ending`）**
 
@@ -711,30 +673,13 @@ interface GameStats {
 | `invite` action | `stats.inviteCount+1`；成功 `acceptCount+1`，婉拒 `rejectCount+1` |
 | `startSession` | 传 `patientId` 给 `onSessionStart`；若 `patientRecords[pid]` 已存在则 `revisitCount+1`；记录危机接诊标记（`waitingDays≥4`） |
 | `restOneDay` | 当日无 abandon 事件 → `noLossDays+1`；理智恢复后更新 `sanityStreak`；末尾调用 `onGameStateSynced` 刷新天数/金钱成就 |
-| `finishSession` | `onSessionEnd` 内：`slot≥当日容量上限 5` → `clinic_full_day`；危机接诊且治愈 → `ethics_help_desperate`；真相≥95 → `therapy_deep_truth` |
+| `finishSession` | `onSessionEnd` 内：`slot≥MAX_SLOTS` → `clinic_full_day`；危机接诊且治愈 → `ethics_help_desperate`；真相≥95 → `therapy_deep_truth` |
 | `finishReturnVisit` | `aftercareCount+1`；`aftercareEndings.push(rv.ending)` |
 | `onGameStateSynced` | 用 `set` 刷新可推导成就（获客/回访/复诊/天数/金钱/结局/成长/隐藏） |
 
 新分类 `discover`/`aftercare` 需扩展 `Achievement["category"]` 联合类型与 `achievementCategoryLabels`。
 
-### 12.6 成就情感化奖励（P5-5）
-
-**定位**：成就奖励在保留数值（声望/理智/经验/金钱，成长与经营来源）的同时，新增**情感化奖励**维度——解锁信件 / 诊室纪念物 / 记忆碎片 / 特殊回访。发放链路完全在 store 层 `onUnlock` 回调完成，`AchievementEngine`（lib/engine，冻结）零改动，`reward.unlock` 字段对它透明（只读已知数值字段）。
-
-`Achievement["reward"]` 新增 `unlock` 字段（lib/types.ts），四种类型：
-
-| unlock 类型 | 字段 | 数据来源 | 发放行为 |
-| --- | --- | --- | --- |
-| 纪念信 | `unlock.letter` | `lib/data/achievementLetters.ts`（新增，6 封） | 查表 → 按 id 去重 → `g.messages.unshift` 进消息盒（kind="letter"），toast「收到一封来信」 |
-| 诊室纪念物 | `unlock.decor` | `lib/data/decor.ts` 新增 3 件 `source.kind==="achievement"` 的 flower 纪念物（向阳花 / 多肉拼盘 / 启程的种子） | 幂等解锁 `unlockedDecors` + 摆放 `placedDecors`/`decorPositions`（对齐 P5-1 挂画钩子模式） |
-| 记忆碎片 | `unlock.fragment` | 患者 `memoryFragments` / `followUpFragments` | 调 `store.unlockFragment(patientId, fragmentId)`（内含 P5-1 挂画钩子 + commit） |
-| 特殊回访 | `unlock.returnVisit` | 手写患者 id | 患者已治愈（`patientRecords[pid]` 存在）且无待办回访 → 覆盖 `returnVisits[pid]` 安排一次额外探望；未治愈静默跳过 |
-
-- **发放链路**：store init 的 `onUnlock` 回调改为 `(a) => { applyAchievementUnlock(a); showAchievement(a); commit(); }`；`applyAchievementUnlock`（store 模块内 helper）按上述四类逐项发放。
-- **图鉴展示**：`AchievementsPage` 的 `Reward` 组件在数值奖励后追加解锁物品行（📨 来信 / 🪴 诊室纪念 / 🧩 记忆碎片 / ✿ 一位故人将来探望），unlock 不依赖数值 reward 存在。
-- **13 个成就映射**（6 封信 / 3 纪念物 / 2 碎片 / 2 回访）：letter × 6（therapy_first_patient / clinic_day_7 / aftercare_first / ending_awakening_1 / clinic_day_15 / ending_transfer_1）；decor × 3（ending_cure_1 / therapy_10_different / secret_day_1）；fragment × 2（therapy_deep_truth → zhou_m3 / aftercare_3 → lin_m3）；returnVisit × 2（aftercare_5 → chen_lo / aftercare_all_types → xiao_bei）。
-
-### 12.7 图鉴排序与筛选（v0.5.0）
+### 12.6 图鉴排序与筛选（v0.5.0）
 
 - **默认排序**：每个分类内按稀有度降序展示（legendary → epic → rare → common），`achievements.ts` 导出 `RARITY_ORDER: Record<AchievementRarity, number>`（传说 0 … 普通 3），`AchievementsPage` 分组时按 `RARITY_ORDER[a.rarity]` 排序。
 - **一键筛选**：图鉴顶部（返回按钮下方）加筛选按钮组「全部 / 已解锁 / 未解锁」，`useState<"all" | "unlocked" | "locked">` 记忆当前筛选：
@@ -758,25 +703,16 @@ interface GameStats {
 | v0.5.0 | 2026-08-07 | 成就图鉴扩充 38→80：删除生成器成就 2 个，新增获客/回访/复诊/结局/成长/伦理/隐藏 44 个（见 §12）；GameState 新增 `stats` 累计统计字段；`onSessionStart` 接收 `patientId`；`restOneDay` 末尾同步成就引擎；`Achievement.category` 扩展 `discover`/`aftercare`；图鉴卡片按稀有度降序排列 + 全部/已解锁/未解锁一键筛选（§12.6） |
 | v1.0.0 | 2026-08-07 | 界面场景化重构立项（§14）：grill-me 九项决策锁定（全量场景化/温暖手绘保留/Phaser+React 分工/大厅+诊室/点选导航/装修半自由/程序绘制/五期 M1-M5/逐句气泡+回顾）；独立文档体系 docs/kairosoft/{PRD,SPEC,PLAN}.md 完成；M1 技术地基动工 |
 | v1.1.0 | 2026-08-08 | 界面方向定稿为「治愈系手绘纸木质」（非开罗像素，用户决策，见 docs/kairosoft/PRD.md v1.2/v1.3）：纸木质 token 落地、HUD/底栏/面板换肤；**v1.3 彻底移除场景小人**（候诊改名牌卡片，返回按钮/面板窗口统一）；M1/M2 主体完成，`syncFacilities` 崩溃修复 |
-| v1.2.0 | 2026-08-08 | **文档治理**：主 PRD 全量重构为 v1.0.0（用户旅程视角重排玩法主线，五条根决策）；kairosoft 专项文档作废删除，界面方向并入新 PRD §5（叙事层>档案图鉴>经营层）。本节 §14 降级为历史参考 |
-| v1.2.1 | 2026-08-08 | **评审修订**：§3.1 数据模型同步实际字段（todayFollowUps/followUpIdleDays/usedSeeds/returnVisits/discoveryCandidates/pendingArrivals/facilityPositions/stats + 规划中 unlockedFragments）；清理 `sanity` 旧语义（"过低触发幻觉/倒闭"→自我关怀资源、归零温情强制休息） |
-| v1.2.2 | 2026-08-08 | **评审修订（第二轮）**：§3.1 未落地字段统一标注「(规划, PLAN Px-x)」（unlockedFragments/activeSession）；§12.3 标注待修订高频数值成就（日进斗金/悬壶济世/学贯中西/广撒渔网/四面开花，对应 PLAN P5-4/P5-5）；§3.5/§3.6 慈善获客语义待 PLAN P5-2 同步（广告→善意连接） |
-| v1.2.3 | 2026-08-08 | **评审修订（第三轮）**：§3.5/§3.6 慈善获客语义落地（广告→善意连接：广告拉新 300 金 → 慈善活动费 30-150 金；渠道表改为捐图书角/资助社区讲座/公益宣传/治愈者口口相传）；DiscoveryScene 与相关 UI 文案同步 |
-| v1.2.4 | 2026-08-08 | **评审修订（第三轮）**：P5-3 理智完整机制落地（消耗：沉重病例 -10/坏结局 -15/连续不休息第 3 场起 -5；恢复：回访 +10/读信每封 +2/花园待一会 +5 每日一次；归零温情强制休息梦境 +35 恢复）；GameState 新增 sessionSinceRest/gardenDay；清理 sanity"倒闭"旧注释 |
-| v1.2.5 | 2026-08-08 | P5-4：成就描述转向「旅程里程碑」语义（discover_first/5/15/all_channels、therapy_100_patients、clinic_money_100k、growth_skill_8 共 7 个成就的 description 语义化，不再写高频数值肝度目标；name/target/稀有度不变）；§12.3 待修订标注更新（描述已完成，奖励待 P5-5） |
-| v1.2.6 | 2026-08-08 | P5-5：成就奖励情感化（reward 新增 unlock 字段：解锁信件/诊室纪念物/记忆碎片/特殊回访，13 个成就配置；新增 achievementLetters 数据表 6 封信 + decor 3 件纪念物；store onUnlock 发放链路；AchievementEngine 零改动） |
-| v1.2.7 | 2026-08-08 | P5-6：名额提升机制（一天容量 3→动态 2-5：基础 2 + 声望 25/60 各 +1 + 候诊扩容设施 +1；phaseOfSlot 扩 5 档，slot 3-4 切入 night 相位激活夜间分支；queueTarget 改传 GameState；新增候诊扩容设施 1200 金） |
-| v1.2.8 | 2026-08-08 | P6-1：技能命名重构（技能树从专业流派改为倾听者能力语义：解梦术→让 ta 感到安全/自由联想→接住沉默/认知重构→看见防御下的脆弱/暴露疗法→陪 ta 直面恐惧/危机干预→在崩溃边缘陪住 ta/临床药理学→稳稳托住/新药研发→多一条路/催眠术·初级→坚定地引导/深度催眠→走向真相；skill id 全量重构 + truths/patients 的 requireSkill 引用同步；SkillSchool 改 3 陪伴风格 gentle/sharp/firm（更温柔/更敏锐/更坚定）；SkillsTree 同步；登记 SKILL_ID_MIGRATIONS 迁移映射表供 P6-3） |
-| v1.2.9 | 2026-08-08 | P6-2：剧本去术语化（truths/patients 对话与解锁提示去掉 CBT/催眠/药理等治疗手段术语，改为情绪/能力语义；hint 技能名同步 P6-1 新能力名；psychTerms 补催眠/精神分析 2 条科普词条；技能树副标题去流派语义） |
-| v1.3.0 | 2026-08-08 | P6-3：旧档技能迁移（migrateGameState 对 skills 数组做 SKILL_ID_MIGRATIONS 映射迁移，旧技能 id→新能力 id，幂等/未知 id 保留/缺失补空，防引用悬空不丢档；对应 vitest） |
+| v1.4.0 | 2026-08-09 | **首页回归全 React（§15）**：移除 Phaser 大厅画布与「预约清单」弹层，预约全列表直放首页；去重（个人成长 6 入口/发现客户交底部栏）；保留诊所状态精简卡；装修模式降级（拖动落格失效，外观/摆放仍在升级面板管理）；对话候选选项区 max-height 46%→34%、气泡锚点上移至 y=190（防遮挡） |
+| v1.5.0 | 2026-08-09 | **患者池动态化 + 逐日随机到达 + 成就去患者化 + 生成系统下线**：① patients.ts 患者池自动收集：`scripts/scan-patients.mjs`（predev/pretest/prebuild 钩子）扫描 `lib/data/patients/` 生成显式模块映射 `index.generated.ts`，新剧本入目录即进池（不写死患者数）；不用 `import.meta.glob`——它是 Vite 特性，Next.js(webpack) 浏览器端会抛 `{}.glob is not a function`；② 难度按档位/轮次重标（短→简单 / 中→普通 / 长→困难，lin_xiao 长档→困难）；③ GameState 新增 `arrivedPatients`，患者逐日随机到达（难度分桶递进：简单常开 / 普通声望≥25或day≥3 / 困难声望≥60或day≥6，引导患者小北首日已在场）；④ 成就去患者化：碎片奖励改通用纪念物、回访奖励改动态已治愈患者；⑤ 生成器（generator/sceneBuilder/truths/seeds/Generator）下线，发现客户改从手写池选候选；⑥ 旧剧本下线 chen_lo / zhou_mingyuan（chen_mo 保留） |
 
 ---
 
 ## 14. 界面场景化重构 · 治愈系手绘纸木质（v1.0.0 · M1/M2 主体完成）
 
-> **文档治理注记（2026-08-08）**：本小节原配套的 kairosoft/{PRD,SPEC,PLAN}.md 专项文档已**作废删除**，其界面方向（场景化+温暖手绘+纸木质）与产品玩法主线决策已并入新主 [PRD.md](./PRD.md) v1.0.0（§5 界面呈现按新定位重审：**叙事层 > 档案图鉴 > 经营层**）。本节保留为历史决策与技术选型参考。
+> 本小节为立项摘要。产品需求见 [docs/kairosoft/PRD.md](./kairosoft/PRD.md)，技术规格见 [docs/kairosoft/SPEC.md](./kairosoft/SPEC.md)，实施计划见 [docs/kairosoft/PLAN.md](./kairosoft/PLAN.md)。
 >
-> **决策已锁定**：全量场景化（经营层+叙事层都进场景）｜治愈系手绘纸木质（非开罗像素）｜Phaser 场景 + React UI 覆盖层｜大厅+诊室双场景｜**v1.3 场景不绘制小人**（候诊改名牌卡片直接开诊）｜装修模式半自由摆放（位置仅视觉）｜AI 治愈插画背景 + 程序绘制交互叠加｜五期 M1-M5｜对话面对面逐句气泡+右上角回顾窗。产品需求以新 PRD v1.0.0 为准。
+> **决策已锁定**：全量场景化（经营层+叙事层都进场景）｜治愈系手绘纸木质（非开罗像素）｜Phaser 场景 + React UI 覆盖层｜大厅+诊室双场景｜**v1.3 场景不绘制小人**（候诊改名牌卡片直接开诊）｜装修模式半自由摆放（位置仅视觉）｜AI 治愈插画背景 + 程序绘制交互叠加｜五期 M1-M5｜对话面对面逐句气泡+右上角回顾窗。
 
 ### 14.1 目标与背景
 
@@ -821,7 +757,8 @@ interface GameStats {
 - **复用资产**：数据表（patients/skills/upgrades/discovery/achievements）、DialogueEngine、AchievementEngine、Storage 全部不动
 - **样式**：现有 `app/styles/` 模块化结构保留，新增 `phaser` 覆盖层样式（z-index 分层、canvas 尺寸/缩放）
 
-### 14.4 分阶段实施计划（五期，M1/M2 已完成）
+
+### 14.4 分阶段实施计划（五期，详见 docs/kairosoft/PLAN.md）
 
 每期独立可玩、独立提交，风险隔离：
 
@@ -847,3 +784,33 @@ interface GameStats {
 2. 全界面视觉统一为纸木质风格（顶栏/场景/菜单/弹窗）
 3. 原有玩法（对话/复诊/发现客户/回访/成就）零回归
 4. 分阶段每阶段可玩、可提交
+
+---
+
+## 15. 首页回归全 React · 对话布局调整（v1.4.0）
+
+> 用户决策（2026-08-09）：首页不再以 Phaser 场景为主视觉，回归全 React 布局——预约全列表 + 诊所状态精简卡，彻底移除大厅画布（接受装修拖动落格失效）。候选候选项在选项多时曾物理覆盖对话气泡，一并调整布局。
+
+### 15.1 首页布局（全 React）
+
+- 首页（`scene="clinic"`）直接渲染预约清单本体（原 ClinicHall 内容），移除「📋 预约清单」弹层与入口按钮（`clinic-list-toggle` / `clinic-list-mask` 样式删除）
+- 移除 Phaser 大厅画布（`GameCanvas`/`HallScene` 不再挂载于首页）：候诊卡、设施、花/画、装修拖动全部移除
+- **去重**：「个人成长」侧栏 6 个入口（技能/升级/消息/追踪/成就/休息）交给底部栏（`BottomBar` 已有全部入口）；头部「＋发现客户」按钮移除（底部栏「发现」承担）
+- **保留**：今日预约列表（React 清晰卡片）、头部概览 StatChip（已接待/技能/设施）、「诊所状态」精简卡（进度条 + 天数 + 流失）、「花园待一会」理智恢复入口（移入状态卡区）
+
+### 15.2 装修模式降级
+
+- 拖动落格（`decorateMode` / `facilityDropped` / `decorDropped`）失效——画布移除后无处落格
+- 升级面板（`scene="clinic_upgrades"`）保留：设施购置、设施外观变体切换（`setFacilityDecor`）、花/画「摆放/收起」（`toggleDecor`，作为记忆收藏管理）；移除「🛠 装修模式」按钮
+- 数据层零改动：`setFacilityPosition`/`setDecorPosition`/`decorPositions` 保留（兼容旧存档与后续恢复）
+
+### 15.3 对话布局调整（防候选遮挡气泡）
+
+- 候选选项区 `.dialogue-options` `max-height` 46% → **34%**（选项区顶部从 ~53% 降到 ~65% 场景高）
+- 气泡锚点 `CLINIC_LAYOUT.bubbleAnchor.*.y` 250 → **190**（上移到场景 35%，与选项区顶部留 ~16% 间隙）
+- 保留 `bottom:14px` / `overflow-y:auto`（选项多时滚动）
+
+### 15.4 范围
+
+- 数据层 / 对话引擎 / 成就引擎 / 存储层零改动
+- `GameCanvas.tsx` 保留（对话场景 `ClinicRoomCanvas` 仍依赖）；`phaser/hall/*`、`draw/Furniture.ts`、`draw/Decor.ts` 首页不再引用（留待后续清理）

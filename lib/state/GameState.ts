@@ -4,9 +4,11 @@ import type {
   TimePhase,
   Letter,
   EndingType,
+  PatientScenario,
 } from "../types";
 import { saveGameState, loadGameState, clearGameState } from "./Storage";
 import { SKILL_ID_MIGRATIONS } from "../data/skills";
+import { allPatients, GUIDED_PATIENT_ID } from "../data/patients";
 
 // ============================================================
 // 时间系统常量
@@ -154,8 +156,7 @@ export function createInitialState(): GameState {
     todayFollowUps: [],
     followUpIdleDays: {},
     messages: [],
-    generatedScenarios: [],
-    usedSeeds: [],
+    arrivedPatients: [GUIDED_PATIENT_ID],
     returnVisits: {},
     discoveryCandidates: [],
     pendingArrivals: [],
@@ -194,10 +195,17 @@ export function migrateGameState(data: GameState): GameState {
   if (!Array.isArray(data.todayFollowUps)) data.todayFollowUps = [];
   if (!data.followUpIdleDays) data.followUpIdleDays = {};
   if (!data.returnVisits) data.returnVisits = {};
-  if (!Array.isArray(data.usedSeeds)) data.usedSeeds = [];
   // 发现客户：候选与待到达队列（旧存档补默认空）
   if (!Array.isArray(data.discoveryCandidates)) data.discoveryCandidates = [];
   if (!Array.isArray(data.pendingArrivals)) data.pendingArrivals = [];
+  // 逐日随机到达（SPEC v1.5.0）：旧档迁移为「未结案未离场患者全集已到达」（旧档患者不消失）
+  if (!Array.isArray(data.arrivedPatients)) {
+    data.arrivedPatients = allPatients
+      .filter(
+        (p) => !data.patientRecords[p.id] && !data.abandoned.includes(p.id)
+      )
+      .map((p) => p.id);
+  }
   // 装修模式：设施位置（旧存档补默认空）
   if (!data.facilityPositions) data.facilityPositions = {};
   // 装修（P5-1）：设施外观变体 / 解锁装饰 / 摆放装饰 / 装饰位置（旧存档补默认空）
@@ -243,7 +251,6 @@ export function loadGame(): GameState | null {
   if (!Array.isArray(data.todayServed)) data.todayServed = [];
   if (!data.waitingDays) data.waitingDays = {};
   if (!Array.isArray(data.abandoned)) data.abandoned = [];
-  if (!data.generatedScenarios) data.generatedScenarios = [];
   // 消息盒子：旧版 letters 迁移为 letter 类型消息
   if (!Array.isArray(data.messages)) {
     const legacy = data as GameState & { letters?: Letter[] };
@@ -439,4 +446,68 @@ export function todayCapacity(g: GameState): number {
 /** 候诊人数目标：与当日可接名额一致（深入优先） */
 export function queueTarget(g: GameState): number {
   return todayCapacity(g);
+}
+
+// ============================================================
+// 患者逐日随机到达（SPEC v1.5.0）
+// ============================================================
+
+/** 可接诊（未结案、未离场、声望门槛已过）的手写患者 */
+function isArrivable(g: GameState, p: PatientScenario): boolean {
+  if (g.patientRecords[p.id]) return false;
+  if (g.abandoned.includes(p.id)) return false;
+  if (p.requireReputation && g.doctor.reputation < p.requireReputation)
+    return false;
+  return true;
+}
+
+/** 难度分桶开放门槛：简单 始终开放；普通 声望≥25 或 day≥3；困难 声望≥60 或 day≥6 */
+function bucketOpen(g: GameState, difficulty: PatientScenario["difficulty"]): boolean {
+  if (difficulty === "普通") return g.doctor.reputation >= 25 || g.day >= 3;
+  if (difficulty === "困难") return g.doctor.reputation >= 60 || g.day >= 6;
+  return true;
+}
+
+/** 是否已被发现客户候选/待到达队列预占（避免同一患者既被邀约又随机到达） */
+function isPendingCandidate(g: GameState, patientId: string): boolean {
+  return (
+    g.discoveryCandidates.some((c) => c.patientId === patientId) ||
+    g.pendingArrivals.some((a) => a.patientId === patientId)
+  );
+}
+
+/**
+ * 计算本次应新到达的患者 id 列表（逐日随机到达，难度分桶递进）。
+ * 纯函数（只读计算）：目标 = 已到达且可接诊的手写患者数达到 queueTarget(g)；
+ * 不足时从「可接诊 + 未到达 + 未被发现客户预占」的患者中，按开放难度桶随机补足。
+ * 引导患者（小北）由 createInitialState 首日置入，不在此补充范围。
+ * random 可注入（对齐 rollFollowUps 模式，供确定性测试）。
+ */
+export function replenishArrivals(
+  g: GameState,
+  random: () => number = Math.random
+): string[] {
+  const arrivedSet = new Set(g.arrivedPatients);
+  const arrivedServeable = allPatients.filter(
+    (p) => arrivedSet.has(p.id) && isArrivable(g, p)
+  ).length;
+  const shortfall = queueTarget(g) - arrivedServeable;
+  if (shortfall <= 0) return [];
+  const pool = allPatients.filter(
+    (p) =>
+      !arrivedSet.has(p.id) &&
+      isArrivable(g, p) &&
+      !isPendingCandidate(g, p.id) &&
+      bucketOpen(g, p.difficulty)
+  );
+  const arrived: string[] = [];
+  for (let i = 0; i < shortfall && pool.length > 0; i++) {
+    const idx = Math.min(
+      pool.length - 1,
+      Math.floor(Math.max(0, Math.min(0.9999, random())) * pool.length)
+    );
+    const pick = pool.splice(idx, 1)[0];
+    arrived.push(pick.id);
+  }
+  return arrived;
 }

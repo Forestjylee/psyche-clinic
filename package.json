@@ -3,11 +3,14 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/scan-patients.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/scan-patients.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "pretest": "node scripts/scan-patients.mjs",
     "test": "vitest run"
   },
   "dependencies": {

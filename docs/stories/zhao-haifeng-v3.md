@@ -1,0 +1,2154 @@
+# 赵海峰 · v3 · 中剧本 · 5 节拍 · 70+ 轮
+
+> 中档剧本：45 岁资深程序员，被 AI 编程工具替代后失业半年，不敢告诉妻女，每天装作上班去图书馆。
+> 数值：trust 15→30→45→57→65→70；truth 0→70；碎片 2 枚 @25/@50；恶化入口 trust≤55；隐藏结局 @65；cure 主线 72 轮。
+> 生成：`node scripts/md-to-patient.mjs docs/stories/zhao-haifeng-v3.md --walk`
+
+---
+
+## 〇、人物档案
+
+**姓名** 赵海峰，45 岁，资深后端程序员（从业二十年）。妻子在社区超市做收银，女儿读高一。来诊渠道：妻子在图书馆撞见他趴在桌上睡觉，背包里塞着凉透的便当，强劝来诊。
+
+**一句话核心** 一个用二十年手艺焊死自己身份的男人，被一个免费工具三个月教会了他会的全部——他不敢告诉妻女，因为失业在他骨头里等于「变成那个下岗后酗酒打人的父亲」。
+
+**三层真相**
+- 表层（开场就说）：失眠、肩膀发僵、自称「就是最近睡不好」，坚称「我没事，我爱人她非要我来」。
+- 中间层（第 2-3 节拍揭）：失业半年，每天准点出门去图书馆坐着，背包里装着凉便当，不敢让妻女知道。
+- 深层（核心信念，根源）：父亲是国企老工人，四十三岁下岗后酗酒、把母亲按在地上打。他九岁起发誓「绝不像父亲那样没用」。失业在他心里=变成父亲=没用。他守的不是工作，是「我不是我爸」这条命。
+
+**角色三角**
+- 施压者：AI 时代的变革（一个免费工具三个月学会他二十年的手艺）+ 父亲的阴影（下岗=没用的判决，刻在骨头里）。
+- 情感忽视者：父亲——下岗后酗酒打人，从没认可过他；他童年的恐惧无人接住，只能躲门后数数。
+- 被守护者：妻女——他假装上班，是不让她们体验自己童年被父亲无能伤害的恐惧。
+
+**症状意义** 假装上班、去图书馆坐着，不是欺骗，是他对抗「变成父亲」这句咒语的求生方式——只要还「在上班」，他就还是那个有用的赵海峰，不是那个下岗的赵师傅。高潮反转：父亲的问题不是「下岗」，是「喝完酒打人」；他这半年没碰过妻女一根手指，也没沾过酒——他从来不是父亲。
+
+**关键转折** 他盯着父亲年轻时的厂里照片说：「我爸没用，不是因为他下岗，是因为他喝完酒打我们。我没碰过她们一根手指。我……我不是他。」——把「失业=父亲」的等式亲手拆开。
+
+**查重**：已读剧本登记表。本剧本触及父权与职场，但根因是「AI 替代下的中年身份危机 + 下岗父亲代际创伤」，与 chen_mo（不敢停下来的父权压力，根因父权）、zhao_lei（父亲判决的男性规训，根因父权）不同根；与 jiang_yu（创业失败假装上班）身份与困境切入不同（程序员被 AI 替代 vs 创业者失败，根因代际创伤 vs 对父亲的亏欠）。不雷同。
+
+---
+
+## 一、节拍规划表
+
+| 节拍 | 主题 | trust | truth | 阻抗 | 关键事件 | 碎片 |
+|---|---|---|---|---|---|---|
+| 1 | 初访·表层 | 15→30 | 0→~14 | c03 logic | c09 probe（require 25） | — |
+| 2 | 外部触发·中间层 | 30→45 | ~14→~28 | c04 logic | c08 probe（require 25）揭示图书馆 | m1 @25 |
+| 3 | 第一次复访·深层 | 45→57 | ~28→~42 | c05 logic | c07 probe（require 40）父亲下岗 | — |
+| 4 | 根源信念 | 57→65 | ~42→~55 | c10 logic | c06 probe（require 45）失业=父亲 | m2 @50，恶化入口 c02（trust≤55） |
+| 5 | 转向+结局 | 65→70 | ~55→70 | — | c08 fork（require 45 / 隐藏 65） | — |
+
+数值口径：trust 单调递增（empathy 与 probe 同涨 trust）；empathy 线净 +55（15→70 恰达锚点末位）；truth 只由 probe 涨；defense 净下降，阻抗节点短时 +8~+12 回落；cure 路径 72 轮（14×4 + 16）。
+
+---
+
+## 二、剧本元信息（ts-meta）
+
+```ts-meta
+// id: zhao_haifeng
+// tier: 中
+// anchor: 15,30,45,57,65,70
+// truthEnd: 70
+// minCureRounds: 70
+// fragments: 2
+// worsenAtMost: 55
+{
+  id: "zhao_haifeng",
+  name: "赵海峰",
+  title: "45岁资深程序员 · 被妻子强劝来诊",
+  intro: "妻子在图书馆撞见他趴在桌上睡觉，背包里塞着凉透的便当，连拖带劝把他带进诊室。他坐下时把背包抱在腿上，像护着一件不能让人看见的东西。",
+  surface: "失眠、肩膀发僵、说话短促有力，习惯性用『没事』『还好』把话头堵死。自称就是最近睡不好，坚称『我爱人她非要我来』。一个看起来还算体面、只是有点累的中年男人。",
+  truth: "被 AI 编程工具替代，失业半年，每天准点出门去图书馆坐着装上班，不敢告诉妻女。父亲是国企老工人，四十三岁下岗后酗酒、把母亲按在地上打。他九岁起发誓『绝不像父亲那样没用』——失业在他心里等于变成父亲。他守的不是工作，是『我不是我爸』这条命。",
+  palette: { primary: "#4a5d6b", secondary: "#7a8a96", fog: "#2d3a44", bright: "#8fb4c4" },
+  baseReward: 750,
+  difficulty: "普通",
+  startNode: "zh1_start",
+  initialState: { trust: 15, defense: 68, mood: 32, truth: 0, round: 0 },
+  memoryFragments: [
+    {
+      id: "zh_m1",
+      trigger: { truth: 25 },
+      title: "搪瓷缸子",
+      text: "那年我爸四十三，从厂里拿回一个搪瓷缸子和一卷工具。他把工具塞进床底，再没拿出来过。后来那只缸子装满了酒，他一喝多就摔。我蹲在地上一片片捡搪瓷碎片，割破了手也不敢出声。",
+      emotion: "sad",
+    },
+    {
+      id: "zh_m2",
+      trigger: { truth: 50 },
+      title: "门后的数数",
+      text: "我爸喝多了会把我妈按在地上打。我缩在门后，捂着耳朵数数。我数到一千，他就停了。我那年九岁，我发誓，我这辈子都不碰那玩意儿，也不让我妈再那么趴在地上。",
+      emotion: "scared",
+    },
+  ],
+}
+```
+
+---
+
+## 三、节拍骨架（ts-dialog 节点）
+
+### 节拍 1 · 初访·表层（trust 15→30，阻抗：拒绝被当成「有问题的人」）
+
+```ts-dialog
+// id: zh1_start
+{
+  id: "zh1_start",
+  speaker: "narration",
+  text: "赵海峰比预约时间早到了十分钟，却在外面的长椅上坐到铃响才进来。他个子不矮，背却有点佝，进门先把背包抱在胸前，坐下后才放到腿上，手一直搭在包带上。妻子在门口探了下头，被他用眼神挡了回去。",
+  autoNext: "zh1_p01",
+}
+```
+
+```ts-dialog
+// id: zh1_p01
+{
+  id: "zh1_p01",
+  speaker: "patient",
+  text: "医生您好。其实……我没什么事。我爱人她，非让我来。我就是最近睡不太好，肩膀有点僵。您别耽误太多时间，我坐会儿就走。",
+  emotion: "neutral",
+  autoNext: "zh1_c01",
+}
+```
+
+```ts-dialog
+// id: zh1_c01
+{
+  id: "zh1_c01",
+  speaker: "doctor",
+  text: "他提前十分钟到了，却说自己「没什么事」——一个把「没事」挂在嘴边的人，往往最怕被人看出事。",
+  choices: [
+    { id: "zh1_c01_a", text: "「你爱人不放心你，才让你来。你能坐下来，已经比她想得容易了。」", kind: "empathy", effect: { trust: 2, defense: -2 }, next: "zh1_p02" },
+    { id: "zh1_c01_b", text: "「『睡不好』——是睡不着，还是不敢睡？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p02" },
+    { id: "zh1_c01_c", text: "「失眠不是大事，调整调整作息就好了，别太紧张。」", kind: "logic", effect: { trust: -12, defense: 10, mood: -4 }, next: "zh1_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_r01
+{
+  id: "zh1_r01",
+  speaker: "patient",
+  text: "（他嘴角一绷）调整作息。这话我爱人也说过。我要是能调整，还用坐在这儿？医生，我没那么娇气，就是累。",
+  emotion: "angry",
+  autoNext: "zh1_p02",
+}
+```
+
+```ts-dialog
+// id: zh1_p02
+{
+  id: "zh1_p02",
+  speaker: "patient",
+  text: "……其实这阵子，是有点烦。工作上的事。我做技术的，二十年了，最近……行业变化快，有点跟不上。不过没事，我能扛。",
+  emotion: "anxious",
+  autoNext: "zh1_c02",
+}
+```
+
+```ts-dialog
+// id: zh1_c02
+{
+  id: "zh1_c02",
+  speaker: "doctor",
+  text: "他说「能扛」的时候，手不自觉攥了一下背包带。",
+  choices: [
+    { id: "zh1_c02_a", text: "「二十年了，说『跟不上』的时候，你心里是什么滋味？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh1_p03" },
+    { id: "zh1_c02_b", text: "「『行业变化快』——具体是哪种变化让你烦？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_p03
+{
+  id: "zh1_p03",
+  speaker: "patient",
+  text: "什么滋味……就是，我干了二十年的活儿，现在来了个新工具，写得比我还快。我看着它跑，手有点发凉。但这不重要，工具嘛，总会换的。",
+  emotion: "anxious",
+  autoNext: "zh1_c03",
+}
+```
+
+```ts-dialog
+// id: zh1_c03
+{
+  id: "zh1_c03",
+  speaker: "doctor",
+  text: "「手有点发凉」——他第一次让身体替他说话。",
+  choices: [
+    { id: "zh1_c03_a", text: "「你说不重要，可你的手在发凉。这部分，你先别急着压下去。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh1_p04" },
+    { id: "zh1_c03_b", text: "「那个工具写得比你还快——你怕的是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p04" },
+    { id: "zh1_c03_c", text: "「工具替代人力是大趋势，你尽早转型学新东西就行，别钻牛角尖。」", kind: "logic", effect: { trust: -12, defense: 10, mood: -4 }, next: "zh1_r02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_r02
+{
+  id: "zh1_r02",
+  speaker: "patient",
+  text: "（他干笑了一声）转型。我四十五了，上有老下有小，您让我转型？医生，您这话跟我爱人说的一模一样，她不懂，我以为您懂。",
+  emotion: "angry",
+  autoNext: "zh1_p04",
+}
+```
+
+```ts-dialog
+// id: zh1_p04
+{
+  id: "zh1_p04",
+  speaker: "patient",
+  text: "……对不起，我声音大了点。我不是冲您。我就是……这阵子心里堵。每天早上醒过来，胸口像压着块东西。我也不知道怎么了。",
+  emotion: "sad",
+  autoNext: "zh1_c04",
+}
+```
+
+```ts-dialog
+// id: zh1_c04
+{
+  id: "zh1_c04",
+  speaker: "doctor",
+  text: "他道了歉，又把情绪收了回去——习惯性把「对不起」挡在前面。",
+  choices: [
+    { id: "zh1_c04_a", text: "「你不用道歉。心里堵还压着不说，才是最累的。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh1_p05" },
+    { id: "zh1_c04_b", text: "「『胸口压着东西』——这个感觉，是从什么时候开始的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_p05
+{
+  id: "zh1_p05",
+  speaker: "patient",
+  text: "什么时候开始的……记不太清了。就这阵子吧。我每天准点出门，准点回家，跟我爱人说公司忙。她信。我闺女也信。可我……",
+  emotion: "anxious",
+  autoNext: "zh1_c05",
+}
+```
+
+```ts-dialog
+// id: zh1_c05
+{
+  id: "zh1_c05",
+  speaker: "doctor",
+  text: "他说「准点出门，准点回家」——可他坐在你面前，是个被妻子从图书馆拖来的男人。",
+  choices: [
+    { id: "zh1_c05_a", text: "「『她信』——你每天演这个，不累吗？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "zh1_p06" },
+    { id: "zh1_c05_b", text: "「你每天准点出门，去的是公司吗？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "zh1_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_p06
+{
+  id: "zh1_p06",
+  speaker: "patient",
+  text: "（他停了一下，手指抠着包带）……医生，您这话问得。我出门能去哪儿，当然是公司。我就是最近活儿不太多，闲一点。闲一点不犯法吧。",
+  emotion: "anxious",
+  autoNext: "zh1_c06",
+}
+```
+
+```ts-dialog
+// id: zh1_c06
+{
+  id: "zh1_c06",
+  speaker: "doctor",
+  text: "他在补一个借口，补得有点急。",
+  choices: [
+    { id: "zh1_c06_a", text: "「我没说犯法。我是说，你不用在我这儿也演。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh1_p07" },
+    { id: "zh1_c06_b", text: "「『活儿不太多』——是多到几点下班，还是少到没事可做？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_p07
+{
+  id: "zh1_p07",
+  speaker: "patient",
+  text: "……（长出一口气）医生，您是看出来了。我不想撒谎，可有些话，说出来我就……我就不是我了。您能理解吗？我干了二十年，我不能是个闲人。",
+  emotion: "sad",
+  autoNext: "zh1_c07",
+}
+```
+
+```ts-dialog
+// id: zh1_c07
+{
+  id: "zh1_c07",
+  speaker: "doctor",
+  text: "「说出来我就不是我了」——他在守一个比工作更大的东西。",
+  choices: [
+    { id: "zh1_c07_a", text: "「你不是你的工牌。你这个人，比那二十年重得多。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh1_p08" },
+    { id: "zh1_c07_b", text: "「『不能是个闲人』——闲下来，会怎么样？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_p08
+{
+  id: "zh1_p08",
+  speaker: "patient",
+  text: "闲下来……我也不知会怎么样。我就觉得，我要是闲着，我爱人看我眼神会变，我闺女看我眼神也会变。我不敢想那个眼神。",
+  emotion: "scared",
+  autoNext: "zh1_c08",
+}
+```
+
+```ts-dialog
+// id: zh1_c08
+{
+  id: "zh1_c08",
+  speaker: "doctor",
+  text: "他怕的不是失业本身，是妻女看他的「那个眼神」。",
+  choices: [
+    { id: "zh1_c08_a", text: "「你怕她们看你的眼神——那个眼神，你以前见过吗？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh1_p09" },
+    { id: "zh1_c08_b", text: "「你说的『那个眼神』，是什么样的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_p09
+{
+  id: "zh1_p09",
+  speaker: "patient",
+  text: "……见过。小时候见过。算了，不提了。医生，我今天就是来聊聊睡眠，您别往深了问，我扛得住。",
+  emotion: "neutral",
+  autoNext: "zh1_c09",
+}
+```
+
+```ts-dialog
+// id: zh1_c09
+{
+  id: "zh1_c09",
+  speaker: "doctor",
+  text: "他把「小时候见过」缩了回去。这是个路口，但还不到硬闯的时候——他需要先确认你不会推他下坡。",
+  choices: [
+    { id: "zh1_c09_a", text: "「不提也行。但那条路你今天踩出来过一次，它就还在那儿。我等着。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh1_p10" },
+    { id: "zh1_c09_b", text: "「『小时候见过那个眼神』——是谁的眼神？」", kind: "probe", require: { trust: 25 }, effect: { trust: 2, truth: 3 }, next: "zh1_p10", hint: "需要信任≥25" },
+    { id: "zh1_c09_c", text: "「你不说我也帮不了你，自己想清楚再来。」", kind: "logic", effect: { trust: -10, defense: 8, mood: -3 }, next: "zh1_r03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_r03
+{
+  id: "zh1_r03",
+  speaker: "patient",
+  text: "（他站起来又坐下）您这话……跟我领导说的一样。行，那我走了，浪费您时间了。",
+  emotion: "angry",
+  autoNext: "zh1_p10",
+}
+```
+
+```ts-dialog
+// id: zh1_p10
+{
+  id: "zh1_p10",
+  speaker: "patient",
+  text: "……我没走。我坐回去了。医生，您别赶我。我就是……不习惯被人问。我这人，有问题都自己扛。",
+  emotion: "sad",
+  autoNext: "zh1_c10",
+}
+```
+
+```ts-dialog
+// id: zh1_c10
+{
+  id: "zh1_c10",
+  speaker: "doctor",
+  text: "他坐回去了——这是他第一次没在自己面前逃掉。",
+  choices: [
+    { id: "zh1_c10_a", text: "「你坐回来，比『没问题』诚实多了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh1_p11" },
+    { id: "zh1_c10_b", text: "「『有问题都自己扛』——扛了多久了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_p11
+{
+  id: "zh1_p11",
+  speaker: "patient",
+  text: "扛多久……二十年吧。从我有记忆起。我家那口子说我像个闷葫芦，里头装的全是石头。她说得对。",
+  emotion: "neutral",
+  autoNext: "zh1_c11",
+}
+```
+
+```ts-dialog
+// id: zh1_c11
+{
+  id: "zh1_c11",
+  speaker: "doctor",
+  text: "「里头装的全是石头」——他自己知道那个闷葫芦有多沉。",
+  choices: [
+    { id: "zh1_c11_a", text: "「那今天，挑一块最小的石头，拿出来给我看看？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh1_p12" },
+    { id: "zh1_c11_b", text: "「『从有记忆起』——最早的一块石头，是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p12" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_p12
+{
+  id: "zh1_p12",
+  speaker: "patient",
+  text: "最早……（他看向窗外）我小时候，家里不富裕。我爸是工人，后来……算了。真不提了。我今天来，就是想问问，有没有什么药能让我睡好。",
+  emotion: "neutral",
+  autoNext: "zh1_c12",
+}
+```
+
+```ts-dialog
+// id: zh1_c12
+{
+  id: "zh1_c12",
+  speaker: "doctor",
+  text: "他又把话题拉回「药」和「睡」——这是他的安全绳，怕你把他拽太深。",
+  choices: [
+    { id: "zh1_c12_a", text: "「药能帮你睡，但睡不好的根，不在药里。你愿意的话，我们慢慢找。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh1_p13" },
+    { id: "zh1_c12_b", text: "「你两次把话头拐回药——你在躲什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_p13
+{
+  id: "zh1_p13",
+  speaker: "patient",
+  text: "（他苦笑）您眼神挺毒。我……是有点躲。我不习惯。但我答应您，下次来，试着多说一点。今天，就到这儿行吗？我爱人还在外头等我。",
+  emotion: "neutral",
+  autoNext: "zh1_c13",
+}
+```
+
+```ts-dialog
+// id: zh1_c13
+{
+  id: "zh1_c13",
+  speaker: "doctor",
+  text: "他第一次主动约了「下次」。",
+  choices: [
+    { id: "zh1_c13_a", text: "「行。下周这个点，我等你。背包可以放下来，没人拿走它。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh1_p14" },
+    { id: "zh1_c13_b", text: "「『试着多说一点』——你想从哪件事开始说？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_p14" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_p14
+{
+  id: "zh1_p14",
+  speaker: "patient",
+  text: "从哪件事……（他想了想）就从那个工具开始吧。它写得比我还快那天，我盯着屏幕，手是真凉。谢谢您，医生。下回见。",
+  emotion: "calm",
+  autoNext: "zh1_c14",
+}
+```
+
+```ts-dialog
+// id: zh1_c14
+{
+  id: "zh1_c14",
+  speaker: "doctor",
+  text: "他走到门口，把背包从胸前挪到肩上——松了半口气。",
+  choices: [
+    { id: "zh1_c14_a", text: "（送他到门口，不多说。）", kind: "silence", effect: { mood: 2 }, next: "zh1_out" },
+    { id: "zh1_c14_b", text: "「下周见。记得，手凉的时候，可以告诉我。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh1_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh1_out
+{
+  id: "zh1_out",
+  speaker: "narration",
+  text: "赵海峰离开诊室，妻子在走廊尽头站起来迎他。他没像来时那样把背包抱在胸前，而是让它垂在身侧。走出门前，他回头看了你一眼，像在确认一件还没说出口的事。",
+  autoNext: "zh2_start",
+}
+```
+
+### 节拍 2 · 外部触发·中间层（trust 30→45，truth ~14→~28，[m1 碎片 @25]，揭示图书馆）
+
+```ts-dialog
+// id: zh2_start
+{
+  id: "zh2_start",
+  speaker: "narration",
+  text: "一周后，赵海峰准时来了。这周他眼圈有点青，说这周爱人问他『你最近到底在忙什么』，他差点说漏嘴，躲进厕所洗了把脸才出来。",
+  autoNext: "zh2_p01",
+}
+```
+
+```ts-dialog
+// id: zh2_p01
+{
+  id: "zh2_p01",
+  speaker: "patient",
+  text: "医生，我答应您多说一点。可真要说，又不知从哪儿开口。这周……我爱人起疑了。她问我怎么天天准时回家，以前加班多晚都没怨言。我嘴笨，没接上。",
+  emotion: "anxious",
+  autoNext: "zh2_c01",
+}
+```
+
+```ts-dialog
+// id: zh2_c01
+{
+  id: "zh2_c01",
+  speaker: "doctor",
+  text: "「准时回家」反而成了破绽——他演得太周全了。",
+  choices: [
+    { id: "zh2_c01_a", text: "「你演得那么周全，是因为怕她看出什么？」", kind: "empathy", effect: { trust: 2, mood: 2 }, next: "zh2_p02" },
+    { id: "zh2_c01_b", text: "「她问你在忙什么——你心里那个真答案，是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p02
+{
+  id: "zh2_p02",
+  speaker: "patient",
+  text: "真答案……（他低头）我没在忙。我每天出门，就是找个地方坐着。我爱人以为我在公司，我闺女以为我在赚钱。我……我对不起她们。",
+  emotion: "sad",
+  autoNext: "zh2_c02",
+}
+```
+
+```ts-dialog
+// id: zh2_c02
+{
+  id: "zh2_c02",
+  speaker: "doctor",
+  text: "「找个地方坐着」——他终于碰到了那个没说出口的地方。",
+  choices: [
+    { id: "zh2_c02_a", text: "「你每天找的，是哪个地方？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p03" },
+    { id: "zh2_c02_b", text: "「你说『对不起她们』——可你最先对不起的，是自己吧？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh2_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p03
+{
+  id: "zh2_p03",
+  speaker: "patient",
+  text: "……图书馆。我家附近那个区图书馆。我每天准点去，找个靠窗的位子，坐到下班点再回家。有时候看书，有时候就坐着。中午吃我爱人给我带的便当，凉的。",
+  emotion: "sad",
+  autoNext: "zh2_c03",
+}
+```
+
+```ts-dialog
+// id: zh2_c03
+{
+  id: "zh2_c03",
+  speaker: "doctor",
+  text: "图书馆、靠窗的位子、凉的便当——他把半年的日子，一笔一笔摆出来了。",
+  choices: [
+    { id: "zh2_c03_a", text: "「凉便当——你为什么不去热一下？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p04" },
+    { id: "zh2_c03_b", text: "「半年了，一个人坐在那儿，不孤单吗？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh2_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p04
+{
+  id: "zh2_p04",
+  speaker: "patient",
+  text: "热便当要去前台，怕被人看见。孤单……也还好，我习惯了。我从小就会一个人待着。医生，您别可怜我，我可不可怜。",
+  emotion: "neutral",
+  autoNext: "zh2_c04",
+}
+```
+
+```ts-dialog
+// id: zh2_c04
+{
+  id: "zh2_c04",
+  speaker: "doctor",
+  text: "「我可不可怜」——他先把同情挡在门外。",
+  choices: [
+    { id: "zh2_c04_a", text: "「我没说可怜。我说的是，半年一个人扛，太久了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh2_p05" },
+    { id: "zh2_c04_b", text: "「『怕被人看见』——你怕被谁看见？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p05" },
+    { id: "zh2_c04_c", text: "「你这情况，与其躲着，不如直接跟妻子坦白，藏着掖着解决不了问题。」", kind: "logic", effect: { trust: -12, defense: 10, mood: -4 }, next: "zh2_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_r01
+{
+  id: "zh2_r01",
+  speaker: "patient",
+  text: "（他声音硬起来）坦白？您站着说话不腰疼。我跟她坦白，她第一句话就是『那日子怎么过』。我拿什么答？医生，您不懂一个家是靠什么撑着的。",
+  emotion: "angry",
+  autoNext: "zh2_p05",
+}
+```
+
+```ts-dialog
+// id: zh2_p05
+{
+  id: "zh2_p05",
+  speaker: "patient",
+  text: "……我不是冲您。我就是怕。我怕我一开口，这个家就跟我爸那个家一样了。我爸下岗那年，我家就……就塌了。",
+  emotion: "scared",
+  autoNext: "zh2_c05",
+}
+```
+
+```ts-dialog
+// id: zh2_c05
+{
+  id: "zh2_c05",
+  speaker: "doctor",
+  text: "「我爸下岗那年」——他第一次把父亲的事，和自己接到了一起。",
+  choices: [
+    { id: "zh2_c05_a", text: "「你怕自己一开口，就活成了你爸那样。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh2_p06" },
+    { id: "zh2_c05_b", text: "「你爸下岗那年，你家发生了什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p06
+{
+  id: "zh2_p06",
+  speaker: "patient",
+  text: "……我爸，是厂里的老师傅，四十三岁那年下岗。从那以后他就变了个人。我那年十一，我记得他把工具塞进床底，再没拿出来。后来那只搪瓷缸子……",
+  emotion: "sad",
+  autoNext: "zh2_c06",
+}
+```
+
+```ts-dialog
+// id: zh2_c06
+{
+  id: "zh2_c06",
+  speaker: "doctor",
+  text: "他的记忆停在「搪瓷缸子」上——真相到了一个阈值，碎片自己浮了上来。",
+  choices: [
+    { id: "zh2_c06_a", text: "（让他停在那只缸子上，不急着问。）", kind: "silence", effect: { trust: 1, mood: 2 }, next: "zh2_p07" },
+    { id: "zh2_c06_b", text: "「搪瓷缸子——后来怎么了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p07
+{
+  id: "zh2_p07",
+  speaker: "patient",
+  text: "后来那只缸子装满了酒。他一喝多就摔。我蹲在地上一片片捡，割破了手也不敢出声。医生，您别问了，我……我今天说到这儿，有点撑不住。",
+  emotion: "scared",
+  autoNext: "zh2_c07",
+}
+```
+
+```ts-dialog
+// id: zh2_c07
+{
+  id: "zh2_c07",
+  speaker: "doctor",
+  text: "他撑不住了——这是好事，意味着那个闷葫芦，第一次裂了条缝。",
+  choices: [
+    { id: "zh2_c07_a", text: "「撑不住就歇会儿。你今天说出来的，比你二十年说的都多。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh2_p08" },
+    { id: "zh2_c07_b", text: "「你爸下岗后开始喝酒——你怕自己也会这样？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p08
+{
+  id: "zh2_p08",
+  speaker: "doctor",
+  text: "到了可以往里走一步的路口——但他得自己迈这一步。",
+  choices: [
+    { id: "zh2_c08_a", text: "「你不用现在全说。但我想知道——你每天去图书馆，是在躲谁？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "zh2_p09" },
+    { id: "zh2_c08_b", text: "「你怕活成你爸——可你现在，每天假装上班，跟他当年下岗后躲家里，像不像？」", kind: "probe", require: { trust: 25 }, effect: { trust: 2, truth: 3 }, next: "zh2_p09", hint: "需要信任≥25" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p09
+{
+  id: "zh2_p09",
+  speaker: "patient",
+  text: "（他愣了很久）……像。太像了。我爸下岗那阵，也是天天出门，说去找活儿，其实就是在街上晃。我那时小，不懂。现在我懂了——他是不敢回家，不敢让我妈看见他没事干。我现在，跟他一模一样。",
+  emotion: "scared",
+  autoNext: "zh2_c09",
+}
+```
+
+```ts-dialog
+// id: zh2_c09
+{
+  id: "zh2_c09",
+  speaker: "doctor",
+  text: "他亲手把自己和父亲摆到了同一个位置上。",
+  choices: [
+    { id: "zh2_c09_a", text: "「你看见了这一模一样——这件事，你以前敢看吗？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh2_p10" },
+    { id: "zh2_c09_b", text: "「你说『一模一样』——可你跟你爸，真的一样吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p10
+{
+  id: "zh2_p10",
+  speaker: "patient",
+  text: "一样不一样……我不知道。我只知道我这半年，活得跟他当年一模一样。准点出门，没事干，不敢回家说。我活成了我最不想活成的样子。",
+  emotion: "sad",
+  autoNext: "zh2_c10",
+}
+```
+
+```ts-dialog
+// id: zh2_c10
+{
+  id: "zh2_c10",
+  speaker: "doctor",
+  text: "「最不想活成的样子」——这是他半年来最重的一句话。",
+  choices: [
+    { id: "zh2_c10_a", text: "「这句话压了你半年。今天它出来了，就别再塞回去了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh2_p11" },
+    { id: "zh2_c10_b", text: "「你最不想活成的样子——是你爸下岗后的样子，还是别的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p11
+{
+  id: "zh2_p11",
+  speaker: "patient",
+  text: "就是他下岗后的样子。一个没用的男人。我不怕穷，我怕的是……我爱人看我那个眼神，跟我妈当年看我爸一样。那个眼神，我一辈子忘不掉。",
+  emotion: "scared",
+  autoNext: "zh2_c11",
+}
+```
+
+```ts-dialog
+// id: zh2_c11
+{
+  id: "zh2_c11",
+  speaker: "doctor",
+  text: "「那个眼神」——他童年门后的恐惧，长成了他中年的盔甲。",
+  choices: [
+    { id: "zh2_c11_a", text: "「你怕的不是没钱，是怕妻女用那个眼神看你。这部分，我记下了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh2_p12" },
+    { id: "zh2_c11_b", text: "「你妈当年那个眼神里，装的是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p12" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p12
+{
+  id: "zh2_p12",
+  speaker: "patient",
+  text: "装的是……失望，还有怕。我妈那时候，天一黑就紧张。我懂。我现在也天一黑就紧张，怕我爱人哪天也变成那样。",
+  emotion: "sad",
+  autoNext: "zh2_c12",
+}
+```
+
+```ts-dialog
+// id: zh2_c12
+{
+  id: "zh2_c12",
+  speaker: "doctor",
+  text: "他把母亲的怕，过继到了妻子身上。",
+  choices: [
+    { id: "zh2_c12_a", text: "「你爱人，是你爱人，不是你妈。可你这半年，把两件事搅成了一件。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh2_p13" },
+    { id: "zh2_c12_b", text: "「你说『天一黑就紧张』——紧张的是妻女，还是你自己？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p13
+{
+  id: "zh2_p13",
+  speaker: "patient",
+  text: "……是我自己。是我怕。我四十多岁的人了，还怕我爱人看我的眼神。说出来您笑话我吧。",
+  emotion: "sad",
+  autoNext: "zh2_c13",
+}
+```
+
+```ts-dialog
+// id: zh2_c13
+{
+  id: "zh2_c13",
+  speaker: "doctor",
+  text: "他把自己最软的地方，递了出来。",
+  choices: [
+    { id: "zh2_c13_a", text: "「我不笑话你。一个四十多岁的男人敢说『我怕』，比硬扛勇敢多了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh2_p14" },
+    { id: "zh2_c13_b", text: "「你怕的那个眼神，跟今天坐在这儿相比，哪个更重？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_p14" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_p14
+{
+  id: "zh2_p14",
+  speaker: "patient",
+  text: "（他长出一口气）……今天比那个重，也比那个轻。说出来，好像松了点。医生，我下回还能来吗？我想把那个工具的事，说清楚。",
+  emotion: "calm",
+  autoNext: "zh2_c14",
+}
+```
+
+```ts-dialog
+// id: zh2_c14
+{
+  id: "zh2_c14",
+  speaker: "doctor",
+  text: "他主动想讲「那个工具」——这是他给自己定的下一道门。",
+  choices: [
+    { id: "zh2_c14_a", text: "「下周这个点，我等你。你愿意说，我就愿意听。」", kind: "empathy", effect: { mood: 3 }, next: "zh2_out" },
+    { id: "zh2_c14_b", text: "「那个工具——它对你意味着什么，你回去先想想。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh2_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh2_out
+{
+  id: "zh2_out",
+  speaker: "narration",
+  text: "赵海峰走的时候，背包背在肩上，步子比上周沉，但背没那么佝了。他在门口停了一下，没回头，像是在心里把一句话按了下去。",
+  autoNext: "zh3_start",
+}
+```
+
+### 节拍 3 · 第一次复访·深层（trust 45→57，truth ~28→~42，父亲下岗）
+
+```ts-dialog
+// id: zh3_start
+{
+  id: "zh3_start",
+  speaker: "narration",
+  text: "又一周期。赵海峰进来时，眼圈更青了。他说这周女儿问他『爸爸你怎么不去上班了』，他没接话，躲进厨房洗了半天碗。女儿那一问，比妻子起疑更戳他。",
+  autoNext: "zh3_p01",
+}
+```
+
+```ts-dialog
+// id: zh3_p01
+{
+  id: "zh3_p01",
+  speaker: "patient",
+  text: "医生，我闺女问我了。她十五岁，平时不吱声，那天突然问『爸你怎么天天在家』。我没答。我爱人替我圆了过去。我躲在厨房，手抖得碗都拿不住。",
+  emotion: "sad",
+  autoNext: "zh3_c01",
+}
+```
+
+```ts-dialog
+// id: zh3_c01
+{
+  id: "zh3_c01",
+  speaker: "doctor",
+  text: "女儿那一问，戳破了他演了半年的壳。",
+  choices: [
+    { id: "zh3_c01_a", text: "「女儿那一问，戳到的是哪儿？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh3_p02" },
+    { id: "zh3_c01_b", text: "「你手抖得拿不住碗——那个抖，是因为女儿，还是因为别的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p02
+{
+  id: "zh3_p02",
+  speaker: "patient",
+  text: "是因为……我怕她知道她爸是个没用的人。我闺女从小拿我当英雄，她作文里写过『我爸爸是程序员，特别厉害』。我不能让她知道，她爸被一个免费工具替了。",
+  emotion: "scared",
+  autoNext: "zh3_c02",
+}
+```
+
+```ts-dialog
+// id: zh3_c02
+{
+  id: "zh3_c02",
+  speaker: "doctor",
+  text: "「英雄」和「没用」——他活在两个极端里，中间没有缓冲。",
+  choices: [
+    { id: "zh3_c02_a", text: "「你在女儿心里是英雄，可你非得是英雄，才配当她爸吗？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh3_p03" },
+    { id: "zh3_c02_b", text: "「『被一个免费工具替了』——这件事，你恨的是工具，还是自己？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p03
+{
+  id: "zh3_p03",
+  speaker: "patient",
+  text: "我恨我自己。我用二十年练成的手艺，被一个免费工具三个月就学会了。那我这二十年算什么？我天天想这个，想得睡不着。",
+  emotion: "angry",
+  autoNext: "zh3_c03",
+}
+```
+
+```ts-dialog
+// id: zh3_c03
+{
+  id: "zh3_c03",
+  speaker: "doctor",
+  text: "「那我这二十年算什么」——这是他半年来真正的疼点。",
+  choices: [
+    { id: "zh3_c03_a", text: "「这二十年不算什么——这话你信吗？还是你不敢信它算什么？」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh3_p04" },
+    { id: "zh3_c03_b", text: "「工具三个月学会了你的手艺——可它学不会你这二十年里的什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p04
+{
+  id: "zh3_p04",
+  speaker: "patient",
+  text: "……它学不会什么？它什么都能学会。我那个团队，现在就剩俩人看着它跑。我带出来的徒弟，用着它，干得比我快。医生，您说，我算什么？",
+  emotion: "sad",
+  autoNext: "zh3_c04",
+}
+```
+
+```ts-dialog
+// id: zh3_c04
+{
+  id: "zh3_c04",
+  speaker: "doctor",
+  text: "他问「我算什么」——这是他半年来第一次把这个问题递出来。",
+  choices: [
+    { id: "zh3_c04_a", text: "「你问『我算什么』——这个问题，你第一次问，是几岁？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p05" },
+    { id: "zh3_c04_b", text: "「徒弟用着它干得比你快——可那个徒弟，是你教出来的。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh3_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p05
+{
+  id: "zh3_p05",
+  speaker: "patient",
+  text: "（他停了一下）……第一次问，是我十一岁。我爸下岗那年。我那时候就问过自己，我算什么。后来我想明白了，我得有用，有用才不算我爸。",
+  emotion: "neutral",
+  autoNext: "zh3_c05",
+}
+```
+
+```ts-dialog
+// id: zh3_c05
+{
+  id: "zh3_c05",
+  speaker: "doctor",
+  text: "「有用才不算我爸」——这条判决，从十一岁压到现在。",
+  choices: [
+    { id: "zh3_c05_a", text: "「『有用才不算我爸』——这是十一岁的你，给三十四年后的你定的规矩。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh3_p06" },
+    { id: "zh3_c05_b", text: "「你爸下岗那年，你看见了什么，让你定下这条规矩？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p06" },
+    { id: "zh3_c05_c", text: "「你爸下岗是他的事，你把自己跟他绑一起，是你自己的问题。」", kind: "logic", effect: { trust: -12, defense: 10, mood: -4 }, next: "zh3_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_r01
+{
+  id: "zh3_r01",
+  speaker: "patient",
+  text: "（他冷下来）您不了解我爸。您没见过一个男的，下岗以后变成什么样。您别拿这话说我。",
+  emotion: "angry",
+  autoNext: "zh3_p06",
+}
+```
+
+```ts-dialog
+// id: zh3_p06
+{
+  id: "zh3_p06",
+  speaker: "patient",
+  text: "……我爸下岗以后，整个人就瘪了。他以前在厂里是师傅，谁都尊敬他。下岗以后，他出门都不敢抬头。后来他就开始喝酒。",
+  emotion: "sad",
+  autoNext: "zh3_c06",
+}
+```
+
+```ts-dialog
+// id: zh3_c06
+{
+  id: "zh3_c06",
+  speaker: "doctor",
+  text: "他从一个师傅，变成一个不敢抬头的人——赵海峰怕的，正是这条下坡路。",
+  choices: [
+    { id: "zh3_c06_a", text: "「你怕的，是走你爸那条下坡路。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh3_p07" },
+    { id: "zh3_c06_b", text: "「他开始喝酒以后，家里什么样？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p07
+{
+  id: "zh3_p07",
+  speaker: "doctor",
+  text: "到了深层路口。truth 已经够得到父亲的酒——但他得亲口说出来。",
+  choices: [
+    { id: "zh3_c07_a", text: "「你不用一口气说完。先告诉我，他喝完酒，是什么样。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh3_p08" },
+    { id: "zh3_c07_b", text: "「你爸喝完酒，对你妈、对你，做过什么？」", kind: "probe", require: { trust: 40 }, effect: { trust: 2, truth: 3 }, next: "zh3_p08", hint: "需要信任≥40" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p08
+{
+  id: "zh3_p08",
+  speaker: "patient",
+  text: "（他的声音抖了）……他喝多了，会把我妈按在地上打。我缩在门后，捂着耳朵数数。数到一千，他就停了。我那年九岁。",
+  emotion: "scared",
+  autoNext: "zh3_c08",
+}
+```
+
+```ts-dialog
+// id: zh3_c08
+{
+  id: "zh3_c08",
+  speaker: "doctor",
+  text: "「数到一千」——一个九岁的孩子，用数数扛住了一个家的崩塌。",
+  choices: [
+    { id: "zh3_c08_a", text: "「那个数到一千的孩子，现在还坐在你心里，是吗？」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh3_p09" },
+    { id: "zh3_c08_b", text: "「你数到一千的时候，心里在想什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p09
+{
+  id: "zh3_p09",
+  speaker: "patient",
+  text: "在想……我以后绝对不能像他。我不喝酒，不打人，我要有用。我那年就发了誓。我到现在，没碰过那玩意儿，没碰过她们娘俩一根手指。",
+  emotion: "neutral",
+  autoNext: "zh3_c09",
+}
+```
+
+```ts-dialog
+// id: zh3_c09
+{
+  id: "zh3_c09",
+  speaker: "doctor",
+  text: "「没碰过她们一根手指」——他守这条线，守了三十六年。",
+  choices: [
+    { id: "zh3_c09_a", text: "「三十六年，你没变成他。这件事，你敢认吗？」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh3_p10" },
+    { id: "zh3_c09_b", text: "「你守的是『不变成他』——可你守得这么苦，像不像一直在怕自己会变成他？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p10
+{
+  id: "zh3_p10",
+  speaker: "patient",
+  text: "……是。我怕。我越怕，越要装作有用。我这半年假装上班，不是怕妻女知道我没工作，是怕她们觉得我没用。没用，就是我爸。这个等式，我从小刻在骨头上。",
+  emotion: "scared",
+  autoNext: "zh3_c10",
+}
+```
+
+```ts-dialog
+// id: zh3_c10
+{
+  id: "zh3_c10",
+  speaker: "doctor",
+  text: "「没用=我爸」——核心信念浮上来了。",
+  choices: [
+    { id: "zh3_c10_a", text: "「这个等式，今天被你说出来了，它就没那么硬了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh3_p11" },
+    { id: "zh3_c10_b", text: "「『没用=我爸』——这个等式，是你爸下的，还是你下的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p11
+{
+  id: "zh3_p11",
+  speaker: "patient",
+  text: "……是我下的。我十一岁那年自己下的。我以为下了这条，我就能逼自己一直有用，就不会变成他。可我现在，还是走到了这一步。",
+  emotion: "sad",
+  autoNext: "zh3_c11",
+}
+```
+
+```ts-dialog
+// id: zh3_c11
+{
+  id: "zh3_c11",
+  speaker: "doctor",
+  text: "他看见了这个等式是自己下的——这是松动的开始。",
+  choices: [
+    { id: "zh3_c11_a", text: "「你走到了没工作这一步——可你有没有走到『打人』那一步？」", kind: "probe", effect: { trust: 0, mood: 2 }, next: "zh3_p12" },
+    { id: "zh3_c11_b", text: "（陪他停在这个发现上，不急着推。）", kind: "silence", effect: { trust: 1, mood: 2 }, next: "zh3_p12" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p12
+{
+  id: "zh3_p12",
+  speaker: "patient",
+  text: "……没有。我没打过她们。我连重话都没说过一句。我……我跟我爸不一样？医生，您这话什么意思？",
+  emotion: "anxious",
+  autoNext: "zh3_c12",
+}
+```
+
+```ts-dialog
+// id: zh3_c12
+{
+  id: "zh3_c12",
+  speaker: "doctor",
+  text: "他第一次停下来，听「你跟你爸不一样」这句话。",
+  choices: [
+    { id: "zh3_c12_a", text: "「你跟他不一样——这话，你以前敢对自己说吗？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh3_p13" },
+    { id: "zh3_c12_b", text: "「你守了三十六年没打人——可你把『没用』也当成他了。这两件事，是一件事吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p13
+{
+  id: "zh3_p13",
+  speaker: "patient",
+  text: "……我不知道。我得想想。医生，我今天说的够多了，脑子有点乱。我下回再来，行吗？我想把那个等式，再想想清楚。",
+  emotion: "neutral",
+  autoNext: "zh3_c13",
+}
+```
+
+```ts-dialog
+// id: zh3_c13
+{
+  id: "zh3_c13",
+  speaker: "doctor",
+  text: "他主动要把那个等式想清楚——这是他第一次没躲。",
+  choices: [
+    { id: "zh3_c13_a", text: "「行。那个等式你想清楚了，下周带来。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh3_p14" },
+    { id: "zh3_c13_b", text: "「想的时候，别忘了问自己——『没用』和『打人』，是一件事吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_p14" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_p14
+{
+  id: "zh3_p14",
+  speaker: "patient",
+  text: "（他点头，第一次没立刻站起来）我记住了。医生，谢谢您没催我。我活这么大，第一次有人不催我『赶紧好起来』。",
+  emotion: "calm",
+  autoNext: "zh3_c14",
+}
+```
+
+```ts-dialog
+// id: zh3_c14
+{
+  id: "zh3_c14",
+  speaker: "doctor",
+  text: "「不催我赶紧好起来」——他第一次被允许，慢慢来。",
+  choices: [
+    { id: "zh3_c14_a", text: "（送他到门口，把那份「慢慢来」递稳了。）", kind: "silence", effect: { mood: 3 }, next: "zh3_out" },
+    { id: "zh3_c14_b", text: "「那个等式，不是你一个人扛的。下周我们一起拆。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh3_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh3_out
+{
+  id: "zh3_out",
+  speaker: "narration",
+  text: "赵海峰走的时候，在门口站了一会儿，像是在掂量心里那个等式的分量。他没有立刻把背包抱回胸前，而是让它停在肩上。",
+  autoNext: "zh4_start",
+}
+```
+
+### 节拍 4 · 根源信念（trust 57→65，truth ~42→~55，[m2 碎片 @50]，恶化入口 c02 @trust≤55）
+
+```ts-dialog
+// id: zh4_start
+{
+  id: "zh4_start",
+  speaker: "narration",
+  text: "赵海峰这次来，眼睛是红的。他说昨晚女儿又问了一次，他没忍住冲女儿发了火，然后躲进厕所哭了半小时。他说他这辈子，没对女儿大声过。",
+  autoNext: "zh4_p01",
+}
+```
+
+```ts-dialog
+// id: zh4_p01
+{
+  id: "zh4_p01",
+  speaker: "patient",
+  text: "医生，我冲我闺女吼了。她吓得不敢说话，我爱人看我的眼神……就跟当年我妈看我爸一样。我当时心里咯噔一下——我是不是，要变成他了？",
+  emotion: "scared",
+  autoNext: "zh4_c01",
+}
+```
+
+```ts-dialog
+// id: zh4_c01
+{
+  id: "zh4_c01",
+  speaker: "doctor",
+  text: "「我是不是要变成他了」——他最深的恐惧，被一声吼激活了。他站在一个分岔上：一边是往里走，一边是把自己钉死在「我就是我爸」上。",
+  choices: [
+    { id: "zh4_c01_a", text: "「你冲女儿吼了，然后躲进厕所哭——你爸，会躲进厕所哭吗？」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh4_p03" },
+    { id: "zh4_c01_b", text: "「你怕变成他——可你哭的，是怕变成他。这跟『变成他』，是一件事吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh4_p03" },
+    { id: "zh4_c01_c", text: "「你要是真变成你爸了，那这日子也没法过了，谁来管你妻女？」", kind: "logic", require: { trustAtMost: 55 }, effect: { trust: -10, defense: 12, mood: -5 }, next: "zh4_w01", hint: "信任低时可见" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p03
+{
+  id: "zh4_p03",
+  speaker: "patient",
+  text: "……他不会躲进厕所哭。他打完我妈，倒头就睡，呼噜打得震天响。我……我不是他？医生，您再说一遍，我刚才没听清。",
+  emotion: "anxious",
+  autoNext: "zh4_c03",
+}
+```
+
+```ts-dialog
+// id: zh4_c03
+{
+  id: "zh4_c03",
+  speaker: "doctor",
+  text: "他要你「再说一遍」——他太想信这句话了。",
+  choices: [
+    { id: "zh4_c03_a", text: "「你躲进厕所哭——你不是他。这一笔，是你自己写的。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh4_p04" },
+    { id: "zh4_c03_b", text: "「你跟你爸，到底哪儿一样，哪儿不一样？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh4_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p04
+{
+  id: "zh4_p04",
+  speaker: "patient",
+  text: "哪儿一样……都没工作了。哪儿不一样……他打人，我不打。他喝酒，我不喝。可我这半年，天天假装上班，跟他当年下岗后天天出门晃，有什么区别？",
+  emotion: "sad",
+  autoNext: "zh4_c04",
+}
+```
+
+```ts-dialog
+// id: zh4_c04
+{
+  id: "zh4_c04",
+  speaker: "doctor",
+  text: "他又把自己拉回了「一样」——这是核心信念在反弹。",
+  choices: [
+    { id: "zh4_c04_a", text: "「行为上像，不等于人是。你俩的差别，不在『出门晃』，在『回家以后』。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh4_p05" },
+    { id: "zh4_c04_b", text: "「你爸下岗后，回家做了什么？你下岗后，回家做了什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh4_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p05
+{
+  id: "zh4_p05",
+  speaker: "patient",
+  text: "他回家……打我妈，摔东西，骂我没用。我回家……给闺女检查作业，给我爱人做饭，虽然做得难吃。医生，这俩，真不一样？",
+  emotion: "anxious",
+  autoNext: "zh4_c05",
+}
+```
+
+```ts-dialog
+// id: zh4_c05
+{
+  id: "zh4_c05",
+  speaker: "doctor",
+  text: "「这俩真不一样」——他自己已经看见了，只是不敢认。",
+  choices: [
+    { id: "zh4_c05_a", text: "「你做饭，你检查作业——你爸下岗后做过这些吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh4_p06" },
+    { id: "zh4_c05_b", text: "「不一样。你心里其实早有答案，只是那个等式不让你认。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh4_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p06
+{
+  id: "zh4_p06",
+  speaker: "patient",
+  text: "……没有。他下岗以后，连碗都没洗过一个。他只会坐在那儿喝，等我妈把饭端到跟前。我那时候就发誓，我以后绝不能这样。可我还是怕——医生，我是不是在拿自己跟他比？这俩，真不一样？",
+  emotion: "anxious",
+  autoNext: "zh4_c06",
+}
+```
+
+```ts-dialog
+// id: zh4_c06
+{
+  id: "zh4_c06",
+  speaker: "doctor",
+  text: "到了拆那个等式的时候。truth 已经够得到最底下那层。",
+  choices: [
+    { id: "zh4_c06_a", text: "「你爸没用，不是因为他下岗——是因为他喝完酒打你们。你把『下岗』和『打人』焊成了一件事，今天可以拆了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh4_p07" },
+    { id: "zh4_c06_b", text: "「『失业=变成父亲』——这个等式里，父亲真正的问题，是失业吗？」", kind: "probe", require: { trust: 45 }, effect: { trust: 2, truth: 3 }, next: "zh4_p07", hint: "需要信任≥45" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p07
+{
+  id: "zh4_p07",
+  speaker: "patient",
+  text: "（他愣住，半张着嘴）……父亲真正的问题……不是失业。是喝酒，是打人。他下岗不可怕，可怕的是他下岗以后，把自己喝成了另一个人。我……我把两件事焊一起了？",
+  emotion: "scared",
+  autoNext: "zh4_c07",
+}
+```
+
+```ts-dialog
+// id: zh4_c07
+{
+  id: "zh4_c07",
+  speaker: "doctor",
+  text: "他亲手摸到了那个焊点。",
+  choices: [
+    { id: "zh4_c07_a", text: "「你把两件事焊一起，是为了逼自己别停下。可它现在，焊死的是你。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh4_p08" },
+    { id: "zh4_c07_b", text: "「你失业半年——这半年，你碰过酒吗？碰过妻女一根手指吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh4_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p08
+{
+  id: "zh4_p08",
+  speaker: "patient",
+  text: "……没碰过酒。没碰过她们一根手指。我……我这半年最难的时候，也就是躲厕所哭。我没变成他。医生，我没变成他？",
+  emotion: "scared",
+  autoNext: "zh4_c08",
+}
+```
+
+```ts-dialog
+// id: zh4_c08
+{
+  id: "zh4_c08",
+  speaker: "doctor",
+  text: "他在跟你确认——也在跟自己确认。",
+  choices: [
+    { id: "zh4_c08_a", text: "「你没变成他。这句话，是你这半年最该对自己说的一句。」", kind: "empathy", effect: { trust: 1, mood: 4 }, next: "zh4_p09" },
+    { id: "zh4_c08_b", text: "「你躲厕所哭的时候，那个九岁数数的小孩，是不是也松了一口气？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "zh4_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p09
+{
+  id: "zh4_p09",
+  speaker: "patient",
+  text: "（他眼眶红了，没压）……是。他松了口气。我这辈子，第一次觉得，我跟他不一样。可我还是没工作。医生，我没变成他，可我还是没用。",
+  emotion: "sad",
+  autoNext: "zh4_c09",
+}
+```
+
+```ts-dialog
+// id: zh4_c09
+{
+  id: "zh4_c09",
+  speaker: "doctor",
+  text: "他松了一口气，又把「没用」捡了回来——这条还得再走一步。",
+  choices: [
+    { id: "zh4_c09_a", text: "「『没用』这个词——是谁教你的？是你爸，还是你自己？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh4_p10" },
+    { id: "zh4_c09_b", text: "「没工作不等于没用。你女儿作文里那个英雄，不是因为你有工作。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh4_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p10
+{
+  id: "zh4_p10",
+  speaker: "doctor",
+  text: "「没用」这个词的根，得刨一刨。",
+  choices: [
+    { id: "zh4_c10_a", text: "「你爸骂你没用的时候，你几岁？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh4_p11" },
+    { id: "zh4_c10_b", text: "「『没用』是他给你的判决——你守了三十六年，今天该上诉了。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh4_p11" },
+    { id: "zh4_c10_c", text: "「你既然没变成他，那就别在这儿矫情了，赶紧去找份新工作才是正经。」", kind: "logic", effect: { trust: -10, defense: 10, mood: -4 }, next: "zh4_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_r01
+{
+  id: "zh4_r01",
+  speaker: "patient",
+  text: "（他苦笑）矫情。您说得轻巧。我四十五了，投了上百份简历，没人要。您以为我不想找？我不是矫情，我是真的……不知道自己还剩什么。",
+  emotion: "sad",
+  autoNext: "zh4_p11",
+}
+```
+
+```ts-dialog
+// id: zh4_p11
+{
+  id: "zh4_p11",
+  speaker: "patient",
+  text: "我爸骂我没用，是从他下岗那年开始的。我考第一他也不笑，我考砸了他就骂。后来我就不信他了，我自己逼自己有用。可现在，我自己也成了骂我『没用』的那个人。",
+  emotion: "sad",
+  autoNext: "zh4_c11",
+}
+```
+
+```ts-dialog
+// id: zh4_c11
+{
+  id: "zh4_c11",
+  speaker: "doctor",
+  text: "他把父亲的判决，过继成了自己的声音。",
+  choices: [
+    { id: "zh4_c11_a", text: "「你成了骂自己没用的那个人——这一笔，能从今天开始改吗？」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh4_p12" },
+    { id: "zh4_c11_b", text: "「你爸的判决，是他喝醉时下的。你信了三十六年——现在你清醒着，还要接着信吗？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh4_p12" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p12
+{
+  id: "zh4_p12",
+  speaker: "patient",
+  text: "……我不想信了。可不信，我拿什么撑着自己？我这半年，就是靠『我得有用』撑着假装上班的。这个等式拆了，我往哪儿站？",
+  emotion: "anxious",
+  autoNext: "zh4_c12",
+}
+```
+
+```ts-dialog
+// id: zh4_c12
+{
+  id: "zh4_c12",
+  speaker: "doctor",
+  text: "他怕等式拆了，自己没地方站——这是最后一步的犹豫。",
+  choices: [
+    { id: "zh4_c12_a", text: "「等式拆了，你站的地方，是『我是赵海峰』——不是『我不是我爸』，也不是『我有用』。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh4_p13" },
+    { id: "zh4_c12_b", text: "「你不用马上拆。下周最后一次，把这张照片带来——你爸年轻时的。」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh4_p13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p13
+{
+  id: "zh4_p13",
+  speaker: "patient",
+  text: "……我爸年轻时的照片？我那儿有张他在厂里的，穿着工装，笑得挺精神。您要我带它干嘛？",
+  emotion: "neutral",
+  autoNext: "zh4_c13",
+}
+```
+
+```ts-dialog
+// id: zh4_c13
+{
+  id: "zh4_c13",
+  speaker: "doctor",
+  text: "他想起了父亲笑着的样子——那个父亲，他快忘了。",
+  choices: [
+    { id: "zh4_c13_a", text: "「下周，我们一起看看那张照片里的他。也许他，也不只是『没用』两个字。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh4_p14" },
+    { id: "zh4_c13_b", text: "「那张照片里的他，下岗了吗？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh4_p14" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_p14
+{
+  id: "zh4_p14",
+  speaker: "patient",
+  text: "（他愣了一下，声音轻下来）……那张照片里，他还没下岗。他那时候……还挺像个人的。医生，下回，我带照片来。我也想，再看看那个他。",
+  emotion: "calm",
+  autoNext: "zh4_c14",
+}
+```
+
+```ts-dialog
+// id: zh4_c14
+{
+  id: "zh4_c14",
+  speaker: "doctor",
+  text: "他第一次想看父亲「像个人」的样子——连父亲，他也在松手。",
+  choices: [
+    { id: "zh4_c14_a", text: "（送他到门口，把下周的约，定稳。）", kind: "silence", effect: { mood: 3 }, next: "zh4_out" },
+    { id: "zh4_c14_b", text: "「下周，带照片，也带你那句『我不是他』。」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh4_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_out
+{
+  id: "zh4_out",
+  speaker: "narration",
+  text: "赵海峰走的时候，脚步比来时轻。他在门口回头说了一句：「医生，我昨晚冲闺女吼完，蹲下来跟她说了句对不起。她抱着我哭了。」你说，他第一次会蹲下来了。",
+  autoNext: "zh5_start",
+}
+```
+
+#### 失误分支（恶化路径）
+
+```ts-dialog
+// id: zh4_w01
+{
+  id: "zh4_w01",
+  speaker: "patient",
+  text: "（他的脸一下子垮下来）您也这么说？我爱人这么说，我领导这么说，现在连您也这么说——『日子没法过了』。行。那我走，我本来就不该来。",
+  emotion: "angry",
+  autoNext: "zh4_w02",
+}
+```
+
+```ts-dialog
+// id: zh4_w02
+{
+  id: "zh4_w02",
+  speaker: "doctor",
+  text: "话赶话把他推下了坡。现在得看能不能拉一把。",
+  choices: [
+    { id: "zh4_w02_a", text: "「你真没用，那就别撑了，省得害了妻女。」", kind: "logic", effect: { trust: -6, defense: 8, mood: -4 }, next: "zh4_w03" },
+    { id: "zh4_w02_b", text: "（你意识到说错了，想补救。）「我不是这个意思，我……」", kind: "empathy", effect: { trust: -3, mood: -3 }, next: "zh4_w03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh4_w03
+{
+  id: "zh4_w03",
+  speaker: "patient",
+  text: "……不用补救了。我本来就明白，我就是个没用的男人，跟我爸一样。我装了半年，装不下去了。谢谢您今天点醒我。我走了，别找我。",
+  emotion: "broken",
+  autoNext: "zh_end_worsen",
+}
+```
+
+### 节拍 5 · 转向+结局（trust 65→70，truth ~55→70，fork：cure / acceptance / hidden @65）
+
+```ts-dialog
+// id: zh5_start
+{
+  id: "zh5_start",
+  speaker: "narration",
+  text: "最后一次会谈。赵海峰进来，从钱包里掏出一张边角磨白的旧照片，放在桌上。照片里一个穿工装的年轻人站在车床前，笑得腼腆。「我爸，二十六岁。比我闺女大不了多少。」",
+  autoNext: "zh5_p01",
+}
+```
+
+```ts-dialog
+// id: zh5_p01
+{
+  id: "zh5_p01",
+  speaker: "patient",
+  text: "医生，我这一周，把这张照片看了又看。我以前一想到我爸，就是他喝醉打人的样子。我都快忘了他年轻时长这样。他那时候，也是笑的。",
+  emotion: "sad",
+  autoNext: "zh5_c01",
+}
+```
+
+```ts-dialog
+// id: zh5_c01
+{
+  id: "zh5_c01",
+  speaker: "doctor",
+  text: "他第一次看见父亲「笑」的样子——那个被打碎的父亲，重新有了一张脸。",
+  choices: [
+    { id: "zh5_c01_a", text: "「他那时候也笑——这个『笑』，你这三十六年，看见过吗？」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh5_p02" },
+    { id: "zh5_c01_b", text: "「照片里这个笑的年轻人，跟那个喝醉打人的，是同一个人吗？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_p02
+{
+  id: "zh5_p02",
+  speaker: "patient",
+  text: "是同一个人。可又不像是。医生，我这一周想明白一件事——我爸下岗以后，没人帮过他。那个年代，下岗就是天塌了。他一个人扛不住，就把自己喝碎了。他不是天生就打人的。",
+  emotion: "neutral",
+  autoNext: "zh5_c02",
+}
+```
+
+```ts-dialog
+// id: zh5_c02
+{
+  id: "zh5_c02",
+  speaker: "doctor",
+  text: "「他不是天生就打人的」——他开始给父亲，也给自己，留出人的位置。",
+  choices: [
+    { id: "zh5_c02_a", text: "「你给了他一个『也是人』的位置——这份明白，很难得。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh5_p03" },
+    { id: "zh5_c02_b", text: "「你爸扛不住，把自己喝碎了——你呢？你半年没工作，你把自己碎了吗？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_p03
+{
+  id: "zh5_p03",
+  speaker: "patient",
+  text: "……我没碎。我没喝酒，没打人。我躲厕所哭，哭完出来给闺女检查作业。我……我爸没用，不是因为他下岗，是因为他喝完酒打我们。我没碰过她们一根手指。我……我不是他。",
+  emotion: "calm",
+  autoNext: "zh5_c03",
+}
+```
+
+```ts-dialog
+// id: zh5_c03
+{
+  id: "zh5_c03",
+  speaker: "doctor",
+  text: "「我不是他」——这一次，他说得稳了。这是整场最重要的一个瞬间。",
+  choices: [
+    { id: "zh5_c03_a", text: "「这句话，你三十六年才说出来。今天，它真是你的了。」", kind: "empathy", effect: { trust: 1, mood: 4 }, next: "zh5_p04" },
+    { id: "zh5_c03_b", text: "「你不是他——那你这半年，是谁？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_p04
+{
+  id: "zh5_p04",
+  speaker: "patient",
+  text: "这半年是谁……我是赵海峰。一个被工具替了的程序员，一个假装上班的丈夫，一个冲女儿吼完会蹲下来说对不起的爸爸。我不好，但我不是我爸。",
+  emotion: "calm",
+  autoNext: "zh5_c04",
+}
+```
+
+```ts-dialog
+// id: zh5_c04
+{
+  id: "zh5_c04",
+  speaker: "doctor",
+  text: "他给自己，重新起了一个名字。",
+  choices: [
+    { id: "zh5_c04_a", text: "「赵海峰。这个名字，比『不是我爸』重得多。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh5_p05" },
+    { id: "zh5_c04_b", text: "「『被工具替了』——这件事，现在还疼吗？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_p05
+{
+  id: "zh5_p05",
+  speaker: "patient",
+  text: "还疼。我那二十年，不能说一点不算数。可它不是全部了。我还有我闺女，我爱人，还有我这张没碎的脸。医生，我想，回家跟我爱人说实话了。",
+  emotion: "neutral",
+  autoNext: "zh5_c05",
+}
+```
+
+```ts-dialog
+// id: zh5_c05
+{
+  id: "zh5_c05",
+  speaker: "doctor",
+  text: "他想回家说真话了——这是半年假装上班后，第一次想放下那副壳。",
+  choices: [
+    { id: "zh5_c05_a", text: "「说真话——你最怕她哪一句？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_p06" },
+    { id: "zh5_c05_b", text: "「你决定了，就说。我在这儿，你不是一个人。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "zh5_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_p06
+{
+  id: "zh5_p06",
+  speaker: "patient",
+  text: "最怕她说『你怎么不早说』。可我现在想，她要是这么说，我就接一句『我错了，但我现在想说』。我以前不敢，现在敢了。医生，您说我该从哪句开口？",
+  emotion: "anxious",
+  autoNext: "zh5_c06",
+}
+```
+
+```ts-dialog
+// id: zh5_c06
+{
+  id: "zh5_c06",
+  speaker: "doctor",
+  text: "他来问你「从哪句开口」——他要的不是答案，是一份撑腰。",
+  choices: [
+    { id: "zh5_c06_a", text: "「就从那句最难的开始：『我半年没上班了，我没敢告诉你。』」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh5_p07" },
+    { id: "zh5_c06_b", text: "「你不用背词。你蹲下来，像跟女儿说对不起那样，跟她说就行。」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_p07
+{
+  id: "zh5_p07",
+  speaker: "patient",
+  text: "（他点头，把照片收回钱包）医生，还有一件事——我那天冲闺女吼完，蹲下来说对不起，她抱着我哭，说『爸爸你是不是不开心』。我说是。她说『不开心可以不开心，别一个人扛』。一个十五岁的孩子，比我十一岁时懂事。",
+  emotion: "sad",
+  autoNext: "zh5_c07",
+}
+```
+
+```ts-dialog
+// id: zh5_c07
+{
+  id: "zh5_c07",
+  speaker: "doctor",
+  text: "女儿那句「别一个人扛」——他童年的门后数数，终于被人接住了。",
+  choices: [
+    { id: "zh5_c07_a", text: "「你女儿接住了你。那个九岁数到一千的小孩，这回有人替他数了。」", kind: "empathy", effect: { trust: 0, mood: 4 }, next: "zh5_p08" },
+    { id: "zh5_c07_b", text: "「『不开心可以不开心』——你女儿给了你一条你爸没给过你的路。」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_p08
+{
+  id: "zh5_p08",
+  speaker: "patient",
+  text: "（他眼眶又红了，点头）……是。有人替我数了。医生，我这一周想了很多。我想回家跟我爱人说实话，可我不知道从哪儿开口，也不知道说出来之后会怎样。我……接下来该怎么走？",
+  emotion: "sad",
+  autoNext: "zh5_fork",
+}
+```
+
+```ts-dialog
+// id: zh5_fork
+{
+  id: "zh5_fork",
+  speaker: "doctor",
+  text: "走到这里，有个分岔得你来选。你现在手里有那张照片，有「我不是他」这句话，也有妻女在等你。下一步，你想怎么走？",
+  choices: [
+    { id: "zh5_fork_a", text: "「我们来列一张清单：今天回家怎么开口、最坏她怎么说、你能找谁求助。让这张网，先替你兜一阵。」", kind: "special", effect: { trust: 1, mood: 3 }, next: "zh5_s01" },
+    { id: "zh5_fork_b", text: "「你不用现在就什么都解决。带着『我不是他』这句话，慢慢回去过，也算一种答案。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "zh5_a01" },
+    { id: "zh5_fork_c", text: "「你爸当年下岗，没人替那个家说过一句话。今天，我想替那个十一岁的你，跟你爱人，把这件事说清楚——你愿不愿意？」", kind: "confront", require: { trust: 65 }, effect: { trust: 1, truth: 3, mood: -2 }, next: "zh5_h01", hint: "需要信任≥65" },
+  ],
+}
+```
+
+#### 安全网路径（cure 主线）
+
+```ts-dialog
+// id: zh5_s01
+{
+  id: "zh5_s01",
+  speaker: "patient",
+  text: "（他看着你递过去的白纸）……清单。我活了四十五年，没列过这种清单。我以前只列任务清单，需求清单。『回家怎么开口』，我第一次写。",
+  emotion: "neutral",
+  autoNext: "zh5_s02",
+}
+```
+
+```ts-dialog
+// id: zh5_s02
+{
+  id: "zh5_s02",
+  speaker: "doctor",
+  text: "他把「开口」当成了一件可以拆解的活儿——这是程序员的本能，也是他的安全绳。",
+  choices: [
+    { id: "zh5_s02_a", text: "「第一行就写：今晚，饭后，关了电视，我先开口。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh5_s03" },
+    { id: "zh5_s02_b", text: "「最坏的情况，她会怎么说？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_s03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_s03
+{
+  id: "zh5_s03",
+  speaker: "patient",
+  text: "最坏……她哭着说『你怎么骗我半年』。然后她会说『日子还过不过』。我以前就怕这两句。可我现在想，她说这两句，是因为她还在乎这个家。不在乎的人，不问。",
+  emotion: "calm",
+  autoNext: "zh5_s04",
+}
+```
+
+```ts-dialog
+// id: zh5_s04
+{
+  id: "zh5_s04",
+  speaker: "doctor",
+  text: "他把妻子的「质问」，重新听成了「在乎」。",
+  choices: [
+    { id: "zh5_s04_a", text: "「这一句『在乎』，你以前听得见吗？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_s05" },
+    { id: "zh5_s04_b", text: "「你能这么听她的话了——这半年，你没白扛。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh5_s05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_s05
+{
+  id: "zh5_s05",
+  speaker: "patient",
+  text: "以前听不见。我以前一听见质问，就跟我爸一样，要么吼回去，要么躲。我现在不躲了。她要是问，我就说『我错了，我没敢告诉你，我现在想跟你一起想办法』。",
+  emotion: "calm",
+  autoNext: "zh5_s06",
+}
+```
+
+```ts-dialog
+// id: zh5_s06
+{
+  id: "zh5_s06",
+  speaker: "doctor",
+  text: "「跟你一起想办法」——他第一次把妻子，从对手放成了同伴。",
+  choices: [
+    { id: "zh5_s06_a", text: "「『一起想办法』——你这半年，第一次把她算进『我们』里。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh5_s07" },
+    { id: "zh5_s06_b", text: "「你爸当年，有没有跟你妈『一起想办法』？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_s07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_s07
+{
+  id: "zh5_s07",
+  speaker: "patient",
+  text: "没有。我爸一个人扛，扛不住就喝，喝了就打。我妈一个人挨。我不要那个家。我要的是，我跟我爱人，一人扛一半。我闺女不用缩门后数数。",
+  emotion: "neutral",
+  autoNext: "zh5_s08",
+}
+```
+
+```ts-dialog
+// id: zh5_s08
+{
+  id: "zh5_s08",
+  speaker: "doctor",
+  text: "「我闺女不用缩门后数数」——他要斩断的，是三代人的那条链。",
+  choices: [
+    { id: "zh5_s08_a", text: "「这句话，是你替你闺女，也替九岁的自己，下的决心。」", kind: "empathy", effect: { trust: 0, mood: 4 }, next: "zh5_s09" },
+    { id: "zh5_s08_b", text: "「斩这条链，不用一刀——你今晚开口，就是第一刀。」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_s09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_s09
+{
+  id: "zh5_s09",
+  speaker: "patient",
+  text: "（他在纸上写了几行，手有点抖，但写完了）医生，我写好了。今晚饭后，我先开口。最坏她哭着问，我就接『我错了，我们一起想办法』。要是扛不住，我给您打电话——这是我第一次，给自己留一个求救的口子。",
+  emotion: "calm",
+  autoNext: "zh5_s10",
+}
+```
+
+```ts-dialog
+// id: zh5_s10
+{
+  id: "zh5_s10",
+  speaker: "doctor",
+  text: "他写下了第一条「求救口子」——一个四十五岁的男人，第一次允许自己求救。",
+  choices: [
+    { id: "zh5_s10_a", text: "「这条口子，你留着。它不是认输，是你终于让人帮你了。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh5_s11" },
+    { id: "zh5_s10_b", text: "「你爸没留过这种口子。你留了——这就是不一样。」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_s11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_s11
+{
+  id: "zh5_s11",
+  speaker: "patient",
+  text: "……是。他没留过。他宁愿喝碎了，也不开口。我不一样。医生，我这张脸，是我自己挣回来的，不是我爸给的。",
+  emotion: "calm",
+  autoNext: "zh5_s12",
+}
+```
+
+```ts-dialog
+// id: zh5_s12
+{
+  id: "zh5_s12",
+  speaker: "doctor",
+  text: "「这张脸是我自己挣回来的」——他认下了自己。",
+  choices: [
+    { id: "zh5_s12_a", text: "「这张脸，今晚带回家，给妻女看看。她们要的，从来不是有用的赵海峰，是赵海峰。」", kind: "empathy", effect: { trust: 1, mood: 4 }, next: "zh5_s13" },
+    { id: "zh5_s12_b", text: "「那张清单，你回去贴在冰箱上。撑不住的时候，看一眼。」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_s13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_s13
+{
+  id: "zh5_s13",
+  speaker: "patient",
+  text: "（他笑了一下，眼眶又红）好。医生，还有一件事——我那二十年，没白干。我带出来的徒弟，现在用着那个工具，干得挺好。他是我教的。这点，我也想认。",
+  emotion: "calm",
+  autoNext: "zh5_s14",
+}
+```
+
+```ts-dialog
+// id: zh5_s14
+{
+  id: "zh5_s14",
+  speaker: "doctor",
+  text: "「他是我教的」——他给自己的二十年，找到了一个落点。",
+  choices: [
+    { id: "zh5_s14_a", text: "「这二十年没白干——这句话，你早该对自己说了。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh5_s15" },
+    { id: "zh5_s14_b", text: "「工具替了你的手艺，替不了你教出来的人。」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_s15" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_s15
+{
+  id: "zh5_s15",
+  speaker: "patient",
+  text: "……替不了。我徒弟是我教的，我闺女是我蹲下来说对不起的，我爱人是我今晚要开口的。这些，都是我的。工具拿不走。",
+  emotion: "calm",
+  autoNext: "zh5_s16",
+}
+```
+
+```ts-dialog
+// id: zh5_s16
+{
+  id: "zh5_s16",
+  speaker: "doctor",
+  text: "他把「有用」重新定义了——不是手艺，是人。",
+  choices: [
+    { id: "zh5_s16_a", text: "「这才是你的『有用』。今晚，带它回家。」", kind: "empathy", effect: { mood: 4 }, next: "zh_end_cure" },
+    { id: "zh5_s16_b", text: "「工具三个月学会了你的手艺——可这三样，它一辈子学不会。」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh_end_cure" },
+  ],
+}
+```
+
+#### 接纳路径（acceptance）
+
+```ts-dialog
+// id: zh5_a01
+{
+  id: "zh5_a01",
+  speaker: "patient",
+  text: "（他点点头）……慢慢回去过。您说得对，我可能没法一下子把什么都解决。我带着『我不是他』这句话，先回去。工作的事，我慢慢再找。",
+  emotion: "neutral",
+  autoNext: "zh5_a02",
+}
+```
+
+```ts-dialog
+// id: zh5_a02
+{
+  id: "zh5_a02",
+  speaker: "doctor",
+  text: "他选了「带着这句话先回去」——没彻底掀开，但他和解了。",
+  choices: [
+    { id: "zh5_a02_a", text: "「带着这句话，比带着那副壳，轻多了。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh5_a03" },
+    { id: "zh5_a02_b", text: "「工作的事不急。你先把自己，从『没用』里放出来。」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_a03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_a03
+{
+  id: "zh5_a03",
+  speaker: "patient",
+  text: "我试试。我以前一闲下来，骨头里就响警报。现在我知道那个警报是假的，是我爸的声音。它响，我就跟它说一句『我知道了，我今天想歇着』。",
+  emotion: "calm",
+  autoNext: "zh5_a04",
+}
+```
+
+```ts-dialog
+// id: zh5_a04
+{
+  id: "zh5_a04",
+  speaker: "doctor",
+  text: "他没赶走那个声音，但他开始回应它了。",
+  choices: [
+    { id: "zh5_a04_a", text: "「它响它的，你过你的——这本身就是一种赢。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "zh5_a05" },
+    { id: "zh5_a04_b", text: "「那个警报哪天小了，你想拿省下来的力气做什么？」", kind: "probe", effect: { trust: 0, truth: 2 }, next: "zh5_a05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_a05
+{
+  id: "zh5_a05",
+  speaker: "patient",
+  text: "……陪闺女去趟博物馆，她一直想去。再给我爱人做顿像样的饭——我手艺不行，但她不嫌弃。日子嘛，慢慢过。我不是我爸，这就够了。",
+  emotion: "calm",
+  autoNext: "zh_end_accept",
+}
+```
+
+#### 隐藏路径（hidden · 替那个家开口）
+
+```ts-dialog
+// id: zh5_h01
+{
+  id: "zh5_h01",
+  speaker: "patient",
+  text: "（他愣了很久，眼眶慢慢红了）……替那个十一岁的我，跟我爱人说？医生，从来没有人替我说过话。我……我答应。可我怕，她听完，会觉得我这个人，烂到根了。",
+  emotion: "scared",
+  autoNext: "zh5_h02",
+}
+```
+
+```ts-dialog
+// id: zh5_h02
+{
+  id: "zh5_h02",
+  speaker: "doctor",
+  text: "他怕被妻子看见「烂到根」的样子——可这恰恰是妻子最该看见的。",
+  choices: [
+    { id: "zh5_h02_a", text: "「我陪你，把那个十一岁的你，和你这半年的真话，一起讲给她。她要嫁的，是完整的赵海峰。」", kind: "special", effect: { truth: 3, mood: -2 }, next: "zh5_h03" },
+    { id: "zh5_h02_b", text: "「你要是还没准备好，我们就先放一放，等你开口的那天。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "zh5_h04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: zh5_h03
+{
+  id: "zh5_h03",
+  speaker: "patient",
+  text: "（他攥着那张照片，声音发抖）……行。您陪我。我把我爸的事，跟我这半年的事，都跟我爱人说。我这辈子，没把这两件事，跟任何人连起来说过。",
+  emotion: "scared",
+  autoNext: "zh_end_hidden",
+}
+```
+
+```ts-dialog
+// id: zh5_h04
+{
+  id: "zh5_h04",
+  speaker: "patient",
+  text: "……我先放一放。可我答应您，等我准备好的那天，我开口。我不再躲厕所里哭了，我走出来跟她说。谢谢您，替我想了这条道。",
+  emotion: "neutral",
+  autoNext: "zh_end_accept",
+}
+```
+
+---
+
+## 四、结局
+
+```ts-dialog
+// id: zh_end_cure
+{
+  id: "zh_end_cure",
+  speaker: "narration",
+  text: "〔结局 · 治愈〕",
+  isEnding: true,
+  endingType: "cure",
+  endingTitle: "我不是他",
+  endingText: "三个月后，赵海峰来信。他说那天饭后，他关了电视，跟妻子说了「我半年没上班了」。妻子哭了一场，没问『日子怎么过』，只说『你怎么不早说』。他没躲，接了一句『我错了，我现在想跟你一起想办法』。后来他在社区给老人教用手机，女儿在作文里写『我爸爸现在会蹲下来跟我说话』。信末他附了一句：那张父亲年轻时的照片，他洗了两张，一张给自己，一张寄去了老家的坟头。「我这二十年，没白干。我这后半辈子，也轮到我自己过了。」",
+  endingReward: { doctorReputation: 8, doctorMoney: 300, doctorExp: 50, doctorSanity: 5 },
+}
+```
+
+```ts-dialog
+// id: zh_end_accept
+{
+  id: "zh_end_accept",
+  speaker: "narration",
+  text: "〔结局 · 接纳〕",
+  isEnding: true,
+  endingType: "acceptance",
+  endingTitle: "带着这句话",
+  endingText: "赵海峰没再约新的会谈，但每隔两三个月会来坐一坐。他说工作还没着落，那个『你没用』的警报偶尔还会响。他现在会回一句：知道了，我今天想歇着。他说这话时，不再躲着妻女，偶尔会跟女儿一起去博物馆。他没彻底掀开父亲的酒和拳头那一段，但他带着『我不是他』这句话，慢慢过自己的日子。「它还在，但它不再独占我。」",
+  endingReward: { doctorReputation: 4, doctorMoney: 180, doctorExp: 35, doctorSanity: 6 },
+}
+```
+
+```ts-dialog
+// id: zh_end_hidden
+{
+  id: "zh_end_hidden",
+  speaker: "narration",
+  text: "〔结局 · 隐藏·替那个家开口〕",
+  isEnding: true,
+  endingType: "hidden",
+  endingTitle: "替那个家开口",
+  endingText: "你约了赵海峰的妻子来诊室。他攥着父亲年轻时的照片，把下岗、酒、门后的数数、这半年的图书馆，第一次连起来讲给妻子听。妻子听完很久没说话，最后说：「我嫁的是你，不是你的工牌。你怎么不早说，让我陪你扛。」赵海峰在诊室里哭得像个孩子——那个九岁数到一千的小孩，终于有人替他数了。后来他说，他带妻子去了父亲坟前，替那个从没被替过的家，开了第一次口。",
+  endingReward: { doctorReputation: -10, doctorMoney: 100, doctorExp: 80, doctorSanity: -15 },
+}
+```
+
+```ts-dialog
+// id: zh_end_worsen
+{
+  id: "zh_end_worsen",
+  speaker: "narration",
+  text: "〔结局 · 恶化〕",
+  isEnding: true,
+  endingType: "worsen",
+  endingTitle: "图书馆里那张凉桌子",
+  endingText: "赵海峰没再来。两周后他妻子转来消息：他在图书馆趴着睡的时候被女儿撞见了，女儿当场哭着跑出去。他回家后把自己锁在书房里，一句话不说。妻子说，他醒来第一句是『我就是我爸』。那张图书馆靠窗的桌子，最终还是没人替那个四十五岁的男人，从『没用』里拉起来。他没喝酒，也没打人——但他把自己，钉死在了父亲那张下岗后的脸上。",
+  endingReward: { doctorReputation: -8, doctorMoney: 50, doctorExp: 10, doctorSanity: -20 },
+}
+```
+
+---
+
+## 六、状态
+
+- [x] 人物档案完整（一句话核心 / 三层真相 / 角色三角 / 症状意义 / 关键转折）
+- [x] 节拍规划表写在剧本开头，数值口径符合信任合并线
+- [x] v3 结构校验通过 + tsc 通过
+- [x] 走线四线全绿
+- [ ] 聚合入口（由 parent 处理）
+- [ ] 剧本登记表（由 parent 处理）

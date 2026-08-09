@@ -11,6 +11,7 @@ import {
   todayCapacity,
   phaseOfSlot,
   queueTarget,
+  replenishArrivals,
   MAX_SLOTS,
 } from "./GameState";
 import type { GameState, EndingType, PrologueChoice } from "../types";
@@ -65,7 +66,6 @@ describe("prologueChoice 序章开场选择（P4-1）", () => {
       waitingDays: {},
       abandoned: [],
       messages: [],
-      generatedScenarios: [],
     } as unknown as GameState;
     expect(migrateGameState(legacy).prologueChoice).toBeUndefined();
   });
@@ -95,7 +95,6 @@ describe("prologuePassed 序章已通过标记（P4-3）", () => {
       waitingDays: {},
       abandoned: [],
       messages: [],
-      generatedScenarios: [],
     } as unknown as GameState;
     expect(migrateGameState(legacy).prologuePassed).toBeUndefined();
   });
@@ -118,7 +117,6 @@ describe("unlockedFragments 档案图鉴字段默认值（P3-1）", () => {
       waitingDays: {},
       abandoned: [],
       messages: [],
-      generatedScenarios: [],
     } as unknown as GameState;
     const migrated = migrateGameState(legacy);
     expect(migrated.unlockedFragments).toEqual({});
@@ -148,7 +146,6 @@ describe("activeSession 会话断点默认值（P2-8）", () => {
       waitingDays: {},
       abandoned: [],
       messages: [],
-      generatedScenarios: [],
     } as unknown as GameState;
     const migrated = migrateGameState(legacy);
     expect(migrated.activeSession).toBeNull();
@@ -180,7 +177,6 @@ describe("migrateGameState 旧存档兼容", () => {
       waitingDays: {},
       abandoned: [],
       messages: [],
-      generatedScenarios: [],
     } as unknown as GameState;
     const migrated = migrateGameState(legacy);
     expect(migrated.discharged).toEqual([]);
@@ -346,7 +342,6 @@ describe("P5-1 装饰字段默认值（装修=记忆的陈列馆）", () => {
       waitingDays: {},
       abandoned: [],
       messages: [],
-      generatedScenarios: [],
     } as unknown as GameState;
     const migrated = migrateGameState(legacy);
     expect(migrated.facilityDecors).toEqual({});
@@ -451,7 +446,6 @@ describe("P5-3 理智字段默认值（理智完整机制）", () => {
       waitingDays: {},
       abandoned: [],
       messages: [],
-      generatedScenarios: [],
     } as unknown as GameState;
     const migrated = migrateGameState(legacy);
     expect(migrated.sessionSinceRest).toBe(0);
@@ -585,5 +579,137 @@ describe("P6-1 技能 id 迁移（旧档兼容）", () => {
     const legacy = { ...createInitialState() } as Partial<GameState>;
     delete legacy.skills;
     expect(migrateGameState(legacy as GameState).skills).toEqual([]);
+  });
+});
+
+describe("replenishArrivals 患者逐日随机到达（SPEC v1.5.0）", () => {
+  const simpleNotGuided = () =>
+    allPatients.filter((p) => p.id !== GUIDED_PATIENT_ID && p.difficulty === "简单");
+
+  it("首日引导患者置入候诊（createInitialState）", () => {
+    const g = createInitialState();
+    expect(g.arrivedPatients).toEqual([GUIDED_PATIENT_ID]);
+  });
+
+  it("补齐至 queueTarget：随机注入决定选中顺序（首/末）", () => {
+    const g = createInitialState(); // rep10 day1 → 容量 2，引导在场 → shortfall 1
+    const pool = simpleNotGuided();
+    expect(pool.length).toBeGreaterThanOrEqual(2);
+    expect(replenishArrivals(g, () => 0)).toEqual([pool[0].id]);
+    expect(replenishArrivals(g, () => 0.9999)).toEqual([
+      pool[pool.length - 1].id,
+    ]);
+  });
+
+  it("初始（rep10 day1）只开放简单桶：普通/困难患者不被补入", () => {
+    const g = createInitialState();
+    const picks = replenishArrivals(g, () => 0.9999);
+    expect(picks.length).toBeGreaterThan(0);
+    for (const id of picks) {
+      expect(allPatients.find((p) => p.id === id)!.difficulty).toBe("简单");
+    }
+  });
+
+  it("声望≥25 开放普通桶：普通患者可被补入，容量同步 +1", () => {
+    const g = createInitialState();
+    g.doctor.reputation = 25; // 容量 2→3，普通桶开放 → shortfall 2
+    // 池序（rep25，排除 xiao_bei/lin_xiao）：[chen_mo, he_jinglan, jiang_yu, lin_chen, lu_yunxin, mu_qing, ...]，
+    // 0.35 → idx3 命中 lin_chen（普通），0 → 简单首位
+    const seq = [0.35, 0];
+    let i = 0;
+    const picks = replenishArrivals(g, () => seq[i++]);
+    expect(picks.length).toBe(2);
+    const diffs = picks.map((id) => allPatients.find((p) => p.id === id)!.difficulty);
+    expect(diffs).toContain("普通");
+  });
+
+  it("day≥3 开放普通桶（无需声望）：存在 random 命中普通患者", () => {
+    const g = createInitialState();
+    g.day = 3; // 容量仍 2（rep10）→ shortfall 1
+    const pool = allPatients.filter(
+      (p) => !g.arrivedPatients.includes(p.id) && !g.patientRecords[p.id] && !g.abandoned.includes(p.id)
+    );
+    let hitOrdinary = false;
+    for (let i = 0; i < pool.length; i++) {
+      for (const id of replenishArrivals(g, () => i / pool.length)) {
+        if (allPatients.find((p) => p.id === id)!.difficulty === "普通") hitOrdinary = true;
+      }
+    }
+    expect(hitOrdinary).toBe(true);
+  });
+
+  it("day≥6 开放困难桶：存在 random 命中 lin_xiao（困难）", () => {
+    const g = createInitialState();
+    g.day = 6;
+    const pool = allPatients.filter(
+      (p) => !g.arrivedPatients.includes(p.id) && !g.patientRecords[p.id] && !g.abandoned.includes(p.id)
+    );
+    let hitHard = false;
+    for (let i = 0; i < pool.length; i++) {
+      for (const id of replenishArrivals(g, () => i / pool.length)) {
+        if (id === "lin_xiao") hitHard = true;
+      }
+    }
+    expect(hitHard).toBe(true);
+  });
+
+  it("声望≥60 开放困难桶（无需天数）：存在 random 命中 lin_xiao", () => {
+    const g = createInitialState();
+    g.doctor.reputation = 60;
+    const pool = allPatients.filter(
+      (p) => !g.arrivedPatients.includes(p.id) && !g.patientRecords[p.id] && !g.abandoned.includes(p.id)
+    );
+    let hitHard = false;
+    for (let i = 0; i < pool.length; i++) {
+      for (const id of replenishArrivals(g, () => i / pool.length)) {
+        if (id === "lin_xiao") hitHard = true;
+      }
+    }
+    expect(hitHard).toBe(true);
+  });
+
+  it("已到达可接诊数 ≥ queueTarget 时返回空", () => {
+    const g = createInitialState();
+    g.arrivedPatients = ["xiao_bei", "chen_mo"]; // 2 = 容量 2
+    expect(replenishArrivals(g)).toEqual([]);
+  });
+
+  it("返回的患者均未在 arrivedPatients 中（不重复到达）", () => {
+    const g = createInitialState();
+    for (const id of replenishArrivals(g, () => 0.5)) {
+      expect(g.arrivedPatients).not.toContain(id);
+    }
+  });
+
+  it("已被发现客户预占的患者不被随机到达（random=0 跳过 chen_mo）", () => {
+    const g = createInitialState();
+    g.discoveryCandidates = [
+      { id: "d1", patientId: "chen_mo", channelId: "word", expireDay: 1 },
+    ];
+    const picks = replenishArrivals(g, () => 0);
+    expect(picks).not.toContain("chen_mo");
+    expect(picks[0]).toBe("he_jinglan"); // 简单池首位（chen_mo 被预占）
+  });
+});
+
+describe("migrateGameState arrivedPatients 迁移（SPEC v1.5.0）", () => {
+  it("旧档无 arrivedPatients → 迁移为未结案未放弃患者全集（旧档患者不消失）", () => {
+    const legacy = createInitialState() as Partial<GameState>;
+    delete (legacy as { arrivedPatients?: unknown }).arrivedPatients;
+    legacy.patientRecords = { chen_mo: "cure" }; // 已结案 → 不迁移
+    legacy.abandoned = ["he_jinglan"]; // 已放弃 → 不迁移
+    const migrated = migrateGameState(legacy as GameState);
+    const expected = allPatients
+      .filter((p) => p.id !== "chen_mo" && p.id !== "he_jinglan")
+      .map((p) => p.id);
+    expect(migrated.arrivedPatients).toEqual(expected);
+    // 引导患者未结案未放弃 → 也在其中
+    expect(migrated.arrivedPatients).toContain(GUIDED_PATIENT_ID);
+  });
+
+  it("已有 arrivedPatients 的存档保留原值（幂等）", () => {
+    const g = createInitialState();
+    g.arrivedPatients = ["xiao_bei", "chen_mo"];
+    expect(migrateGameState(g).arrivedPatients).toEqual(["xiao_bei", "chen_mo"]);
   });
 });

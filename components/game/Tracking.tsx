@@ -8,10 +8,13 @@ import { DECAY_START_DAY, WARN_DAY } from "@/lib/state/GameState";
 
 export function Tracking() {
   const { game, setScene, startSession, playSound } = useGame();
-  const all = [...allPatients, ...game.generatedScenarios];
+  const all = allPatients;
 
   const tracked = all.filter(
-    (p) => !game.patientRecords[p.id] && !game.abandoned.includes(p.id)
+    (p) =>
+      !game.patientRecords[p.id] &&
+      !game.abandoned.includes(p.id) &&
+      game.arrivedPatients.includes(p.id)
   );
   const closed = all.filter(
     (p) => game.patientRecords[p.id] || game.abandoned.includes(p.id)

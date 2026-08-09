@@ -60,11 +60,14 @@ describe("成就 unlock 情感化奖励引用完整性（P5-5）", () => {
       ).toBe(true);
     }
   });
-  it("unlock.returnVisit 引用的患者为手写患者（allPatients）", () => {
+  it("unlock.returnVisit 为 'auto'（动态选已治愈患者）或现存患者 id（旧数据兼容）", () => {
     const patientIds = new Set(allPatients.map((p) => p.id));
     for (const a of withUnlock) {
-      const pid = a.reward?.unlock?.returnVisit;
-      if (pid) expect(patientIds.has(pid), `${a.id} returnVisit=${pid}`).toBe(true);
+      const rv = a.reward?.unlock?.returnVisit;
+      if (rv)
+        expect(rv === "auto" || patientIds.has(rv), `${a.id} returnVisit=${rv}`).toBe(
+          true
+        );
     }
   });
   it("四类 unlock 各 6/3/2/2，合计 13", () => {
@@ -73,8 +76,8 @@ describe("成就 unlock 情感化奖励引用完整性（P5-5）", () => {
     const fragments = withUnlock.filter((a) => a.reward?.unlock?.fragment);
     const visits = withUnlock.filter((a) => a.reward?.unlock?.returnVisit);
     expect(letters).toHaveLength(6);
-    expect(decors).toHaveLength(3);
-    expect(fragments).toHaveLength(2);
+    expect(decors).toHaveLength(5);
+    expect(fragments).toHaveLength(0);
     expect(visits).toHaveLength(2);
   });
 });

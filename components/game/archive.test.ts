@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { createInitialState } from "../../lib/state/GameState";
 import type { GameState, PatientScenario } from "../../lib/types";
+import { allPatients } from "../../lib/data/patients";
 import {
   allFragmentsCollected,
   seenPatientIds,
@@ -13,11 +14,11 @@ import {
   unlockedFragmentsFor,
 } from "./archive";
 
-/** 最小生成患者剧本（模拟 generator 产物） */
+/** 最小合成患者剧本（纯函数参数用，不写入任何 game 状态） */
 function genScenario(id: string): PatientScenario {
   return {
     id,
-    name: `生成-${id}`,
+    name: `测试-${id}`,
     title: "测试剧本",
     intro: "一段简介。",
     surface: "测试表象。",
@@ -45,22 +46,22 @@ function genScenario(id: string): PatientScenario {
   };
 }
 
-/** 在初始状态上铺一组「见过」数据 */
+/** 在初始状态上铺一组「见过」数据（全部用池内真实手写患者） */
 function seenGame(): GameState {
   const g = createInitialState();
   g.patientRecords["lin_xiao"] = "cure";
-  g.abandoned.push("gen_abandon");
-  g.discharged.push("zhou_mingyuan");
-  g.followUpCount["chen_lo"] = 1;
-  g.returnVisits["gen_return"] = {
+  g.abandoned.push("he_jinglan");
+  g.discharged.push("zhao_lei");
+  g.followUpCount["xiao_bei"] = 1;
+  g.returnVisits["jiang_yu"] = {
     ending: "acceptance",
     dueDay: 5,
     arrived: true,
     seen: false,
   };
   g.unlockedFragments["lin_xiao"] = ["lin_m1"];
-  g.todayServed.push("gen_today");
-  g.waitingDays["gen_waiting"] = 3;
+  g.todayServed.push("su_nian");
+  g.waitingDays["lu_yunxin"] = 3;
   return g;
 }
 
@@ -74,12 +75,12 @@ describe("seenPatientIds 「见过」集合（并集）", () => {
     expect(seen).toEqual(
       new Set([
         "lin_xiao",
-        "gen_abandon",
-        "zhou_mingyuan",
-        "chen_lo",
-        "gen_return",
-        "gen_today",
-        "gen_waiting",
+        "he_jinglan",
+        "zhao_lei",
+        "xiao_bei",
+        "jiang_yu",
+        "su_nian",
+        "lu_yunxin",
       ])
     );
     // 未出现于任何状态的患者不进集合
@@ -87,49 +88,51 @@ describe("seenPatientIds 「见过」集合（并集）", () => {
   });
 });
 
-describe("archivePatients 档案列表（见过驱动 + 顺序）", () => {
-  it("手写患者在前、生成患者在后，未见过的患者不出现", () => {
+describe("archivePatients 档案列表（见过驱动 + 索引顺序）", () => {
+  it("档案患者按全量索引顺序（引导置顶 + 字母序），仅见过的患者出现", () => {
     const g = seenGame();
-    g.generatedScenarios = [genScenario("gen_today")];
     const list = archivePatients(g);
     const ids = list.map((p) => p.id);
-    // chen_lo（followUpCount）、lin_xiao（patientRecords）、zhou_mingyuan（discharged）为手写患者
-    // gen_today（todayServed）为生成患者
-    expect(ids).toEqual(["chen_lo", "lin_xiao", "zhou_mingyuan", "gen_today"]);
+    // seen 集合 7 位患者，均按 allPatients 顺序（xiao_bei 引导置顶，其余 id 字母序）
+    expect(ids).toEqual([
+      "xiao_bei",
+      "he_jinglan",
+      "jiang_yu",
+      "lin_xiao",
+      "lu_yunxin",
+      "su_nian",
+      "zhao_lei",
+    ]);
   });
-  it("seen 集合中含无对应剧本的异常 id 时安全跳过", () => {
+  it("game 状态含无对应剧本的异常 id 时安全跳过", () => {
     const g = seenGame();
-    g.generatedScenarios = [];
-    const seen = seenPatientIds(g);
-    seen.add("ghost_id"); // 数据异常：无剧本
-    const list = archivePatients(g);
-    expect(list.some((p) => p.id === "ghost_id")).toBe(false);
+    g.todayServed.push("ghost_id"); // 数据异常：id 不在手写患者池
+    expect(seenPatientIds(g).has("ghost_id")).toBe(true);
+    expect(archivePatients(g).some((p) => p.id === "ghost_id")).toBe(false);
   });
   it("从未出现在任何状态的患者不出现在档案", () => {
     const g = createInitialState();
-    // 全量患者（patientC/A/B）都在 allPatients 中，但未见于任何 game 状态
+    // 全量手写患者都在 allPatients 中，但未见于任何 game 状态（arrivedPatients 不算「见过」）
     expect(archivePatients(g).length).toBe(0);
   });
-  it("新患者接诊后自动出现在档案（无需注册），接诊前不出现", () => {
+  it("手写患者接诊后自动出现在档案（glob 池），接诊前不出现", () => {
     const g = createInitialState();
-    // 新生成患者剧本已入库，但尚未接诊（未进入任一 seen 状态）→ 不出现
-    g.generatedScenarios.push(genScenario("new_p"));
+    // zhao_lei 已在池中，但尚未接诊（未进入任一 seen 状态）→ 不出现
     expect(archivePatients(g).length).toBe(0);
-    // 手写患者已结案，随后新生成患者被接诊（进入 seen 状态 → 自动入库）
-    g.patientRecords["chen_lo"] = "cure";
-    g.waitingDays["new_p"] = 0;
+    // 接诊后（进入 seen 状态 → 自动入库）
+    g.patientRecords["zhao_lei"] = "cure";
+    g.waitingDays["zhao_lei"] = 0;
     const ids = archivePatients(g).map((p) => p.id);
-    // 手写在前、生成患者自动出现在末尾，无需任何注册代码
-    expect(ids).toEqual(["chen_lo", "new_p"]);
+    // 索引顺序：xiao_bei 未见不出现，zhao_lei 为唯一见过的患者
+    expect(ids).toEqual(["zhao_lei"]);
   });
-  it("同一位新患者结案后仍只出现一次（不因状态叠加重复入库）", () => {
+  it("同一位患者结案后仍只出现一次（不因状态叠加重复入库）", () => {
     const g = createInitialState();
-    g.generatedScenarios.push(genScenario("new_p"));
-    g.waitingDays["new_p"] = 1; // 候诊中被接诊
-    expect(archivePatients(g).map((p) => p.id)).toEqual(["new_p"]);
+    g.waitingDays["zhao_lei"] = 1; // 候诊中被接诊
+    expect(archivePatients(g).map((p) => p.id)).toEqual(["zhao_lei"]);
     // 结案进入 patientRecords（叠加第二个 seen 状态），仍只出现一次
-    g.patientRecords["new_p"] = "cure";
-    expect(archivePatients(g).map((p) => p.id)).toEqual(["new_p"]);
+    g.patientRecords["zhao_lei"] = "cure";
+    expect(archivePatients(g).map((p) => p.id)).toEqual(["zhao_lei"]);
   });
 });
 
@@ -142,19 +145,19 @@ describe("deriveArchiveStatus 状态推导优先级", () => {
   });
   it("abandoned → 已离场 · 放弃治疗", () => {
     const g = seenGame();
-    expect(deriveArchiveStatus(g, "gen_abandon").kind).toBe("abandoned");
+    expect(deriveArchiveStatus(g, "he_jinglan").kind).toBe("abandoned");
   });
   it("discharged → 已离场", () => {
     const g = seenGame();
-    expect(deriveArchiveStatus(g, "zhou_mingyuan").kind).toBe("discharged");
+    expect(deriveArchiveStatus(g, "zhao_lei").kind).toBe("discharged");
   });
   it("followUpCount > 0 且未结案/离场 → 复诊中", () => {
     const g = seenGame();
-    expect(deriveArchiveStatus(g, "chen_lo").kind).toBe("followup");
+    expect(deriveArchiveStatus(g, "xiao_bei").kind).toBe("followup");
   });
   it("其余 → 候诊/治疗中，带等待天数", () => {
     const g = seenGame();
-    const st = deriveArchiveStatus(g, "gen_waiting");
+    const st = deriveArchiveStatus(g, "lu_yunxin");
     expect(st.kind).toBe("active");
     expect(st.waitDays).toBe(3);
   });
@@ -192,14 +195,13 @@ describe("碎片查询（memoryFragments + followUpFragments）", () => {
   });
   it("unlockedFragmentsFor 按解锁顺序返回，id 找不到的条目跳过", () => {
     const g = seenGame();
-    g.generatedScenarios = [genScenario("gen_today")];
-    const p = g.generatedScenarios[0];
-    g.unlockedFragments["gen_today"] = ["gen_today_m1", "ghost_frag"];
+    const p = allPatients.find((x) => x.id === "lin_xiao")!;
+    g.unlockedFragments["lin_xiao"] = ["lin_m1", "ghost_frag"];
     const frags = unlockedFragmentsFor(g, p);
-    expect(frags.map((f) => f.id)).toEqual(["gen_today_m1"]);
+    expect(frags.map((f) => f.id)).toEqual(["lin_m1"]);
     // 顺序由 unlockedFragments 数组决定
-    g.unlockedFragments["gen_today"] = ["ghost_frag", "gen_today_m1"];
-    expect(unlockedFragmentsFor(g, p).map((f) => f.id)).toEqual(["gen_today_m1"]);
+    g.unlockedFragments["lin_xiao"] = ["ghost_frag", "lin_m1"];
+    expect(unlockedFragmentsFor(g, p).map((f) => f.id)).toEqual(["lin_m1"]);
   });
 });
 
@@ -262,28 +264,24 @@ describe("allFragmentsCollected 集齐判定（PRD 泄底封口出口）", () =>
   it("无碎片系统（fragmentCount 为 0）→ false", () => {
     const g = createInitialState();
     const p = genScenario("p1");
-    g.generatedScenarios = [p];
     p.memoryFragments = [];
     expect(allFragmentsCollected(g, p)).toBe(false);
   });
   it("有碎片但未集齐 → false", () => {
     const g = createInitialState();
     const p = genScenario("p1");
-    g.generatedScenarios = [p];
     g.unlockedFragments["p1"] = [];
     expect(allFragmentsCollected(g, p)).toBe(false);
   });
   it("碎片全部集齐 → true", () => {
     const g = createInitialState();
     const p = genScenario("p1");
-    g.generatedScenarios = [p];
     g.unlockedFragments["p1"] = ["p1_m1"];
     expect(allFragmentsCollected(g, p)).toBe(true);
   });
   it("初诊+复诊多碎片：缺一段 false，补齐 true", () => {
     const g = createInitialState();
     const p = genScenario("p1");
-    g.generatedScenarios = [p];
     p.followUpFragments = [
       {
         id: "p1_f1",

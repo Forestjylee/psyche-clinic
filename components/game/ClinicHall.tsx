@@ -2,8 +2,6 @@
 
 import { useGame } from "@/lib/hooks/useGame";
 import { allPatients, GUIDED_PATIENT_ID } from "@/lib/data/patients";
-import { allSkills, allClinicUpgrades } from "@/lib/data/skills";
-import { allAchievements } from "@/lib/data/achievements";
 import { endingColor, endingLabel, endingEmotion } from "./constants";
 import { ChibiCharacter } from "./ChibiCharacter";
 import {
@@ -14,22 +12,14 @@ import {
   firstSessionDone,
 } from "@/lib/state/GameState";
 
+/** 今日预约（首页本体，SPEC §15 v1.4.0）：
+ *  预约全列表直放首页；「个人成长」入口去重交给底部栏，仅保留诊所状态精简卡 + 花园入口。 */
 export function ClinicHall() {
-  const {
-    game,
-    startSession,
-    setScene,
-    restOneDay,
-    spendTimeInGarden,
-    playSound,
-    expToNext,
-    achievementEngine,
-    openReturnVisit,
-  } = useGame();
+  const { game, startSession, playSound, openReturnVisit } = useGame();
 
-  // 候诊列表：已放弃治疗的患者不再出现
-  const allAvailable = [...allPatients, ...game.generatedScenarios].filter(
-    (p) => !game.abandoned.includes(p.id)
+  // 候诊列表：已到达候诊的手写患者；已放弃治疗的不再出现
+  const allAvailable = allPatients.filter(
+    (p) => !game.abandoned.includes(p.id) && game.arrivedPatients.includes(p.id)
   );
   // 首诊机制保障（P4-5）：任何患者完成一次接诊即首诊完成；完成前除引导患者外全部锁定
   const firstUnlocked = firstSessionDone(game);
@@ -58,17 +48,6 @@ export function ClinicHall() {
       // 引导患者（第一位来访者）恒置顶
       return Number(b.id === GUIDED_PATIENT_ID) - Number(a.id === GUIDED_PATIENT_ID);
     });
-  const totalPatients = allAvailable.length;
-  const achCount = achievementEngine
-    ? Object.values(achievementEngine.getProgressMap()).filter((p) => p.unlocked).length
-    : 0;
-
-  const getRestRecovery = () => {
-    let base = 15;
-    if (game.clinicUpgrades.includes("rest_room")) base += 10;
-    return base;
-  };
-
   const onCardClick = (p: (typeof allAvailable)[number]) => {
     // 治愈回访：玩家已到访，点击进入探望对话（非治疗）
     const rv = game.returnVisits[p.id];
@@ -93,18 +72,13 @@ export function ClinicHall() {
   };
 
   const night = isNightSlot(game.slot);
-  const abandonedCount = game.abandoned.length;
-  const unreadCount = game.messages.filter((m) => !m.read).length;
-  const trackedCount = allAvailable.filter(
-    (p) => !game.patientRecords[p.id]
-  ).length;
 
   return (
     <div className={`scene clinic ${night ? "clinic-night" : ""}`}>
       <div className="clinic-header">
         <div className="clinic-header-left">
           <h1>今 日 预 约</h1>
-          <p>心理咨询预约清单 · 每一位来访者都带着心事而来，先坐下来，听他说。</p>
+          <p>每一位来访者都带着心事而来，先坐下来，听他说。</p>
         </div>
         <div className="clinic-header-right">
           <StatChip val={Object.keys(game.patientRecords).length} label="已接待" />
@@ -116,16 +90,6 @@ export function ClinicHall() {
         <div className="patient-section">
           <div className="section-title">
             今 日 预 约 <span className="count">{sortedAvailable.length} 位客户</span>
-            <button
-              className="patient-add-btn"
-              onClick={() => {
-                playSound("page");
-                setScene("discover");
-              }}
-              title="付出一点善意，让需要你的人找到你"
-            >
-              ＋ 发现客户
-            </button>
           </div>
           <div className="patient-list">
             {sortedAvailable.length === 0 ? (
@@ -220,99 +184,6 @@ export function ClinicHall() {
             })}
           </div>
         </div>
-        <div className="clinic-side">
-          <div className="side-card">
-            <h3>个 人 成 长</h3>
-            <SideBtn
-              label="技能树"
-              right={`LV.${game.doctor.level} · ${game.doctor.exp}/${expToNext(game.doctor.level)}`}
-              progress={(game.doctor.exp / expToNext(game.doctor.level)) * 100}
-              guide="skills"
-              onClick={() => {
-                playSound("page");
-                setScene("skills");
-              }}
-            />
-            <SideBtn
-              label="诊所升级"
-              right={`$${game.doctor.money}`}
-              rightClass="side-btn-cost"
-              onClick={() => {
-                playSound("page");
-                setScene("clinic_upgrades");
-              }}
-            />
-            <SideBtn
-              label="消息盒子"
-              right={
-                unreadCount > 0
-                  ? `${unreadCount} 条未读`
-                  : `${game.messages.length} 条`
-              }
-              rightClass={unreadCount > 0 ? "msg-unread-badge" : undefined}
-              onClick={() => {
-                playSound("page");
-                setScene("letters");
-              }}
-            />
-            <SideBtn
-              label="客户追踪"
-              right={`${trackedCount} 人`}
-              onClick={() => {
-                playSound("page");
-                setScene("tracking");
-              }}
-            />
-            <SideBtn
-              label="成就图鉴"
-              right={`${achCount} / ${allAchievements.length}`}
-              rightClass="ach-side-count"
-              onClick={() => {
-                playSound("page");
-                setScene("achievements");
-              }}
-            />
-            <SideBtn
-              label="休息一日"
-              right={`理智 +${getRestRecovery()}`}
-              rightClass={`rest-side-tag ${game.doctor.sanity < 50 ? "low" : ""}`}
-              guide="rest"
-              className={game.doctor.sanity < 50 ? "rest-low" : undefined}
-              onClick={restOneDay}
-            />
-            <SideBtn
-              label="花园待一会"
-              right="理智 +5"
-              rightClass={`rest-side-tag ${game.gardenDay === game.day ? "done" : game.doctor.sanity < 50 ? "low" : ""}`}
-              className={game.gardenDay === game.day ? "garden-done" : game.doctor.sanity < 50 ? "rest-low" : undefined}
-              onClick={spendTimeInGarden}
-            />
-          </div>
-          <div className="side-card">
-            <h3>诊 所 状 态</h3>
-            <div className="side-stats">
-              <StatLine
-                label="已接待客户"
-                value={`${Object.keys(game.patientRecords).length} / ${totalPatients}`}
-                progress={(Object.keys(game.patientRecords).length / Math.max(totalPatients, 1)) * 100}
-              />
-              <StatLine
-                label="已解锁技能"
-                value={`${game.skills.length} / ${allSkills.length}`}
-                progress={(game.skills.length / Math.max(allSkills.length, 1)) * 100}
-              />
-              <StatLine
-                label="诊所升级"
-                value={`${game.clinicUpgrades.length} / ${allClinicUpgrades.length}`}
-                progress={(game.clinicUpgrades.length / Math.max(allClinicUpgrades.length, 1)) * 100}
-              />
-              <StatLine label="游戏天数" value={<span className="stat-day-badge">第 {game.day} 天</span>} />
-              {abandonedCount > 0 ? (
-                <StatLine label="流失客户" value={`${abandonedCount} 人`} />
-              ) : null}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -323,67 +194,6 @@ function StatChip({ val, label }: { val: number | string; label: string }) {
     <div className="clinic-stat-chip">
       <div className="chip-val">{val}</div>
       <div className="chip-label">{label}</div>
-    </div>
-  );
-}
-
-function SideBtn({
-  label,
-  right,
-  rightClass,
-  guide,
-  progress,
-  className,
-  onClick,
-}: {
-  label: string;
-  right?: string;
-  rightClass?: string;
-  guide?: string;
-  progress?: number;
-  className?: string;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      className={`side-btn ${className ?? ""}`}
-      data-guide={guide}
-      onClick={onClick}
-    >
-      <span className="side-btn-main">
-        <span className="side-btn-label">{label}</span>
-        {progress !== undefined ? (
-          <span className="side-btn-progress">
-            <span className="side-btn-progress-fill" style={{ width: `${Math.min(Math.max(progress, 0), 100)}%` }} />
-          </span>
-        ) : null}
-      </span>
-      {right ? <span className={rightClass} style={{ color: "var(--text-dim)" }}>{right}</span> : null}
-    </button>
-  );
-}
-
-function StatLine({
-  label,
-  value,
-  progress,
-}: {
-  label: string;
-  value: React.ReactNode;
-  progress?: number;
-}) {
-  return (
-    <div className="stat-line">
-      <span className="stat-line-label">{label}</span>
-      {progress !== undefined ? (
-        <span className="stat-line-bar">
-          <span
-            className="stat-line-bar-fill"
-            style={{ width: `${Math.min(Math.max(progress, 0), 100)}%` }}
-          />
-        </span>
-      ) : null}
-      <span className="stat-line-value">{value}</span>
     </div>
   );
 }

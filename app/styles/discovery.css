@@ -1,8 +1,9 @@
 /* ========== 发现客户（主动获客 v0.4.0） ========== */
+/* 与其他子页面（成就/升级/技能）一致的块级流式布局：
+   移除 flex column —— 之前会把 nav-back 拉伸成全宽、note 贴底，
+   导致发现页与其余子页面观感不一致 */
 .discover-view {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
+  /* 无特殊布局，自然流动 */
 }
 
 .discover-section {
@@ -190,7 +191,7 @@
 }
 
 .discover-note {
-  margin-top: auto;
+  margin-top: 28px;
   padding-top: 18px;
   font-size: 12px;
   color: var(--text-muted);

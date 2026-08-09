@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useGame } from "@/lib/hooks/useGame";
-import { bridge, EVENTS } from "@/lib/bridge/EventBridge";
 
 /** 首次游玩标记 key */
 export const ONBOARDED_KEY = "ps.onboarded";
@@ -34,16 +33,16 @@ const STEPS: GuideStep[] = [
     place: "bottom",
   },
   {
-    target: ".clinic-side .side-btn[data-guide='skills']",
-    title: "个人成长",
-    text: "接诊会获得经验。打开「技能树」可以学习话术，提升接诊效果。",
-    place: "left",
+    target: ".bb-item[title='技能树']",
+    title: "技能树",
+    text: "接诊会获得经验。点底栏「技能」学习话术，提升接诊效果。",
+    place: "bottom",
   },
   {
-    target: ".clinic-side .side-btn[data-guide='rest']",
+    target: ".bb-item[title='休息一日']",
     title: "休息一日",
-    text: "一天接诊结束后，点击「休息一日」推进到明天，理智会恢复，也可能有新客户上门。",
-    place: "left",
+    text: "一天接诊结束后，点底栏「休息」推进到明天，理智会恢复，也可能有新客户上门。",
+    place: "bottom",
   },
 ];
 
@@ -112,10 +111,7 @@ export function Onboarding() {
       ok = true;
     }
     if (ok) {
-      // 首启引导的三个 spotlight 目标都在预约清单弹层内：先发指令自动打开清单，
-      // 保证目标 DOM 必然在场（触发与玩家是否手动开清单解耦）。
-      bridge.emit(EVENTS.openAppointmentList, {});
-      // 等清单挂载 + 布局稳定后计算高亮框
+      // 预约清单本体常驻首页（v1.4.0），无需自动打开弹层；等布局稳定后计算高亮框
       const t = window.setTimeout(() => setShow(true), 400);
       return () => window.clearTimeout(t);
     }

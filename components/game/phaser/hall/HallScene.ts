@@ -135,12 +135,13 @@ export class HallScene extends Phaser.Scene {
   /** 从 store 只读计算候诊患者（未完成/未放弃/声望解锁/今日未接诊） */
   private waitingList(): PatientScenario[] {
     const g = useGameStore.getState().game;
-    return [...allPatients, ...g.generatedScenarios]
+    return allPatients
       .filter(
         (p) =>
           !g.patientRecords[p.id] &&
           !g.abandoned.includes(p.id) &&
           !g.todayServed.includes(p.id) &&
+          g.arrivedPatients.includes(p.id) &&
           (p.requireReputation
             ? g.doctor.reputation >= p.requireReputation
             : true)

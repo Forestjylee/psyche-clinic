@@ -161,7 +161,7 @@ export const allAchievements: Achievement[] = [
     reward: {
       exp: 80,
       reputation: 5,
-      unlock: { fragment: { patientId: "zhou_mingyuan", fragmentId: "zhou_m3" } },
+      unlock: { decor: "trophy_clarity" },
     },
   },
 
@@ -846,7 +846,7 @@ export const allAchievements: Achievement[] = [
     reward: {
       exp: 80,
       reputation: 5,
-      unlock: { fragment: { patientId: "lin_xiao", fragmentId: "lin_m3" } },
+      unlock: { decor: "trophy_warmth" },
     },
   },
   {
@@ -860,7 +860,7 @@ export const allAchievements: Achievement[] = [
     reward: {
       exp: 150,
       reputation: 8,
-      unlock: { returnVisit: "chen_lo" },
+      unlock: { returnVisit: "auto" },
     },
   },
   {
@@ -884,7 +884,7 @@ export const allAchievements: Achievement[] = [
     reward: {
       exp: 200,
       reputation: 10,
-      unlock: { returnVisit: "xiao_bei" },
+      unlock: { returnVisit: "auto" },
     },
   },
 ];

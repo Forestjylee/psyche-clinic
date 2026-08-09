@@ -1,0 +1,1348 @@
+# 唐致远 · v3 · 短剧本 · 4 节拍 · 40+ 轮
+
+> 短档剧本：退休身份真空。一个把"行长"当本名的男人，退休后发现名片背面是空的。
+> 数值：trust 15→28→40→50→58；truth 0→40；碎片 1 枚 @30；恶化入口 trust≤40；隐藏结局 @50；cure 主线 40 轮。
+> 生成：`node scripts/md-to-patient.mjs docs/stories/tang-zhiyuan-v3.md --walk`
+
+---
+
+## 〇、人物档案
+
+**姓名** 唐致远，60 岁，刚退休半年的银行行长。女儿带他来，说他退休后没出过门，整夜整夜睡不着。
+
+**一句话核心**：一个把"行长"当成本名的男人，退休后发现名片背面是空的——他不是不适应退休，是发现自己从来没问过"不挂头衔的我，是谁"。
+
+**三层真相**：
+- 表层（开场就说）：失眠、易怒、反复整理旧文件、不接老同事电话。他说"我就是闲下来不习惯"。
+- 中间层（第 2-3 节拍揭）：退休欢送会上，没人提他当年救活的那个支行，只说"辛苦了"；他亲手培养的继任者，把他牵头三年的改革方案搁进了抽屉。他守了四十年的"被需要"，原来一转身就没人记得。
+- 深层（核心信念）：22 岁第一次升职，老科长拍着他肩膀说"小唐有出息"——那是他这辈子第一次觉得自己"被看见"。从此他把"出息"和"位置"焊死，用职位高低丈量自己存在的分量。退休=那把尺子断了。
+
+**角色三角**：老科长（已故）=施压者（那句"有出息"刻进骨头）/ 老同事与继任者=情感忽视者（欢送会只说"辛苦"，方案被搁置）/ 女儿=被守护者（他怕女儿也嫁一个"没出息"的人，所以一辈子要"有出息"给她看）。
+
+**症状意义**：反复整理旧文件不是舍不得，是他在一遍遍确认"我确实存在过、被需要过"。开场埋（他说自己"闲下来不习惯"时其实是在摸那叠文件）、中段被问（医生点破"你不是在整理文件，是在整理自己存在过的证据"）、高潮意义反转（他终于敢问"不挂头衔的我，还值不值得被看见"）。
+
+**关键转折**：他翻出老科长当年送他的那支旧钢笔，笔帽内侧刻着"致远"两个字——他这才明白，老科长要的不是他坐到哪把椅子上，是他这个人。他守了四十年的"出息"，原来从一开始就被人看见过。
+
+---
+
+## 一、剧本元信息（ts-meta）
+
+```ts-meta
+// id: tang_zhiyuan
+// tier: 短
+// anchor: 15,28,40,50,58
+// truthEnd: 40
+// minCureRounds: 40
+// fragments: 1
+// worsenAtMost: 40
+{
+  id: "tang_zhiyuan",
+  name: "唐致远",
+  title: "退休银行行长 · 退休半年不出门 · 女儿送诊",
+  intro: "退休半年，他没出过门，整夜睡不着，把几十年的旧文件翻出来一遍遍理。女儿硬拉他来，他答应了，理由是『别让孩子担心。』",
+  surface: "失眠、易怒、反复整理旧文件、回避老同事电话。说话得体、克制，把『闲下来不习惯』挂在嘴边。看似体面、镇定、无可挑剔。",
+  truth: "22 岁第一次升职，老科长拍他肩膀说『小唐有出息』——那是他第一次觉得自己『被看见』。从此他把『出息』和『位置』焊死，用职位丈量自己存在的分量。退休=那把尺子断了，他不是不适应退休，是发现自己从来没问过『不挂头衔的我，是谁』。",
+  palette: { primary: "#5b6b8a", secondary: "#9ba6bd", fog: "#6b6557", bright: "#cdd6e6" },
+  baseReward: 650,
+  difficulty: "简单",
+  startNode: "tz1_start",
+  initialState: { trust: 15, defense: 65, mood: 35, truth: 0, round: 0 },
+  memoryFragments: [
+    {
+      id: "tang_m1",
+      trigger: { truth: 30 },
+      title: "科长室的那一下",
+      text: "科长室的百叶窗拉着，光一条一条落在桌上的任命文件上。老科长把钢笔塞进我手里，拍着我的肩说：『小唐有出息。』那一年我二十二。从那天起，我觉得自己总算被这世界看见了。",
+      emotion: "sad",
+    },
+  ],
+}
+```
+
+---
+
+## 二、节拍骨架（ts-dialog 节点）
+
+### 节拍 1 · 初访·表层（trust 15→28，truth 0→22，阻抗：拒绝被当成"适应不良的退休老人"）
+
+```ts-dialog
+// id: tz1_start
+{
+  id: "tz1_start",
+  speaker: "narration",
+  text: "深秋的上午，唐致远由女儿陪着来的。女儿在门口松开他胳膊时，他下意识整了整外套领子，像要进会场。坐定后，他把公文包搁在膝上，又挪到腿边，最后摆正——动作很轻，却一丝不苟。",
+  autoNext: "tz1_p01",
+}
+```
+
+```ts-dialog
+// id: tz1_p01
+{
+  id: "tz1_p01",
+  speaker: "patient",
+  text: "医生您好。其实真没什么大事，就是退休了，闲下来不习惯。我女儿非说我状态不对，我陪她走一趟，让她安心。我身体好着呢，就是觉少。",
+  emotion: "neutral",
+  autoNext: "tz1_c01",
+}
+```
+
+```ts-dialog
+// id: tz1_c01
+{
+  id: "tz1_c01",
+  speaker: "doctor",
+  text: "他说着「没什么大事」，手却一直压在公文包上——像怕它跑掉，又像怕自己跑掉。",
+  choices: [
+    { id: "tz1_c01_a", text: "「你女儿担心你，可你自己——这半年，有哪一刻是为自己难受的？」", kind: "empathy", effect: { trust: 2, defense: -1 }, next: "tz1_p02" },
+    { id: "tz1_c01_b", text: "「『闲下来不习惯』——这话你跟谁说过几次了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz1_p02" },
+    { id: "tz1_c01_c", text: "「退休嘛，谁都不习惯，找点事干就好了，别太当回事。」", kind: "logic", effect: { trust: -8, defense: 8, mood: -4 }, next: "tz1_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz1_p02
+{
+  id: "tz1_p02",
+  speaker: "patient",
+  text: "（他愣了一下，坐直了些）……您这话问得，我一时不知道怎么接。我这辈子没为自己难受过，都是为工作、为家里。退休嘛，就是不忙了，慢慢适应。",
+  emotion: "anxious",
+  autoNext: "tz1_c02",
+}
+```
+
+```ts-dialog
+// id: tz1_c02
+{
+  id: "tz1_c02",
+  speaker: "doctor",
+  text: "他反复用「慢慢适应」把那个「难受」压回去——好像承认难受，就等于承认自己撑不住。",
+  choices: [
+    { id: "tz1_c02_a", text: "「『慢慢适应』——你是在适应退休，还是在适应『没用』这两个字？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz1_p03" },
+    { id: "tz1_c02_b", text: "（不急着追，安静地等他自己往下说。）", kind: "silence", effect: { trust: 1 }, next: "tz1_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz1_p03
+{
+  id: "tz1_p03",
+  speaker: "patient",
+  text: "……『没用』。这话我女儿也说过。她说我成天在家转来转去，像丢了魂。我听了心里咯噔一下，可我嘴上还是说，我哪有。其实我知道，我一停下来，心里就发空。",
+  emotion: "anxious",
+  autoNext: "tz1_c03",
+}
+```
+
+```ts-dialog
+// id: tz1_c03
+{
+  id: "tz1_c03",
+  speaker: "doctor",
+  text: "「心里发空」——这是他第一次没用「习惯」来搪塞。",
+  choices: [
+    { id: "tz1_c03_a", text: "「『心里发空』——那个空，是什么时候开始有的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz1_p04" },
+    { id: "tz1_c03_b", text: "「被女儿说中『丢了魂』的那一刻，你心里是什么感觉？」", kind: "empathy", effect: { trust: 1 }, next: "tz1_p04" },
+    { id: "tz1_c03_c", text: "「退休了就该享清福，别老想着有没有用。」", kind: "logic", effect: { trust: -5, defense: 4 }, next: "tz1_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz1_p04
+{
+  id: "tz1_p04",
+  speaker: "patient",
+  text: "（他的手从公文包上挪开了）……我女儿小的时候，我天天加班，她半夜发烧都是她妈抱着去医院。我现在闲下来了，反而不知道怎么跟她待着。我总觉得，我得是个『有用』的爹，她才会愿意跟我坐着。",
+  emotion: "sad",
+  autoNext: "tz1_c04",
+}
+```
+
+```ts-dialog
+// id: tz1_c04
+{
+  id: "tz1_c04",
+  speaker: "doctor",
+  text: "他眼眶有点红，但马上用「我得是个有用的爹」把那点脆弱盖了回去。",
+  choices: [
+    { id: "tz1_c04_a", text: "「你拼命当一个『有用』的爹——可你女儿今天陪你来，她要的好像不是『有用』，是『在』。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "tz1_p05" },
+    { id: "tz1_c04_b", text: "「『有用』这个词，你是对女儿说的，还是对自己说了四十年？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "tz1_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz1_p05
+{
+  id: "tz1_p05",
+  speaker: "patient",
+  text: "……对自己说的吧。我从小就信这个，人得有出息，得有用，不然活着跟没活一样。这话听着老套，可我这四十年，就是这么撑过来的。",
+  emotion: "neutral",
+  autoNext: "tz1_c05",
+}
+```
+
+```ts-dialog
+// id: tz1_c05
+{
+  id: "tz1_c05",
+  speaker: "doctor",
+  text: "他第一次主动说出「从小就信这个」——这是条可以往里走的路。",
+  choices: [
+    { id: "tz1_c05_a", text: "「『从小就信』——这头一回信，是谁让你信的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz1_p06" },
+    { id: "tz1_c05_b", text: "（不打断，让他自己接上那段记忆。）", kind: "silence", effect: { trust: 1 }, next: "tz1_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz1_p06
+{
+  id: "tz1_p06",
+  speaker: "patient",
+  text: "……是我刚进银行那会儿。一个老科长，看着我踏实，手把手带了我三年。后来我升了，他拍了拍我肩膀。就那一下，我记了一辈子。具体他说了啥，我这阵子翻来覆去想，越想越模糊。",
+  emotion: "neutral",
+  autoNext: "tz1_c06",
+}
+```
+
+```ts-dialog
+// id: tz1_c06
+{
+  id: "tz1_c06",
+  speaker: "doctor",
+  text: "他在替那段记忆找回细节——说明它对他比任何头衔都重。",
+  choices: [
+    { id: "tz1_c06_a", text: "「你翻来覆去想那句话——是因为退休之后，再没人这么拍过你了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz1_p07" },
+    { id: "tz1_c06_b", text: "「那一下拍肩，对你意味着什么？」", kind: "empathy", effect: { trust: 1 }, next: "tz1_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz1_p07
+{
+  id: "tz1_p07",
+  speaker: "patient",
+  text: "（他沉默了十几秒）……意味着，我被看见了。我爹妈孩子多，顾不上我一个。从小到大，我都是那个不吵不闹、不出错的。老科长那一下，是我头一回觉得，原来我这个人，是会被谁记住的。",
+  emotion: "neutral",
+  autoNext: "tz1_c07",
+}
+```
+
+```ts-dialog
+// id: tz1_c07
+{
+  id: "tz1_c07",
+  speaker: "doctor",
+  text: "「被看见」——这才是他真正守了四十年的东西，不是头衔。",
+  choices: [
+    { id: "tz1_c07_a", text: "「被看见，和被提拔，是一回事吗？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "tz1_p08" },
+    { id: "tz1_c07_b", text: "「你守了四十年的，到底是『行长』这两个字，还是『被看见』那种感觉？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "tz1_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz1_p08
+{
+  id: "tz1_p08",
+  speaker: "patient",
+  text: "（他的声音低下去）……是那种感觉。可退休那天我才发现，那四十年里，被看见的好像只有『行长』，不是我。我把名字活成了头衔，头衔一摘，我啥也不是。",
+  emotion: "sad",
+  autoNext: "tz1_c08",
+}
+```
+
+```ts-dialog
+// id: tz1_c08
+{
+  id: "tz1_c08",
+  speaker: "doctor",
+  text: "「头衔一摘，我啥也不是」——他自己把那层壳剥开了。",
+  choices: [
+    { id: "tz1_c08_a", text: "「那四十年里，有没有一刻，你是不靠头衔也被谁记住的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz1_p09" },
+    { id: "tz1_c08_b", text: "「你说『啥也不是』——那个『啥也不是』的人，今年几岁？」", kind: "empathy", effect: { trust: 1 }, next: "tz1_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz1_p09
+{
+  id: "tz1_p09",
+  speaker: "patient",
+  text: "二十二岁吧。刚进银行，啥都不是，连名字都没人记。那会儿我天天盼着，哪天能被人叫一声『小唐』，而不是『新来的』。后来我坐到行长的位置上，所有人都叫我『唐行』，可我再没听过那声『小唐』。",
+  emotion: "anxious",
+  autoNext: "tz1_c09",
+}
+```
+
+```ts-dialog
+// id: tz1_c09
+{
+  id: "tz1_c09",
+  speaker: "doctor",
+  text: "他把「被叫小唐」当成了被看见的标记——头衔越高，离那个被看见的自己反而越远。",
+  choices: [
+    { id: "tz1_c09_a", text: "「你爬了四十年，是为了离『小唐』更近，还是更远？」", kind: "empathy", effect: { trust: 1 }, next: "tz1_p10" },
+    { id: "tz1_c09_b", text: "「『再没听过那声小唐』——你最想被谁这样叫一次？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz1_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz1_p10
+{
+  id: "tz1_p10",
+  speaker: "patient",
+  text: "……我想让我女儿叫一声。可她现在叫我『爸』，都带着客客气气。我有时候想，我这一辈子『有出息』给她看，是不是反倒把她推远了。然后我马上又想，别想这些，先把日子过顺。",
+  emotion: "sad",
+  autoNext: "tz1_c10",
+}
+```
+
+```ts-dialog
+// id: tz1_c10
+{
+  id: "tz1_c10",
+  speaker: "doctor",
+  text: "「别想这些」——他又给心里那个空盖了一块布。",
+  choices: [
+    { id: "tz1_c10_a", text: "「你怕女儿跟你客气——这份怕，是你今晚最诚实的一句话。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "tz1_out" },
+    { id: "tz1_c10_b", text: "「『别想这些』——这是你自己的话，还是当年那个老科长的声音？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz1_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz1_out
+{
+  id: "tz1_out",
+  speaker: "narration",
+  text: "第一次会谈结束，唐致远起身时，把公文包提起来又放下。「……下次，还是这个点？」他问得认真，像在确认一个会议排期。",
+  autoNext: "tz2_start",
+}
+```
+
+```ts-dialog
+// id: tz1_r01
+{
+  id: "tz1_r01",
+  speaker: "patient",
+  text: "（他的脸色沉下来）您这话说得轻巧。我干了四十年，用得着您教我怎么退休？我没病，就是闲，您别给我扣帽子。",
+  emotion: "angry",
+  autoNext: "tz1_p02",
+}
+```
+
+### 节拍 2 · 中间层触发（trust 28→40，truth 22→34，[m1 碎片@30]）
+
+```ts-dialog
+// id: tz2_start
+{
+  id: "tz2_start",
+  speaker: "narration",
+  text: "一周后，唐致远准时来了，手里拎着一沓用皮筋扎好的旧文件。他说这周把女儿一家叫来吃了顿饭，饭桌上他没怎么说话，光看着外孙扒饭。你注意到，他说「看着外孙」时，眼角的纹路松了一点。",
+  autoNext: "tz2_p01",
+}
+```
+
+```ts-dialog
+// id: tz2_p01
+{
+  id: "tz2_p01",
+  speaker: "patient",
+  text: "这周还行，睡得多一点。我外孙五岁，吃饭老掉米粒，我看着他，莫名其妙就乐了。可吃完饭他们一走，屋里一静，我心里又开始发空。我就把这堆文件翻出来理。",
+  emotion: "neutral",
+  autoNext: "tz2_c01",
+}
+```
+
+```ts-dialog
+// id: tz2_c01
+{
+  id: "tz2_c01",
+  speaker: "doctor",
+  text: "他在「看着外孙乐了」和「屋里一静就发空」之间来回。",
+  choices: [
+    { id: "tz2_c01_a", text: "「你理文件的时候，理的是工作，还是『我存在过』这件事？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "tz2_p02" },
+    { id: "tz2_c01_b", text: "「外孙让你乐了，可他们一走你就发空——那个空，是什么形状？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "tz2_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz2_p02
+{
+  id: "tz2_p02",
+  speaker: "patient",
+  text: "……理的是『我干过这些事』吧。您说怪不怪，这些文件，当年我签的时候觉得天大的事，现在翻出来，连我自己都说不清它们到底解决了什么。可我要是不理，就更觉得这四十年是空的。",
+  emotion: "anxious",
+  autoNext: "tz2_c02",
+}
+```
+
+```ts-dialog
+// id: tz2_c02
+{
+  id: "tz2_c02",
+  speaker: "doctor",
+  text: "他自己开始往那个「空」里看了。",
+  choices: [
+    { id: "tz2_c02_a", text: "「『说不清解决了什么』——这四十年里，有没有一件事，是你现在还说得清它『有用』的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz2_p03" },
+    { id: "tz2_c02_b", text: "（点点头，让他自己往下接，不急着替他归纳。）", kind: "silence", effect: { trust: 1 }, next: "tz2_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz2_p03
+{
+  id: "tz2_p03",
+  speaker: "patient",
+  text: "……有一件。零三年的时候，我们那个支行坏账快撑不住了，我带着几个人，一个一个去谈去磨，硬是把它救回来。那一年我没回家过年。我以为这事，他们总会记得。",
+  emotion: "sad",
+  autoNext: "tz2_c03",
+}
+```
+
+```ts-dialog
+// id: tz2_c03
+{
+  id: "tz2_c03",
+  speaker: "doctor",
+  text: "「他们总会记得」——他守着一句没被兑现的承诺。",
+  choices: [
+    { id: "tz2_c03_a", text: "「退休那天，有人提过这件事吗？」", kind: "empathy", effect: { trust: 1 }, next: "tz2_p04" },
+    { id: "tz2_c03_b", text: "「『总会记得』——后来呢？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz2_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz2_p04
+{
+  id: "tz2_p04",
+  speaker: "patient",
+  text: "（他苦笑了一下）……没有。欢送会上，他们一人说一句『唐行辛苦了』，就跟念稿子似的。我等了一晚上，等有人提一嘴那个支行，等谁说一句『当年多亏您』。没人提。我回家路上，在车里坐了半个钟头没动。",
+  emotion: "sad",
+  autoNext: "tz2_c04",
+}
+```
+
+```ts-dialog
+// id: tz2_c04
+{
+  id: "tz2_c04",
+  speaker: "doctor",
+  text: "「在车里坐了半个钟头」——那不是失落，是他守了四十年的「被记得」，当场碎了。",
+  choices: [
+    { id: "tz2_c04_a", text: "「你等的不是一句夸奖，是有人能证明——你这四十年，没白活。」", kind: "empathy", effect: { trust: 2, mood: 4 }, next: "tz2_p05" },
+    { id: "tz2_c04_b", text: "「没人为那件事开口——是他们忘了，还是那件事，本来就没你以为的那么重？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "tz2_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz2_p05
+{
+  id: "tz2_p05",
+  speaker: "patient",
+  text: "……我也问过自己。后来我想明白了，不是我救的那个支行不重要，是在他们眼里，『唐行』做这些是应该的。应该的事，没人记。可我心里那个声音还在喊：那不该是我唐致远被记住的事吗？",
+  emotion: "anxious",
+  autoNext: "tz2_c05",
+}
+```
+
+```ts-dialog
+// id: tz2_c05
+{
+  id: "tz2_c05",
+  speaker: "doctor",
+  text: "他第一次把「唐行」和「唐致远」分开了。",
+  choices: [
+    { id: "tz2_c05_a", text: "「『唐行』是应该的，『唐致远』呢——谁记得他？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz2_p06" },
+    { id: "tz2_c05_b", text: "（陪他停在这句话上，不急着推。）", kind: "silence", effect: { trust: 1 }, next: "tz2_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz2_p06
+{
+  id: "tz2_p06",
+  speaker: "patient",
+  text: "（他的眼眶红了，这次没压）……没人记得。我这四十年，把『唐致远』活没了，只剩『唐行』。我有时候半夜醒过来，看着天花板，想『唐致远』是谁，我答不上来。我活了六十年，把自己活成了一个头衔，头衔一摘，里面是空的。",
+  emotion: "scared",
+  autoNext: "tz2_c06",
+}
+```
+
+```ts-dialog
+// id: tz2_c06
+{
+  id: "tz2_c06",
+  speaker: "doctor",
+  text: "他终于说出了那个「空」——不是退休带来的，是四十年攒下的。",
+  choices: [
+    { id: "tz2_c06_a", text: "「这个『空』，是从哪一年开始住进来的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz2_p07" },
+    { id: "tz2_c06_b", text: "「那个答不上来的『唐致远』，最怕的是什么？」", kind: "empathy", effect: { trust: 1 }, next: "tz2_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz2_p07
+{
+  id: "tz2_p07",
+  speaker: "patient",
+  text: "……二十二岁。我刚升职那天，老科长拍我肩，说『小唐有出息』。从那天起，我就把『有出息』当成了我这个人。我以为只要我一直有出息，那个『被看见』的感觉就一直在。可我越往上走，看见的越是『唐行』，不是『小唐』。",
+  emotion: "scared",
+  autoNext: "tz2_c07",
+}
+```
+
+```ts-dialog
+// id: tz2_c07
+{
+  id: "tz2_c07",
+  speaker: "doctor",
+  text: "「二十二岁」——他把那个被拍肩的下午，摆到了桌上。",
+  choices: [
+    { id: "tz2_c07_a", text: "「老科长拍你那一下，看见的是『有出息的小唐』，还是『将来的唐行』？」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "tz2_p08" },
+    { id: "tz2_c07_b", text: "「你说他『看见』了你——他看见的，和你后来追的，是同一个东西吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz2_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz2_p08
+{
+  id: "tz2_p08",
+  speaker: "patient",
+  text: "……他看见的是『小唐』。是我踏实、肯学、不耍滑头。不是后来的『唐行』。我追了一辈子的『有出息』，追到后来，把那个『小唐』追丢了。我赢了位置，输了自己。这笔账，我到现在才敢算。",
+  emotion: "sad",
+  autoNext: "tz2_c08",
+}
+```
+
+```ts-dialog
+// id: tz2_c08
+{
+  id: "tz2_c08",
+  speaker: "doctor",
+  text: "「赢了位置，输了自己」——他自己把账算清了。",
+  choices: [
+    { id: "tz2_c08_a", text: "「你赢了四十年，那个『小唐』却一直没回来——是不是因为，你从没敢回头找他？」", kind: "empathy", effect: { trust: 1, defense: 3 }, next: "tz2_p09" },
+    { id: "tz2_c08_b", text: "「『没敢算这笔账』——不敢算的背后，是怕算出什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz2_p09" },
+    { id: "tz2_c08_c", text: "「你都这把岁数了，还纠结这些干嘛，好好享福不行吗。」", kind: "confront", effect: { trust: -3, defense: 6 }, next: "tz2_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz2_p09
+{
+  id: "tz2_p09",
+  speaker: "patient",
+  text: "……怕算出来，我这四十年，追错了。我怕我一承认追错了，我这辈子就全白干了。我有点……不敢认。",
+  emotion: "scared",
+  autoNext: "tz2_c09",
+}
+```
+
+```ts-dialog
+// id: tz2_c09
+{
+  id: "tz2_c09",
+  speaker: "doctor",
+  text: "他没躲开，只是不敢认——这已经是很大的台阶。",
+  choices: [
+    { id: "tz2_c09_a", text: "「不敢认就慢慢认。今天你能说出『追错了』三个字，已经比四十年前勇敢了。」", kind: "empathy", effect: { trust: 2, mood: 4 }, next: "tz2_p10" },
+    { id: "tz2_c09_b", text: "「如果现在有个办法，能让那个『小唐』回来——你想试试吗？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "tz2_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz2_p10
+{
+  id: "tz2_p10",
+  speaker: "patient",
+  text: "……想。我外孙那天喊我『姥爷』，不是『唐行姥爷』，就『姥爷』俩字。我愣了一下，心里头热乎乎的。我想，要是能让『唐致远』也回来，我外孙认的，才真是他姥爷。",
+  emotion: "neutral",
+  autoNext: "tz2_c10",
+}
+```
+
+```ts-dialog
+// id: tz2_c10
+{
+  id: "tz2_c10",
+  speaker: "doctor",
+  text: "会谈结束前的最后一问。",
+  choices: [
+    { id: "tz2_c10_a", text: "「你外孙那一声『姥爷』，是这半年里，叫得最对的一句称呼。」", kind: "empathy", effect: { mood: 3 }, next: "tz2_out" },
+    { id: "tz2_c10_b", text: "「『让唐致远回来』——这句话，是你今晚给自己最大的礼物。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz2_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz2_out
+{
+  id: "tz2_out",
+  speaker: "narration",
+  text: "第二次会谈结束，唐致远没有急着起身。他盯着窗外那棵梧桐看了一会儿。「那棵树，叶子都黄了。」他说，「我在这楼里上了四十年班，头一回发现，院子里有棵梧桐。」",
+  autoNext: "tz3_start",
+}
+```
+
+### 节拍 3 · 深层信念（trust 40→50，truth 34→46，恶化入口 @trust≤40）
+
+```ts-dialog
+// id: tz3_start
+{
+  id: "tz3_start",
+  speaker: "narration",
+  text: "又一周，唐致远照常赴约。这周他去了趟老家，给老科长的墓扫了扫。他说这话时，手里攥着一支旧钢笔，笔帽磨得发亮。",
+  autoNext: "tz3_p01",
+}
+```
+
+```ts-dialog
+// id: tz3_p01
+{
+  id: "tz3_p01",
+  speaker: "patient",
+  text: "这周我回老家了一趟。站在老科长墓前，我才发现，我连他叫什么全名，都得想半天。我只记得『老科长』，记得他那一下拍肩。我这四十年记着的，其实就那么一下。",
+  emotion: "neutral",
+  autoNext: "tz3_c01",
+}
+```
+
+```ts-dialog
+// id: tz3_c01
+{
+  id: "tz3_c01",
+  speaker: "doctor",
+  text: "「记着的就那么一下」——他正在看清，自己究竟在守什么。",
+  choices: [
+    { id: "tz3_c01_a", text: "「那一下拍肩，对你意味着什么——你现在能说清了吗？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "tz3_p02" },
+    { id: "tz3_c01_b", text: "「站在墓前想不起全名——你心里是什么感觉？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "tz3_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_p02
+{
+  id: "tz3_p02",
+  speaker: "patient",
+  text: "……意味着，我这辈子总算被一个人，不带条件地看见了。我爹妈看见的是『老三能不能帮家里』，单位看见的是『唐行能不能扛事』。只有老科长那一下，看见的就是我这个人。",
+  emotion: "neutral",
+  autoNext: "tz3_c02",
+}
+```
+
+```ts-dialog
+// id: tz3_c02
+{
+  id: "tz3_c02",
+  speaker: "doctor",
+  text: "那条「被看见」的真正主人，露出来了。",
+  choices: [
+    { id: "tz3_c02_a", text: "「『不带条件地被看见』——四十年里，除了他，还有谁这样看见过你？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz3_p03" },
+    { id: "tz3_c02_b", text: "（陪他停在这句话上，感受那一下拍肩的分量。）", kind: "silence", effect: { trust: 1 }, next: "tz3_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_p03
+{
+  id: "tz3_p03",
+  speaker: "patient",
+  text: "我信了四十年，只要我够有出息，那种被看见的感觉就会一直在。可我现在算明白了，我追的不是『有出息』，是『那一下』。我追丢了。",
+  emotion: "anxious",
+  autoNext: "tz3_c03",
+}
+```
+
+```ts-dialog
+// id: tz3_c03
+{
+  id: "tz3_c03",
+  speaker: "doctor",
+  text: "他把它叫「追丢了的那一下」——他很会形容自己的空。",
+  choices: [
+    { id: "tz3_c03_a", text: "「那一下，其实从没走。走的是你——你一头扎进『有出息』，把它留在了原地。」", kind: "empathy", effect: { trust: 1 }, next: "tz3_p04" },
+    { id: "tz3_c03_b", text: "「你说追丢了——你最近一次，想回头找它，是什么时候？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz3_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_p04
+{
+  id: "tz3_p04",
+  speaker: "patient",
+  text: "（他的肩膀塌下来）……就是这周。我回老家，翻出这支钢笔——是老科长送我的，我升职那天他塞我兜里的。我这四十年没敢用过，怕用坏了。我这阵子才敢拿出来看。",
+  emotion: "sad",
+  autoNext: "tz3_c04",
+}
+```
+
+```ts-dialog
+// id: tz3_c04
+{
+  id: "tz3_c04",
+  speaker: "doctor",
+  text: "他看清了自己手里一直攥着的东西。",
+  choices: [
+    { id: "tz3_c04_a", text: "「你四十年没敢用，是怕用坏钢笔，还是怕碰坏那一下？」", kind: "empathy", effect: { mood: 2 }, next: "tz3_p05" },
+    { id: "tz3_c04_b", text: "「钢笔是老科长给你的——他给的是笔，还是别的什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz3_p05" },
+    { id: "tz3_c04_c", text: "「一支破笔你守四十年，这不是念旧，这是放不下。」", kind: "confront", effect: { trust: -3, defense: 5 }, next: "tz3_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_p05
+{
+  id: "tz3_p05",
+  speaker: "patient",
+  text: "……我想让他再拍我一下。我想让他知道，我没辜负他。可我这阵子翻来覆去想，我怕的不是辜负他，是怕他看见现在的我，会失望——我这个『唐致远』，早就不是他拍肩的那个『小唐』了。",
+  emotion: "scared",
+  autoNext: "tz3_c05",
+}
+```
+
+```ts-dialog
+// id: tz3_c05
+{
+  id: "tz3_c05",
+  speaker: "doctor",
+  text: "核心信念露出来了：「不挂头衔的我，不值得被看见」。",
+  choices: [
+    { id: "tz3_c05_a", text: "「老科长当年拍的是『小唐』，不是『将来的唐行』——他看见的，恰恰是你现在怕被他失望的那部分。」", kind: "empathy", effect: { trust: 2, mood: 4 }, next: "tz3_p06" },
+    { id: "tz3_c05_b", text: "「你说他会失望——假如那个『小唐』真的还在，他会怎么看你这四十年？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "tz3_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_p06
+{
+  id: "tz3_p06",
+  speaker: "patient",
+  text: "最坏……他会说，致远，你跑太远了，都听不见我叫你了。可就算想清楚了这个，我还是不敢把『唐行』放下。因为那个声音会在我耳边说：你不挂头衔，谁还记得你？",
+  emotion: "anxious",
+  autoNext: "tz3_c06",
+}
+```
+
+```ts-dialog
+// id: tz3_c06
+{
+  id: "tz3_c06",
+  speaker: "doctor",
+  text: "他第一次把「放下头衔」和「被记得」摆到了一起——发现放下没那么可怕。",
+  choices: [
+    { id: "tz3_c06_a", text: "「那个声音说『谁还记得你』——它说的话，是老科长的话，还是你自己吓自己？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz3_p07" },
+    { id: "tz3_c06_b", text: "「你能把『放下头衔』和『被记得』分开想，这已经不是那个只会追位置的人了。」", kind: "silence", effect: { trust: 1 }, next: "tz3_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_p07
+{
+  id: "tz3_p07",
+  speaker: "patient",
+  text: "（他攥紧那支钢笔）……是我自己吓自己。老科长从来没说过『你得有出息我才看见你』。是我自己把『有出息』当成了被看见的门票。我四十年了，天天拿这张门票往里挤，就没想过，那门本来就没锁。",
+  emotion: "anxious",
+  autoNext: "tz3_c07",
+}
+```
+
+```ts-dialog
+// id: tz3_c07
+{
+  id: "tz3_c07",
+  speaker: "doctor",
+  text: "「那门本来就没锁」——他用了四十年，才敢推开。",
+  choices: [
+    { id: "tz3_c07_a", text: "「门没锁——那现在，你想推门进去，找的是谁？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz3_p08" },
+    { id: "tz3_c07_b", text: "「当你敢说『门没锁』，那个声音就已经不是你的主人了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "tz3_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_p08
+{
+  id: "tz3_p08",
+  speaker: "patient",
+  text: "（他反复摩挲着笔帽）……找『小唐』。我想让他知道，我没忘他。我这四十年把他藏得太深，他都快闷坏了。我要是真的把他放出来，说不定，我外孙喊的那声『姥爷』，才真有人答应。",
+  emotion: "calm",
+  autoNext: "tz3_c08",
+}
+```
+
+```ts-dialog
+// id: tz3_c08
+{
+  id: "tz3_c08",
+  speaker: "doctor",
+  text: "他开始敢让「小唐」出来了。",
+  choices: [
+    { id: "tz3_c08_a", text: "「要不要一起试试：今天回去，那个声音再响的时候，你就对自己说一句『小唐回来了』。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "tz3_p09" },
+    { id: "tz3_c08_b", text: "「『小唐』出来之后，你最想让他做的第一件事是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz3_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_p09
+{
+  id: "tz3_p09",
+  speaker: "patient",
+  text: "……陪我外孙好好吃顿饭，不掉米粒也不说他。再陪我妈坐坐——她八十五了，我这些年一年才回一次。我想让她叫一声『致远』，不是『唐行』。",
+  emotion: "neutral",
+  autoNext: "tz3_c09",
+}
+```
+
+```ts-dialog
+// id: tz3_c09
+{
+  id: "tz3_c09",
+  speaker: "doctor",
+  text: "最后一次会谈的收束。这一次，他想为家人，也为自己，把「小唐」叫回来。",
+  choices: [
+    { id: "tz3_c09_a", text: "「为家人，也为你自己——这两件事，其实是同一件事。」", kind: "empathy", effect: { trust: 1 }, next: "tz3_p10" },
+    { id: "tz3_c09_b", text: "「『小唐』回来之后，你想对自己说的第一句话是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz3_p10" },
+    { id: "tz3_c09_c", text: "「你要是真放不下那把椅子，那我也没办法。你自己看着办吧。」", kind: "logic", require: { trustAtMost: 40 }, effect: { trust: -10, defense: 10 }, next: "tz3_w01", hint: "仅信任≤40 时可见" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_p10
+{
+  id: "tz3_p10",
+  speaker: "patient",
+  text: "（他想了想，第一次笑得有点松）……『小唐，你回来啦』。就这句。我等了四十年，没人这样叫过我，我自己也没有。",
+  emotion: "happy",
+  autoNext: "tz3_c10",
+}
+```
+
+```ts-dialog
+// id: tz3_c10
+{
+  id: "tz3_c10",
+  speaker: "doctor",
+  text: "「小唐，你回来啦」——这是他六十年来，第一次允许自己被这样叫一声。",
+  choices: [
+    { id: "tz3_c10_a", text: "「这一声，是你用自己的声音叫的。把它带走。」", kind: "empathy", effect: { mood: 4 }, next: "tz3_out" },
+    { id: "tz3_c10_b", text: "「你觉得，那个二十二岁的『小唐』，听见这一声，会高兴吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz3_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_out
+{
+  id: "tz3_out",
+  speaker: "narration",
+  text: "第三次会谈结束。唐致远起身时，把那支钢笔从外套口袋换到了贴身的内袋里。他转身时，你看见他后背的外套不再绷得那么紧了。",
+  autoNext: "tz4_start",
+}
+```
+
+```ts-dialog
+// id: tz3_w01
+{
+  id: "tz3_w01",
+  speaker: "patient",
+  text: "（他沉默了很久，声音很冷）您说得对，我就是放不下那把椅子。我活该。反正我这四十年，也没人真觉得我这个人有什么可取的，他们记的，是『唐行』。",
+  emotion: "broken",
+  autoNext: "tz3_w02",
+}
+```
+
+```ts-dialog
+// id: tz3_w02
+{
+  id: "tz3_w02",
+  speaker: "doctor",
+  text: "他说错了话，把唐致远推进了「反正没人记得我这个人」的深坑。",
+  choices: [
+    { id: "tz3_w02_a", text: "「我不是这个意思，我只是……你得自己想开才行。」", kind: "logic", effect: { trust: -6, defense: 6 }, next: "tz3_w03" },
+    { id: "tz3_w02_b", text: "（他显然已经不想听了。你道歉，然后试着补救。）", kind: "empathy", effect: { trust: -3, mood: -4 }, next: "tz3_w03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz3_w03
+{
+  id: "tz3_w03",
+  speaker: "patient",
+  text: "……不用补救了。我本来就没指望谁。就这样吧，谢谢您今天的时间。",
+  emotion: "broken",
+  autoNext: "tz_end_worsen",
+}
+```
+
+### 节拍 4 · 转向 + 结局（trust 50→58，cure 主线分叉 + 安全网）
+
+```ts-dialog
+// id: tz4_start
+{
+  id: "tz4_start",
+  speaker: "narration",
+  text: "两周后是最后一次会谈。唐致远带来了一样东西——一张被翻软的旧照片，照片上是一个年轻人和一个中年人站在支行门口。「这周那声音再响，我就把照片拿出来看。」他说，「看着看着，我发现那声音翻来覆去就那几句。」",
+  autoNext: "tz4_p01",
+}
+```
+
+```ts-dialog
+// id: tz4_p01
+{
+  id: "tz4_p01",
+  speaker: "patient",
+  text: "它说的每一句我都认识。『你不挂头衔谁记得你』，『你退休了就什么都不是』。小时候是这话，现在还是这话。我现在能把它写下来，在旁边画个叉。这感觉挺怪的，但我心里踏实多了。",
+  emotion: "calm",
+  autoNext: "tz4_fork",
+}
+```
+
+```ts-dialog
+// id: tz4_fork
+{
+  id: "tz4_fork",
+  speaker: "doctor",
+  text: "他拿到了那张照片——这不是对抗，是他开始辨认那些话，而不是被它们牵着走。走到这里，有一条分岔需要他选择。",
+  choices: [
+    { id: "tz4_fork_a", text: "「我们来做最后一张清单：退休后允许自己做的事、能找到『小唐』的小习惯、你女儿和我都知道的求救信号。让安全网先替你兜一阵。」", kind: "special", effect: { trust: 1, mood: 2 }, next: "tz4_s01" },
+    { id: "tz4_fork_b", text: "「你不用现在就把那把椅子彻底搬走。学会带着它退休，也是一种答案。」", kind: "empathy", effect: { trust: 1 }, next: "tz4_a01" },
+    { id: "tz4_fork_c", text: "「老科长拍你那一下，从来没人替你说一句『他看见的是你这个人，不是你的位置』。今天，我想替四十年前那个小唐，说一次：他够了，你也够了。」", kind: "confront", require: { trust: 50 }, effect: { trust: 1, truth: 3 }, next: "tz4_h01", hint: "需要信任≥50" },
+  ],
+}
+```
+
+#### 安全网路径（cure 主线）
+
+```ts-dialog
+// id: tz4_s01
+{
+  id: "tz4_s01",
+  speaker: "patient",
+  text: "（他看着那张空白的清单，沉默了一会儿）……求救信号。我活了大半辈子，还没跟谁开过这个口。我总觉得，开口就是认输，就是『唐行』撑不住了。",
+  emotion: "neutral",
+  autoNext: "tz4_s02",
+}
+```
+
+```ts-dialog
+// id: tz4_s02
+{
+  id: "tz4_s02",
+  speaker: "doctor",
+  text: "他把「求救」当成了掉架子。",
+  choices: [
+    { id: "tz4_s02_a", text: "「求救不是认输。你女儿硬拉你来这一趟，也是一种求救——是她学会了替你接住自己。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "tz4_s03" },
+    { id: "tz4_s02_b", text: "「『唐行撑不住』——这句话，是那个声音说的，还是你信了四十年的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz4_s03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_s03
+{
+  id: "tz4_s03",
+  speaker: "patient",
+  text: "（他低头看着清单）……行，我写。我写『连着三天睡不着、又想把自己关屋里』就给我女儿打电话。还有，我答应您，会跟我妈说一句『我这一阵不太顺』。",
+  emotion: "calm",
+  autoNext: "tz4_s04",
+}
+```
+
+```ts-dialog
+// id: tz4_s04
+{
+  id: "tz4_s04",
+  speaker: "doctor",
+  text: "他亲手写下了第一条求救信号——这是他给那个声音上的第一道锁。",
+  choices: [
+    { id: "tz4_s04_a", text: "「你写得很清楚。这通电话打出去，不是你输了，是你终于让对的人帮你了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "tz4_s05" },
+    { id: "tz4_s04_b", text: "「跟妈妈说『不顺』——最难开口的，是『不顺』这两个字，还是 admitting 你也会不顺？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz4_s05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_s05
+{
+  id: "tz4_s05",
+  speaker: "patient",
+  text: "最难说的……是『我也会不顺』。我这些年都是跟家里说『没事』『都好』，没说过『我不顺』。我怕他们一听，就觉得我这个顶梁柱塌了。",
+  emotion: "sad",
+  autoNext: "tz4_s06",
+}
+```
+
+```ts-dialog
+// id: tz4_s06
+{
+  id: "tz4_s06",
+  speaker: "doctor",
+  text: "「没事」和「我不顺」之间，隔着四十年不敢开口的墙。",
+  choices: [
+    { id: "tz4_s06_a", text: "「下次心里又发空的时候，试着对你女儿说一句『爸这一阵不太顺』。就一句。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "tz4_s07" },
+    { id: "tz4_s06_b", text: "「你妈八十五了——她是不是也从没听你说过『不顺』？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz4_s07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_s07
+{
+  id: "tz4_s07",
+  speaker: "patient",
+  text: "（他闭了闭眼）……没说过。她一直以为她儿子是铁打的。我那时候以为，被需要就得撑着，撑不住也得装撑住。现在我知道了，装出来的撑，迟早把自己撑空。",
+  emotion: "neutral",
+  autoNext: "tz4_s08",
+}
+```
+
+```ts-dialog
+// id: tz4_s08
+{
+  id: "tz4_s08",
+  speaker: "doctor",
+  text: "「装出来的撑，迟早把自己撑空」——他正在用新的话，替换那条旧规矩。",
+  choices: [
+    { id: "tz4_s08_a", text: "「那现在，你还觉得只有『撑得住』才配被家人要吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz4_s09" },
+    { id: "tz4_s08_b", text: "「你外孙喊你『姥爷』的时候，他可从没查过你撑不撑得住。」", kind: "empathy", effect: { mood: 4 }, next: "tz4_s09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_s09
+{
+  id: "tz4_s09",
+  speaker: "patient",
+  text: "（他笑着摇头）……他喊我，纯粹是因为我是他姥爷，不是因为我有出息。我好像，一直欠自己这么一份不挂头衔的被要着。",
+  emotion: "calm",
+  autoNext: "tz4_s10",
+}
+```
+
+```ts-dialog
+// id: tz4_s10
+{
+  id: "tz4_s10",
+  speaker: "doctor",
+  text: "他看见了自己一直欠缺的东西——不是头衔，不是被记得，是被不带条件地要着。",
+  choices: [
+    { id: "tz4_s10_a", text: "「这份『要着』，你外孙先给了你。现在，轮到你自己给自己了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "tz4_s11" },
+    { id: "tz4_s10_b", text: "「你能说出『欠自己一份不挂头衔的被要着』——那个『小唐』，听见了。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz4_s11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_s11
+{
+  id: "tz4_s11",
+  speaker: "patient",
+  text: "（他摩挲着那支钢笔）……其实老科长当年给我的，不是这支笔。是『小唐，我看见你了』这句话。我守了四十年，守错了对象，守对了意思。我现在才敢把它接住。",
+  emotion: "calm",
+  autoNext: "tz4_s12",
+}
+```
+
+```ts-dialog
+// id: tz4_s12
+{
+  id: "tz4_s12",
+  speaker: "doctor",
+  text: "「守错了对象，守对了意思」——四十年的迷雾，被他一句话拨开了。",
+  choices: [
+    { id: "tz4_s12_a", text: "「你终于把那句话接住了。那支笔，从今天起，可以拿出来用了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "tz4_s13" },
+    { id: "tz4_s12_b", text: "「如果现在让二十二岁的『小唐』回到那张任命文件前，你最想跟他说什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz4_s13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_s13
+{
+  id: "tz4_s13",
+  speaker: "patient",
+  text: "（他沉默了一会儿，声音轻下来）……我会跟他说：致远，别跑太远，老科长叫你呢。你这一辈子，不是非得当『唐行』，当『小唐』也挺好。他太累了，跑了四十年，没人叫他一声。",
+  emotion: "sad",
+  autoNext: "tz4_s14",
+}
+```
+
+```ts-dialog
+// id: tz4_s14
+{
+  id: "tz4_s14",
+  speaker: "doctor",
+  text: "他给心里那个年轻人，补上了迟到四十年的那声「小唐」。",
+  choices: [
+    { id: "tz4_s14_a", text: "「这一声，二十二岁的他等到了。今天回家的路上，记得也对现在的自己叫一声。」", kind: "empathy", effect: { mood: 4 }, next: "tz4_s15" },
+    { id: "tz4_s14_b", text: "「你心里那个说『谁还记得你』的声音，听见你叫『小唐』，它还能站得住吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz4_s15" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_s15
+{
+  id: "tz4_s15",
+  speaker: "patient",
+  text: "（他笑了，眼眶却红着）……它应该会愣住吧。这么多年，还没人这样叫过它。医生，谢谢您。这句话，我好像大半辈子没跟人好好说过。",
+  emotion: "calm",
+  autoNext: "tz4_s16",
+}
+```
+
+```ts-dialog
+// id: tz4_s16
+{
+  id: "tz4_s16",
+  speaker: "doctor",
+  text: "「谢谢您」——他终于把压在胸口的那句话，放了出来。",
+  choices: [
+    { id: "tz4_s16_a", text: "「你最该谢的是自己——是你敢走进这间屋子，敢回头叫那一声『小唐』。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "tz4_s17" },
+    { id: "tz4_s16_b", text: "「回到家里，你最想做的第一件事是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz4_s17" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_s17
+{
+  id: "tz4_s17",
+  speaker: "patient",
+  text: "……用这支笔，给我外孙写封信。他还不认字，可等他认字了，能知道他姥爷叫唐致远，不叫唐行。我女儿说我最近睡得沉，打呼噜，说我六十了，睡觉倒像小孩。",
+  emotion: "happy",
+  autoNext: "tz4_s18",
+}
+```
+
+```ts-dialog
+// id: tz4_s18
+{
+  id: "tz4_s18",
+  speaker: "doctor",
+  text: "「睡觉像小孩」——这是他能得到的，最好的一句夸奖。",
+  choices: [
+    { id: "tz4_s18_a", text: "「那就继续睡得像个小孩。那张清单你留着，那个声音再来敲门，你知道怎么开门，也知道怎么请它走。」", kind: "empathy", effect: { mood: 4 }, next: "tz_end_cure" },
+    { id: "tz4_s18_b", text: "「四十年的『唐行』，你当够了。从今天起，学学当『小唐』。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz_end_cure" },
+  ],
+}
+```
+
+#### 接纳路径（acceptance）
+
+```ts-dialog
+// id: tz4_a01
+{
+  id: "tz4_a01",
+  speaker: "patient",
+  text: "（他点点头）……带着它退休。您说得对，我可能没法一下子把『唐行』从身上扒下来。他跟了我四十年，我允许他再住一阵。",
+  emotion: "neutral",
+  autoNext: "tz4_a02",
+}
+```
+
+```ts-dialog
+// id: tz4_a02
+{
+  id: "tz4_a02",
+  speaker: "doctor",
+  text: "他没有选择「彻底放下」，而是选择了「共处」——这也是一种向前。",
+  choices: [
+    { id: "tz4_a02_a", text: "「允许他住一阵，但把钥匙从他那儿拿回来——让他住，你来当家。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "tz4_a03" },
+    { id: "tz4_a02_b", text: "「他再响的时候，你会怎么回应他？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz4_a03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_a03
+{
+  id: "tz4_a03",
+  speaker: "patient",
+  text: "……我会跟他说：你跟了我四十年，我知道你是为我好。但我今天想歇着。说多了，他好像真的会小声一点。",
+  emotion: "calm",
+  autoNext: "tz4_a04",
+}
+```
+
+```ts-dialog
+// id: tz4_a04
+{
+  id: "tz4_a04",
+  speaker: "doctor",
+  text: "他在「歇着」和「有出息」之间，第一次站到了歇着这一边。",
+  choices: [
+    { id: "tz4_a04_a", text: "「那个声音会小声一点——不是因为你赢了他，是因为你不再怕他了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "tz4_a05" },
+    { id: "tz4_a04_b", text: "「如果有一天他真的完全安静了，你打算拿省下来的力气做什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "tz4_a05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_a05
+{
+  id: "tz4_a05",
+  speaker: "patient",
+  text: "（他想了想）……多回几趟老家，给我妈做顿饭。她老人家，吃了大半辈子我做的『有事不回家』。我这些年，连她生日都没赶上几回。",
+  emotion: "neutral",
+  autoNext: "tz_end_accept",
+}
+```
+
+#### 隐藏路径（hidden · 强制介入）
+
+```ts-dialog
+// id: tz4_h01
+{
+  id: "tz4_h01",
+  speaker: "patient",
+  text: "（他愣住了，半晌没说话。然后眼睛红了）……从来没有人说过他够了。我自己，也从来没对自己说过。您替他……替我说了。",
+  emotion: "broken",
+  autoNext: "tz4_h02",
+}
+```
+
+```ts-dialog
+// id: tz4_h02
+{
+  id: "tz4_h02",
+  speaker: "doctor",
+  text: "四十年的「必须有用」，终于有人替他站了出来。但接下来，有个更重的决定需要你面对。",
+  choices: [
+    { id: "tz4_h02_a", text: "「我打算联系你女儿，还有你母亲。有些话，不该只有你一个人扛着。」", kind: "special", effect: { mood: -3 }, next: "tz4_h03" },
+    { id: "tz4_h02_b", text: "「我们先把这件事放在这儿，等你准备好再说。」", kind: "empathy", effect: { trust: 1 }, next: "tz4_h05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_h03
+{
+  id: "tz4_h03",
+  speaker: "patient",
+  text: "（他的声音发抖）联系我妈？您……您要跟我妈说『唐致远这些年其实撑得很苦』？医生，我怕。我妈八十五了，我怕她一听，就受不了。",
+  emotion: "scared",
+  autoNext: "tz4_h04",
+}
+```
+
+```ts-dialog
+// id: tz4_h04
+{
+  id: "tz4_h04",
+  speaker: "doctor",
+  text: "他害怕，但这一次，他愿意让你扶着他，把那句话递到母亲手里。",
+  choices: [
+    { id: "tz4_h04_a", text: "「你怕，是因为这些年你一个人扛。现在你六十了，身后有我，有你女儿，有你妈。」", kind: "special", effect: { truth: 3, mood: -2 }, next: "tz_end_hidden" },
+    { id: "tz4_h04_b", text: "「我们先不急着说。把这句话放在心里，等你觉得能开口的那天，我们再说。」", kind: "empathy", effect: { trust: 1 }, next: "tz4_h05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: tz4_h05
+{
+  id: "tz4_h05",
+  speaker: "patient",
+  text: "（他垂下眼睛）……好。等我觉得能说的时候，我再跟您说。谢谢您没有逼我。",
+  emotion: "neutral",
+  autoNext: "tz_end_accept",
+}
+```
+
+---
+
+## 三、结局
+
+```ts-dialog
+// id: tz_end_cure
+{
+  id: "tz_end_cure",
+  speaker: "narration",
+  text: "〔结局 · 治愈〕",
+  isEnding: true,
+  endingType: "cure",
+  endingTitle: "小唐，你回来啦",
+  endingText: "三个月后，唐致远来信。他用那支旧钢笔，给外孙写了一封 Sloppy 的信，落款是『姥爷唐致远』。他说他现在每周回一趟老家，给他妈做顿饭，偶尔还是会心里发空，但发空的时候，会对着窗外那棵梧桐，轻轻叫自己一声『小唐』。他说：那棵梧桐黄了又绿，我今年，终于看清它的叶子了。",
+  endingReward: { doctorReputation: 8, doctorMoney: 300, doctorExp: 50, doctorSanity: 5 },
+}
+```
+
+```ts-dialog
+// id: tz_end_accept
+{
+  id: "tz_end_accept",
+  speaker: "narration",
+  text: "〔结局 · 接纳〕",
+  isEnding: true,
+  endingType: "acceptance",
+  endingTitle: "与『唐行』共处",
+  endingText: "唐致远没有再约新的会谈，但他每隔两个月会来一趟，坐一会儿，跟你聊几句。他说『唐行』那个声音还在，偶尔还是会冲他喊『你不挂头衔谁记得你』。他现在会回一句：知道了，我今天想歇着。他说，这不是赢，但他终于觉得，那是他自己的日子了。",
+  endingReward: { doctorReputation: 4, doctorMoney: 180, doctorExp: 35, doctorSanity: 6 },
+}
+```
+
+```ts-dialog
+// id: tz_end_hidden
+{
+  id: "tz_end_hidden",
+  speaker: "narration",
+  text: "〔结局 · 隐藏·那声小唐〕",
+  isEnding: true,
+  endingType: "hidden",
+  endingTitle: "那声小唐",
+  endingText: "你约谈了唐致远八十五岁的母亲。老人坐在你对面，听到『他这些年其实撑得很苦，他怕你担心，从没说过不顺』时，她很久没说话。最后她说：『我那个老三啊，从小就闷着。』后来，唐致远给你打过一次电话，说他妈破天荒地摸着他的脸，叫了他一声『致远』。他说他挂了电话，一个人在院子里哭了很久。这段母子情没有和解的台词，但终于有人，替那个闷了一辈子的『小唐』，把话说出来了。",
+  endingReward: { doctorReputation: -10, doctorMoney: 100, doctorExp: 80, doctorSanity: -15 },
+}
+```
+
+```ts-dialog
+// id: tz_end_worsen
+{
+  id: "tz_end_worsen",
+  speaker: "narration",
+  text: "〔结局 · 恶化〕",
+  isEnding: true,
+  endingType: "worsen",
+  endingTitle: "那把空椅子",
+  endingText: "唐致远没有再来。他女儿后来转来一条消息：他把自己关在书房里，整夜整夜地整理那些旧文件，三天没出门，被女儿硬送去检查，查出血压飙高、严重失眠。她说，他醒来的第一句话是『又给你们添麻烦了』。那把行长椅早就搬走了，可他心里那把空椅子，最终还是没人替『小唐』坐上去。",
+  endingReward: { doctorReputation: -8, doctorMoney: 50, doctorExp: 10, doctorSanity: -20 },
+}
+```
+
+---
+
+## 六、状态
+
+- [x] v3 机器可解析格式（ts-meta + ts-dialog 全部就位）
+- [x] trust 锚点 15→28→40→50→58；truth 0→40；碎片 1 枚 @30
+- [x] 恶化入口 @trust≤40（tz3_c09_c）；隐藏结局 @trust50（tz4_fork_c）
+- [x] cure 主线 40 轮（4 节拍各 10 轮）
+- [x] 转换器生成 + 走线验收（`node scripts/md-to-patient.mjs docs/stories/tang-zhiyuan-v3.md --walk`）

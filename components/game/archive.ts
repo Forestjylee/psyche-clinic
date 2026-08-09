@@ -27,11 +27,10 @@ export function seenPatientIds(game: GameState): Set<string> {
   return seen;
 }
 
-/** 患者全量 id → 剧本 索引（手写 allPatients 在前、generatedScenarios 在后，保持出现顺序） */
-export function scenarioIndex(game: GameState): Map<string, PatientScenario> {
+/** 患者全量 id → 剧本 索引（手写 allPatients，glob 聚合目录内全部剧本） */
+export function scenarioIndex(): Map<string, PatientScenario> {
   const m = new Map<string, PatientScenario>();
   for (const p of allPatients) m.set(p.id, p);
-  for (const p of game.generatedScenarios) m.set(p.id, p);
   return m;
 }
 
@@ -39,7 +38,7 @@ export function scenarioIndex(game: GameState): Map<string, PatientScenario> {
 export function archivePatients(game: GameState): PatientScenario[] {
   const seen = seenPatientIds(game);
   const out: PatientScenario[] = [];
-  for (const p of scenarioIndex(game).values()) {
+  for (const p of scenarioIndex().values()) {
     if (seen.has(p.id)) out.push(p);
   }
   return out;

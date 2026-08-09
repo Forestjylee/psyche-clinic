@@ -25,6 +25,7 @@ import {
   advanceDayState,
   todayCapacity,
   queueTarget,
+  replenishArrivals,
   REPUTATION_LOSS_PER_ABANDON,
   RETURN_VISIT_DELAY,
   resolveDueReturns,
@@ -34,6 +35,7 @@ import {
 import { allPatients, GUIDED_PATIENT_ID } from "./data/patients";
 import { AchievementEngine } from "./engine/AchievementEngine";
 import { DialogueEngine } from "./engine/DialogueEngine";
+import { pickReturnVisitPatient } from "./engine/returnVisit";
 import { allSkills, allClinicUpgrades } from "./data/skills";
 import {
   decorById,
@@ -57,7 +59,6 @@ export type Scene =
   | "clinic_upgrades"
   | "letters"
   | "tracking"
-  | "generator"
   | "achievements"
   | "discover"
   | "archive";
@@ -86,25 +87,23 @@ export interface EndingData {
   patientId?: string;
 }
 
-const MAX_GENERATED = 8;
-
 // 递增 ID 计数器（store 单例，模块级即可）
 let toastId = 0;
 let floatId = 0;
 
 export type SoundName = Parameters<ReturnType<typeof getSound>["play"]>[0];
 
-/** 按 id 查找患者剧本（手写 + 生成） */
+/** 按 id 查找患者剧本（手写池） */
 export function scenarioById(
-  g: GameState,
+  _g: GameState,
   id: string
 ): PatientScenario | undefined {
-  return [...allPatients, ...g.generatedScenarios].find((p) => p.id === id);
+  return allPatients.find((p) => p.id === id);
 }
 
 /** 当前可接诊的患者（未完成、未离开、且声望已解锁） */
 function serveablePatients(g: GameState): PatientScenario[] {
-  return [...allPatients, ...g.generatedScenarios].filter(
+  return allPatients.filter(
     (p) =>
       !g.patientRecords[p.id] &&
       !g.abandoned.includes(p.id) &&
@@ -112,21 +111,8 @@ function serveablePatients(g: GameState): PatientScenario[] {
   );
 }
 
-/**
- * 记录已用种子 id 用于去重：seedId 已存在说明上一轮池已耗尽、回退全池重洗，
- * 此时重置本轮去重记录重新开始；否则加入已用列表。
- */
 /** P5-3：本次会话是否为危机接诊（患者等待≥4天），startSession 记录、finishSession 结算用 */
 let lastSessionCritical = false;
-
-function markSeedUsed(g: GameState, s: PatientScenario): void {
-  if (!s.seedId) return;
-  if (g.usedSeeds.includes(s.seedId)) {
-    g.usedSeeds = [s.seedId];
-  } else {
-    g.usedSeeds.push(s.seedId);
-  }
-}
 
 export interface GameStore {
   // —— 状态 ——
@@ -174,10 +160,8 @@ export interface GameStore {
   toggleDecor: (decorId: string) => void;
   /** 装修（P5-1）：保存花/画摆放位置（拖动落格） */
   setDecorPosition: (decorId: string, x: number, y: number) => void;
-  generateScenario: (opts: Record<string, unknown>, random: boolean) => void;
-  deleteScenario: (id: string) => void;
   // —— 发现客户 ——
-  discover: (channelId: string) => Promise<void>;
+  discover: (channelId: string) => void;
   invite: (candidateId: string) => void;
   discardCandidate: (candidateId: string) => void;
   saveNow: () => void;
@@ -296,49 +280,49 @@ export const useGameStore = create<GameStore>((set, get) => {
     if (unlock.fragment) {
       get().unlockFragment(unlock.fragment.patientId, unlock.fragment.fragmentId);
     }
-    // 4) 特殊回访：患者已治愈/接纳/觉醒（回访语义结局）且无待办回访 → 安排一次额外探望；其它结局或未接待静默跳过
+    // 4) 特殊回访：从已治愈/接纳/觉醒且无待办回访的患者中动态选一位（unlock.returnVisit==="auto"），
+    //    安排一次额外探望；无候选静默跳过。患者 id 直选仅兼容旧数据。
     if (unlock.returnVisit) {
-      const pid = unlock.returnVisit;
-      const rec = g.patientRecords[pid];
-      if (rec === "cure" || rec === "acceptance" || rec === "awakening") {
-        const existing = g.returnVisits[pid];
-        if (!existing || existing.seen) {
-          g.returnVisits[pid] = {
-            ending: rec,
-            dueDay: g.day + 1,
-            arrived: false,
-            seen: false,
-          };
-          const p = scenarioById(g, pid);
-          toast(`收到消息：${p?.name ?? "一位故人"}想再来看看你。`, "ok");
+      const pid =
+        unlock.returnVisit === "auto"
+          ? pickReturnVisitPatient(g)
+          : unlock.returnVisit;
+      if (pid) {
+        const rec = g.patientRecords[pid];
+        if (rec === "cure" || rec === "acceptance" || rec === "awakening") {
+          const existing = g.returnVisits[pid];
+          if (!existing || existing.seen) {
+            g.returnVisits[pid] = {
+              ending: rec,
+              dueDay: g.day + 1,
+              arrived: false,
+              seen: false,
+            };
+            const p = scenarioById(g, pid);
+            toast(`收到消息：${p?.name ?? "一位故人"}想再来看看你。`, "ok");
+          }
         }
       }
     }
   };
 
-  /** 补充预约清单：低于目标人数时自动生成新客户加入，并写入通知消息 */
-  const replenishQueue = async () => {
+  /** 补充预约清单：已到达候诊的手写患者数低于目标时，按难度分桶随机补足新到达患者，并写入通知消息 */
+  const replenishQueue = () => {
     const g = get().game;
-    const added: string[] = [];
-    while (
-      serveablePatients(g).length < queueTarget(g) &&
-      g.generatedScenarios.length < MAX_GENERATED
-    ) {
-      const { generateScenario: gen } = await import("./data/generator");
-      const s = gen({ excludeSeeds: g.usedSeeds }, g.doctor.reputation);
-      markSeedUsed(g, s);
-      g.generatedScenarios.unshift(s);
-      added.push(s.name);
+    const arrivals = replenishArrivals(g);
+    for (const id of arrivals) {
+      g.arrivedPatients.push(id);
     }
-    for (const name of added) {
+    for (const id of arrivals) {
+      const p = allPatients.find((x) => x.id === id);
       g.messages.unshift({
-        id: `notice-${g.day}-${name}`,
+        id: `arrive-${g.day}-${id}`,
         kind: "notice",
-        title: "新客户预约",
-        body: `${name} 预约了心理咨询，已加入今日预约清单。`,
+        title: "新客户到访",
+        body: `${p?.name ?? id} 今天来到了诊所，已加入今日预约清单。`,
         day: g.day,
         read: false,
-        patientName: name,
+        patientName: p?.name ?? id,
       });
     }
     commit();
@@ -434,6 +418,8 @@ export const useGameStore = create<GameStore>((set, get) => {
         return;
       }
       if (!g.todayServed.includes(p.id)) g.todayServed.push(p.id);
+      // 逐日随机到达：任何会话开始的患者视为已到达（含断点恢复/复诊/旧档迁入患者）
+      if (!g.arrivedPatients.includes(p.id)) g.arrivedPatients.push(p.id);
       // P5-3 危机接诊标记：患者等待≥4天视为沉重病例（与成就口径一致），结算时消耗理智
       lastSessionCritical = (g.waitingDays[p.id] ?? 0) >= 4;
       // 病情恶化可逆：患者来就诊，等待天数归零，暂缓放弃
@@ -445,8 +431,11 @@ export const useGameStore = create<GameStore>((set, get) => {
 
     restOneDay: async () => {
       const g = get().game;
-      // 日终：重置名额 + 患者等待天数推进（恶化/放弃）
-      const events = advanceDayState(g, serveablePatients(g));
+      // 日终：重置名额 + 患者等待天数推进（恶化/放弃）——仅推进已到达候诊的手写患者
+      const events = advanceDayState(
+        g,
+        serveablePatients(g).filter((p) => g.arrivedPatients.includes(p.id))
+      );
       g.day += 1;
       // 治愈回访到达：写入回访信（温暖闭环，非治疗）
       for (const r of resolveDueReturns(g)) {
@@ -463,16 +452,14 @@ export const useGameStore = create<GameStore>((set, get) => {
           tone: "thanks",
         });
       }
-      // 发现客户：到期的已邀约客户入预约清单（满额顺延）；未邀约候选过期清除
-      const arrivedNames: string[] = [];
+      // 发现客户：到期的已邀约客户标记到达（arrivedPatients）；未邀约候选过期清除
+      const arrivedIds: string[] = [];
       const keepArrivals: PendingArrival[] = [];
       for (const a of g.pendingArrivals) {
         if (a.arriveDay <= g.day) {
-          if (g.generatedScenarios.length < MAX_GENERATED) {
-            g.generatedScenarios.unshift(a.scenario);
-            arrivedNames.push(a.scenario.name);
-          } else {
-            keepArrivals.push({ ...a, arriveDay: g.day + 1 });
+          if (!g.arrivedPatients.includes(a.patientId)) {
+            g.arrivedPatients.push(a.patientId);
+            arrivedIds.push(a.patientId);
           }
         } else {
           keepArrivals.push(a);
@@ -483,15 +470,16 @@ export const useGameStore = create<GameStore>((set, get) => {
       g.discoveryCandidates = g.discoveryCandidates.filter(
         (c) => c.expireDay > g.day
       );
-      for (const name of arrivedNames) {
+      for (const id of arrivedIds) {
+        const p = allPatients.find((x) => x.id === id);
         g.messages.unshift({
-          id: `arrive-${g.day}-${name}`,
+          id: `arrive-${g.day}-${id}`,
           kind: "notice",
           title: "新客户到访",
-          body: `${name} 接受了你的邀约，今日到诊，已加入预约清单。`,
+          body: `${p?.name ?? id} 接受了你的邀约，今日到诊，已加入预约清单。`,
           day: g.day,
           read: false,
-          patientName: name,
+          patientName: p?.name ?? id,
         });
       }
       if (g.discoveryCandidates.length < candidatesBefore) {
@@ -515,7 +503,7 @@ export const useGameStore = create<GameStore>((set, get) => {
         g.stats.noLossDays += 1;
       g.stats.sanityStreak =
         g.doctor.sanity >= 60 ? g.stats.sanityStreak + 1 : 0;
-      get().achievementEngine?.onInviteesArrived(arrivedNames.length);
+      get().achievementEngine?.onInviteesArrived(arrivedIds.length);
       get().achievementEngine?.onGameStateSynced(g);
       commit();
       playSound("rest");
@@ -559,8 +547,8 @@ export const useGameStore = create<GameStore>((set, get) => {
           });
         }
       }
-      // 候诊区补充新患者
-      await replenishQueue();
+      // 候诊区补充新到达患者（难度分桶随机补足）
+      replenishQueue();
     },
 
     learnSkill: (id: string) => {
@@ -635,35 +623,7 @@ export const useGameStore = create<GameStore>((set, get) => {
       commit();
     },
 
-    generateScenario: (opts: Record<string, unknown>, random: boolean) => {
-      const g = get().game;
-      if (g.generatedScenarios.length >= MAX_GENERATED) {
-        toast(`已达上限 ${MAX_GENERATED} 个，请先移除部分剧本`);
-        playSound("locked");
-        return;
-      }
-      // 动态导入避免循环
-      import("./data/generator").then(({ generateScenario: gen }) => {
-        const scenario = gen(
-          random ? { excludeSeeds: g.usedSeeds } : opts,
-          g.doctor.reputation
-        );
-        markSeedUsed(g, scenario);
-        g.generatedScenarios.unshift(scenario);
-        commit();
-        playSound("page");
-        toast(`已生成新剧本：${scenario.name}（${scenario.difficulty}）`);
-      });
-    },
-
-    deleteScenario: (id: string) => {
-      const g = get().game;
-      g.generatedScenarios = g.generatedScenarios.filter((x) => x.id !== id);
-      commit();
-      toast("已移除该剧本");
-    },
-
-    discover: async (channelId: string) => {
+    discover: (channelId: string) => {
       const g = get().game;
       const ch = discoveryChannels.find((c) => c.id === channelId);
       if (!ch) return;
@@ -682,33 +642,46 @@ export const useGameStore = create<GameStore>((set, get) => {
       g.stats.discoverCount += 1;
       if (!g.stats.channelsUsed.includes(channelId))
         g.stats.channelsUsed.push(channelId);
-      const { generateScenario: gen } = await import("./data/generator");
+      // 候选从手写患者池随机选：可接诊 + 未到达 + 未被其他候选预占（SPEC v1.5.0，不再生成患者）
       const count =
         ch.minCount + Math.floor(Math.random() * (ch.maxCount - ch.minCount + 1));
+      const pool = allPatients.filter(
+        (p) =>
+          !g.arrivedPatients.includes(p.id) &&
+          !g.patientRecords[p.id] &&
+          !g.abandoned.includes(p.id) &&
+          !g.discoveryCandidates.some((c) => c.patientId === p.id)
+      );
       const names: string[] = [];
-      for (let i = 0; i < count; i++) {
-        const s = gen({ excludeSeeds: g.usedSeeds }, g.doctor.reputation);
-        markSeedUsed(g, s);
+      for (let i = 0; i < count && pool.length > 0; i++) {
+        const idx = Math.floor(Math.random() * pool.length);
+        const pick = pool.splice(idx, 1)[0];
         g.discoveryCandidates.unshift({
           id: `disc-${Date.now()}-${i}`,
-          scenario: s,
+          patientId: pick.id,
           channelId,
           expireDay: g.day + 1,
         });
-        names.push(s.name);
+        names.push(pick.name);
+      }
+      if (names.length === 0) {
+        commit();
+        playSound("locked");
+        toast("暂时没有新的可发现客户，患者都已到诊或结案", "warn");
+        return;
       }
       g.messages.unshift({
         id: `disc-${g.day}-${channelId}-${Date.now()}`,
         kind: "notice",
         title: "发现新客户",
-        body: `通过「${ch.name}」发现 ${count} 位潜在客户：${names.join("、")}。请决定是否发送邀约。`,
+        body: `通过「${ch.name}」发现 ${names.length} 位潜在客户：${names.join("、")}。请决定是否发送邀约。`,
         day: g.day,
         read: false,
         patientName: names[0],
       });
       commit();
       playSound("page");
-      toast(`花费 $${ch.cost}，发现 ${count} 位潜在客户`, "ok");
+      toast(`花费 $${ch.cost}，发现 ${names.length} 位潜在客户`, "ok");
     },
 
     invite: (candidateId: string) => {
@@ -717,7 +690,8 @@ export const useGameStore = create<GameStore>((set, get) => {
       if (idx < 0) return;
       const cand = g.discoveryCandidates[idx];
       g.discoveryCandidates.splice(idx, 1);
-      const name = cand.scenario.name;
+      const patient = allPatients.find((p) => p.id === cand.patientId);
+      const name = patient?.name ?? cand.patientId;
       const rate = inviteAcceptRate(cand.channelId, g.doctor.reputation);
       const accepted = Math.random() < rate;
       // 成就累计：发出邀约次数
@@ -727,9 +701,12 @@ export const useGameStore = create<GameStore>((set, get) => {
         let offset = arrivalDayOffset();
         // 今日名额已满则顺延至明日
         if (offset === 0 && g.slot >= todayCapacity(g)) offset = 1;
-        g.pendingArrivals.push({ scenario: cand.scenario, arriveDay: g.day + offset });
+        g.pendingArrivals.push({
+          patientId: cand.patientId,
+          arriveDay: g.day + offset,
+        });
         g.messages.unshift({
-          id: `invite-ok-${g.day}-${cand.scenario.id}`,
+          id: `invite-ok-${g.day}-${cand.patientId}`,
           kind: "notice",
           title: "邀约成功",
           body: `${name} 接受了你的邀约，${offset === 0 ? "今日" : offset === 1 ? "明日" : "后日"}到诊。`,
@@ -743,7 +720,7 @@ export const useGameStore = create<GameStore>((set, get) => {
       } else {
         g.stats.rejectCount += 1;
         g.messages.unshift({
-          id: `invite-no-${g.day}-${cand.scenario.id}`,
+          id: `invite-no-${g.day}-${cand.patientId}`,
           kind: "notice",
           title: "邀约被婉拒",
           body: `${name} 婉拒了你的邀约，表示暂时不需要。`,
@@ -763,14 +740,16 @@ export const useGameStore = create<GameStore>((set, get) => {
       if (idx < 0) return;
       const cand = g.discoveryCandidates[idx];
       g.discoveryCandidates.splice(idx, 1);
+      const name =
+        allPatients.find((p) => p.id === cand.patientId)?.name ?? cand.patientId;
       g.messages.unshift({
-        id: `discard-${g.day}-${cand.scenario.id}`,
+        id: `discard-${g.day}-${cand.patientId}`,
         kind: "notice",
         title: "暂不考虑",
-        body: `${cand.scenario.name} 的邀约未发送，对方已另寻帮助。`,
+        body: `${name} 的邀约未发送，对方已另寻帮助。`,
         day: g.day,
         read: false,
-        patientName: cand.scenario.name,
+        patientName: name,
       });
       commit();
       playSound("click");
@@ -937,8 +916,8 @@ export const useGameStore = create<GameStore>((set, get) => {
       });
       // P5-3 归零温情场景：结算后理智归零 → 结局页关闭时进入梦境（restDreamPending 只留这一处写）
       if (get().game.doctor.sanity <= 0) set({ restDreamPending: true });
-      // 每接诊 2 位，候诊区补充一位新患者
-      if (g.slot % 2 === 0) void replenishQueue();
+      // 每接诊 2 位，候诊区补充一位新到达患者
+      if (g.slot % 2 === 0) replenishQueue();
     },
 
     markAllMessagesRead: () => {

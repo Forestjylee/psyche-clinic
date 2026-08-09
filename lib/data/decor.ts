@@ -6,7 +6,7 @@ import type { FacilityPosition } from "../types";
  *  - variant  设施升级解锁的外观变体（换垫/换板/加顶饰等），画在对应设施上；
  *  - flower   治愈/接纳结局的患者送的花，独立摆放；
  *  - picture  记忆碎片解锁的挂画，独立摆放。
- * 生成患者（generatedScenarios）无稳定故事，不做花/画；仅手写患者有。
+ * 仅手写患者（glob 池）有稳定故事，做花/画纪念物。
  */
 
 export type DecorSource =
@@ -77,7 +77,7 @@ export const DECOR_DEFS: DecorDef[] = [
     slot: "receptionist",
     size: { w: 40, h: 56 },
   },
-  // ========== 治愈患者送的花（4 个） ==========
+  // ========== 治愈患者送的花（2 个） ==========
   {
     id: "flower_xiao_bei",
     name: "小北的花",
@@ -98,27 +98,7 @@ export const DECOR_DEFS: DecorDef[] = [
     size: { w: 30, h: 34 },
     defaultPos: { x: 420, y: 290 },
   },
-  {
-    id: "flower_chen_lo",
-    name: "陈洛的花",
-    story: "陈洛寄来的向日葵，说辞职那天在花店前站了很久——原来他也会为无关 deadline 的东西停下来。",
-    source: { kind: "patient", patientId: "chen_lo" },
-    kind: "flower",
-    slot: "flower_chen_lo",
-    size: { w: 30, h: 34 },
-    defaultPos: { x: 200, y: 440 },
-  },
-  {
-    id: "flower_zhou_mingyuan",
-    name: "周明远的花",
-    story: "周明远叫人送来一盆兰花，附了张字条：这杯水，终于没有怪味了。",
-    source: { kind: "patient", patientId: "zhou_mingyuan" },
-    kind: "flower",
-    slot: "flower_zhou_mingyuan",
-    size: { w: 30, h: 34 },
-    defaultPos: { x: 640, y: 440 },
-  },
-  // ========== 成就解锁的旅程纪念物（3 个，无患者，暖阳固定配色） ==========
+  // ========== 成就解锁的旅程纪念物（5 个，无患者，暖阳固定配色） ==========
   {
     id: "trophy_first_heal",
     name: "向阳花",
@@ -149,7 +129,27 @@ export const DECOR_DEFS: DecorDef[] = [
     size: { w: 30, h: 34 },
     defaultPos: { x: 60, y: 180 },
   },
-  // ========== 记忆碎片挂画（4 个，每个患者第一块碎片） ==========
+  {
+    id: "trophy_clarity",
+    name: "澄明灯",
+    story: "把真相说到九十五分以上的那一天，你给诊室添了一盏小灯。它不耀眼，正好照亮那些说不出口的话。",
+    source: { kind: "achievement" },
+    kind: "flower",
+    slot: "trophy_clarity",
+    size: { w: 30, h: 34 },
+    defaultPos: { x: 200, y: 340 },
+  },
+  {
+    id: "trophy_warmth",
+    name: "守望的花",
+    story: "探望过一位位回来的故人之后，你摆下一盆守望的花——有人回来，它就开一朵。",
+    source: { kind: "achievement" },
+    kind: "flower",
+    slot: "trophy_warmth",
+    size: { w: 30, h: 34 },
+    defaultPos: { x: 320, y: 420 },
+  },
+  // ========== 记忆碎片挂画（2 个，每个患者第一块碎片） ==========
   {
     id: "picture_xiao_bei_m1",
     name: "饭桌上的比较·记忆画",
@@ -169,26 +169,6 @@ export const DECOR_DEFS: DecorDef[] = [
     slot: "picture_lin_xiao_m1",
     size: { w: 46, h: 38 },
     defaultPos: { x: 860, y: 120 },
-  },
-  {
-    id: "picture_chen_lo_m1",
-    name: "凌晨两点的饮水机·记忆画",
-    story: "这是陈洛的过去一角，挂在墙上，提醒你为什么坐在这里。",
-    source: { kind: "fragment", patientId: "chen_lo", fragmentId: "chen_m1" },
-    kind: "picture",
-    slot: "picture_chen_lo_m1",
-    size: { w: 46, h: 38 },
-    defaultPos: { x: 700, y: 300 },
-  },
-  {
-    id: "picture_zhou_mingyuan_m1",
-    name: "杯底的白色·记忆画",
-    story: "这是周明远的过去一角，挂在墙上，提醒你为什么坐在这里。",
-    source: { kind: "fragment", patientId: "zhou_mingyuan", fragmentId: "zhou_m1" },
-    kind: "picture",
-    slot: "picture_zhou_mingyuan_m1",
-    size: { w: 46, h: 38 },
-    defaultPos: { x: 880, y: 320 },
   },
 ];
 

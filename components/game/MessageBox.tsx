@@ -34,11 +34,11 @@ export function MessageBox() {
 
   const palettes = useMemo(() => {
     const m = new Map<string, PatientPalette>();
-    for (const p of [...allPatients, ...game.generatedScenarios]) {
+    for (const p of allPatients) {
       if (!m.has(p.name)) m.set(p.name, p.palette);
     }
     return m;
-  }, [game.generatedScenarios]);
+  }, []);
 
   const counts = useMemo(() => {
     const c = { all: game.messages.length, letter: 0, warning: 0, notice: 0 };

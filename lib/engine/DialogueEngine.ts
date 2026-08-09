@@ -192,6 +192,8 @@ export class DialogueEngine {
     const r = choice.require;
     if (!r) return true;
     if (r.trust !== undefined && this.state.trust < r.trust) return false;
+    // 信任上限：仅低信任（失误累积）玩家可选，正常信任玩家不可见恶化入口
+    if (r.trustAtMost !== undefined && this.state.trust > r.trustAtMost) return false;
     if (r.defense !== undefined && this.state.defense > r.defense) return false;
     if (r.mood !== undefined && this.state.mood < r.mood) return false;
     if (r.truth !== undefined && this.state.truth < r.truth) return false;

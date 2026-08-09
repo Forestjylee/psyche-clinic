@@ -15,7 +15,6 @@ import { SkillsTree } from "./SkillsTree";
 import { ClinicUpgrades } from "./ClinicUpgrades";
 import { MessageBox } from "./MessageBox";
 import { Tracking } from "./Tracking";
-import { Generator } from "./Generator";
 import { DiscoveryScene } from "./DiscoveryScene";
 import { AchievementsPage } from "./AchievementsPage";
 import { PatientArchive } from "./PatientArchive";
@@ -64,7 +63,6 @@ export function GameApp() {
         {scene === "clinic_upgrades" ? <ClinicUpgrades /> : null}
         {scene === "letters" ? <MessageBox /> : null}
         {scene === "tracking" ? <Tracking /> : null}
-        {scene === "generator" ? <Generator /> : null}
         {scene === "discover" ? <DiscoveryScene /> : null}
         {scene === "achievements" ? <AchievementsPage /> : null}
         {scene === "archive" ? <PatientArchive /> : null}

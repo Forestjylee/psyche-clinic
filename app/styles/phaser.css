@@ -27,94 +27,22 @@
   letter-spacing: 2px;
 }
 
-/* 预约清单入口（M1 过渡，M2 患者场景化后移除或降级） */
-.clinic-list-toggle {
-  position: fixed;
-  right: 20px;
-  top: 96px;
-  z-index: 20;
-  padding: 10px 16px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #fff;
-  font-weight: 600;
-  font-size: 14px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 14px var(--accent-glow);
-  transition: transform 0.15s;
-}
-.clinic-list-toggle:hover {
-  transform: translateY(-1px);
+/* ========== 首页本体（SPEC §15 v1.4.0） ==========
+   预约清单直放首页：全屏背景铺满，内容区居中限宽，底部留白给 BottomBar（fixed 底部） */
+.scene.clinic .clinic-header,
+.scene.clinic .clinic-body {
+  width: 100%;
+  max-width: 1240px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.clinic-list-mask {
-  position: fixed;
-  inset: 0;
-  z-index: 120;
-  background: rgba(10, 8, 6, 0.62);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 28px 16px 90px;
-}
-.clinic-list-mask .scene.clinic {
-  max-width: 1000px;
-  width: 100%;
-}
-.clinic-list-close {
-  position: fixed;
-  left: 50%;
-  bottom: 24px;
-  transform: translateX(-50%);
-  z-index: 130;
-  padding: 12px 30px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #fff;
-  font-weight: 700;
-  font-size: 15px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 6px 18px var(--accent-glow);
-}
-
-/* ========== 设施升级面板（浮层）纸木质 ========== */
-.clinic-list-mask .scene.panel-view {
-  max-width: 880px;
-  width: 100%;
-  margin-top: 24px;
-  padding: 28px 36px 36px;
-  border-radius: 24px;
-  background: linear-gradient(165deg, rgba(255, 253, 246, 0.98), rgba(247, 242, 232, 0.97));
-  border: 1px solid var(--paper-border);
-  box-shadow: var(--shadow-paper), inset 0 1px 0 rgba(255, 255, 255, 0.85);
-}
+/* 设施升级面板头部（ClinicUpgrades 仍用） */
 .panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-}
-.decorate-btn {
-  padding: 10px 18px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #fff;
-  font-weight: 700;
-  font-size: 14px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 12px var(--accent-glow);
-  transition: transform 0.15s;
-}
-.decorate-btn:hover {
-  transform: translateY(-1px);
-}
-.decorate-btn.active {
-  background: linear-gradient(135deg, var(--good), #4a9a6a);
-  box-shadow: 0 4px 14px rgba(90, 180, 130, 0.5);
 }
 
 /* ========== 底部菜单栏（精简纸木质木牌） ========== */

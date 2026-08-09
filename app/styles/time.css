@@ -15,16 +15,20 @@
   box-shadow: var(--shadow-deep), 0 0 24px rgba(95, 185, 138, 0.2);
 }
 
-/* 夜晚降临：大厅整体压暗一层 */
-.scene.clinic-night {
+/* 夜晚降临：背景图（clinic::before 承载）保持不变，只用暖琥珀光斑营造夜色，不用黑色遮罩 */
+.scene.clinic-night::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(90, 70, 40, 0.10), transparent 240px),
-    radial-gradient(ellipse at 30% 0%, rgba(90, 70, 40, 0.12), transparent 50%),
-    var(--bg-deep);
+    linear-gradient(180deg, rgba(120, 90, 50, 0.16), transparent 240px),
+    radial-gradient(ellipse at 30% 0%, rgba(120, 90, 50, 0.18), transparent 50%);
 }
 .clinic-night .clinic-header h1,
 .clinic-night .clinic-header p {
-  text-shadow: 0 0 18px rgba(201, 168, 106, 0.35);
+  text-shadow: 0 1px 3px rgba(20, 15, 8, 0.7), 0 0 18px rgba(201, 168, 106, 0.35);
 }
 
 /* 顶部门店时间条 */
