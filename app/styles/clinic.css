@@ -1,11 +1,13 @@
 /* ========== 诊所大厅 · 经营主界面 ========== */
 .clinic {
-  position: relative;
+  /* absolute 撑满场景（.scene 的 inset 生效），避免只盖住内容高度、
+     露出 #app 的清晰背景，导致上半毛玻璃+下半清晰的割裂 */
+  position: absolute;
   display: flex;
   flex-direction: column;
   background: var(--bg-deep);
 }
-/* 背景图独立成伪元素层：纯虚化背景图，不叠加任何毛玻璃/遮罩层 */
+/* 背景图独立成伪元素层：纯虚化背景图铺满整张，不叠加任何毛玻璃/遮罩层 */
 .clinic::before {
   content: "";
   position: absolute;
