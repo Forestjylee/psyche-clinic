@@ -1,0 +1,1477 @@
+# 孟娜 · v3 · 短剧本 · 4 节拍 · 40+ 轮
+
+> 短档示例剧本：作为「v3 机器可解析格式」的活样板。
+> 数值：trust 15→28→40→50→58；truth 0→40；碎片 1 枚 @30；恶化入口 trust≤40；隐藏结局 @50；cure 主线 40 轮。
+> 生成：`node scripts/md-to-patient.mjs docs/stories/meng_na-v3.md --walk`
+
+---
+
+## 〇、人物档案
+
+**姓名** 孟娜，32 岁，保险公司文员，离婚两年，儿子 6 岁。公司体检血压偏高，同事听出她每次接儿子都如临大敌，劝她来看看。
+
+**一句话核心** 儿子被前夫接走一半时间，她怕的不是失去抚养权，是「儿子会觉得我不够好」——她不是在养儿子，是在救那个七岁被「为你好」送走的自己。
+
+**三层真相**
+- 表层（开场就说）：血压高、睡不着；每次接儿子小心翼翼，玩具比前夫家多一倍；嘴上总说「我没事，就是有点事睡不好」。
+- 中间层（第 2-3 节拍揭）：前夫起诉调整抚养安排，新家条件更好，她怕儿子「去过就不想回我这儿」；妈妈总念「当初你要是不离婚」。
+- 深层（核心信念，根源在儿童期）：七岁被爸妈「为你好」式送到外婆家寄养三年，没人问过她愿不愿意。她学会「乖不够，得证明自己够好，才不会被送走」，这套规矩如今全压在儿子身上。
+
+**角色三角** 施压者=前夫（有条件更好的家）与妈妈（「你不离婚就好了」）；情感忽视者=童年时替她做决定的妈妈；被守护者=儿子（也是那个被送走的、没被接住的小女孩）。
+
+**症状意义** 过度准备不是控制，是怕被「判不合格」而失去孩子——她在防着童年那个被送走的自己重演。「不够好就会被丢掉」是她的警报，开场埋在买玩具里、中段被问、高潮由儿子那句「我在你这才想回家」反转。
+
+**关键转折** 儿子从爸爸家回来，抱着她说「妈妈，我在你这才想回家」——她要的合格证，儿子亲手发给了她。
+
+**写作注意** 不评判离婚选择；核心是「妈妈不需要满分，孩子要的是她在那」。
+
+---
+
+## 一、剧本元信息（ts-meta）
+
+```ts-meta
+// id: meng_na
+// tier: 短
+// anchor: 15,28,40,50,58
+// truthEnd: 40
+// minCureRounds: 40
+// fragments: 1
+// worsenAtMost: 40
+{
+  id: "meng_na",
+  name: "孟娜",
+  title: "单亲妈妈 · 保险公司文员 · 被同事劝来",
+  intro: "公司体检血压偏高，同事听出她每次接儿子都如临大敌，劝她来看看。她答应了，理由是『就当让同事放心。』",
+  surface: "32 岁，离婚两年，儿子 6 岁。每次接儿子都小心翼翼，玩具比前夫家多一倍。前夫起诉调整抚养安排，她整夜睡不着。嘴上总说『我没事，就是血压有点高』。",
+  truth: "她童年被妈妈『为你好』式送走过——七岁寄养外婆家三年，没人问过她愿不愿意。那种『被大人决定』的痛，她绝不让儿子重演，所以拼命证明自己够好，怕被『判不合格』而失去孩子。",
+  palette: { primary: "#7a9bb5", secondary: "#b0c4d6", fog: "#8a7a72", bright: "#cfe0e8" },
+  baseReward: 650,
+  difficulty: "简单",
+  startNode: "mn1_start",
+  initialState: { trust: 15, defense: 65, mood: 35, truth: 0, round: 0 },
+  memoryFragments: [
+    {
+      id: "meng_m1",
+      trigger: { truth: 30 },
+      title: "村口的车",
+      text: "车开走的时候，我趴在车窗上往后看，外婆的院子越来越小。没人问过我想不想去，也没人说什么时候来接我。我攥着书包带子，在心里告诉自己：别哭，哭了就没人要你了。",
+      emotion: "scared",
+    },
+  ],
+}
+```
+
+---
+
+## 二、节拍规划表
+
+| 节拍 | 主题 | trust | truth | 阻抗 | 关键事件 | 碎片 | 过场归位 |
+|---|---|---|---|---|---|---|---|
+| 1 初访·表层 | 「我没事，就是血压有点高」接儿子如临大敌、玩具比前夫家多一倍 | 15→28 | 0→22 | c01 逻辑说教 → r01（defense+8） | c08 妈妈骂「疯了」 | — | mn1_out |
+| 2 中间层触发 | 前夫起诉调整抚养、新家条件更好、妈妈念「要是不离婚」 | 28→40 | 22→34 | c02 逻辑（defense+6） | c08 揭出「以前失去过什么」→ 七岁被送走 | [m1 @30] 村口的车 | mn2_out |
+| 3 深层信念 | 「乖不够，得够好才不会被送走」→ 把童年规矩套在儿子身上 | 40→50 | 34→46 | c03 逻辑 / c04 confront（defense+6） | c05 看见村口那个没被接住的小孩 | — | mn3_out |
+| 4 转向+结局 | 关键转折「妈妈，我在你这才想回家」→ 不需要满分，孩子要的是她在那 | 50→58 | 46→* | —（resolve 拍） | c_s07 儿子那句话落点 | — | mn4 结局分叉 |
+
+- trust 单调递增：empathy 与 probe 同涨（轻 +1、实质 +2~+3、纯过场 +0）；logic/confront 失误显著负值 -5~-10
+- truth 只由 probe 涨（轻 +2、实质 +3）；碎片 @30
+- defense 净下降，阻抗节点短时回升再回落
+- 主线选择 41 次（cure 路径）：节拍 1=10 轮、节拍 2=10 轮、节拍 3=10 轮、节拍 4=11 轮
+- 每节拍约 1/3 实质选择（带 require 或较大 effect），2/3 轻推进
+
+---
+
+## 三、节拍骨架（ts-dialog 节点）
+
+### 节拍 1 · 初访·表层（trust 15→28，truth 0→22，阻抗：拒绝被当成「不合格的妈妈」）
+
+```ts-dialog
+// id: mn1_start
+{
+  id: "mn1_start",
+  speaker: "narration",
+  text: "候诊区里，孟娜坐立不安，手里攥着手机，屏幕一亮一暗。轮到她了，她推门进来，先替你解释了半句——「我其实真没什么大毛病」。",
+  autoNext: "mn1_p01",
+}
+```
+
+```ts-dialog
+// id: mn1_p01
+{
+  id: "mn1_p01",
+  speaker: "patient",
+  text: "医生您好。我其实……真没什么大毛病。就是公司体检血压高了一点，同事非让我来看看。您别多想，我平时挺好的，就是最近有点事，睡不太好。",
+  emotion: "anxious",
+  autoNext: "mn1_c01",
+}
+```
+
+```ts-dialog
+// id: mn1_c01
+{
+  id: "mn1_c01",
+  speaker: "doctor",
+  text: "你还没坐下，就先说自己「挺好的」。我猜，你最近那些「有点事」，可能比血压更需要人听听。",
+  choices: [
+    { id: "mn1_c01_a", text: "「不急着说事。你就先在这儿坐一会儿，不着急。」", kind: "empathy", effect: { trust: 2, defense: -1 }, next: "mn1_p02" },
+    { id: "mn1_c01_b", text: "「『有点事』——是什么事，让你睡不太好？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn1_p02" },
+    { id: "mn1_c01_c", text: "「血压高就早点睡，少操心，情绪稳住就好了。」", kind: "logic", effect: { trust: -8, defense: 8, mood: -4 }, next: "mn1_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn1_r01
+{
+  id: "mn1_r01",
+  speaker: "patient",
+  text: "（她的脸色一下子冷下来）您这话说得……像我不懂照顾自己似的。我不是不睡，我是……算了，反正说了您也未必懂。",
+  emotion: "angry",
+  autoNext: "mn1_p02",
+}
+```
+
+```ts-dialog
+// id: mn1_p02
+{
+  id: "mn1_p02",
+  speaker: "patient",
+  text: "……是我儿子。每周四他爸那边送他来。我一到周三晚上就开始睡不着，怕迟到、怕路上堵、怕他等急了。明明只是个普通的接送，我也不知道我紧张什么。",
+  emotion: "anxious",
+  autoNext: "mn1_c02",
+}
+```
+
+```ts-dialog
+// id: mn1_c02
+{
+  id: "mn1_c02",
+  speaker: "doctor",
+  text: "「明明只是个接送」——可你自己也在问，到底在紧张什么。",
+  choices: [
+    { id: "mn1_c02_a", text: "「怕他等急了，是因为你不想让他觉得，妈妈不靠谱吧。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn1_p03" },
+    { id: "mn1_c02_b", text: "「你平时接别人会这样吗？还是只有接儿子会？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn1_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn1_p03
+{
+  id: "mn1_p03",
+  speaker: "patient",
+  text: "……只有接儿子会。我给他买玩具，也比那边多一倍。衣柜里、床头，全是给他准备的。他每次来，我都想让他觉得，妈妈这儿更好。",
+  emotion: "sad",
+  autoNext: "mn1_c03",
+}
+```
+
+```ts-dialog
+// id: mn1_c03
+{
+  id: "mn1_c03",
+  speaker: "doctor",
+  text: "「让他觉得妈妈这儿更好」——听起来，你在跟谁较着劲。",
+  choices: [
+    { id: "mn1_c03_a", text: "「跟谁较劲？是你前夫，还是……你自己心里那个声音？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn1_p04" },
+    { id: "mn1_c03_b", text: "「你那么想让他觉得你好——你有多怕他觉得你不好？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "mn1_p04" },
+    { id: "mn1_c03_c", text: "「孩子小，还不懂比较这些。你别给自己加太多戏。」", kind: "logic", effect: { trust: -6, defense: 5 }, next: "mn1_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn1_p04
+{
+  id: "mn1_p04",
+  speaker: "patient",
+  text: "……是怕他觉得我不好。他上回从那边回来，说爸爸家的玩具车会变形，我当时就上网下单了一台更贵的。我姐说我有病，说我在花钱买安心。",
+  emotion: "neutral",
+  autoNext: "mn1_c04",
+}
+```
+
+```ts-dialog
+// id: mn1_c04
+{
+  id: "mn1_c04",
+  speaker: "doctor",
+  text: "你姐姐那句「花钱买安心」，戳到你了。",
+  choices: [
+    { id: "mn1_c04_a", text: "「『花钱买安心』——你在买谁的安心？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "mn1_p05" },
+    { id: "mn1_c04_b", text: "「你只是想让他觉得妈妈这儿不缺什么。这份心，不丢人。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "mn1_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn1_p05
+{
+  id: "mn1_p05",
+  speaker: "patient",
+  text: "买我自己的吧。好像他高兴了，我才能确认自己没做错。离婚这两年，我一直怕一件事——怕他长大了觉得，妈妈当初不该离开他爸。",
+  emotion: "neutral",
+  autoNext: "mn1_c05",
+}
+```
+
+```ts-dialog
+// id: mn1_c05
+{
+  id: "mn1_c05",
+  speaker: "doctor",
+  text: "「怕他长大了这么想」——你在替六年后的他，提前审判自己。",
+  choices: [
+    { id: "mn1_c05_a", text: "「这个念头，是最近才有的，还是从离婚那天就在了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn1_p06" },
+    { id: "mn1_c05_b", text: "「被一个还没发生的审判压着，太累了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn1_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn1_p06
+{
+  id: "mn1_p06",
+  speaker: "patient",
+  text: "……从离婚那天就在了。他妈……前夫他妈来接过一次孩子，当着我的面说，说好好的家，偏要拆散。那话我记到今天。",
+  emotion: "neutral",
+  autoNext: "mn1_c06",
+}
+```
+
+```ts-dialog
+// id: mn1_c06
+{
+  id: "mn1_c06",
+  speaker: "doctor",
+  text: "那句话不是判决，可你把它收进了心里。",
+  choices: [
+    { id: "mn1_c06_a", text: "「你收进去的，是那句话，还是『我果然不够好』的证明？」", kind: "empathy", effect: { trust: 1 }, next: "mn1_p07" },
+    { id: "mn1_c06_b", text: "「她说『好好的家』——可那个家到底好不好，只有你自己知道，对吧？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn1_p07" },
+    { id: "mn1_c06_c", text: "「别人的闲话，你越在意，越显得你心虚。」", kind: "logic", effect: { trust: -6, defense: 5 }, next: "mn1_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn1_p07
+{
+  id: "mn1_p07",
+  speaker: "patient",
+  text: "……是。外人看着，我是把好好的家拆了。可他们不知道，那几年我是怎么过的。算了，不说了，反正也说不清。",
+  emotion: "neutral",
+  autoNext: "mn1_c07",
+}
+```
+
+```ts-dialog
+// id: mn1_c07
+{
+  id: "mn1_c07",
+  speaker: "doctor",
+  text: "「反正也说不清」——你觉得别人不会懂，所以干脆不说。",
+  choices: [
+    { id: "mn1_c07_a", text: "「今天不用跟别人解释。你想说多少，说多少。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn1_p08" },
+    { id: "mn1_c07_b", text: "「那个外人看『好好的』的家，你住着的时候，是什么感觉？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn1_p08" },
+    { id: "mn1_c07_c", text: "「家家有本难念的经，离婚也不是什么大事，别放心上。」", kind: "logic", effect: { trust: -6, defense: 6 }, next: "mn1_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn1_p08
+{
+  id: "mn1_p08",
+  speaker: "patient",
+  text: "……是我一个人住着一整栋空房子的感觉。他常年在外面，家里就我跟儿子。我那时候想，要是哪天我没了，大概也没人知道。后来我提出离婚，我妈第一个骂我，说我疯了。",
+  emotion: "sad",
+  autoNext: "mn1_c08",
+}
+```
+
+```ts-dialog
+// id: mn1_c08
+{
+  id: "mn1_c08",
+  speaker: "doctor",
+  text: "你妈骂你「疯了」——这句话，比前夫家那句话，更疼吧。",
+  choices: [
+    { id: "mn1_c08_a", text: "「你妈为什么这么说？她平时怎么看你？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "mn1_p09" },
+    { id: "mn1_c08_b", text: "「最亲的人不理解你，那是最孤的一个瞬间。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "mn1_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn1_p09
+{
+  id: "mn1_p09",
+  speaker: "patient",
+  text: "我妈……我妈总觉得，女人结了婚，天大的事都得忍。她年轻时候也是这么过来的。她不是不疼我，她就是不懂，一个人也能把孩子带好。",
+  emotion: "neutral",
+  autoNext: "mn1_c09",
+}
+```
+
+```ts-dialog
+// id: mn1_c09
+{
+  id: "mn1_c09",
+  speaker: "doctor",
+  text: "「她不是不疼我，就是不懂」——你在替她说话。",
+  choices: [
+    { id: "mn1_c09_a", text: "「你那么护着你妈，可你妈有没有问过你，一个人带孩子累不累？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn1_p10" },
+    { id: "mn1_c09_b", text: "「她说『一个人也能把孩子带好』——你信这句话吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn1_p10" },
+    { id: "mn1_c09_c", text: "「老人观念就这样，你别跟她们计较。」", kind: "logic", effect: { trust: -5, defense: 4 }, next: "mn1_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn1_p10
+{
+  id: "mn1_p10",
+  speaker: "patient",
+  text: "……一半信一半不信吧。信的时候，我还能撑下去。不信的时候，我就想，要是儿子哪天哭着说要跟爸爸住，我是不是就真的什么都做错了。",
+  emotion: "neutral",
+  autoNext: "mn1_c10",
+}
+```
+
+```ts-dialog
+// id: mn1_c10
+{
+  id: "mn1_c10",
+  speaker: "doctor",
+  text: "你把自己整个人的对错，都押在了儿子的一句话上。",
+  choices: [
+    { id: "mn1_c10_a", text: "「如果儿子有天真的说想跟爸爸住，你会怎么面对？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn1_out" },
+    { id: "mn1_c10_b", text: "「你连最坏的那句话，都在心里排练过无数遍了吧。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn1_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn1_out
+{
+  id: "mn1_out",
+  speaker: "narration",
+  text: "第一次会谈结束。孟娜起身时又看了一眼手机，没有新消息。她苦笑着说：「他爸那边明天来谈抚养安排的事，我今晚怕是又睡不着了。」",
+  autoNext: "mn2_start",
+}
+```
+
+### 节拍 2 · 中间层触发（trust 28→40，truth 22→34，[m1 碎片@30]）
+
+```ts-dialog
+// id: mn2_start
+{
+  id: "mn2_start",
+  speaker: "narration",
+  text: "又一周，孟娜来了。她比上次憔悴，眼下发青。坐下来第一句话是：「他把我告了。」",
+  autoNext: "mn2_p01",
+}
+```
+
+```ts-dialog
+// id: mn2_p01
+{
+  id: "mn2_p01",
+  speaker: "patient",
+  text: "前夫把我告了。他要调整抚养安排，说儿子该多跟他住。我以前总怕这一天，现在真来了，我反而不怕了——我怕的是他在法庭上赢了我。",
+  emotion: "anxious",
+  autoNext: "mn2_c01",
+}
+```
+
+```ts-dialog
+// id: mn2_c01
+{
+  id: "mn2_c01",
+  speaker: "doctor",
+  text: "「怕他赢」——赢的是什么？是儿子，还是那句「你不如我」？",
+  choices: [
+    { id: "mn2_c01_a", text: "「你觉得他赢的话，会在儿子心里赢走什么？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "mn2_p02" },
+    { id: "mn2_c01_b", text: "「被自己的前夫告上法庭，换谁都没法好好睡。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "mn2_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn2_p02
+{
+  id: "mn2_p02",
+  speaker: "patient",
+  text: "……都有吧。他新家条件好，房子大，他父母能帮忙带孩子。我这儿……就我跟儿子，一间卧室。我怕儿子去了那边，就觉得爸爸那儿才是家。",
+  emotion: "neutral",
+  autoNext: "mn2_c02",
+}
+```
+
+```ts-dialog
+// id: mn2_c02
+{
+  id: "mn2_c02",
+  speaker: "doctor",
+  text: "你把自己比「条件」，比输了。",
+  choices: [
+    { id: "mn2_c02_a", text: "「你儿子今年六岁。他要的『家』，在你心里是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn2_p03" },
+    { id: "mn2_c02_b", text: "「你怕的不是房子小，是怕儿子觉得你不够好，对不对？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn2_p03" },
+    { id: "mn2_c02_c", text: "「法律看的是条件，你在这儿自怨自艾没用。」", kind: "logic", effect: { trust: -6, defense: 6 }, next: "mn2_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn2_p03
+{
+  id: "mn2_p03",
+  speaker: "patient",
+  text: "……是。我从小就知道，小孩心里有杆秤。谁对他好，他就在谁那儿。我不是怕他爸对他不好，我是怕……我自己站不住。",
+  emotion: "sad",
+  autoNext: "mn2_c03",
+}
+```
+
+```ts-dialog
+// id: mn2_c03
+{
+  id: "mn2_c03",
+  speaker: "doctor",
+  text: "「怕自己站不住」——这个怕，好像不是最近才有的。",
+  choices: [
+    { id: "mn2_c03_a", text: "「不是最近才有——那是从什么时候开始的？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "mn2_p04" },
+    { id: "mn2_c03_b", text: "「你一个带着孩子的妈妈，站到今天，已经很不容易了。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "mn2_p04" },
+    { id: "mn2_c03_c", text: "「你想太多了。法院不会因为你房子小就判你输。」", kind: "logic", effect: { trust: -5, defense: 4 }, next: "mn2_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn2_p04
+{
+  id: "mn2_p04",
+  speaker: "patient",
+  text: "我妈也说，说当初你要是不离婚，哪有今天这些事。她每回打电话，都要念一遍。我知道她是心疼我，可她那句话，像一根刺，扎在我心口，怎么也拔不出来。",
+  emotion: "neutral",
+  autoNext: "mn2_c04",
+}
+```
+
+```ts-dialog
+// id: mn2_c04
+{
+  id: "mn2_c04",
+  speaker: "doctor",
+  text: "你妈那句「要是不离婚」——它在替你妈说话，还是替你自己心里那个怀疑说话？",
+  choices: [
+    { id: "mn2_c04_a", text: "「『要是当初不离婚』——你自己，信这句话吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn2_p05" },
+    { id: "mn2_c04_b", text: "「被最亲的人一遍遍念这句，像是连退路都被否定了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn2_p05" },
+    { id: "mn2_c04_c", text: "「你妈也是为你好，你别跟她顶。」", kind: "logic", effect: { trust: -5, defense: 4 }, next: "mn2_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn2_p05
+{
+  id: "mn2_p05",
+  speaker: "patient",
+  text: "……半信半疑吧。白天我不信，我告诉自己，离了婚我照样能把儿子带好。可一到晚上，我躺在床上，就会想：要是没离婚，儿子是不是就不用受这些颠簸了。",
+  emotion: "neutral",
+  autoNext: "mn2_c05",
+}
+```
+
+```ts-dialog
+// id: mn2_c05
+{
+  id: "mn2_c05",
+  speaker: "doctor",
+  text: "白天你替自己撑腰，晚上你替自己定罪。",
+  choices: [
+    { id: "mn2_c05_a", text: "「『受这些颠簸』——你儿子的颠簸，是你带给他的吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn2_p06" },
+    { id: "mn2_c05_b", text: "「你连晚上那点念头都揪着自己不放，太累了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn2_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn2_p06
+{
+  id: "mn2_p06",
+  speaker: "patient",
+  text: "……我不知道。我有时候看着他，心里就想，是我对不起他，让他这么小就没了一个完整的家。医生说，孩子要的是爱，不是家完整不完整。可我说不出口，因为我心里那道坎，我自己都过不去。",
+  emotion: "sad",
+  autoNext: "mn2_c06",
+}
+```
+
+```ts-dialog
+// id: mn2_c06
+{
+  id: "mn2_c06",
+  speaker: "doctor",
+  text: "你把「完整的家」和「爱」，摆成了两件对立的、不能同时拥有的事。",
+  choices: [
+    { id: "mn2_c06_a", text: "「你觉得，单亲家庭的孩子，注定缺了点什么吗？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "mn2_p07" },
+    { id: "mn2_c06_b", text: "「你那么怕儿子缺爱——可你自己，缺了多少年的爱，有人问过吗？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "mn2_p07" },
+    { id: "mn2_c06_c", text: "「现在单亲家庭多了去了，你别把这事想得那么严重。」", kind: "logic", effect: { trust: -6, defense: 5 }, next: "mn2_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn2_p07
+{
+  id: "mn2_p07",
+  speaker: "patient",
+  text: "我儿子……他其实很黏我。上回感冒发烧，半夜哭着喊妈妈，我一晚上没合眼，他抓着我的手就睡了。那时候我觉得，我什么都能扛。可一冷静下来，我又开始怕。",
+  emotion: "neutral",
+  autoNext: "mn2_c07",
+}
+```
+
+```ts-dialog
+// id: mn2_c07
+{
+  id: "mn2_c07",
+  speaker: "doctor",
+  text: "在「我什么都能扛」和「我怕」之间，你一天要来回几次？",
+  choices: [
+    { id: "mn2_c07_a", text: "「抓着你手就能睡着——儿子给了你最踏实的答案，只是你不肯信。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn2_p08" },
+    { id: "mn2_c07_b", text: "「他黏你的时候，你有没有觉得，其实你早就被需要了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn2_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn2_p08
+{
+  id: "mn2_p08",
+  speaker: "patient",
+  text: "有。可我不敢信。我怕一信了，就松懈了，一松懈，就真的会失去他。我以前也以为，只要我够听话、够懂事，就不会失去什么。后来我知道，不是那样的。",
+  emotion: "sad",
+  autoNext: "mn2_c08",
+}
+```
+
+```ts-dialog
+// id: mn2_c08
+{
+  id: "mn2_c08",
+  speaker: "doctor",
+  text: "「以前也以为，只要够好就不会失去」——「以前」，是什么时候？",
+  choices: [
+    { id: "mn2_c08_a", text: "「你以前『失去』过什么？那次之后，你就开始怕了吗？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "mn2_p09" },
+    { id: "mn2_c08_b", text: "「这话听着，像一个小时候的你在说话。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn2_p09" },
+    { id: "mn2_c08_c", text: "「你现在不是在养儿子，你是在防着自己重演某件事。」", kind: "confront", effect: { trust: -3, defense: 6 }, next: "mn2_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn2_p09
+{
+  id: "mn2_p09",
+  speaker: "patient",
+  text: "……我小时候，被我爸妈送到外婆家住了三年。他们说要出去打工，说外婆那儿好。没人问过我愿不愿意。我一个小孩，拎着书包就上了车。后来我才知道，我不是去玩，是去『寄养』。",
+  emotion: "neutral",
+  autoNext: "mn2_c09",
+}
+```
+
+```ts-dialog
+// id: mn2_c09
+{
+  id: "mn2_c09",
+  speaker: "doctor",
+  text: "「没人问过我愿不愿意」——这句话，你好像压了很多年。",
+  choices: [
+    { id: "mn2_c09_a", text: "「那时候你几岁？外婆家，你住得惯吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn2_p10" },
+    { id: "mn2_c09_b", text: "「你被那样决定过，所以你拼命不让儿子再被那样决定。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "mn2_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn2_p10
+{
+  id: "mn2_p10",
+  speaker: "patient",
+  text: "七八岁吧。外婆家条件其实挺好，外婆也疼我。可我总觉得，我是被『送』出去的。后来我妈来接我，我说我不想走，她就说，那你再住一阵，我忙。我就在那儿，又住了一年。",
+  emotion: "neutral",
+  autoNext: "mn2_c10",
+}
+```
+
+```ts-dialog
+// id: mn2_c10
+{
+  id: "mn2_c10",
+  speaker: "doctor",
+  text: "那三年里，你有没有一次，觉得「我妈不要我了」？",
+  choices: [
+    { id: "mn2_c10_a", text: "「问自己这个问题，是不是很难受？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn2_out" },
+    { id: "mn2_c10_b", text: "「你到现在，还留着那种『随时会被送走』的怕。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn2_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn2_out
+{
+  id: "mn2_out",
+  speaker: "narration",
+  text: "第二次会谈结束。孟娜站起身，又坐下，说：「我今天说的这些，我从没跟别人讲过。我姐都不知道。我总觉得，说出来显得我矫情。可那三年，明明是我心里最大的一根刺。」",
+  autoNext: "mn3_start",
+}
+```
+
+### 节拍 3 · 深层信念（trust 40→50，truth 34→46，恶化入口 @trust≤40）
+
+```ts-dialog
+// id: mn3_start
+{
+  id: "mn3_start",
+  speaker: "narration",
+  text: "又一周，孟娜来了，带来一份文件——前夫起诉的应诉材料。她说：「我昨晚整理完这些，忽然想起来，我小时候被送走那天，也是背着一个这么大的书包。」她比划了一下。",
+  autoNext: "mn3_p01",
+}
+```
+
+```ts-dialog
+// id: mn3_p01
+{
+  id: "mn3_p01",
+  speaker: "patient",
+  text: "我昨晚翻来覆去，想起那三年。外婆其实对我很好，可我始终记得，我站在村口，看着我妈坐的车开走，我哭都哭不出来。后来我再也没求过谁别走。",
+  emotion: "neutral",
+  autoNext: "mn3_c01",
+}
+```
+
+```ts-dialog
+// id: mn3_c01
+{
+  id: "mn3_c01",
+  speaker: "doctor",
+  text: "「再也没求过谁别走」——你从那以后，就学会了不开口。",
+  choices: [
+    { id: "mn3_c01_a", text: "「不开口，是怕开口也没用，还是怕一开口就哭出来？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn3_p02" },
+    { id: "mn3_c01_b", text: "「七岁的你，站在村口的那天，今天也站在你心里。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "mn3_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_p02
+{
+  id: "mn3_p02",
+  speaker: "patient",
+  text: "都有吧。我那时候就知道，哭没有用。我妈是大人，她说的话就是决定。我一个小孩，没有说话的份。所以我从小就特别听话，特别懂事，特别想让大人觉得我乖。",
+  emotion: "neutral",
+  autoNext: "mn3_c02",
+}
+```
+
+```ts-dialog
+// id: mn3_c02
+{
+  id: "mn3_c02",
+  speaker: "doctor",
+  text: "你从小就学会了「让大人觉得我乖」——那是你小时候的保命符。",
+  choices: [
+    { id: "mn3_c02_a", text: "「『乖』换来了什么？你被留下来了，还是还是被送走了？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "mn3_p03" },
+    { id: "mn3_c02_b", text: "「靠『乖』活下来的小孩，长大以后，还得一直乖下去。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "mn3_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_p03
+{
+  id: "mn3_p03",
+  speaker: "patient",
+  text: "……还是被送走了。所以从那以后我明白，光乖不够，我得证明自己有用、自己够好，别人才会留我在身边。现在我把这一套，全用在我儿子身上了。",
+  emotion: "sad",
+  autoNext: "mn3_c03",
+}
+```
+
+```ts-dialog
+// id: mn3_c03
+{
+  id: "mn3_c03",
+  speaker: "doctor",
+  text: "你把你童年那套「够好才不会被送走」的规矩，套到了儿子身上。",
+  choices: [
+    { id: "mn3_c03_a", text: "「你觉得，儿子会像你当年一样，被你『送走』吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn3_p04" },
+    { id: "mn3_c03_b", text: "「你不是在养儿子，你是在救那个七岁没被留住的自己。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "mn3_p04" },
+    { id: "mn3_c03_c", text: "「你儿子跟你不一样，你前夫也没那么坏，你别把两件事混在一起。」", kind: "logic", effect: { trust: -6, defense: 6 }, next: "mn3_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_p04
+{
+  id: "mn3_p04",
+  speaker: "patient",
+  text: "……我知道不一样。可我控制不住。每次儿子要回他爸那边，我心里就发慌，像有人要把我的孩子从我手里抢走。我知道他爸不是我妈，我知道儿子不是当年的我，可我就是怕。",
+  emotion: "anxious",
+  autoNext: "mn3_c04",
+}
+```
+
+```ts-dialog
+// id: mn3_c04
+{
+  id: "mn3_c04",
+  speaker: "doctor",
+  text: "你在用一个三十年前的剧本，演今天的每一天。",
+  choices: [
+    { id: "mn3_c04_a", text: "「那个剧本里，你是什么角色？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn3_p05" },
+    { id: "mn3_c04_b", text: "「你明知道不一样，还是怕——这份怕，不是现在才有的。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn3_p05" },
+    { id: "mn3_c04_c", text: "「你该怕的不是前夫，是你从来没敢面对那个被送走的小孩。」", kind: "confront", effect: { trust: -3, defense: 6 }, next: "mn3_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_p05
+{
+  id: "mn3_p05",
+  speaker: "patient",
+  text: "……被送走的那个小孩。我这么多年，一直没敢看她。我拼命工作、拼命给儿子买东西、拼命证明我是个合格的妈妈，就是不敢回头看，那个站在村口的小孩，一直在等我接她回来。",
+  emotion: "sad",
+  autoNext: "mn3_c05",
+}
+```
+
+```ts-dialog
+// id: mn3_c05
+{
+  id: "mn3_c05",
+  speaker: "doctor",
+  text: "她等了你三十年，今天你终于愿意看她了。",
+  choices: [
+    { id: "mn3_c05_a", text: "「如果现在能回头对她说一句话，你想说什么？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "mn3_p06" },
+    { id: "mn3_c05_b", text: "「你把自己活成了『不能被送走』的样子，可那个小孩，只是想要你说一句『对不起，我来接你了』。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "mn3_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_p06
+{
+  id: "mn3_p06",
+  speaker: "patient",
+  text: "……我想说，对不起，你其实没做错什么，是大人做了决定，不是你的错。可我那时候不知道。我那时候以为，是我不够好，所以他们才不要我。",
+  emotion: "broken",
+  autoNext: "mn3_c06",
+}
+```
+
+```ts-dialog
+// id: mn3_c06
+{
+  id: "mn3_c06",
+  speaker: "doctor",
+  text: "你把「大人的决定」，记成了「我不够好」——这是今天最重的一句话。",
+  choices: [
+    { id: "mn3_c06_a", text: "「这句话，你背了多久了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn3_p07" },
+    { id: "mn3_c06_b", text: "「不是你的错。这句话，我想替那个七岁的小孩，说给你听。」", kind: "empathy", effect: { trust: 1, mood: 4 }, next: "mn3_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_p07
+{
+  id: "mn3_p07",
+  speaker: "patient",
+  text: "背到我儿子出生。他出生那天，我抱着他，第一个念头是：我得让他觉得，妈妈会一直在。我不能让他经历我经历过的。所以我拼命对他好，好到……连我自己都分不清，我是在爱他，还是在救自己。",
+  emotion: "neutral",
+  autoNext: "mn3_c07",
+}
+```
+
+```ts-dialog
+// id: mn3_c07
+{
+  id: "mn3_c07",
+  speaker: "doctor",
+  text: "你分不清，是因为这两件事，在你心里早就是同一件了。",
+  choices: [
+    { id: "mn3_c07_a", text: "「你拼命对他好——他感觉到了吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn3_p08" },
+    { id: "mn3_c07_b", text: "「你爱他的方式里，藏着那个没人好好爱过的你。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn3_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_p08
+{
+  id: "mn3_p08",
+  speaker: "patient",
+  text: "他……他其实挺开心的。他每次来，都蹦蹦跳跳。可他越开心，我越怕。我怕哪天他去了他爸那儿，发现那边更好，就不想回来了。我怕他一旦比较，我就输了。",
+  emotion: "neutral",
+  autoNext: "mn3_c08",
+}
+```
+
+```ts-dialog
+// id: mn3_c08
+{
+  id: "mn3_c08",
+  speaker: "doctor",
+  text: "「怕被比较」——你不是怕儿子比较，你是怕自己被判不合格。",
+  choices: [
+    { id: "mn3_c08_a", text: "「『不合格』的标准，是谁定的？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "mn3_p09" },
+    { id: "mn3_c08_b", text: "「你从小就被打分，现在连当妈妈，你都要给自己打分。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "mn3_p09" },
+    { id: "mn3_c08_c", text: "「你这样想，只会把自己逼疯，对儿子也不好。」", kind: "logic", effect: { trust: -5, defense: 5 }, next: "mn3_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_p09
+{
+  id: "mn3_p09",
+  speaker: "patient",
+  text: "……我妈定的吧。我小时候她总说，谁家孩子怎么怎么样。我考第一，她说那是应该的。我考第二，她就叹气。我长大了，考卷换成生活，判官还在我心里，一天都没下班。",
+  emotion: "neutral",
+  autoNext: "mn3_c09",
+}
+```
+
+```ts-dialog
+// id: mn3_c09
+{
+  id: "mn3_c09",
+  speaker: "doctor",
+  text: "最后，你有一个很重的选择要给她。那个判官，在她心里判了三十年。",
+  choices: [
+    { id: "mn3_c09_a", text: "「判官在你心里下了三十年班。今天，你愿不愿意替她休一天假？」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "mn3_p10" },
+    { id: "mn3_c09_b", text: "「如果判官有一天不在了，你想怎么当妈妈？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn3_p10" },
+    { id: "mn3_c09_c", text: "「你爸你妈是那样，可你不能一辈子活在他们那套里。你这样下去，只会把自己和儿子都拖垮。」", kind: "logic", require: { trustAtMost: 40 }, effect: { trust: -10, defense: 10 }, next: "mn3_w01", hint: "仅信任≤40 时可见" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_p10
+{
+  id: "mn3_p10",
+  speaker: "patient",
+  text: "……我想，我就安安静静地陪着他，不用给他买那么多玩具，不用每次见面都像考试。我就想，让他知道，妈妈在，妈妈不会走。就这一件事。",
+  emotion: "neutral",
+  autoNext: "mn3_c10",
+}
+```
+
+```ts-dialog
+// id: mn3_c10
+{
+  id: "mn3_c10",
+  speaker: "doctor",
+  text: "「妈妈不会走」——这句话，你等了多少年才敢说？",
+  choices: [
+    { id: "mn3_c10_a", text: "「你说出来的时候，心里那个小孩，是不是也松了一口气？」", kind: "empathy", effect: { mood: 3 }, next: "mn3_out" },
+    { id: "mn3_c10_b", text: "「『妈妈在，不会走』——你信这句话的时候，是在对谁说？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn3_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_out
+{
+  id: "mn3_out",
+  speaker: "narration",
+  text: "第三次会谈结束。孟娜临走前说：「我以前觉得，我这么拼命，是为了儿子好。今天我才发现，我也是在等一个人，跟我说『你不会被送走』。」她顿了顿，「医生，你说，我能不能当那个，对我自己说这句话的人？」",
+  autoNext: "mn4_start",
+}
+```
+
+```ts-dialog
+// id: mn3_w01
+{
+  id: "mn3_w01",
+  speaker: "patient",
+  text: "（她沉默了很久，声音很冷）您说得对，我可能就是不行。我妈说得没错，我要是不离婚，哪来这些事。我连个家都给不了我儿子，我拿什么跟人家争。",
+  emotion: "broken",
+  autoNext: "mn3_w02",
+}
+```
+
+```ts-dialog
+// id: mn3_w02
+{
+  id: "mn3_w02",
+  speaker: "doctor",
+  text: "她低下头，不再看你。你把那句话，从她心里最脆的地方说了出来。",
+  choices: [
+    { id: "mn3_w02_a", text: "「我不是这个意思，我是说你要调整心态，别钻牛角尖。」", kind: "logic", effect: { trust: -6, defense: 6 }, next: "mn3_w03" },
+    { id: "mn3_w02_b", text: "（她显然已经不想听了。你道歉，试着补救。）", kind: "empathy", effect: { trust: -3, mood: -4 }, next: "mn3_w03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn3_w03
+{
+  id: "mn3_w03",
+  speaker: "patient",
+  text: "……不用了。反正我从小就没人觉得我能行。就这样吧，谢谢您今天的时间。",
+  emotion: "broken",
+  autoNext: "mn_end_worsen",
+}
+```
+
+### 节拍 4 · 转向 + 结局（trust 50→58，cure 主线分叉 + 安全网）
+
+```ts-dialog
+// id: mn4_start
+{
+  id: "mn4_start",
+  speaker: "narration",
+  text: "最后一次会谈。孟娜坐下来，没有先说话。她翻着手机里的相册，停在一张照片上——儿子蹲在公园地上，正给一只蚂蚁让路。她说：「他上周跟我说，蚂蚁也要回家，我们不能踩它的路。」",
+  autoNext: "mn4_p01",
+}
+```
+
+```ts-dialog
+// id: mn4_p01
+{
+  id: "mn4_p01",
+  speaker: "patient",
+  text: "他越来越像个小大人了。我以前总急着把他拽回来，怕他跑远了就回不来。可他在外面玩够了，还是会跑回来喊我。我好像，有点敢信这件事了。",
+  emotion: "calm",
+  autoNext: "mn4_fork",
+}
+```
+
+```ts-dialog
+// id: mn4_fork
+{
+  id: "mn4_fork",
+  speaker: "doctor",
+  text: "她开始敢信「他会回来」了。走到这里，有一条路要她自己选——是彻底放下那本「不合格妈妈」的账本，还是先带着怕往前走，又或者，把那根扎了三十年的刺，还给它原本的主人。",
+  choices: [
+    { id: "mn4_fork_a", text: "「我们来做最后一件事：把那本『我不够好』的账本，一页页撕掉。允许自己休息、允许自己求助、允许儿子看见你的疲惫。今天，你先给自己发一张合格证。」", kind: "special", effect: { trust: 1, mood: 2 }, next: "mn4_s01" },
+    { id: "mn4_fork_b", text: "「你不用一下子全想通。带着『还是怕』继续当妈妈，也是一种答案。」", kind: "empathy", effect: { trust: 1 }, next: "mn4_a01" },
+    { id: "mn4_fork_c", text: "「你妈当年替你做决定，把你送走。今天，我想陪你把那件事还给她——有些话，该由当年做决定的大人，也来面对一次。」", kind: "confront", require: { trust: 50 }, effect: { trust: 1, truth: 3 }, next: "mn4_h01", hint: "需要信任≥50" },
+  ],
+}
+```
+
+#### 安全网路径（cure 主线）
+
+```ts-dialog
+// id: mn4_s01
+{
+  id: "mn4_s01",
+  speaker: "patient",
+  text: "合格证……我长这么大，从来没人给我发过这东西。我妈只发「你还能更好」。我连给自己盖个章的勇气，都没练过。",
+  emotion: "neutral",
+  autoNext: "mn4_c_s01",
+}
+```
+
+```ts-dialog
+// id: mn4_c_s01
+{
+  id: "mn4_c_s01",
+  speaker: "doctor",
+  text: "那就从最小的章盖起。",
+  choices: [
+    { id: "mn4_c_s01_a", text: "「今天你接儿子，不用带新玩具。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn4_s02" },
+    { id: "mn4_c_s01_b", text: "「合格证上，你最想先写哪一条？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_s02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_s02
+{
+  id: "mn4_s02",
+  speaker: "patient",
+  text: "……写「我不必跟谁比」。儿子去他爸那边回来，我不用再追着问：爸爸家好不好？我想我就接住他，说「回来啦，想你了」。",
+  emotion: "neutral",
+  autoNext: "mn4_c_s02",
+}
+```
+
+```ts-dialog
+// id: mn4_c_s02
+{
+  id: "mn4_c_s02",
+  speaker: "doctor",
+  text: "「接住他，说想你了」——这就是儿子一直在等的那句话。",
+  choices: [
+    { id: "mn4_c_s02_a", text: "「你能说出这句，说明你开始信：他回来，是因为这儿是他的家，不是因为你比谁好。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "mn4_s03" },
+    { id: "mn4_c_s02_b", text: "「如果他回来说爸爸家好，你会怎么接？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_s03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_s03
+{
+  id: "mn4_s03",
+  speaker: "patient",
+  text: "（她沉默了一会儿）……那我就说，那下次我们再一起去你爸那儿玩。我心里可能会酸一下，但我不会再把「他是不是不要我了」写在脸上了。",
+  emotion: "neutral",
+  autoNext: "mn4_c_s03",
+}
+```
+
+```ts-dialog
+// id: mn4_c_s03
+{
+  id: "mn4_c_s03",
+  speaker: "doctor",
+  text: "「我会酸一下」——那一酸，是什么？",
+  choices: [
+    { id: "mn4_c_s03_a", text: "「你能说出来，说明你已经在心里松开了手。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "mn4_s04" },
+    { id: "mn4_c_s03_b", text: "「那一酸，是那个七岁的小孩在替你酸吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_s04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_s04
+{
+  id: "mn4_s04",
+  speaker: "patient",
+  text: "……是她。她没等到我妈来接她。现在我一看到儿子要离开，她就替我疼一下。",
+  emotion: "sad",
+  autoNext: "mn4_c_s04",
+}
+```
+
+```ts-dialog
+// id: mn4_c_s04
+{
+  id: "mn4_c_s04",
+  speaker: "doctor",
+  text: "那一下疼，是她在提醒你：别让她再等了。",
+  choices: [
+    { id: "mn4_c_s04_a", text: "「如果让七岁的你，看着今天的你——你觉得她会放心吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_s05" },
+    { id: "mn4_c_s04_b", text: "「你已经替她扛了很久了。剩下的路，她可以歇在你肩上。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn4_s05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_s05
+{
+  id: "mn4_s05",
+  speaker: "patient",
+  text: "（她低下头，眼泪掉下来）……她会放心的。她会觉得，这个妈妈，跟她不一样。她会觉得，有人替她把那条路走完了。",
+  emotion: "broken",
+  autoNext: "mn4_c_s05",
+}
+```
+
+```ts-dialog
+// id: mn4_c_s05
+{
+  id: "mn4_c_s05",
+  speaker: "doctor",
+  text: "她已经替她走了很远了。",
+  choices: [
+    { id: "mn4_c_s05_a", text: "「你妈当年没有给你的那句『你放心』，今天你自己给了。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_s06" },
+    { id: "mn4_c_s05_b", text: "「那句『你放心』，你也说给现在的自己听。」", kind: "empathy", effect: { mood: 3 }, next: "mn4_s06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_s06
+{
+  id: "mn4_s06",
+  speaker: "patient",
+  text: "（她抹了抹眼睛）我这两天，试着没给儿子买玩具。他来的时候，我就蹲下来抱了抱他，说：妈妈想你了。他愣了一下，然后搂住我脖子，说——",
+  emotion: "neutral",
+  autoNext: "mn4_c_s06",
+}
+```
+
+```ts-dialog
+// id: mn4_c_s06
+{
+  id: "mn4_c_s06",
+  speaker: "doctor",
+  text: "她没说完，眼泪又下来了。你等着她。",
+  choices: [
+    { id: "mn4_c_s06_a", text: "（你不催，陪她一起等那句话。）", kind: "silence", effect: { trust: 1 }, next: "mn4_s07" },
+    { id: "mn4_c_s06_b", text: "「他说了什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_s07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_s07
+{
+  id: "mn4_s07",
+  speaker: "patient",
+  text: "他说：妈妈，我在你这才想回家。他说完就睡着了，我抱着他，一晚上没敢动，怕一放手，这句话就碎了。",
+  emotion: "broken",
+  autoNext: "mn4_c_s07",
+}
+```
+
+```ts-dialog
+// id: mn4_c_s07
+{
+  id: "mn4_c_s07",
+  speaker: "doctor",
+  text: "他回的不是「这个家条件好」，他回的是「想回家」。他想要的从来不是满分妈妈，是你在那。",
+  choices: [
+    { id: "mn4_c_s07_a", text: "「他这句话，是你这些年最想要的那张合格证。他自己，亲手发给你了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "mn4_s08" },
+    { id: "mn4_c_s07_b", text: "「『怕这句话碎了』——它碎了吗？你到今天，还信不过它？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_s08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_s08
+{
+  id: "mn4_s08",
+  speaker: "patient",
+  text: "……今天送他去上幼儿园，他在门口挥挥手说：妈妈再见，我晚上回来吃饭。就这一句，我站在那儿，又哭又笑。我以前总觉得，得把他留在我这儿，才算赢了。现在我明白了，他在哪，哪儿就是他的家，我不用跟他爸抢。",
+  emotion: "calm",
+  autoNext: "mn4_c_s08",
+}
+```
+
+```ts-dialog
+// id: mn4_c_s08
+{
+  id: "mn4_c_s08",
+  speaker: "doctor",
+  text: "你不用抢。你只要在，他就回来。",
+  choices: [
+    { id: "mn4_c_s08_a", text: "「如果他说想跟他爸住一阵，你现在还会慌吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_s09" },
+    { id: "mn4_c_s08_b", text: "「你已经敢想『他还会回来』了——这就是进步。」", kind: "empathy", effect: { mood: 3 }, next: "mn4_s09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_s09
+{
+  id: "mn4_s09",
+  speaker: "patient",
+  text: "……会慌，但我不会觉得那是「我输了」了。他会回来，因为这儿有他妈妈，有他吃饭的桌子，有他放玩具的角落。那是我一点点垒起来的地方。",
+  emotion: "calm",
+  autoNext: "mn4_c_s09",
+}
+```
+
+```ts-dialog
+// id: mn4_c_s09
+{
+  id: "mn4_c_s09",
+  speaker: "doctor",
+  text: "你垒起来的地方，就叫家。",
+  choices: [
+    { id: "mn4_c_s09_a", text: "「你心里那个七岁的自己，看到这个家，放心了吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_s10" },
+    { id: "mn4_c_s09_b", text: "「这个家，是你替她垒起来的。」", kind: "empathy", effect: { mood: 3 }, next: "mn4_s10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_s10
+{
+  id: "mn4_s10",
+  speaker: "patient",
+  text: "她放心了。我昨天晚上，梦见外婆家的村口。我站在那儿，不是等车开走，是等我妈回来。后来我发现，站那儿的不是小时候的我，是我自己，拎着菜，正要回家做饭。我儿子在后面喊：妈，快点。",
+  emotion: "happy",
+  autoNext: "mn4_c_s10",
+}
+```
+
+```ts-dialog
+// id: mn4_c_s10
+{
+  id: "mn4_c_s10",
+  speaker: "doctor",
+  text: "村口那个小孩，今天终于换了个姿势——她不再等车开走，她是正要回家。",
+  choices: [
+    { id: "mn4_c_s10_a", text: "「你妈当年没来接你。今天的你，自己去接自己了。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn_end_cure" },
+    { id: "mn4_c_s10_b", text: "「她等到了。回家吧，儿子在等你。」", kind: "empathy", effect: { mood: 4 }, next: "mn_end_cure" },
+  ],
+}
+```
+
+#### 接纳路径（acceptance）
+
+```ts-dialog
+// id: mn4_a01
+{
+  id: "mn4_a01",
+  speaker: "patient",
+  text: "……带着怕继续当妈妈。您说得对，我可能没办法一下子不慌了。它跟了我这么多年，我允许它再住一阵。",
+  emotion: "neutral",
+  autoNext: "mn4_c_a01",
+}
+```
+
+```ts-dialog
+// id: mn4_c_a01
+{
+  id: "mn4_c_a01",
+  speaker: "doctor",
+  text: "允许它住，但钥匙在你手里——让它住，你来当家。",
+  choices: [
+    { id: "mn4_c_a01_a", text: "「它再慌的时候，你会怎么对自己说？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_a02" },
+    { id: "mn4_c_a01_b", text: "「你已经敢让它『住着』了，而不是赶走它——这一步不小。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "mn4_a02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_a02
+{
+  id: "mn4_a02",
+  speaker: "patient",
+  text: "……我会对自己说：怕没事，怕完，我还能接住儿子。我不用拿满分，只要我站在那儿，他就知道妈妈在。",
+  emotion: "neutral",
+  autoNext: "mn4_c_a02",
+}
+```
+
+```ts-dialog
+// id: mn4_c_a02
+{
+  id: "mn4_c_a02",
+  speaker: "doctor",
+  text: "「只要我站在那儿」——你已经是个够好的妈妈了。",
+  choices: [
+    { id: "mn4_c_a02_a", text: "「『站在那儿』这个答案，你是说给儿子的，还是说给小时候的自己？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_a03" },
+    { id: "mn4_c_a02_b", text: "「这句话，你替自己说出来，很不容易。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn4_a03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_a03
+{
+  id: "mn4_a03",
+  speaker: "patient",
+  text: "说给我自己吧。她等这句话，等了太久了。",
+  emotion: "neutral",
+  autoNext: "mn4_c_a03",
+}
+```
+
+```ts-dialog
+// id: mn4_c_a03
+{
+  id: "mn4_c_a03",
+  speaker: "doctor",
+  text: "那今天，你替她说出来：你够好了，你站在那儿，就够了。",
+  choices: [
+    { id: "mn4_c_a03_a", text: "「如果她听见了，她最想做什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_a04" },
+    { id: "mn4_c_a03_b", text: "「她等这句话等了太久——今天你替她说了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn4_a04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_a04
+{
+  id: "mn4_a04",
+  speaker: "patient",
+  text: "（她笑了笑）……她最想去买个菜，回家给儿子做顿饭，然后坐在他旁边，看他吃完，说一句：慢点吃。",
+  emotion: "calm",
+  autoNext: "mn4_c_a04",
+}
+```
+
+```ts-dialog
+// id: mn4_c_a04
+{
+  id: "mn4_c_a04",
+  speaker: "doctor",
+  text: "那就从这顿饭开始。它不贵，但你为自己点了题。",
+  choices: [
+    { id: "mn4_c_a04_a", text: "「那个七岁的小孩，等到这顿饭了吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn_end_accept" },
+    { id: "mn4_c_a04_b", text: "「回去就做这顿饭吧。她在等你。」", kind: "empathy", effect: { mood: 3 }, next: "mn_end_accept" },
+  ],
+}
+```
+
+#### 隐藏路径（hidden · 强制介入）
+
+```ts-dialog
+// id: mn4_h01
+{
+  id: "mn4_h01",
+  speaker: "patient",
+  text: "（她愣住了，半晌没说话）……还给她？医生，你是说，要跟我妈谈那件事？我这一辈子，都在躲那三年，从来没敢在她面前提过一个字。",
+  emotion: "broken",
+  autoNext: "mn4_c_h01",
+}
+```
+
+```ts-dialog
+// id: mn4_c_h01
+{
+  id: "mn4_c_h01",
+  speaker: "doctor",
+  text: "那件事不是你一个人的秘密。它该由当年做决定的大人，也来面对一次。",
+  choices: [
+    { id: "mn4_c_h01_a", text: "「我打算约你母亲谈一次。有些话，不该只有你一个人记得。」", kind: "special", effect: { mood: -3 }, next: "mn4_h02" },
+    { id: "mn4_c_h01_b", text: "「我们不急。先把它放在这儿，等你准备好了再说。」", kind: "empathy", effect: { trust: 1 }, next: "mn4_h03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_h02
+{
+  id: "mn4_h02",
+  speaker: "patient",
+  text: "（她的声音发抖）我怕。我怕我妈说，那时候是没办法；我怕她一句『为你好』，就把那三年又盖过去了。我怕我哭出来，她会觉得我矫情。",
+  emotion: "scared",
+  autoNext: "mn4_c_h02",
+}
+```
+
+```ts-dialog
+// id: mn4_c_h02
+{
+  id: "mn4_c_h02",
+  speaker: "doctor",
+  text: "你怕的，是她的『为你好』会盖住你的痛。",
+  choices: [
+    { id: "mn4_c_h02_a", text: "「那我替你把那句话问出口：她可以不认，但你不能再替她压着。」", kind: "special", effect: { truth: 3, mood: -2 }, next: "mn_end_hidden" },
+    { id: "mn4_c_h02_b", text: "「我们先不说。让那个七岁的你先缓一缓。」", kind: "empathy", effect: { trust: 1 }, next: "mn4_h03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_h03
+{
+  id: "mn4_h03",
+  speaker: "patient",
+  text: "（她垂下眼睛）……好。那件事先放着。谢谢您没有逼我。",
+  emotion: "neutral",
+  autoNext: "mn4_c_h03",
+}
+```
+
+```ts-dialog
+// id: mn4_c_h03
+{
+  id: "mn4_c_h03",
+  speaker: "doctor",
+  text: "不逼你。等你哪天真想谈了，我在这儿。",
+  choices: [
+    { id: "mn4_c_h03_a", text: "「放下的这段时间，你打算怎么陪那个小孩？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn4_h04" },
+    { id: "mn4_c_h03_b", text: "「你愿意先陪着她，这本身就是照顾。」", kind: "empathy", effect: { trust: 1 }, next: "mn4_h04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: mn4_h04
+{
+  id: "mn4_h04",
+  speaker: "patient",
+  text: "……就多抱抱儿子吧。抱他的时候，我总觉得，也像在抱小时候的自己。我可能给不了她一个完整的答案，但我能让她知道，她没有被忘掉。",
+  emotion: "neutral",
+  autoNext: "mn4_c_h04",
+}
+```
+
+```ts-dialog
+// id: mn4_c_h04
+{
+  id: "mn4_c_h04",
+  speaker: "doctor",
+  text: "你没忘掉她，这就够了。剩下的，慢慢来。",
+  choices: [
+    { id: "mn4_c_h04_a", text: "「如果你妈一辈子不认那件事，你会怎么面对？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "mn_end_accept" },
+    { id: "mn4_c_h04_b", text: "「她有没有被忘掉，由你说了算，不是由你妈。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "mn_end_accept" },
+  ],
+}
+```
+
+---
+
+## 四、结局
+
+```ts-dialog
+// id: mn_end_cure
+{
+  id: "mn_end_cure",
+  speaker: "narration",
+  text: "〔结局 · 治愈〕",
+  isEnding: true,
+  endingType: "cure",
+  endingTitle: "我在你这才想回家",
+  endingText: "三个月后，孟娜来信。抚养安排谈下来了，一人一半，她没再买双倍玩具。她学会了在儿子去爸爸家时，蹲下来说「去玩得开心，妈妈等你回来」。她说，儿子上周从爸爸家回来，一进门就喊「妈妈，我饿了」。她站在厨房，忽然觉得，这就是她要的生活——不是赢过谁，是有人回家。",
+  endingReward: { doctorReputation: 8, doctorMoney: 300, doctorExp: 50, doctorSanity: 5 },
+}
+```
+
+```ts-dialog
+// id: mn_end_accept
+{
+  id: "mn_end_accept",
+  speaker: "narration",
+  text: "〔结局 · 接纳〕",
+  isEnding: true,
+  endingType: "acceptance",
+  endingTitle: "带着怕继续爱",
+  endingText: "孟娜没有再约新的会谈，但她每隔一阵会来坐坐。她说她还是会在儿子去爸爸家前一夜睡不着，但她不再整夜查手机。她学会了对自己说：怕没关系，怕完我还能接住他。她说，她第一次觉得，当妈妈不用满分，只要她在那儿。",
+  endingReward: { doctorReputation: 4, doctorMoney: 180, doctorExp: 35, doctorSanity: 6 },
+}
+```
+
+```ts-dialog
+// id: mn_end_worsen
+{
+  id: "mn_end_worsen",
+  speaker: "narration",
+  text: "〔结局 · 恶化〕",
+  isEnding: true,
+  endingType: "worsen",
+  endingTitle: "那根拔不出的刺",
+  endingText: "孟娜没有再来。她的同事后来转达：前夫调整抚养的官司她没怎么应诉，话越来越少。她妈来城里照顾她，每天念「当初要是不离婚」。她整夜醒着，守着手机，等一个不会再来的消息。儿子有天说「妈妈，你好像不太开心」，她张了张嘴，什么也说不出来。那根「我不够好」的刺，扎得更深了。",
+  endingReward: { doctorReputation: -8, doctorMoney: 50, doctorExp: 10, doctorSanity: -20 },
+}
+```
+
+```ts-dialog
+// id: mn_end_hidden
+{
+  id: "mn_end_hidden",
+  speaker: "narration",
+  text: "〔结局 · 隐藏·那根刺，还给她〕",
+  isEnding: true,
+  endingType: "hidden",
+  endingTitle: "那根刺，还给她",
+  endingText: "你约谈了孟娜的母亲。老人坐在你对面，听到「她七岁那年，被你们送到外婆家三年，她到现在还觉得，是因为她不够好」时，很久没有说话。最后她说：「我以为外婆带她挺好，她也没说过不愿意。」后来，孟娜给你打过一次电话，说她妈破天荒地问了她一句「那时候，你是不是不愿意」。她说她握着电话，眼泪流了满脸。这段关系没有一夜和解，但那个没人问过的问题，终于被问出口了。",
+  endingReward: { doctorReputation: -10, doctorMoney: 100, doctorExp: 80, doctorSanity: -15 },
+}
+```
+
+---
+
+## 五、状态
+
+- [x] v3 机器可解析格式（ts-meta + ts-dialog 全部就位）
+- [x] trust 锚点 15→28→40→50→58；truth 0→40；碎片 1 枚 @30
+- [x] 恶化入口 @trust≤40（mn3_c09_c）；隐藏结局 @trust50（mn4_fork_c）
+- [x] cure 主线 41 轮（节拍 1-3 各 10 轮，节拍 4 = fork + 10 = 11 轮）
+- [x] 转换器生成 + 走线验收（`node scripts/md-to-patient.mjs docs/stories/meng_na-v3.md --walk`）
+  - 生成 meng_na.ts + meng_na.walk.test.ts，结构校验 + tsc 通过
+  - 走线 4 线全过：共情 cure+trust 58+41 轮 / 均衡 cure+碎片 1 / 失误 worsen+trust≤40 / 探问 cure+truth 40+
+- [ ] 登记表登记（由主流程统一维护，agent 不改）

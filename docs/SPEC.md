@@ -705,6 +705,7 @@ interface GameStats {
 | v1.1.0 | 2026-08-08 | 界面方向定稿为「治愈系手绘纸木质」（非开罗像素，用户决策，见 docs/kairosoft/PRD.md v1.2/v1.3）：纸木质 token 落地、HUD/底栏/面板换肤；**v1.3 彻底移除场景小人**（候诊改名牌卡片，返回按钮/面板窗口统一）；M1/M2 主体完成，`syncFacilities` 崩溃修复 |
 | v1.4.0 | 2026-08-09 | **首页回归全 React（§15）**：移除 Phaser 大厅画布与「预约清单」弹层，预约全列表直放首页；去重（个人成长 6 入口/发现客户交底部栏）；保留诊所状态精简卡；装修模式降级（拖动落格失效，外观/摆放仍在升级面板管理）；对话候选选项区 max-height 46%→34%、气泡锚点上移至 y=190（防遮挡） |
 | v1.5.0 | 2026-08-09 | **患者池动态化 + 逐日随机到达 + 成就去患者化 + 生成系统下线**：① patients.ts 患者池自动收集：`scripts/scan-patients.mjs`（predev/pretest/prebuild 钩子）扫描 `lib/data/patients/` 生成显式模块映射 `index.generated.ts`，新剧本入目录即进池（不写死患者数）；不用 `import.meta.glob`——它是 Vite 特性，Next.js(webpack) 浏览器端会抛 `{}.glob is not a function`；② 难度按档位/轮次重标（短→简单 / 中→普通 / 长→困难，lin_xiao 长档→困难）；③ GameState 新增 `arrivedPatients`，患者逐日随机到达（难度分桶递进：简单常开 / 普通声望≥25或day≥3 / 困难声望≥60或day≥6，引导患者小北首日已在场）；④ 成就去患者化：碎片奖励改通用纪念物、回访奖励改动态已治愈患者；⑤ 生成器（generator/sceneBuilder/truths/seeds/Generator）下线，发现客户改从手写池选候选；⑥ 旧剧本下线 chen_lo / zhou_mingyuan（chen_mo 保留） |
+| v1.5.1 | 2026-08-09 | **候诊大厅清单拆分（§15.1）**：已完成且可重新接诊的患者（`patientRecords` 有结局、非回访探望、今日未接诊）从「今日预约」移出，单独成「已完成 · 可重新接诊」区块（受控高度滚动、为空隐藏）；回访探望与断点患者仍保留在主清单。改 `components/game/ClinicHall.tsx`（`isCompleted / isReturning / isResuming` 分类 + 共用卡片渲染函数）与 `app/styles/clinic.css`（`.today-section` 占满 / `.completed-section` max-height 34%） |
 
 ---
 
@@ -797,6 +798,7 @@ interface GameStats {
 - 移除 Phaser 大厅画布（`GameCanvas`/`HallScene` 不再挂载于首页）：候诊卡、设施、花/画、装修拖动全部移除
 - **去重**：「个人成长」侧栏 6 个入口（技能/升级/消息/追踪/成就/休息）交给底部栏（`BottomBar` 已有全部入口）；头部「＋发现客户」按钮移除（底部栏「发现」承担）
 - **保留**：今日预约列表（React 清晰卡片）、头部概览 StatChip（已接待/技能/设施）、「诊所状态」精简卡（进度条 + 天数 + 流失）、「花园待一会」理智恢复入口（移入状态卡区）
+- **v1.5.1 清单拆分**：预约清单分为两个独立区块——「今日预约」（未完成患者 + 治愈回访探望患者 + 断点患者，可对话优先置顶）与「已完成 · 可重新接诊」（`patientRecords[id]` 有结局、无回访探望、今日未接诊的已治愈患者）。已完成区为受控高度内部滚动（`max-height: 34%`，顶部虚线分隔），无符合条件患者时整块隐藏。分类判定见 `ClinicHall.tsx` 的 `isCompleted / isReturning / isResuming`：回访探望保留在主清单置顶，断点患者恒在主清单「继续上次」。
 
 ### 15.2 装修模式降级
 

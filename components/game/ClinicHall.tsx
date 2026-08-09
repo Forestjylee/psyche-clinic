@@ -39,15 +39,30 @@ export function ClinicHall() {
     }
     return !!game.returnVisits[p.id]?.arrived && !game.returnVisits[p.id]?.seen;
   };
-  // 首页清单：今日已接诊的客户隐藏（次日恢复，断点患者除外）；可对话的客户优先排顶部
-  const sortedAvailable = allAvailable
-    .filter((p) => resumableId === p.id || !game.todayServed.includes(p.id))
+  // 已完成：治愈过（patientRecords 有记录）
+  const isCompleted = (p: (typeof allAvailable)[number]) => !!game.patientRecords[p.id];
+  // 回访探望：治愈患者回访已到访、未探望（探望非治疗，保留在主清单置顶）
+  const isReturning = (p: (typeof allAvailable)[number]) =>
+    !!game.returnVisits[p.id]?.arrived && !game.returnVisits[p.id]?.seen;
+  const isResuming = (p: (typeof allAvailable)[number]) => resumableId === p.id;
+  // 今日已接诊的客户隐藏（次日恢复，断点患者除外）
+  const notServed = (p: (typeof allAvailable)[number]) =>
+    isResuming(p) || !game.todayServed.includes(p.id);
+
+  // 主清单「今日预约」：断点患者 + 未完成 + 回访探望；可对话的客户优先排顶部
+  // （断点患者恒在主清单「继续上次」，即使其 patientRecords 已有记录）
+  const todayList = allAvailable
+    .filter((p) => (isResuming(p) || !isCompleted(p) || isReturning(p)) && notServed(p))
     .sort((a, b) => {
       const byTalk = Number(canTalk(b)) - Number(canTalk(a));
       if (byTalk !== 0) return byTalk;
       // 引导患者（第一位来访者）恒置顶
       return Number(b.id === GUIDED_PATIENT_ID) - Number(a.id === GUIDED_PATIENT_ID);
     });
+  // 已完成清单「可重新接诊」：治愈过、非回访探望、非断点，且今日未接诊（次日恢复）
+  const completedList = allAvailable.filter(
+    (p) => isCompleted(p) && !isReturning(p) && !isResuming(p) && notServed(p)
+  );
   const onCardClick = (p: (typeof allAvailable)[number]) => {
     // 治愈回访：玩家已到访，点击进入探望对话（非治疗）
     const rv = game.returnVisits[p.id];
@@ -71,6 +86,93 @@ export function ClinicHall() {
     startSession(p);
   };
 
+  // 共用卡片渲染（「今日预约」与「已完成 · 可重新接诊」同款卡片）
+  const renderPatientCard = (p: (typeof allAvailable)[number]) => {
+    const completed = game.patientRecords[p.id];
+    const rv = game.returnVisits[p.id];
+    const returning = !!rv?.arrived && !rv.seen;
+    const resuming = resumableId === p.id;
+    const firstSessionLocked = guidedLocked(p);
+    const locked =
+      firstSessionLocked ||
+      (p.requireReputation ? game.doctor.reputation < p.requireReputation : false);
+    const servedToday = game.todayServed.includes(p.id);
+    const waitDays = game.waitingDays[p.id] ?? 0;
+    const alive = !completed && !locked;
+    const decaying = alive && waitDays >= DECAY_START_DAY;
+    const critical = alive && waitDays >= WARN_DAY;
+    return (
+      <div
+        key={p.id}
+        className={`patient-card ${locked ? "locked" : ""} ${completed ? "completed" : ""} ${servedToday ? "served-today" : ""} ${resuming ? "resuming" : ""} ${decaying ? "decaying" : ""} ${critical ? "critical" : ""} ${returning ? "returning" : ""}`}
+        style={
+          {
+            "--card-accent": p.palette.primary,
+            "--card-accent-glow": `${p.palette.primary}40`,
+          } as React.CSSProperties
+        }
+        onClick={() => onCardClick(p)}
+      >
+        <div className="patient-avatar">
+          <ChibiCharacter
+            palette={p.palette}
+            size="md"
+            emotion={completed ? endingEmotion[completed] : "neutral"}
+          />
+        </div>
+        <div className="patient-info">
+          <div className="patient-name">
+            <span className="patient-name-text">{p.name}</span>
+            <span className={`patient-difficulty ${p.difficulty}`}>
+              {p.difficulty === "简单" ? "😊" : p.difficulty === "困难" ? "⚠" : "✦"}{" "}
+              {p.difficulty}
+            </span>
+            {completed ? (
+              <span
+                className="patient-difficulty"
+                style={{ color: endingColor(completed), borderColor: endingColor(completed) }}
+              >
+                {endingLabel(completed)}
+              </span>
+            ) : null}
+          </div>
+          <div className="patient-title">{p.title}</div>
+          {p.id === GUIDED_PATIENT_ID && !completed ? (
+            <div className="patient-guide-tag">第一位来访者</div>
+          ) : null}
+          <div className="patient-intro">{p.intro}</div>
+          {locked ? (
+            <div className="patient-locked-tag">
+              {firstSessionLocked
+                ? "先见见今天的第一位来访者"
+                : `需要声望 ${p.requireReputation}（当前 ${game.doctor.reputation}）`}
+            </div>
+          ) : null}
+          {resuming ? (
+            <div className="patient-resume-tag">⏸ 上次对话未完成 · 点击继续</div>
+          ) : returning ? (
+            <div className="patient-return-tag">✿ 他来看你了 · 点击探望</div>
+          ) : servedToday ? (
+            <div className="patient-served-tag">今日已接诊 · 明日可复诊</div>
+          ) : completed ? (
+            <div className="patient-completed-tag">已完成 · 可重新接诊</div>
+          ) : null}
+          {alive && waitDays > 0 ? (
+            <div
+              className={`patient-wait-tag ${critical ? "critical" : ""} ${decaying ? "decaying" : ""}`}
+            >
+              {critical
+                ? `⚠ 病情严重 · 已等待 ${waitDays} 天`
+                : decaying
+                ? `病情加重 · 已等待 ${waitDays} 天`
+                : `已等待 ${waitDays} 天`}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    );
+  };
+
   const night = isNightSlot(game.slot);
 
   return (
@@ -87,103 +189,32 @@ export function ClinicHall() {
         </div>
       </div>
       <div className="clinic-body">
-        <div className="patient-section">
+        <div className="patient-section today-section">
           <div className="section-title">
-            今 日 预 约 <span className="count">{sortedAvailable.length} 位客户</span>
+            今 日 预 约 <span className="count">{todayList.length} 位客户</span>
           </div>
           <div className="patient-list">
-            {sortedAvailable.length === 0 ? (
+            {todayList.length === 0 ? (
               <div className="empty-state">
                 今日名额已用完。
                 <br />
                 点击「休息一日」进入下一天。
               </div>
             ) : null}
-            {sortedAvailable.map((p) => {
-              const completed = game.patientRecords[p.id];
-              const rv = game.returnVisits[p.id];
-              const returning = !!rv?.arrived && !rv.seen;
-              const resuming = resumableId === p.id;
-              const firstSessionLocked = guidedLocked(p);
-              const locked = firstSessionLocked || (p.requireReputation ? game.doctor.reputation < p.requireReputation : false);
-              const servedToday = game.todayServed.includes(p.id);
-              const waitDays = game.waitingDays[p.id] ?? 0;
-              const alive = !completed && !locked;
-              const decaying = alive && waitDays >= DECAY_START_DAY;
-              const critical = alive && waitDays >= WARN_DAY;
-              return (
-                <div
-                  key={p.id}
-                  className={`patient-card ${locked ? "locked" : ""} ${completed ? "completed" : ""} ${servedToday ? "served-today" : ""} ${resuming ? "resuming" : ""} ${decaying ? "decaying" : ""} ${critical ? "critical" : ""} ${returning ? "returning" : ""}`}
-                  style={
-                    {
-                      "--card-accent": p.palette.primary,
-                      "--card-accent-glow": `${p.palette.primary}40`,
-                    } as React.CSSProperties
-                  }
-                  onClick={() => onCardClick(p)}
-                >
-                  <div className="patient-avatar">
-                    <ChibiCharacter
-                      palette={p.palette}
-                      size="md"
-                      emotion={completed ? endingEmotion[completed] : "neutral"}
-                    />
-                  </div>
-                  <div className="patient-info">
-                    <div className="patient-name">
-                      <span className="patient-name-text">{p.name}</span>
-                      <span className={`patient-difficulty ${p.difficulty}`}>
-                        {p.difficulty === "简单" ? "😊" : p.difficulty === "困难" ? "⚠" : "✦"}{" "}
-                        {p.difficulty}
-                      </span>
-                      {completed ? (
-                        <span
-                          className="patient-difficulty"
-                          style={{ color: endingColor(completed), borderColor: endingColor(completed) }}
-                        >
-                          {endingLabel(completed)}
-                        </span>
-                      ) : null}
-                    </div>
-                    <div className="patient-title">{p.title}</div>
-                    {p.id === GUIDED_PATIENT_ID && !completed ? (
-                      <div className="patient-guide-tag">第一位来访者</div>
-                    ) : null}
-                    <div className="patient-intro">{p.intro}</div>
-                    {locked ? (
-                      <div className="patient-locked-tag">
-                        {firstSessionLocked
-                          ? "先见见今天的第一位来访者"
-                          : `需要声望 ${p.requireReputation}（当前 ${game.doctor.reputation}）`}
-                      </div>
-                    ) : null}
-                    {resuming ? (
-                      <div className="patient-resume-tag">⏸ 上次对话未完成 · 点击继续</div>
-                    ) : returning ? (
-                      <div className="patient-return-tag">✿ 他来看你了 · 点击探望</div>
-                    ) : servedToday ? (
-                      <div className="patient-served-tag">今日已接诊 · 明日可复诊</div>
-                    ) : completed ? (
-                      <div className="patient-completed-tag">已完成 · 可重新接诊</div>
-                    ) : null}
-                    {alive && waitDays > 0 ? (
-                      <div
-                        className={`patient-wait-tag ${critical ? "critical" : ""} ${decaying ? "decaying" : ""}`}
-                      >
-                        {critical
-                          ? `⚠ 病情严重 · 已等待 ${waitDays} 天`
-                          : decaying
-                          ? `病情加重 · 已等待 ${waitDays} 天`
-                          : `已等待 ${waitDays} 天`}
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              );
-            })}
+            {todayList.map(renderPatientCard)}
           </div>
         </div>
+        {completedList.length > 0 ? (
+          <div className="patient-section completed-section">
+            <div className="section-title">
+              已 完 成 · 可 重 新 接 诊{" "}
+              <span className="count">{completedList.length} 位客户</span>
+            </div>
+            <div className="patient-list">
+              {completedList.map(renderPatientCard)}
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -681,14 +681,24 @@ describe("replenishArrivals 患者逐日随机到达（SPEC v1.5.0）", () => {
     }
   });
 
-  it("已被发现客户预占的患者不被随机到达（random=0 跳过 chen_mo）", () => {
+  it("已被发现客户预占的患者不被随机到达（random=0 命中池内首位）", () => {
     const g = createInitialState();
     g.discoveryCandidates = [
       { id: "d1", patientId: "chen_mo", channelId: "word", expireDay: 1 },
     ];
     const picks = replenishArrivals(g, () => 0);
     expect(picks).not.toContain("chen_mo");
-    expect(picks[0]).toBe("he_jinglan"); // 简单池首位（chen_mo 被预占）
+    // 清单无关：random=0 应命中简单池中第一个未被预占且未到达的患者
+    // （患者池会随新剧本持续扩容，首位不硬编码具体 id）
+    const expectedFirst = allPatients.find(
+      (p) =>
+        p.difficulty === "简单" &&
+        !g.arrivedPatients.includes(p.id) &&
+        !g.patientRecords[p.id] &&
+        !g.abandoned.includes(p.id) &&
+        !g.discoveryCandidates.some((c) => c.patientId === p.id)
+    );
+    expect(picks[0]).toBe(expectedFirst?.id);
   });
 });
 

@@ -14,32 +14,60 @@ function isPatientScenario(x: unknown): x is PatientScenario {
   );
 }
 
+import * as m_an_ning from "./an_ning";
+import * as m_bai_lan from "./bai_lan";
 import * as m_chen_mo from "./chen_mo";
+import * as m_gu_xiaoman from "./gu_xiaoman";
 import * as m_he_jinglan from "./he_jinglan";
+import * as m_he_xiaobei from "./he_xiaobei";
 import * as m_jiang_yu from "./jiang_yu";
 import * as m_lin_chen from "./lin_chen";
+import * as m_lin_wanyu from "./lin_wanyu";
 import * as m_lin_xiao from "./lin_xiao";
+import * as m_liu_guoqiang from "./liu_guoqiang";
 import * as m_lu_yunxin from "./lu_yunxin";
+import * as m_meng_na from "./meng_na";
 import * as m_mu_qing from "./mu_qing";
+import * as m_qi_yehang from "./qi_yehang";
+import * as m_shen_jingyi from "./shen_jingyi";
 import * as m_su_nian from "./su_nian";
+import * as m_tang_jianguo from "./tang_jianguo";
 import * as m_tang_zhiyuan from "./tang_zhiyuan";
 import * as m_xiao_bei from "./xiao_bei";
+import * as m_xu_chenxi from "./xu_chenxi";
+import * as m_xue_fen from "./xue_fen";
+import * as m_yu_zi from "./yu_zi";
 import * as m_zhao_haifeng from "./zhao_haifeng";
 import * as m_zhao_lei from "./zhao_lei";
+import * as m_zhou_manyun from "./zhou_manyun";
 
 const modules: Record<string, unknown> = {
+  an_ning: m_an_ning,
+  bai_lan: m_bai_lan,
   chen_mo: m_chen_mo,
+  gu_xiaoman: m_gu_xiaoman,
   he_jinglan: m_he_jinglan,
+  he_xiaobei: m_he_xiaobei,
   jiang_yu: m_jiang_yu,
   lin_chen: m_lin_chen,
+  lin_wanyu: m_lin_wanyu,
   lin_xiao: m_lin_xiao,
+  liu_guoqiang: m_liu_guoqiang,
   lu_yunxin: m_lu_yunxin,
+  meng_na: m_meng_na,
   mu_qing: m_mu_qing,
+  qi_yehang: m_qi_yehang,
+  shen_jingyi: m_shen_jingyi,
   su_nian: m_su_nian,
+  tang_jianguo: m_tang_jianguo,
   tang_zhiyuan: m_tang_zhiyuan,
   xiao_bei: m_xiao_bei,
+  xu_chenxi: m_xu_chenxi,
+  xue_fen: m_xue_fen,
+  yu_zi: m_yu_zi,
   zhao_haifeng: m_zhao_haifeng,
   zhao_lei: m_zhao_lei,
+  zhou_manyun: m_zhou_manyun,
 };
 
 export const collected: PatientScenario[] = Object.values(modules)

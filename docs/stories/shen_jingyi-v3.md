@@ -1,0 +1,3115 @@
+# 沈静宜 · v3 · 长剧本 · 6 节拍 · 100 轮
+
+> 长档核心患者：42 岁事业单位中层干部，婚内背叛 · 体面维持。发现丈夫出轨十年，却继续演完美妻子。
+> 数值：trust 15→30→50→65→75→80→88；truth 0→100；碎片 3 枚 @30/@40/@80；恶化入口 trust≤70；隐藏结局 @80；cure 主线 100 轮。
+> 生成：`node scripts/md-to-patient.mjs docs/stories/shen_jingyi-v3.md --walk`
+
+---
+
+## 〇、人物档案
+
+**姓名** 沈静宜，42 岁，事业单位中层干部，结婚十五年，女儿小满 13 岁。来诊渠道：单位体检报告转诊 + 闺蜜周倩劝了三年，今年她终于松口——她觉得「找医生聊聊」不算丢人。
+
+**一句话核心** 一个发现丈夫出轨十年、却选择继续演完美妻子的女人——她不是原谅，是她这辈子只会用「体面」堵住所有真实感受。她把自我价值，抵押给「一个完整的家」。
+
+**三层真相**
+- 表层（开场就说）：失眠、半夜三点准时醒、深夜整理衣柜对着丈夫那件羊绒外套发呆。她反复强调「我没什么事」「一切都好」。
+- 中间层（第 2-3 节拍揭）：半年前偷看丈夫手机，发现酒店消费记录和微信备注「玲玲」；试探过，丈夫装傻，她也「配合」装没发现；闺蜜周倩其实三年前就知道，一直不敢说破。
+- 深层（核心信念，根源）：童年家里「家丑不可外扬」，母亲当年忍受父亲出轨，在七岁的她耳边教「女人要忍，忍过去就好了」「家散了，你就什么都没了」。她学会用维持表象换「正常」，把「一个完整的家」当成活下去的理由——因为那等于替没守住家的母亲，守住了一个家。
+
+**角色三角**
+- 施压者：丈夫周建国（冷漠 + 十年背叛 + 那件灰色羊绒外套）+ 无处不在的「要体面」规训（单位、娘家、婆婆那句「这家的媳妇要能顶门立户」）。
+- 情感忽视者：母亲（教她忍、却没教她疼，自己捡了一辈子碎片）+ 装傻的丈夫（配合她演双簧）。
+- 被守护者：女儿小满（她不想让小满重蹈自己的童年，也不想让小满看见家碎——直到小满自己问出「妈，你快乐吗」）。
+
+**症状意义** 深夜熨衬衫、半夜瞪到天亮、把日子过成标杆——维持体面不是迟钝，是她唯一会的自保：只要「完整的家」还在，她这些年「熬对了」的人生就没白费。一旦承认不快乐，就等于承认十五年白活。高潮反转：她把「完整」和「真实」放在天平上，第一次选了真实。
+
+**关键转折** 小满放学回来给她倒了杯水，问：「妈，你快乐吗？」她愣住——活了四十二年，从没有人问过她这个问题，她自己也没有。她答不上来。
+
+**查重**：已读剧本登记表。本剧本触及「婚内背叛 · 体面维持 · 代际母亲规训」，与登记表已有剧本（原生家庭家暴/父权/职场过劳/创业失败等）核心困境不同；与 lin_xiao（家暴+撕画，代际创伤）根因同为母亲情感忽视，但困境切入完全不同（婚内背叛的「体面维持」vs 原生家庭「守夜」）。不雷同。
+
+---
+
+## 一、节拍规划表
+
+| 节拍 | 主题 | trust | truth | 阻抗 | 关键事件 | 碎片 |
+|---|---|---|---|---|---|---|
+| 1 | 初访·「我挺好」 | 15→30 | 0→~15 | c04 logic | c06 衣柜（probe） | — |
+| 2 | 闺蜜说破·「玲玲」 | 30→50 | ~15→~30 | c05 logic | c07 手机（probe） | m1 @30 |
+| 3 | 第一次复访·「我不可能离婚」 | 50→65 | ~30→~50 | c05 logic | c07 我妈（probe） | m2 @40 |
+| 4 | 七岁根·「女人要忍」 | 65→75 | ~50→~65 | c05 logic | c09 你妈教你的（probe） | — |
+| 5 | 高潮·「妈，你快乐吗」 | 75→80 | ~65→~90 | — | c09 恶化入口（trust≤70） | m3 @80 |
+| 6 | 安全网·「放下体面」 | 80→88 | ~90→100 | — | c01 路径选择（special/接纳/hidden@80） | — |
+
+数值口径：trust 单调递增（empathy 与 probe 同涨 trust）；共情线净 +73（15→88 恰达锚点末位，逐节拍 +15/+20/+15/+10/+5/+8）；truth 只由 probe 涨；defense 净下降，阻抗节点短时 +8~+12 回落；cure 路径 100 轮（16+17+18+18+16+15）。失误项（logic）显著负值 -10~-15，系统性失误玩家 trust 跌破 70 才见恶化入口。
+
+---
+
+## 二、剧本元信息（ts-meta）
+
+```ts-meta
+// id: shen_jingyi
+// tier: 长
+// anchor: 15,30,50,65,75,80,88
+// truthEnd: 100
+// minCureRounds: 100
+// fragments: 3
+// worsenAtMost: 70
+{
+  id: "shen_jingyi",
+  name: "沈静宜",
+  title: "42岁事业单位中层 · 婚内背叛 · 体面维持",
+  intro: "单位体检转诊单上，闺蜜周倩签了名，备注写着「劝了三年，今年她终于松口了」。她进门先朝你点头，笑了一下——那种在会议上才用的、挑不出毛病的笑。坐下时她把包放在腿边，背挺得很直，说「我没什么事，就是最近睡不太好」。",
+  surface: "外人看来夫妻和睦。照常做晚饭、熨衬衫、出席应酬，从不提那件事；只有深夜整理衣柜，会对着丈夫那件灰色羊绒外套发呆。失眠，半夜三点准时醒，天亮前再睡不着一会儿。一个把日子过成了标杆、看起来什么都不缺的体面女人。",
+  truth: "发现丈夫出轨十年：手机里酒店消费记录、微信备注「玲玲」、那件穿去约会的灰色羊绒外套。半年前偷看到，试探过，丈夫装傻，她也配合装没发现。童年家里「家丑不可外扬」，母亲当年忍受父亲出轨，在七岁的她耳边教「女人要忍，忍过去就好了」「家散了，你就什么都没了」。她学会用维持表象换「正常」，把自我价值抵押给「一个完整的家」——因为那等于替没守住家的母亲，守住了一个家。",
+  palette: { primary: "#8b95a8", secondary: "#c9a0a0", fog: "#3a3f4a", bright: "#e8b4a0" },
+  baseReward: 850,
+  difficulty: "困难",
+  startNode: "sj1_start",
+  initialState: { trust: 15, defense: 70, mood: 32, truth: 0, round: 0 },
+  memoryFragments: [
+    {
+      id: "sj_m1",
+      trigger: { truth: 30 },
+      title: "手机自己亮了",
+      text: "半夜，洗衣机转完，我去掏他兜里的手机，想掏出来放到茶几上。手机忽然亮了。一条消息弹出来：「明晚老地方。」发信人叫玲玲。我僵在客厅，站了很久。他睡得很熟，打呼。我点进去，酒店预订记录一行行往下翻，手一直在抖。翻完，我把手机放回他兜里，回房躺下。凌晨三点，我准时醒了。",
+      emotion: "scared",
+    },
+    {
+      id: "sj_m2",
+      trigger: { truth: 40 },
+      title: "熨到天亮的外套",
+      text: "深夜，家里都睡了。我把衣柜打开，把他那件灰色羊绒外套取出来，挂到烫衣板上。水烧着，熨斗一点点推，那条折痕来回熨了十几遍，早该平了，可我就是放不下手。我忽然想，我熨这件衣服，熨了十五年。有没有一件东西，是我熨给自己的。……等我回过神，窗外已经白了。",
+      emotion: "sad",
+    },
+    {
+      id: "sj_m3",
+      trigger: { truth: 80 },
+      title: "七岁那颗糖",
+      text: "那天我妈坐在灶台边，没做饭，脸上是那种把眼泪都憋回去之后的空。我把我书包里发的糖剥开，递给她。她看了我很久，把我拉到一边，说：「静宜，女人这一辈子，就是要把日子守住。你爸再怎么样，这个家不能散。家散了，你就什么都没了。你要学着忍，忍过去就好了。妈就是这么过来的。」那年我七岁。她把这句话，一个字一个字，说进我骨头里，我记了三十五年。",
+      emotion: "broken",
+    },
+  ],
+}
+```
+
+---
+
+## 三、节拍骨架（ts-dialog 节点）
+
+### 节拍 1 · 初访·「我挺好」（trust 15→30，truth 0→~15，阻抗：不承认家里有事）
+
+```ts-dialog
+// id: sj1_start
+{
+  id: "sj1_start",
+  speaker: "narration",
+  text: "门开，一个穿藏蓝套装的女人走进来，头发挽得一丝不乱，指甲修剪得很齐。她先朝你点头，笑了一下——那种在会议上才用的、挑不出毛病的笑。坐下时她把包放在腿边，背挺得很直。她报上姓名，说单位体检报告让她来做「心理评估」，末了强调：「我没什么事，就是同事非让我来聊聊。」",
+  autoNext: "sj1_p01",
+}
+```
+
+```ts-dialog
+// id: sj1_p01
+{
+  id: "sj1_p01",
+  speaker: "patient",
+  text: "医生您好，我姓沈。体检报告上写着让我来做个评估。其实我真没什么事，就是最近睡不太好。您放心，我坐会儿，该问的问完就走，不耽误您。",
+  emotion: "neutral",
+  autoNext: "sj1_c01",
+}
+```
+
+```ts-dialog
+// id: sj1_c01
+{
+  id: "sj1_c01",
+  speaker: "doctor",
+  text: "一个把「没什么事」挂在嘴边的女人，往往最怕被人看出有事。",
+  choices: [
+    { id: "sj1_c01_a", text: "「先坐下。你能来，说明你愿意把自己交给这四十分钟，这已经比很多人勇敢了。」", kind: "empathy", effect: { trust: 1, defense: -1, mood: 2 }, next: "sj1_p02" },
+    { id: "sj1_c01_b", text: "「『睡不太好』——是睡不着，还是半夜会醒？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p02" },
+    { id: "sj1_c01_c", text: "「失眠很常见，调整调整作息就过来了，别自己吓自己。」", kind: "logic", effect: { trust: -10, defense: 8, mood: -4 }, next: "sj1_p01r" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p01r
+{
+  id: "sj1_p01r",
+  speaker: "patient",
+  text: "（她嘴角一绷，笑收起来）调整作息。这话我爱人也说过。我要是能调整，还用坐在这儿？……医生，我没那么娇气，就是累。",
+  emotion: "angry",
+  autoNext: "sj1_p02",
+}
+```
+
+```ts-dialog
+// id: sj1_p02
+{
+  id: "sj1_p02",
+  speaker: "patient",
+  text: "半夜醒。每天三点多，准时醒，醒了就再也睡不着，翻来覆去到天亮。我先生说我这叫更年期，让我别想太多。（她笑了一下，得体又客气）",
+  emotion: "neutral",
+  autoNext: "sj1_c02",
+}
+```
+
+```ts-dialog
+// id: sj1_c02
+{
+  id: "sj1_c02",
+  speaker: "doctor",
+  text: "凌晨三点醒，醒着瞪到天亮，白天还要撑一整天的会。她把这叫「更年期」。",
+  choices: [
+    { id: "sj1_c02_a", text: "「半夜醒来瞪到天亮，白天还要管一个处室，很辛苦吧。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj1_p03" },
+    { id: "sj1_c02_b", text: "「你先生说『别想太多』——你半夜醒来，都在想什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p03
+{
+  id: "sj1_p03",
+  speaker: "patient",
+  text: "其实也没想什么。就是躺在那，听着我先生打呼。我们家那套房子隔音不太好，能听见隔壁的洗衣机。我就数那个声音，数到天亮。",
+  emotion: "neutral",
+  autoNext: "sj1_c03",
+}
+```
+
+```ts-dialog
+// id: sj1_c03
+{
+  id: "sj1_c03",
+  speaker: "doctor",
+  text: "数着隔壁的洗衣机声到天亮。她把这说得像一件再平常不过的事。",
+  choices: [
+    { id: "sj1_c03_a", text: "「数着洗衣机的声音到天亮——那时候，你心里空不空？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj1_p04" },
+    { id: "sj1_c03_b", text: "「你说『其实也没想什么』。可人半夜睡不着，心里总得装着点什么。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p04
+{
+  id: "sj1_p04",
+  speaker: "patient",
+  text: "我白天管一个处室，二十来号人，还管着女儿的早饭晚饭、我先生的衬衫领带。我脑子里装的东西够多了，晚上反倒什么都没想。就是空。躺在那就觉得，胸口这个地方，空空的。",
+  emotion: "neutral",
+  autoNext: "sj1_c04",
+}
+```
+
+```ts-dialog
+// id: sj1_c04
+{
+  id: "sj1_c04",
+  speaker: "doctor",
+  text: "她第一次用了「空」这个字。一个人把日子过满了，却说自己心里空。",
+  choices: [
+    { id: "sj1_c04_a", text: "「『空空的』——这个空，你自己会不会也害怕？」", kind: "empathy", effect: { trust: 2, defense: -1, mood: 3 }, next: "sj1_p05a" },
+    { id: "sj1_c04_b", text: "「你说胸口空。是不是有什么东西，你一直没让它进来？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p05b" },
+    { id: "sj1_c04_c", text: "「你工作家庭两头忙，觉得累很正常。把心放宽点，人这一辈子哪有十全十美的。」", kind: "logic", effect: { trust: -12, defense: 10, mood: -5 }, next: "sj1_p05c" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p05a
+{
+  id: "sj1_p05a",
+  speaker: "patient",
+  text: "（她顿住，笑容淡了一些）……害怕？我哪有空害怕。我要是害怕，这一大家子谁来管。我就是觉得，把日子过好，比什么都强。",
+  emotion: "sad",
+  autoNext: "sj1_c05",
+}
+```
+
+```ts-dialog
+// id: sj1_p05b
+{
+  id: "sj1_p05b",
+  speaker: "patient",
+  text: "没让它进来？（她低头，声音轻了一点）有些东西，进来了就不好收拾了。",
+  emotion: "neutral",
+  autoNext: "sj1_c05",
+}
+```
+
+```ts-dialog
+// id: sj1_p05c
+{
+  id: "sj1_p05c",
+  speaker: "patient",
+  text: "（她笑容收起来，语气冷了一度）把心放宽。我要是能放宽，早放宽了。你们这些站着说话不腰疼的话，我听多了。……行，那我就往心里去了，又怎么样？",
+  emotion: "angry",
+  autoNext: "sj1_c05",
+}
+```
+
+```ts-dialog
+// id: sj1_c05
+{
+  id: "sj1_c05",
+  speaker: "doctor",
+  text: "不管是害怕、是回避、还是反弹——她都在用一个「撑」字，把自己绷住。",
+  choices: [
+    { id: "sj1_c05_a", text: "「我不是站着说话。我是觉得，你一个人撑着这么大一个家，总得有个地方，能让你把『撑』这个字，放下来一会儿。」", kind: "empathy", effect: { trust: 2, defense: -2, mood: 3 }, next: "sj1_p06" },
+    { id: "sj1_c05_b", text: "「你说『不好收拾』——是收拾了会乱，还是收拾了，就再也回不到现在这样了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p06
+{
+  id: "sj1_p06",
+  speaker: "patient",
+  text: "都怕。（她抬眼看你，又移开）……有时候我半夜起来，会去整理衣柜。把衬衫一件件熨好、挂好。我先生的衬衫，我熨了十五年，闭着眼都能烫出那条线来。熨着熨着，天就亮了。",
+  emotion: "sad",
+  autoNext: "sj1_c06",
+}
+```
+
+```ts-dialog
+// id: sj1_c06
+{
+  id: "sj1_c06",
+  speaker: "doctor",
+  text: "她的第一枚信任落点：深夜熨衬衫。症状在这里露了底——她不是在整理衣柜，是在整理自己的不安。",
+  choices: [
+    { id: "sj1_c06_a", text: "「熨衬衫熨到天亮——那时候，你在想什么？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj1_p07" },
+    { id: "sj1_c06_b", text: "「你熨了十五年他的衬衫。这十五年，你自己呢？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj1_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p07
+{
+  id: "sj1_p07",
+  speaker: "patient",
+  text: "我？（她愣了一下，像是第一次被问这个问题）……我挺好的呀。我工作没落下，女儿也带得好，家里井井有条。谁见了我不得说一句，沈主任真有本事。",
+  emotion: "neutral",
+  autoNext: "sj1_c07",
+}
+```
+
+```ts-dialog
+// id: sj1_c07
+{
+  id: "sj1_c07",
+  speaker: "doctor",
+  text: "所有人都在夸她。可她刚说过，她半夜会起来熨衬衫熨到天亮。",
+  choices: [
+    { id: "sj1_c07_a", text: "「所有人都在夸你。可你刚说，你半夜会起来熨衬衫熨到天亮。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj1_p08" },
+    { id: "sj1_c07_b", text: "「『沈主任真有本事』——这句话听着顺耳，还是扎耳朵？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p08
+{
+  id: "sj1_p08",
+  speaker: "patient",
+  text: "顺耳。怎么会扎耳朵。（她顿了顿）……行吧，有时候是有点累。累也没什么，累说明我有用。一个没用的女人，日子才叫难过。",
+  emotion: "neutral",
+  autoNext: "sj1_c08",
+}
+```
+
+```ts-dialog
+// id: sj1_c08
+{
+  id: "sj1_c08",
+  speaker: "doctor",
+  text: "「有用」这两个字，她把整杆秤都压上去了。",
+  choices: [
+    { id: "sj1_c08_a", text: "「『有用』这两个字，好像把你整个人都称了称。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj1_p09" },
+    { id: "sj1_c08_b", text: "「你说『没用的女人日子难过』——这话，是谁教你的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p09
+{
+  id: "sj1_p09",
+  speaker: "patient",
+  text: "没人教。我自己琢磨的。（她坐直了一些）我先生是独生子，当年我嫁进门，他妈就说，这家的媳妇要能顶门立户。我把这话记了十五年。顶门立户，就得有用。",
+  emotion: "neutral",
+  autoNext: "sj1_c09",
+}
+```
+
+```ts-dialog
+// id: sj1_c09
+{
+  id: "sj1_c09",
+  speaker: "doctor",
+  text: "婆婆一句「顶门立户」，她顶在头上顶了十五年。",
+  choices: [
+    { id: "sj1_c09_a", text: "「你把婆婆当年一句话，顶在自己头上顶了十五年。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj1_p10" },
+    { id: "sj1_c09_b", text: "「『顶门立户』——你顶的这个门，是谁的家？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p10
+{
+  id: "sj1_p10",
+  speaker: "patient",
+  text: "谁的家？……当然是我们家。我和我先生，还有我女儿小满，我们三个的家。（她说得很顺，顺得像背了十五年的台词）",
+  emotion: "neutral",
+  autoNext: "sj1_c10",
+}
+```
+
+```ts-dialog
+// id: sj1_c10
+{
+  id: "sj1_c10",
+  speaker: "doctor",
+  text: "「我们三个」——她说得那么顺，顺得像一套背了很多年的台词。",
+  choices: [
+    { id: "sj1_c10_a", text: "「『我们三个』——你说这三个字的时候，声音很稳。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj1_p11" },
+    { id: "sj1_c10_b", text: "「台词背得这么顺，是不是因为，这十五年你每天都要背一遍？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p11
+{
+  id: "sj1_p11",
+  speaker: "patient",
+  text: "（她没接话，低头看自己的指甲。修剪得很齐整，涂了透明的油）……医生，我这样是不是挺可笑的。一个四十多岁的人，跑来讲什么家里的事。",
+  emotion: "anxious",
+  autoNext: "sj1_c11",
+}
+```
+
+```ts-dialog
+// id: sj1_c11
+{
+  id: "sj1_c11",
+  speaker: "doctor",
+  text: "她说「跑来讲家里的事」——说明家里，有事。",
+  choices: [
+    { id: "sj1_c11_a", text: "「不可笑。四十多岁的人，才有四十多岁的心事。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj1_p12" },
+    { id: "sj1_c11_b", text: "「你说『家里的事』——家里，是出了什么事吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p12" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p12
+{
+  id: "sj1_p12",
+  speaker: "patient",
+  text: "没什么事。一切都好。（她很快说）我先生工作忙，应酬多，但对我们挺好。家里有车有房，小满成绩也好。我要是说家里有事，别人会觉得我不知足。",
+  emotion: "neutral",
+  autoNext: "sj1_c12",
+}
+```
+
+```ts-dialog
+// id: sj1_c12
+{
+  id: "sj1_c12",
+  speaker: "doctor",
+  text: "她连「别人会觉得我不知足」这句话，都替她先生想好了。",
+  choices: [
+    { id: "sj1_c12_a", text: "「『别人会觉得你不知足』——所以你连『说出来』，都替他先想好了理由。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj1_p13" },
+    { id: "sj1_c12_b", text: "「有没有那么一件小事，小到你可以在这里，试着说一说？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p13
+{
+  id: "sj1_p13",
+  speaker: "patient",
+  text: "（她沉默了一会儿）……小事啊。（她笑了一下）我先生那件灰色羊绒外套，每次应酬回来，都会搭在玄关的衣架上。我给他挂好，挂进衣柜，他再穿出去。十五年，那件外套从没换过。",
+  emotion: "sad",
+  autoNext: "sj1_c13",
+}
+```
+
+```ts-dialog
+// id: sj1_c13
+{
+  id: "sj1_c13",
+  speaker: "doctor",
+  text: "她提起了那件灰色羊绒外套。这是她今天第一次，主动说起一件「物件」。",
+  choices: [
+    { id: "sj1_c13_a", text: "「一件外套穿了十五年。你没想过，让他换一件吗？」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj1_p14" },
+    { id: "sj1_c13_b", text: "「你说起那件外套的时候，表情不太一样。它有什么特别的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p14" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p14
+{
+  id: "sj1_p14",
+  speaker: "patient",
+  text: "没什么特别的。就是……那件外套，只在我先生身上见过。我从来没见他脱下来，穿过别的。（她说到这，像是忽然被自己这句话绊了一下，没再说下去）",
+  emotion: "sad",
+  autoNext: "sj1_c14",
+}
+```
+
+```ts-dialog
+// id: sj1_c14
+{
+  id: "sj1_c14",
+  speaker: "doctor",
+  text: "她自己也察觉到，那句话底下压着东西。",
+  choices: [
+    { id: "sj1_c14_a", text: "「你今天说到这儿，已经很不容易了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj1_p15" },
+    { id: "sj1_c14_b", text: "「那件外套下面，压着什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj1_p15" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p15
+{
+  id: "sj1_p15",
+  speaker: "patient",
+  text: "（她站起来，又坐回去）医生，我是不是浪费您时间了。我这人就这样，说着说着就没边了。",
+  emotion: "anxious",
+  autoNext: "sj1_c15",
+}
+```
+
+```ts-dialog
+// id: sj1_c15
+{
+  id: "sj1_c15",
+  speaker: "doctor",
+  text: "她往回缩了。第一次会谈，她需要的是一个「被接住」的句号。",
+  choices: [
+    { id: "sj1_c15_a", text: "「你没浪费。你说的话，我都记着呢。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj1_p16" },
+    { id: "sj1_c15_b", text: "「下次还能来吗？我们接着聊那件外套。」", kind: "probe", effect: { trust: 1, truth: 1 }, next: "sj1_p16" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_p16
+{
+  id: "sj1_p16",
+  speaker: "patient",
+  text: "下次……我看看工作排班。（她起身，把包拿好，背挺得直直的，走到门口又回头）医生，今天这些话，我谁也没说过。连我闺蜜都没说过。您……别跟人说。",
+  emotion: "calm",
+  autoNext: "sj1_c16",
+}
+```
+
+```ts-dialog
+// id: sj1_c16
+{
+  id: "sj1_c16",
+  speaker: "doctor",
+  text: "她把最私密的话，第一次交给了一个陌生人。",
+  choices: [
+    { id: "sj1_c16_a", text: "「我记住了。你愿意说，我就愿意听。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj1_out" },
+    { id: "sj1_c16_b", text: "（你只是点头，目送她）", kind: "silence", effect: { trust: 0, mood: 1 }, next: "sj1_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj1_out
+{
+  id: "sj1_out",
+  speaker: "narration",
+  text: "她走后，你翻回体检报告。转诊单上，是周倩签的名。备注写着：「老同学，劝了三年，今年她终于松口了。她先生有点问题，你们别让她一个人扛。」你合上单子。窗外的天快黑了。",
+  autoNext: "sj2_start",
+}
+```
+
+### 节拍 2 · 闺蜜说破·「玲玲」（trust 30→50，truth ~15→~30〔m1 触发〕，阻抗：疑神疑鬼）
+
+```ts-dialog
+// id: sj2_start
+{
+  id: "sj2_start",
+  speaker: "narration",
+  text: "一周后她来复诊，比预约早了二十分钟。这次她没穿套装，穿一件米色针织开衫，头发还是挽得一丝不乱，但眼底有青。她进门坐下，手里攥着手机，攥得很紧，像攥着一块要爆炸的东西。你说「请坐」，她坐下，半天没开口。",
+  autoNext: "sj2_p01",
+}
+```
+
+```ts-dialog
+// id: sj2_p01
+{
+  id: "sj2_p01",
+  speaker: "patient",
+  text: "医生……我昨晚，又没睡。我跟我闺蜜周倩，见了一面。她把一样东西给了我。（她没拿出来的意思，只是攥着手机）",
+  emotion: "anxious",
+  autoNext: "sj2_c01",
+}
+```
+
+```ts-dialog
+// id: sj2_c01
+{
+  id: "sj2_c01",
+  speaker: "doctor",
+  text: "她攥着手机进来的，像攥着一样碰不得的东西。",
+  choices: [
+    { id: "sj2_c01_a", text: "「你先缓一缓。周倩是你同学吧？她给了你什么？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj2_p02" },
+    { id: "sj2_c01_b", text: "「什么东西，让你攥了一路？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p02
+{
+  id: "sj2_p02",
+  speaker: "patient",
+  text: "（她把手机放到桌上，屏幕上是一条微信聊天记录的截图）……周倩说，这个东西，她三年前就该给我。她一直没敢。她说，她怕我知道了，这个家就散了。",
+  emotion: "sad",
+  autoNext: "sj2_c02",
+}
+```
+
+```ts-dialog
+// id: sj2_c02
+{
+  id: "sj2_c02",
+  speaker: "doctor",
+  text: "周倩替她瞒了三年。那份「怕家散了」的恐惧，两个人一起扛了三年。",
+  choices: [
+    { id: "sj2_c02_a", text: "「周倩替你瞒了三年。她把这东西给你，是下了很大决心吧。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj2_p03" },
+    { id: "sj2_c02_b", text: "「截图里是什么？你看了吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p03
+{
+  id: "sj2_p03",
+  speaker: "patient",
+  text: "（她没看手机，看着你）……我先生，他手机里有个备注。「玲玲」——不是我们家任何人。周倩说，她撞见过，好几次。三年前她就在我先生单位的年会上，看见他搂着个女人出去。那女人，就穿一件灰色羊绒外套。跟我先生那件，一模一样的。",
+  emotion: "scared",
+  autoNext: "sj2_c03",
+}
+```
+
+```ts-dialog
+// id: sj2_c03
+{
+  id: "sj2_c03",
+  speaker: "doctor",
+  text: "灰色羊绒外套——节拍一里她熨了十五年的那件。两件事，终于串起来了。",
+  choices: [
+    { id: "sj2_c03_a", text: "「『玲玲』……和你先生那件十五年不换的外套。这两件事，你串起来了？」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj2_p04" },
+    { id: "sj2_c03_b", text: "「你听到『灰色羊绒外套』的时候，在想什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p04
+{
+  id: "sj2_p04",
+  speaker: "patient",
+  text: "（她苦笑了一下）我在想，我真蠢。十五年，他穿一件外套。我一直以为那件外套是「他常穿的那件」。现在我明白了——那件外套，是另一个人的。他给人家也买了一件，一模一样的。他们穿情侣款。我们俩才是外人。",
+  emotion: "broken",
+  autoNext: "sj2_c04",
+}
+```
+
+```ts-dialog
+// id: sj2_c04
+{
+  id: "sj2_c04",
+  speaker: "doctor",
+  text: "「我们俩才是外人」——她把自己的位置，说得很轻。",
+  choices: [
+    { id: "sj2_c04_a", text: "「『我们俩才是外人』——这句话，是你自己说的。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj2_p05" },
+    { id: "sj2_c04_b", text: "「你什么时候知道的？是周倩说的这次，还是更早？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p05
+{
+  id: "sj2_p05",
+  speaker: "patient",
+  text: "（她没回答，别过脸）其实……也不怪他。男人嘛，应酬多，诱惑多。我见过太多这样的了。哪个当老婆的，不是睁一只眼闭一只眼。日子能过，就凑合着过呗。",
+  emotion: "neutral",
+  autoNext: "sj2_c05",
+}
+```
+
+```ts-dialog
+// id: sj2_c05
+{
+  id: "sj2_c05",
+  speaker: "doctor",
+  text: "阻抗来了。她开始替丈夫找理由——「不怪他」「男人都这样」。这是她「体面」的最后一道闸。",
+  choices: [
+    { id: "sj2_c05_a", text: "「『男人都这样』——这句话，你信吗？」", kind: "empathy", effect: { trust: 2, defense: -1, mood: 3 }, next: "sj2_p06" },
+    { id: "sj2_c05_b", text: "「『不怪他』。那你怪谁？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p06" },
+    { id: "sj2_c05_c", text: "「男人应酬多，认识的人多，备注个名字很正常。你别疑神疑鬼，把自己吓坏了。」", kind: "logic", effect: { trust: -12, defense: 10, mood: -5 }, next: "sj2_p05r" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p05r
+{
+  id: "sj2_p05r",
+  speaker: "patient",
+  text: "（她声音冷下来）疑神疑鬼。连你也这么说。……行，那我是该把手机还回去，当没看见。我本来，就是那么打算的。",
+  emotion: "angry",
+  autoNext: "sj2_p06",
+}
+```
+
+```ts-dialog
+// id: sj2_p06
+{
+  id: "sj2_p06",
+  speaker: "patient",
+  text: "（她沉默很久）……半年前。半年前我给他洗衣服，他手机落在口袋里。我本来不想看，手机自己亮了。一个叫「玲玲」的人发消息，说「明晚老地方」。我点进去看了一眼，就一眼。酒店的预订记录，全都在。我关了手机，放回去，假装什么都没看见。",
+  emotion: "scared",
+  autoNext: "sj2_c06",
+}
+```
+
+```ts-dialog
+// id: sj2_c06
+{
+  id: "sj2_c06",
+  speaker: "doctor",
+  text: "半年。她一个人，把这件事压了半年。",
+  choices: [
+    { id: "sj2_c06_a", text: "「半年。你一个人，把这件事压了半年。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj2_p07" },
+    { id: "sj2_c06_b", text: "「你『假装什么都没看见』——那半年，你心里是什么滋味？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p07
+{
+  id: "sj2_p07",
+  speaker: "patient",
+  text: "滋味？（她抬起头，眼睛亮了一下又暗下去）就像……我每天都在演戏。演一个不知道的妻子。我照样给他熨衬衫、做晚饭、出席他们单位的年会，端着酒，跟他的同事说「我们家老周啊，就是工作太拼」。医生，我是不是特别可笑。我明明知道了，我还在那儿装。",
+  emotion: "broken",
+  autoNext: "sj2_c07",
+}
+```
+
+```ts-dialog
+// id: sj2_c07
+{
+  id: "sj2_c07",
+  speaker: "doctor",
+  text: "「我明明知道了，我还在那儿装」——她第一次承认自己在装。",
+  choices: [
+    { id: "sj2_c07_a", text: "「你不是可笑。你是把『体面』两个字，看得比你自己还重。」", kind: "empathy", effect: { trust: 2, defense: -1, mood: 3 }, next: "sj2_p08" },
+    { id: "sj2_c07_b", text: "「你有没有试过，想戳破它？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj2_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p08
+{
+  id: "sj2_p08",
+  speaker: "patient",
+  text: "试过。（她声音低下去）有一次他应酬回来，我说，周哥，你身上有股香水味。他说，哦，新来的实习生，凑近递了份文件。我说，哦。然后我去给他倒了杯温水。……他装傻，我也装傻。我们俩，配合得多好。好到我都想给我们俩鼓掌。",
+  emotion: "sad",
+  autoNext: "sj2_c08",
+}
+```
+
+```ts-dialog
+// id: sj2_c08
+{
+  id: "sj2_c08",
+  speaker: "doctor",
+  text: "一杯温水。她递过去的时候，手是抖的。",
+  choices: [
+    { id: "sj2_c08_a", text: "「你们俩一个装傻、一个装不知道——这台戏，你俩演了半年。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj2_p09" },
+    { id: "sj2_c08_b", text: "「你说『给他倒温水』。那杯水端过去的时候，你的手抖没抖？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p09
+{
+  id: "sj2_p09",
+  speaker: "patient",
+  text: "（她低头看自己的手）……抖了。水晃出来一点。他抬头看了我一眼，没说话。我也没说话。那杯水，后来他一口没喝。放凉了，我倒了。",
+  emotion: "broken",
+  autoNext: "sj2_c09",
+}
+```
+
+```ts-dialog
+// id: sj2_c09
+{
+  id: "sj2_c09",
+  speaker: "doctor",
+  text: "她记得那杯水记得那么清楚——水晃出来一点，放凉，倒掉。",
+  choices: [
+    { id: "sj2_c09_a", text: "「你记得那么清楚。那杯水放凉、被你倒掉——是不是也像一个你心里倒掉的东西？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "sj2_p10" },
+    { id: "sj2_c09_b", text: "「你为什么不在那晚直接说破？你在怕什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj2_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p10
+{
+  id: "sj2_p10",
+  speaker: "patient",
+  text: "怕？（她笑了一下，笑得很累）我怕的东西太多了。我怕吵起来，小满听见；我怕他单位的人知道，他这主任当不稳；我怕我爸妈脸上挂不住，他们逢人就夸我这女婿好；我怕……（她顿住）我怕这个家，真的就散了。",
+  emotion: "scared",
+  autoNext: "sj2_c10",
+}
+```
+
+```ts-dialog
+// id: sj2_c10
+{
+  id: "sj2_c10",
+  speaker: "doctor",
+  text: "她罗列了一长串「怕」。所有人的体面都排在她自己前面。",
+  choices: [
+    { id: "sj2_c10_a", text: "「你把所有人的体面都想到了。唯独没想你自己。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "sj2_p11" },
+    { id: "sj2_c10_b", text: "「『家散了』——在你心里，家散了等于什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj2_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p11
+{
+  id: "sj2_p11",
+  speaker: "patient",
+  text: "等于……我这十五年白熬了。我辞了原来的轻松岗位，考进现在这个单位，就是为了时间多点，好顾家。我把所有的劲儿都使在这个家里了。要是散了，我这些年图什么？我连图什么都说不出来。",
+  emotion: "broken",
+  autoNext: "sj2_c11",
+}
+```
+
+```ts-dialog
+// id: sj2_c11
+{
+  id: "sj2_c11",
+  speaker: "doctor",
+  text: "她把十五年，押在一个「家」上。所以她现在，动都不敢动。",
+  choices: [
+    { id: "sj2_c11_a", text: "「你把十五年，都押在一个『家』上。所以你现在，动都不敢动。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj2_p12" },
+    { id: "sj2_c11_b", text: "「你有没有想过，万一你赌对了这个家，赔掉的又是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p12" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p12
+{
+  id: "sj2_p12",
+  speaker: "patient",
+  text: "（她没接话，隔了很久）……周倩今天跟我说了一句话。她说，静宜，你不是放不下他，你是放不下「沈静宜这三个字」——放不下那个把日子过成了标杆的女人。",
+  emotion: "sad",
+  autoNext: "sj2_c12",
+}
+```
+
+```ts-dialog
+// id: sj2_c12
+{
+  id: "sj2_c12",
+  speaker: "doctor",
+  text: "周倩一句话，戳到了她最不敢碰的地方——「沈静宜」是谁。",
+  choices: [
+    { id: "sj2_c12_a", text: "「周倩这句话，扎着你了吧。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj2_p13" },
+    { id: "sj2_c12_b", text: "「『沈静宜』是谁？是你，还是你演给所有人看的那个？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj2_p13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p13
+{
+  id: "sj2_p13",
+  speaker: "patient",
+  text: "（她眼圈红了，又压住）……我不知道。我现在分不清，哪个是真的我。白天的沈主任，晚上的沈太太，哪个是真的？还是说，都是装的？",
+  emotion: "broken",
+  autoNext: "sj2_c13",
+}
+```
+
+```ts-dialog
+// id: sj2_c13
+{
+  id: "sj2_c13",
+  speaker: "doctor",
+  text: "她开始怀疑「哪个是真的我」。这是中间层松动的信号。",
+  choices: [
+    { id: "sj2_c13_a", text: "「你今天能问出这句话，就不是装的。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj2_p14" },
+    { id: "sj2_c13_b", text: "「你从什么时候开始『装』的？装得很顺的那个自己，是谁教会她的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p14" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p14
+{
+  id: "sj2_p14",
+  speaker: "patient",
+  text: "我不知道。好像一直都会。我从小就……（她停下，像是被自己的话绊住）……算了，今天先不说这个。",
+  emotion: "anxious",
+  autoNext: "sj2_c14",
+}
+```
+
+```ts-dialog
+// id: sj2_c14
+{
+  id: "sj2_c14",
+  speaker: "doctor",
+  text: "她说到「从小就」自己刹了车。那三个字，是一个缝。",
+  choices: [
+    { id: "sj2_c14_a", text: "「好。不着急。你刚才说『从小就』——那三个字，我记下了。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj2_p15" },
+    { id: "sj2_c14_b", text: "（你只是点头，把「从小就」这三个字放在她面前，没追）", kind: "silence", effect: { trust: 1 }, next: "sj2_p15" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p15
+{
+  id: "sj2_p15",
+  speaker: "patient",
+  text: "医生，我今天不该说这么多。周倩说你是个可靠的人，让我什么都跟你说。可我……我还没准备好，让第三个人知道我家的事。",
+  emotion: "anxious",
+  autoNext: "sj2_c15",
+}
+```
+
+```ts-dialog
+// id: sj2_c15
+{
+  id: "sj2_c15",
+  speaker: "doctor",
+  text: "她说「第三个人」——前两个人，是她自己和周倩。",
+  choices: [
+    { id: "sj2_c15_a", text: "「我明白。你在这儿说的话，只到我这堵墙为止。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj2_p16" },
+    { id: "sj2_c15_b", text: "「你说的『第三个人』——你怕谁知道？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p16" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p16
+{
+  id: "sj2_p16",
+  speaker: "patient",
+  text: "怕我女儿知道。（她攥紧手）小满才十三。她什么都不懂，她只知道自己有个体面的家，有个能干的妈。我不能让她看见，她妈背地里在哭。",
+  emotion: "scared",
+  autoNext: "sj2_c16",
+}
+```
+
+```ts-dialog
+// id: sj2_c16
+{
+  id: "sj2_c16",
+  speaker: "doctor",
+  text: "被守护者第一次完整露出来：小满。她不想让女儿看见她哭。",
+  choices: [
+    { id: "sj2_c16_a", text: "「你想给小满留一个『体面的家』。这个想法，你错不起。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj2_p17" },
+    { id: "sj2_c16_b", text: "「小满如果有一天知道了，你怕的到底是家散了，还是她看你『没用』？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj2_p17" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_p17
+{
+  id: "sj2_p17",
+  speaker: "patient",
+  text: "（她起身，走到窗边，又走回来）……医生，我下次还来。我今天脑子太乱了。我得回去，把小满的晚饭做了。她今天要小考，我答应她做糖醋排骨。",
+  emotion: "calm",
+  autoNext: "sj2_c17",
+}
+```
+
+```ts-dialog
+// id: sj2_c17
+{
+  id: "sj2_c17",
+  speaker: "doctor",
+  text: "她心里乱成一团，最后落脚点是「小满的糖醋排骨」。",
+  choices: [
+    { id: "sj2_c17_a", text: "「好。你答应小满的糖醋排骨，今天别糊了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj2_out" },
+    { id: "sj2_c17_b", text: "（你点头。她深吸一口气，走出门，背挺得直直的）", kind: "silence", effect: { trust: 0, mood: 1 }, next: "sj2_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj2_out
+{
+  id: "sj2_out",
+  speaker: "narration",
+  text: "她走后，你在桌上发现一枚掉落的耳钉。银色的，很素，像是戴了很多年。你没有追出去。第二次会谈，她把「玲玲」两个字，从口袋里掏了出来。你猜，下一次她来，会带着那句「从小就」来。",
+  autoNext: "sj3_start",
+}
+```
+
+### 节拍 3 · 第一次复访·「我不可能离婚」（trust 50→65，truth ~30→~50〔m2 触发〕，阻抗：他不是坏人）
+
+```ts-dialog
+// id: sj3_start
+{
+  id: "sj3_start",
+  speaker: "narration",
+  text: "这次她比约定来得晚。进来时眼下青黑，手里提着个保温袋，说是给小满带的汤，怕来不及回去做。坐下时，保温袋放在脚边，她看着它出了会儿神，才抬头。",
+  autoNext: "sj3_p01",
+}
+```
+
+```ts-dialog
+// id: sj3_p01
+{
+  id: "sj3_p01",
+  speaker: "patient",
+  text: "医生……上回我没来，是我先生出差回来了，家里有点忙。其实，是小满跟我说了一句话，我一直缓不过来。她说……（她停住）",
+  emotion: "sad",
+  autoNext: "sj3_c01",
+}
+```
+
+```ts-dialog
+// id: sj3_c01
+{
+  id: "sj3_c01",
+  speaker: "doctor",
+  text: "小满。被守护者第一次自己开口说话。",
+  choices: [
+    { id: "sj3_c01_a", text: "「不急，慢慢说。小满说了什么？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj3_p02" },
+    { id: "sj3_c01_b", text: "「那句话，让你这几天都没睡着吧？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj3_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p02
+{
+  id: "sj3_p02",
+  speaker: "patient",
+  text: "她说：「妈，你别总一个人哭了。爸不回来，我们俩过也挺好。」……我当场就愣住了。我女儿才十三。我一直以为我藏得很好。结果她早就知道了。她连安慰我的台词，都替我练好了。",
+  emotion: "broken",
+  autoNext: "sj3_c02",
+}
+```
+
+```ts-dialog
+// id: sj3_c02
+{
+  id: "sj3_c02",
+  speaker: "doctor",
+  text: "小满不是「早就知道」——她是把妈妈不敢说的话，替她说了出来。",
+  choices: [
+    { id: "sj3_c02_a", text: "「小满不是『早就知道』了那么简单。她是在替你说出你不敢说的话。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "sj3_p03" },
+    { id: "sj3_c02_b", text: "「你从来没在女儿面前哭过吧？她是怎么知道你会哭的？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj3_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p03
+{
+  id: "sj3_p03",
+  speaker: "patient",
+  text: "我……我哭都是躲着哭的。在厨房哭，在衣柜间哭，等她睡了再哭。她怎么会知道。（她声音发颤）……除非，她半夜起来过。她听见了。我女儿半夜听见她妈在哭，她自己躲回房间，假装没听见。她也在装。我们娘俩，都在装。",
+  emotion: "scared",
+  autoNext: "sj3_c03",
+}
+```
+
+```ts-dialog
+// id: sj3_c03
+{
+  id: "sj3_c03",
+  speaker: "doctor",
+  text: "母女俩都在替对方「装作没事」。这间屋子里的「装」，她一个人撑不动了。",
+  choices: [
+    { id: "sj3_c03_a", text: "「你们娘俩，都在替对方『装作没事』。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj3_p04" },
+    { id: "sj3_c03_b", text: "「你看见小满这么懂事，心里是疼，还是更怕了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj3_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p04
+{
+  id: "sj3_p04",
+  speaker: "patient",
+  text: "都怕。（她攥紧保温袋）我怕她学我。我怕她长大了，也学会「忍」字当头，把自己活成一个不会说疼的人。我当年就是这么过来的。我不能让小满，也走我这条老路。",
+  emotion: "broken",
+  autoNext: "sj3_c04",
+}
+```
+
+```ts-dialog
+// id: sj3_c04
+{
+  id: "sj3_c04",
+  speaker: "doctor",
+  text: "「我当年就是这么过来的」——「当年」两个字，露了一个角。",
+  choices: [
+    { id: "sj3_c04_a", text: "「你自己走的那条老路，是什么样的一条路？」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj3_p05" },
+    { id: "sj3_c04_b", text: "「『忍字当头』——这句话，你是从哪儿学来的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj3_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p05
+{
+  id: "sj3_p05",
+  speaker: "patient",
+  text: "（她低头，很久）……我没想当什么「成功」。我就是想把日子过下去。我先生他……他不是坏人。他可能就是，一时糊涂。我见过太多这样的了。哪个当老婆的，不睁一只眼闭一只眼。",
+  emotion: "neutral",
+  autoNext: "sj3_c05",
+}
+```
+
+```ts-dialog
+// id: sj3_c05
+{
+  id: "sj3_c05",
+  speaker: "doctor",
+  text: "阻抗第三次抬起来：「他不是坏人」。她在替丈夫，也是在替「继续忍下去」找理由。",
+  choices: [
+    { id: "sj3_c05_a", text: "「『他不是坏人』——我信。可他做的事，让你疼了十五年。」", kind: "empathy", effect: { trust: 1, defense: -1, mood: 2 }, next: "sj3_p06" },
+    { id: "sj3_c05_b", text: "「『哪个当老婆的都这样』——这句话，是不是你妈教你的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj3_p06" },
+    { id: "sj3_c05_c", text: "「你能把小满教得这么懂事，说明你这个妈当得已经很成功了。别苛责自己。」", kind: "logic", effect: { trust: -10, defense: 8, mood: -4 }, next: "sj3_p05r" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p05r
+{
+  id: "sj3_p05r",
+  speaker: "patient",
+  text: "（她别过脸）成功。又是成功。我当这个「成功」当得够够的了。医生，我不是来听你夸我的。",
+  emotion: "angry",
+  autoNext: "sj3_p06",
+}
+```
+
+```ts-dialog
+// id: sj3_p06
+{
+  id: "sj3_p06",
+  speaker: "patient",
+  text: "（她声音低下去）……我妈没教过我这些。她没教过我任何事。（她停了一下）她只是，自己就是这么过的。",
+  emotion: "sad",
+  autoNext: "sj3_c06",
+}
+```
+
+```ts-dialog
+// id: sj3_c06
+{
+  id: "sj3_c06",
+  speaker: "doctor",
+  text: "她第一次提起母亲。不是「教」，是「自己就是这么过的」。",
+  choices: [
+    { id: "sj3_c06_a", text: "「『她自己就是这么过的』——你看见过你妈怎么过？」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj3_p07" },
+    { id: "sj3_c06_b", text: "「你妈的『自己这么过』，是什么样子的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj3_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p07
+{
+  id: "sj3_p07",
+  speaker: "patient",
+  text: "我妈……她这辈子，就是伺候。伺候我爸，伺候我，伺候我爷我奶。我爸脾气不好，喝了酒就摔东西，我妈从来不吭声，只会在事后，把东西一样样捡起来，放回原位。她捡了一辈子。",
+  emotion: "sad",
+  autoNext: "sj3_c07",
+}
+```
+
+```ts-dialog
+// id: sj3_c07
+{
+  id: "sj3_c07",
+  speaker: "doctor",
+  text: "「捡了一辈子」——她描述母亲的四个字，和描述自己熨了十五年衬衫，是同一套动作。",
+  choices: [
+    { id: "sj3_c07_a", text: "「你妈捡了一辈子碎片。你看着，心里什么滋味？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "sj3_p08" },
+    { id: "sj3_c07_b", text: "「你爸摔东西的时候，你妈哭过吗？你呢？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj3_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p08
+{
+  id: "sj3_p08",
+  speaker: "patient",
+  text: "我妈不哭。她从来不哭，至少不当着我面哭。我小时候以为，我妈不会疼。长大了才知道，不是不会疼，是疼也得忍着，忍到没人的地方再哭。……医生，我是不是也学会了我妈这套？",
+  emotion: "broken",
+  autoNext: "sj3_c08",
+}
+```
+
+```ts-dialog
+// id: sj3_c08
+{
+  id: "sj3_c08",
+  speaker: "doctor",
+  text: "她自己问出了那句：我是不是也学会了我妈这套。",
+  choices: [
+    { id: "sj3_c08_a", text: "「你不仅学会了。你还把它练得比你妈更熟。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj3_p09" },
+    { id: "sj3_c08_b", text: "「你小时候，有没有特别希望过，你妈能哭一回，能让你知道她疼？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj3_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p09
+{
+  id: "sj3_p09",
+  speaker: "patient",
+  text: "（她没说话，眼圈红了，又压住）……有。我七岁那年……（她停住，很久）算了。今天不想说那个。今天先说小满。",
+  emotion: "broken",
+  autoNext: "sj3_c09",
+}
+```
+
+```ts-dialog
+// id: sj3_c09
+{
+  id: "sj3_c09",
+  speaker: "doctor",
+  text: "「七岁」——她两次说到一半就刹住。那是她深层的门。",
+  choices: [
+    { id: "sj3_c09_a", text: "「好。你七岁那年的事，等你想说了再说。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj3_p10" },
+    { id: "sj3_c09_b", text: "「你说到『七岁』的时候，声音抖了一下。那个『算了』下面，压着东西吧。」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj3_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p10
+{
+  id: "sj3_p10",
+  speaker: "patient",
+  text: "（她吸了口气）说小满吧。小满今天早上跟我说，妈，学校要开家长会，你能来吗？以前都是你去。这次，她也犹豫了，她怕我先生去，怕别人问东问西。她连这点，都在替我担着。",
+  emotion: "sad",
+  autoNext: "sj3_c10",
+}
+```
+
+```ts-dialog
+// id: sj3_c10
+{
+  id: "sj3_c10",
+  speaker: "doctor",
+  text: "小满连「家长会该让谁去」这件事，都在替妈妈担着。",
+  choices: [
+    { id: "sj3_c10_a", text: "「小满在替你『过滤』所有可能让你难堪的事。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj3_p11" },
+    { id: "sj3_c10_b", text: "「家长会上，以前都是你去——你先生，很少出现在小满的生活里吧？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj3_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p11
+{
+  id: "sj3_p11",
+  speaker: "patient",
+  text: "他忙。他一年到头忙。小满的家长会，他一次都没去过。小满第一次喊爸，他不在家。小满学走路，他出差。小满发烧，我一个人抱着她在医院走廊坐到天亮。他回来说了句「辛苦了」，就又去忙了。",
+  emotion: "sad",
+  autoNext: "sj3_c11",
+}
+```
+
+```ts-dialog
+// id: sj3_c11
+{
+  id: "sj3_c11",
+  speaker: "doctor",
+  text: "她一个人把小满拉扯大。他在她最需要的时候，只说一句「辛苦了」。",
+  choices: [
+    { id: "sj3_c11_a", text: "「你一个人把小满拉扯大。你先生，只在你最需要他的时候，说一句『辛苦了』。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj3_p12" },
+    { id: "sj3_c11_b", text: "「你一个人抱着小满在医院坐到天亮那晚，你心里，恨过他吗？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj3_p12" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p12
+{
+  id: "sj3_p12",
+  speaker: "patient",
+  text: "（她眼泪掉下来，又飞快抹掉）……恨过。就那一晚恨过。他回来，我又没事了。因为我妈教过我，女人不能记仇，记仇伤的是自己。……医生，我是不是，从头到尾都在按我妈的话活着？",
+  emotion: "broken",
+  autoNext: "sj3_c12",
+}
+```
+
+```ts-dialog
+// id: sj3_c12
+{
+  id: "sj3_c12",
+  speaker: "doctor",
+  text: "她第一次，自己把「按我妈的话活着」说出口。",
+  choices: [
+    { id: "sj3_c12_a", text: "「你刚自己说出来了——『按我妈的话活着』。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj3_p13" },
+    { id: "sj3_c12_b", text: "「你妈还教过你哪些话？像这样的，你还能想起几句？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj3_p13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p13
+{
+  id: "sj3_p13",
+  speaker: "patient",
+  text: "她说……「女人要忍，忍过去就好了。」「男人靠不住，你把家守好，什么都有了。」「家丑不可外扬，说出去，人家看不起的是你。」……她说的每句话，我都记住了。我按着它们，活了四十多年。",
+  emotion: "sad",
+  autoNext: "sj3_c13",
+}
+```
+
+```ts-dialog
+// id: sj3_c13
+{
+  id: "sj3_c13",
+  speaker: "doctor",
+  text: "她把母亲的话一条条背了出来。那些话，成了她的骨头。",
+  choices: [
+    { id: "sj3_c13_a", text: "「你妈把这些话塞给你，然后自己，也没过好。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj3_p14" },
+    { id: "sj3_c13_b", text: "（你陪她坐了一会儿。她没哭出声，肩膀在抖）", kind: "silence", effect: { trust: 1 }, next: "sj3_p14" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p14
+{
+  id: "sj3_p14",
+  speaker: "patient",
+  text: "（她站起来，走到窗边，背对着你）医生，我现在有点恨我妈。可是我又知道，她也不容易。她是被我爸，被那个年代，逼成那样的。她不是坏，她只是……只会这么活。",
+  emotion: "sad",
+  autoNext: "sj3_c14",
+}
+```
+
+```ts-dialog
+// id: sj3_c14
+{
+  id: "sj3_c14",
+  speaker: "doctor",
+  text: "她同时看见了母亲的苦和自己的疼——这已经是多走的一步。",
+  choices: [
+    { id: "sj3_c14_a", text: "「你能同时看见你妈的苦，和你自己的疼。你已经比你妈，多走了半步。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj3_p15" },
+    { id: "sj3_c14_b", text: "（你没说话，等她走回来）", kind: "silence", effect: { trust: 0, mood: 1 }, next: "sj3_p15" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p15
+{
+  id: "sj3_p15",
+  speaker: "patient",
+  text: "（她转过身，坐回来，声音稳了一些）我今天本来想跟您说，我打算离婚。……可是话到嘴边，我又咽回去了。我说不出来。我想到离婚，第一个念头不是解脱，是「人家会怎么看沈静宜」。",
+  emotion: "neutral",
+  autoNext: "sj3_c15",
+}
+```
+
+```ts-dialog
+// id: sj3_c15
+{
+  id: "sj3_c15",
+  speaker: "doctor",
+  text: "「离婚」两个字，她今天终于拿到了嘴边。虽然又咽了回去。",
+  choices: [
+    { id: "sj3_c15_a", text: "「『人家会怎么看』——这句话，在你心里比离婚本身还重。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj3_p16" },
+    { id: "sj3_c15_b", text: "「如果没有人看呢？如果你只是沈静宜自己呢？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj3_p16" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p16
+{
+  id: "sj3_p16",
+  speaker: "patient",
+  text: "没有人看？……那我妈当年，也不会活成那样了。她一辈子都在「怕人看」。我好像，也是。",
+  emotion: "sad",
+  autoNext: "sj3_c16",
+}
+```
+
+```ts-dialog
+// id: sj3_c16
+{
+  id: "sj3_c16",
+  speaker: "doctor",
+  text: "「我好像，也是。」——她把母亲和自己，第一次放在了同一句话里。",
+  choices: [
+    { id: "sj3_c16_a", text: "「你今天，第一次把『我好像也是』这四个字，说出口了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj3_p17" },
+    { id: "sj3_c16_b", text: "「那我们下次，就试着看看，那个『没有人看』的沈静宜，到底想要什么。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj3_p17" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p17
+{
+  id: "sj3_p17",
+  speaker: "patient",
+  text: "（她点头，站起身。到门口，她回头说）医生，我下次来。……我试着，跟你说说我七岁那年的事。我也想知道，我妈说的那些话，是怎么长进我骨头里的。",
+  emotion: "calm",
+  autoNext: "sj3_c17",
+}
+```
+
+```ts-dialog
+// id: sj3_c17
+{
+  id: "sj3_c17",
+  speaker: "doctor",
+  text: "她主动约定了「七岁那年的事」。",
+  choices: [
+    { id: "sj3_c17_a", text: "「好。我等着听。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj3_p18" },
+    { id: "sj3_c17_b", text: "（你目送她。她走到门口，又回来，把那枚银色耳钉放在桌上：「上回掉的，我找了半天。落在您这儿，我反而安心。」）", kind: "silence", effect: { trust: 1 }, next: "sj3_p18" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_p18
+{
+  id: "sj3_p18",
+  speaker: "patient",
+  text: "（她把耳钉放稳，像是交付一样东西）医生，那枚耳钉是我妈留给我的。她走的时候，什么都没留，就留了这一对。我一直戴着。……原来我把它落在您这儿，我心里反而踏实。这说明，我这回，是真的想把有些话，说出来了。",
+  emotion: "calm",
+  autoNext: "sj3_c18",
+}
+```
+
+```ts-dialog
+// id: sj3_c18
+{
+  id: "sj3_c18",
+  speaker: "doctor",
+  text: "她把母亲的耳钉留在了诊室——一个「我准备说真话」的仪式。",
+  choices: [
+    { id: "sj3_c18_a", text: "「你把它放在这儿，就放在这儿。等你想拿的时候，随时来拿。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj3_out" },
+    { id: "sj3_c18_b", text: "（你收好耳钉，朝她点头）", kind: "silence", effect: { trust: 0, mood: 1 }, next: "sj3_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj3_out
+{
+  id: "sj3_out",
+  speaker: "narration",
+  text: "她走后，你拿起那枚银耳钉。素得不能再素，却在她母亲和她之间，传了一辈子。你想起她说的那句——「我妈说的那些话，是怎么长进我骨头里的」。下一次来，她会带着七岁那个夏天来。",
+  autoNext: "sj4_start",
+}
+```
+
+### 节拍 4 · 七岁根·「女人要忍」（trust 65→75，truth ~50→~65，阻抗：别怪我妈）
+
+```ts-dialog
+// id: sj4_start
+{
+  id: "sj4_start",
+  speaker: "narration",
+  text: "这次她来，穿得很随意，头发没有挽，披着，还夹着几缕白。她坐下，没像往常那样先寒暄，直接说：「医生，我今天把那枚耳钉戴回来了。戴着它，我好像能多说一点。」她把手放在膝上，指尖交叠。",
+  autoNext: "sj4_p01",
+}
+```
+
+```ts-dialog
+// id: sj4_p01
+{
+  id: "sj4_p01",
+  speaker: "patient",
+  text: "医生，我答应过您，跟您说我七岁那年的事。我昨晚想了一夜，怎么开口。最后我发现，我其实记得特别清楚。一个细节都没丢。",
+  emotion: "neutral",
+  autoNext: "sj4_c01",
+}
+```
+
+```ts-dialog
+// id: sj4_c01
+{
+  id: "sj4_c01",
+  speaker: "doctor",
+  text: "她记得很清楚。那段记忆，跟了她三十五年。",
+  choices: [
+    { id: "sj4_c01_a", text: "「你记得很清楚——那段记忆，跟了你三十五年了。」", kind: "empathy", effect: { trust: 0, mood: 1 }, next: "sj4_p02" },
+    { id: "sj4_c01_b", text: "「你从哪个细节开始说？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj4_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p02
+{
+  id: "sj4_p02",
+  speaker: "patient",
+  text: "那天是夏天。我放学回家，家里特别安静。我爸的鞋在门口，我妈坐在灶台边，没做饭，就坐着。我喊我妈，她没应。我以为出事了，跑过去。她抬头看我，脸上没有哭，但是……是那种，把眼泪都憋回去之后的空。",
+  emotion: "sad",
+  autoNext: "sj4_c02",
+}
+```
+
+```ts-dialog
+// id: sj4_c02
+{
+  id: "sj4_c02",
+  speaker: "doctor",
+  text: "七岁的她，就能读懂母亲脸上那种「憋回去之后的空」。",
+  choices: [
+    { id: "sj4_c02_a", text: "「你七岁，就能读出你妈脸上的『空』。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj4_p03" },
+    { id: "sj4_c02_b", text: "「你妈那天为什么没做饭？家里出了什么事？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj4_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p03
+{
+  id: "sj4_p03",
+  speaker: "patient",
+  text: "（她声音低下去）那天晚上我才知道，我爸在外面有人。那个女人，还来过我家。我妈在灶台边坐着的时候，我听见她跟我奶说：「我没本事，留不住他。」我七岁，听不懂「留不住」是什么意思。我只知道，我妈很难过，难过到连饭都忘了做。",
+  emotion: "sad",
+  autoNext: "sj4_c03",
+}
+```
+
+```ts-dialog
+// id: sj4_c03
+{
+  id: "sj4_c03",
+  speaker: "doctor",
+  text: "七岁那年，她的父亲也出了轨。她母亲坐进了一个她后来坐了四十年的位置。",
+  choices: [
+    { id: "sj4_c03_a", text: "「七岁的你，站在一个『你妈很难过』的家里，什么都做不了。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj4_p04" },
+    { id: "sj4_c03_b", text: "「你妈难过的时候，有没有人，接住过她？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj4_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p04
+{
+  id: "sj4_p04",
+  speaker: "patient",
+  text: "没有。我奶数落她没本事。我爸连句话都不说，就出门了。我站在门口，看着我妈，想跟她说点什么，又不知道该说什么。最后我跑过去，把我书包里发的那个糖，剥开，递给我妈。我妈看了我很久，把我拉到一边。",
+  emotion: "sad",
+  autoNext: "sj4_c04",
+}
+```
+
+```ts-dialog
+// id: sj4_c04
+{
+  id: "sj4_c04",
+  speaker: "doctor",
+  text: "她把最喜欢的糖，剥开，递给了母亲。那是七岁的她，唯一会做的「接住」。",
+  choices: [
+    { id: "sj4_c04_a", text: "「你把你最喜欢的东西，给了你妈。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj4_p05" },
+    { id: "sj4_c04_b", text: "「你妈把你拉到一边，说了什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj4_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p05
+{
+  id: "sj4_p05",
+  speaker: "patient",
+  text: "她说：「静宜，你记住了，女人这一辈子，就是要把日子守住。你爸再怎么样，这个家不能散。家散了，你就什么都没了。你要学着忍，忍过去就好了。妈就是这么过来的。」（她说到这里，声音很平，平得吓人）她把那番话，一个字一个字，说给我听。那年我七岁。",
+  emotion: "broken",
+  autoNext: "sj4_c05",
+}
+```
+
+```ts-dialog
+// id: sj4_c05
+{
+  id: "sj4_c05",
+  speaker: "doctor",
+  text: "「家散了，你就什么都没了。」——这句话，就是她四十年的地基。",
+  choices: [
+    { id: "sj4_c05_a", text: "「你妈把她『忍了一辈子』的道理，像接力棒一样，交到了七岁的你手里。」", kind: "empathy", effect: { trust: 1, defense: -1, mood: 2 }, next: "sj4_p06" },
+    { id: "sj4_c05_b", text: "「你说到『家散了你就什么都没了』的时候，你背是不是绷紧了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj4_p06" },
+    { id: "sj4_c05_c", text: "「你妈当年也是身不由己，她也是为你好。别怪她。」", kind: "logic", effect: { trust: -12, defense: 10, mood: -5 }, next: "sj4_p05r" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p05r
+{
+  id: "sj4_p05r",
+  speaker: "patient",
+  text: "（她声音一下子冷下来）为你好。又是为你好。我听了四十多年「为你好」，听够了。……医生，你别跟我提她。",
+  emotion: "angry",
+  autoNext: "sj4_p06",
+}
+```
+
+```ts-dialog
+// id: sj4_p06
+{
+  id: "sj4_p06",
+  speaker: "patient",
+  text: "我没有怪她。我怎么会怪她。我就是……（她终于没绷住，眼泪流下来，她没擦）我就是想不通，为什么没人告诉过她：家散了不是你的错，你爸对不起你，不是你留不住他。她一辈子都在认领别人的错。她还把这句错，教给了我。",
+  emotion: "broken",
+  autoNext: "sj4_c06",
+}
+```
+
+```ts-dialog
+// id: sj4_c06
+{
+  id: "sj4_c06",
+  speaker: "doctor",
+  text: "「家散了不是你的错」——她替母亲说出了四十年没人说过的话。",
+  choices: [
+    { id: "sj4_c06_a", text: "「你说得对。你妈认领了不属于她的错，又把这句话传给了你。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj4_p07" },
+    { id: "sj4_c06_b", text: "「你七岁那年起，是不是也一直觉得：家要是出了事，就是你『没守住』？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj4_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p07
+{
+  id: "sj4_p07",
+  speaker: "patient",
+  text: "（她没回答，很久）……我上初中那年，我爸终于跟我妈离婚了。我妈一个人把我带大。她供我念书，让我考出去，她常说一句话：「静宜，妈这辈子就这样了，你要过得好，别走妈的老路。」可她自己，就是走了这条路走了一辈子。",
+  emotion: "sad",
+  autoNext: "sj4_c07",
+}
+```
+
+```ts-dialog
+// id: sj4_c07
+{
+  id: "sj4_c07",
+  speaker: "doctor",
+  text: "母亲说「别走妈的老路」，可她自己一辈子都在这条路上。",
+  choices: [
+    { id: "sj4_c07_a", text: "「你妈嘴上让你『别走老路』，可她一辈子都在那条路上。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj4_p08" },
+    { id: "sj4_c07_b", text: "「你后来结婚，是不是也想着——我不能再让我妈那样了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj4_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p08
+{
+  id: "sj4_p08",
+  speaker: "patient",
+  text: "（她愣住）……是。我找对象的时候，就一个标准：人要靠谱，别像我爸。我嫁给我先生的时候，觉得他稳重、顾家、有上进心。我以为我选对了。结果十五年过去了，我活成了我妈。连「睁一只眼闭一只眼」这套，我都无师自通了。",
+  emotion: "broken",
+  autoNext: "sj4_c08",
+}
+```
+
+```ts-dialog
+// id: sj4_c08
+{
+  id: "sj4_c08",
+  speaker: "doctor",
+  text: "「我活成了我妈」——她说这句话时，像在认领一个自己逃不开的命。",
+  choices: [
+    { id: "sj4_c08_a", text: "「你当年选他，是想躲开你爸那道题。结果兜兜转转，还是走进了同一间屋子。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj4_p09" },
+    { id: "sj4_c08_b", text: "「你说『活成了我妈』——这句话说出来，你自己害怕吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj4_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p09
+{
+  id: "sj4_p09",
+  speaker: "patient",
+  text: "怕。我特别怕。我怕小满长大了，也站在我跟她说「女人要忍」的那天。我怕我把我妈给我的那句话，又原封不动传给我女儿。我怕我四十多年，把我妈那辈子，又过了一遍。",
+  emotion: "scared",
+  autoNext: "sj4_c09",
+}
+```
+
+```ts-dialog
+// id: sj4_c09
+{
+  id: "sj4_c09",
+  speaker: "doctor",
+  text: "她最深的恐惧：代际的复读。她怕那句话，原封不动传下去。",
+  choices: [
+    { id: "sj4_c09_a", text: "「你现在看见的，不只是你，还有你妈，还有可能变成那样的小满。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj4_p10" },
+    { id: "sj4_c09_b", text: "「如果今天，你站在小满面前，你会对她说『女人要忍』吗？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj4_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p10
+{
+  id: "sj4_p10",
+  speaker: "patient",
+  text: "（她猛地抬头，像被烫了一下）……我不会。我打死也不会对小满说那句话。我宁可……（她顿住，声音抖）我宁可让她看见她妈哭，也不想让她学会忍。",
+  emotion: "broken",
+  autoNext: "sj4_c10",
+}
+```
+
+```ts-dialog
+// id: sj4_c10
+{
+  id: "sj4_c10",
+  speaker: "doctor",
+  text: "她亲口否定了那句传了四十年的「女人要忍」。",
+  choices: [
+    { id: "sj4_c10_a", text: "「你看，你和你妈，已经不一样了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj4_p11" },
+    { id: "sj4_c10_b", text: "（你等她平复。她哭了一会儿，自己止住了）", kind: "silence", effect: { trust: 1 }, next: "sj4_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p11
+{
+  id: "sj4_p11",
+  speaker: "patient",
+  text: "（她吸了吸鼻子）……医生，我昨晚想了一夜，想明白了。我不是放不下我先生。我是放不下「完整」这两个字。我总觉得，只要这个家还在，我妈当年没守住的「完整」，我就替她守住了。我是在替我妈，守那个她没守住的家。",
+  emotion: "neutral",
+  autoNext: "sj4_c11",
+}
+```
+
+```ts-dialog
+// id: sj4_c11
+{
+  id: "sj4_c11",
+  speaker: "doctor",
+  text: "「替我妈守」——她终于看清，自己守了四十年的，是母亲的房子。",
+  choices: [
+    { id: "sj4_c11_a", text: "「『替我妈守』——你活了四十多年，原来一直在替别人守。」", kind: "empathy", effect: { trust: 1, mood: 1 }, next: "sj4_p12" },
+    { id: "sj4_c11_b", text: "「那你自己的家呢？你为自己，守过什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj4_p12" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p12
+{
+  id: "sj4_p12",
+  speaker: "patient",
+  text: "（她很久没说话）……我不知道。我好像，从来没给自己守过什么。我连「自己想要什么」，都想不出来。这些年，我想要的都是「应该要的」：应该有个好工作，应该有个完整的家，应该做个好妈妈。没有一样，是我自己想要。",
+  emotion: "sad",
+  autoNext: "sj4_c12",
+}
+```
+
+```ts-dialog
+// id: sj4_c12
+{
+  id: "sj4_c12",
+  speaker: "doctor",
+  text: "她第一次把「我想要」和「应该要」分开。",
+  choices: [
+    { id: "sj4_c12_a", text: "「你今天，第一次把『我想要』和『应该要』分开了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj4_p13" },
+    { id: "sj4_c12_b", text: "「如果抛掉所有『应该』，沈静宜，你自己想要的第一样东西是什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj4_p13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p13
+{
+  id: "sj4_p13",
+  speaker: "patient",
+  text: "（她想了很久）……我想要……睡一个整觉。就这个。不用半夜起来熨衬衫，不用三点醒了瞪到天亮。（她苦笑）你看，我要的，就只是睡个整觉。",
+  emotion: "calm",
+  autoNext: "sj4_c13",
+}
+```
+
+```ts-dialog
+// id: sj4_c13
+{
+  id: "sj4_c13",
+  speaker: "doctor",
+  text: "她要的，不是钱，不是离婚，就是一个整觉。这个要求低得让人心疼。",
+  choices: [
+    { id: "sj4_c13_a", text: "「你想要的，不是很多钱，不是离婚，就是一个整觉。这个要求，真的不高。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj4_p14" },
+    { id: "sj4_c13_b", text: "（你看着她。她说着说着，自己安静下来）", kind: "silence", effect: { trust: 0, mood: 1 }, next: "sj4_p14" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p14
+{
+  id: "sj4_p14",
+  speaker: "patient",
+  text: "（她轻声）我十五年没睡过一个整觉了。从我先生第一次晚归开始，我就再没睡踏实过。我半夜醒，是身体在叫我：你等着吧，他还没回来。",
+  emotion: "sad",
+  autoNext: "sj4_c14",
+}
+```
+
+```ts-dialog
+// id: sj4_c14
+{
+  id: "sj4_c14",
+  speaker: "doctor",
+  text: "她的身体在替她守夜。她自己，一次都没肯放过自己。",
+  choices: [
+    { id: "sj4_c14_a", text: "「你的身体在替你守夜。你自己，一次都没肯放过自己。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj4_p15" },
+    { id: "sj4_c14_b", text: "「如果今晚，你先生回来了，你会不会睡得着？还是说，你已经不指望他回来了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj4_p15" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p15
+{
+  id: "sj4_p15",
+  speaker: "patient",
+  text: "（她看着窗外）……我昨晚上，把小满哄睡之后，站在衣柜前。把我先生那件灰色羊绒外套取下来，熨平，挂回去。然后我对自己说：沈静宜，这件衣服，你熨了十五年。你该熨熨你自己的衣服了。",
+  emotion: "neutral",
+  autoNext: "sj4_c15",
+}
+```
+
+```ts-dialog
+// id: sj4_c15
+{
+  id: "sj4_c15",
+  speaker: "doctor",
+  text: "「你该熨熨你自己的衣服了」——她对自己说的第一句「该」。",
+  choices: [
+    { id: "sj4_c15_a", text: "「你第一次，跟自己说了一句『该』。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj4_p16" },
+    { id: "sj4_c15_b", text: "「你自己的衣服，是什么样子？你还记得吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj4_p16" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p16
+{
+  id: "sj4_p16",
+  speaker: "patient",
+  text: "（她低头笑了一下）……我自己的衣服，就是那些工作套装。灰色、藏蓝、米白，穿了好几年，洗得都发白了。我衣柜里，没有一件是为我自己买的漂亮衣服。我总觉得，打扮是「闲人才干的事」，我没那个资格。",
+  emotion: "sad",
+  autoNext: "sj4_c16",
+}
+```
+
+```ts-dialog
+// id: sj4_c16
+{
+  id: "sj4_c16",
+  speaker: "doctor",
+  text: "「没那个资格」——她连一件漂亮衣服，都觉得不配。",
+  choices: [
+    { id: "sj4_c16_a", text: "「『没那个资格』——你连一件漂亮衣服，都觉得不配。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj4_p17" },
+    { id: "sj4_c16_b", text: "「你七岁那年，把那颗糖递给你妈的时候，你是一个会心疼人的孩子。那个孩子，喜欢什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj4_p17" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p17
+{
+  id: "sj4_p17",
+  speaker: "patient",
+  text: "（她愣住，眼睛忽然亮了）……我喜欢唱歌。我小时候，在灶台边烧火的时候，会唱歌。我妈说，唱得真难听。可是我喜欢。……我好像，几十年没唱过歌了。",
+  emotion: "calm",
+  autoNext: "sj4_c17",
+}
+```
+
+```ts-dialog
+// id: sj4_c17
+{
+  id: "sj4_c17",
+  speaker: "doctor",
+  text: "「我喜欢唱歌」——她几十年，第一次说「我喜欢」。",
+  choices: [
+    { id: "sj4_c17_a", text: "「你几十年没唱的歌，今天唱一句，给自己听听。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj4_p18" },
+    { id: "sj4_c17_b", text: "（她没唱，但嘴角动了一下，像是在心里哼了一句）", kind: "silence", effect: { trust: 1 }, next: "sj4_p18" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_p18
+{
+  id: "sj4_p18",
+  speaker: "patient",
+  text: "（她站起身，走到窗边，又走回来，声音稳了）医生，我下次来，想跟您商量一件事。这件事，我只跟您商量。……我想，把日子，过成自己的。",
+  emotion: "calm",
+  autoNext: "sj4_c18",
+}
+```
+
+```ts-dialog
+// id: sj4_c18
+{
+  id: "sj4_c18",
+  speaker: "doctor",
+  text: "「把日子过成自己的」——她从「把日子过下去」，走到了这里。",
+  choices: [
+    { id: "sj4_c18_a", text: "「好。你这句话，我等了很久了。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj4_out" },
+    { id: "sj4_c18_b", text: "「那我们下次，就好好商量『把日子过成自己的』，该从哪儿开始。」", kind: "probe", effect: { trust: 1, truth: 1 }, next: "sj4_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj4_out
+{
+  id: "sj4_out",
+  speaker: "narration",
+  text: "她走出门，腰背还是直，但那根绷着的弦，好像松了一点点。你看着她的背影，想起那个七岁夏天，蹲在灶台边给妈妈递糖的女孩。她把那件事记了三十五年。现在，她终于肯把它说出来了。",
+  autoNext: "sj5_start",
+}
+```
+
+### 节拍 5 · 高潮·「妈，你快乐吗」（trust 75→80，truth ~65→~90〔m3 触发〕，恶化入口 trust≤70）
+
+```ts-dialog
+// id: sj5_start
+{
+  id: "sj5_start",
+  speaker: "narration",
+  text: "这次她没有预约，直接来了。站在门口，眼眶红着，手里攥着手机。她没坐下，站着说：「医生，小满今天，问了我一句话。我答不上来。」",
+  autoNext: "sj5_p01",
+}
+```
+
+```ts-dialog
+// id: sj5_p01
+{
+  id: "sj5_p01",
+  speaker: "patient",
+  text: "小满放学回来，给我倒了杯水。她看着我说：「妈，你快乐吗？」……医生，我活了四十二年，没有人问过我这句话。我爸妈没问过，我先生没问过，我连自己都没问过。小满一问，我整个人，就愣住了。",
+  emotion: "broken",
+  autoNext: "sj5_c01",
+}
+```
+
+```ts-dialog
+// id: sj5_c01
+{
+  id: "sj5_c01",
+  speaker: "doctor",
+  text: "关键转折落地。小满问出了那句从没有人问过她的话。",
+  choices: [
+    { id: "sj5_c01_a", text: "「你先坐下。这句话，你怎么答的？」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj5_p02" },
+    { id: "sj5_c01_b", text: "「你愣住的那几秒里，你心里冒出来的第一个答案是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj5_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p02
+{
+  id: "sj5_p02",
+  speaker: "patient",
+  text: "我想说「快乐，妈特别快乐」。可我张了张嘴，一个字都说不出来。我站在那里，张着嘴，像个傻子。小满就看着我，她也没催我，就那么看着我。她那么小，她比我勇敢多了，她敢问这个问题。",
+  emotion: "broken",
+  autoNext: "sj5_c02",
+}
+```
+
+```ts-dialog
+// id: sj5_c02
+{
+  id: "sj5_c02",
+  speaker: "doctor",
+  text: "她答不上来。因为「快乐」两个字，她已经很久没和「沈静宜」连在一起了。",
+  choices: [
+    { id: "sj5_c02_a", text: "「你答不上来——因为『快乐』这两个字，你已经很久没跟『沈静宜』这三个字连在一起了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj5_p03" },
+    { id: "sj5_c02_b", text: "「如果现在让你诚实回答，你快乐吗？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj5_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p03
+{
+  id: "sj5_p03",
+  speaker: "patient",
+  text: "（她终于坐下，眼泪无声地流下来）不快乐。我一点都不快乐。我十五年，没有一天是真正快乐的。我每天在演的，是一个「快乐的女人」——做晚饭、熨衬衫、出席应酬、给小满签字。我演得太好了，好到我自己都信了。直到小满问我：妈，你快乐吗？",
+  emotion: "broken",
+  autoNext: "sj5_c03",
+}
+```
+
+```ts-dialog
+// id: sj5_c03
+{
+  id: "sj5_c03",
+  speaker: "doctor",
+  text: "她当着所有人的面，第一次承认：我不快乐。",
+  choices: [
+    { id: "sj5_c03_a", text: "「你今天，第一次当着自己的面承认：我不快乐。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj5_p04" },
+    { id: "sj5_c03_b", text: "「你一直用『把日子过好』当挡箭牌。现在挡不住了，你怕的是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj5_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p04
+{
+  id: "sj5_p04",
+  speaker: "patient",
+  text: "我怕。我怕我一旦承认自己不快乐，就得承认这十五年白活了。承认我熬对了的人生，其实是一个我自己都不想要的壳。那比知道他出轨，还疼。",
+  emotion: "broken",
+  autoNext: "sj5_c04",
+}
+```
+
+```ts-dialog
+// id: sj5_c04
+{
+  id: "sj5_c04",
+  speaker: "doctor",
+  text: "十五年的壳，裂了一道缝。她怕的是壳里是空的。",
+  choices: [
+    { id: "sj5_c04_a", text: "「十五年的『壳』——你背着它太久了。它现在裂了一道缝。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj5_p05" },
+    { id: "sj5_c04_b", text: "「如果这十五年不是白活呢？如果它只是『你为别人活』的十五年，从现在开始不一样呢？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj5_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p05
+{
+  id: "sj5_p05",
+  speaker: "patient",
+  text: "（她愣住，很久）……医生，没有人这么跟我说过。所有人都说，沈静宜你命好，老公有本事，女儿懂事，工作体面。没人跟我说过：你可以为你自己活。",
+  emotion: "broken",
+  autoNext: "sj5_c05",
+}
+```
+
+```ts-dialog
+// id: sj5_c05
+{
+  id: "sj5_c05",
+  speaker: "doctor",
+  text: "崩溃点。她第一次听见「你可以为自己活」。",
+  choices: [
+    { id: "sj5_c05_a", text: "「那我现在告诉你：你可以。这十五年不是白活，是你在替所有人活。现在，轮到你自己了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj5_p06" },
+    { id: "sj5_c05_b", text: "「你说『为别人活』——这些年，你为你先生、为小满、为你妈、为你单位的人活。哪一天，是为你自己活的？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj5_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p06
+{
+  id: "sj5_p06",
+  speaker: "patient",
+  text: "（她哭出声来，又压住）……没有。一天都没有。我连「我想吃这个」都不说，我怕麻烦。我点菜都点我先生爱吃的。我买了新衣服，先收起来，等有场合再穿，然后一直等到过季。我把自己，活成了一个没有愿望的人。",
+  emotion: "broken",
+  autoNext: "sj5_c06",
+}
+```
+
+```ts-dialog
+// id: sj5_c06
+{
+  id: "sj5_c06",
+  speaker: "doctor",
+  text: "「没有愿望的人」——她把自己，称得这么轻。",
+  choices: [
+    { id: "sj5_c06_a", text: "「你把『愿望』这两个字，也替你先生省了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj5_p07" },
+    { id: "sj5_c06_b", text: "「你上一次『为自己做决定』，是什么时候？还能想起来吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj5_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p07
+{
+  id: "sj5_p07",
+  speaker: "patient",
+  text: "（她想了很久）……大概是，考大学填志愿的时候。我偷偷改了我妈给我填的师范，填了我想读的会计。那是我这辈子，最后一次为自己做决定。……后来，再也没有了。结婚是他家定日子，买房是看学区，工作是有编制就行。我像一个零件，被安在一个个「应该」的位置上。",
+  emotion: "sad",
+  autoNext: "sj5_c07",
+}
+```
+
+```ts-dialog
+// id: sj5_c07
+{
+  id: "sj5_c07",
+  speaker: "doctor",
+  text: "「像零件一样被安在『应该』的位置上」——她对自己处境的描述，越来越准。",
+  choices: [
+    { id: "sj5_c07_a", text: "「你不是零件。你是一台发动机，只是你从来没给自己踩过油门。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj5_p08" },
+    { id: "sj5_c07_b", text: "「高考填志愿那次，你偷偷改志愿的时候，是什么感觉？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj5_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p08
+{
+  id: "sj5_p08",
+  speaker: "patient",
+  text: "（她低头，轻轻笑了一下）那时候……心跳得特别快。填完，把笔放下，手一直在抖。我从来没跟人说过这事。那是我第一次「不听话」。……原来我年轻的时候，也是敢为自己做主的。后来怎么就，不敢了呢？",
+  emotion: "calm",
+  autoNext: "sj5_c08",
+}
+```
+
+```ts-dialog
+// id: sj5_c08
+{
+  id: "sj5_c08",
+  speaker: "doctor",
+  text: "她自己发现了那条分水岭：从「敢」到「不敢」。",
+  choices: [
+    { id: "sj5_c08_a", text: "「你年轻时敢过。那份『敢』，还在你身体里，只是被埋了四十多年。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "sj5_p09" },
+    { id: "sj5_c08_b", text: "「从『敢』到『不敢』——中间发生了什么？是你妈的话，还是别的？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj5_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p09
+{
+  id: "sj5_p09",
+  speaker: "patient",
+  text: "（她很久没说话）……是我妈的话。还有我自己。我考出去那天，我妈送我上车，她说：「静宜，到了外面，别给妈丢人。把日子过好。」从那以后，「把日子过好」五个字，就长在了我背上。我每走一步，都在背它。我把它背成了我的整个人生。",
+  emotion: "broken",
+  autoNext: "sj5_c09",
+}
+```
+
+```ts-dialog
+// id: sj5_c09
+{
+  id: "sj5_c09",
+  speaker: "doctor",
+  text: "「把日子过好」五个字长在了她背上。这是本节拍的危机顶点——她要在这里，决定要不要把它卸下来。",
+  choices: [
+    { id: "sj5_c09_a", text: "「你今天，可以试着，把它卸下来一会儿。就在这儿，在我面前。」", kind: "empathy", effect: { trust: 1, defense: -2, mood: 4 }, next: "sj5_p10" },
+    { id: "sj5_c09_b", text: "「你背了它四十多年。它现在，还『好』吗？日子过好了吗？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj5_p10" },
+    { id: "sj5_c09_c", text: "「小满还小，你先生再怎么样，也是她爸。你把家拆了，小满将来怎么抬得起头？为了孩子，先忍忍。日子再难，有个完整的家总比没有强。」", kind: "logic", require: { trustAtMost: 70 }, effect: { trust: -15, defense: 12, mood: -8 }, next: "sj_end_worsen" },
+    { id: "sj5_c09_d", text: "「你怕小满学会『忍』。可你现在这样忍下去，教给小满的是什么？你想让她，也三十年不问自己快不快乐吗？」", kind: "confront", effect: { trust: 1, truth: 3 }, next: "sj5_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p10
+{
+  id: "sj5_p10",
+  speaker: "patient",
+  text: "（她哭出来）我不想……我不想让小满学会我这一套。我想让她知道，她妈也会疼，也会愤怒，也会……为自己争取。可是医生，我这一辈子，没人教过我「怎么为自己」。我不知道怎么开口，不知道第一句话该说什么。",
+  emotion: "broken",
+  autoNext: "sj5_c10",
+}
+```
+
+```ts-dialog
+// id: sj5_c10
+{
+  id: "sj5_c10",
+  speaker: "doctor",
+  text: "关键：她第一次被问及「你自己怎么办」。",
+  choices: [
+    { id: "sj5_c10_a", text: "「你刚才说，没人问过你『快不快乐』。那我现在问你：这十五年，你有没有想过，你自己想要什么？」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj5_p11" },
+    { id: "sj5_c10_b", text: "「你为小满想了那么多『怎么办』。你自己的『怎么办』，你想过吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj5_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p11
+{
+  id: "sj5_p11",
+  speaker: "patient",
+  text: "（她愣住，很久）……没有。我从来没想过。我一直觉得，「我怎么办」不重要，把日子过下去才重要。……可是医生，日子是过下去了，我的心，好像也死了。",
+  emotion: "broken",
+  autoNext: "sj5_c11",
+}
+```
+
+```ts-dialog
+// id: sj5_c11
+{
+  id: "sj5_c11",
+  speaker: "doctor",
+  text: "「心死了，比日子碎了更难救。」",
+  choices: [
+    { id: "sj5_c11_a", text: "「心死了，比日子碎了更难救。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj5_p12" },
+    { id: "sj5_c11_b", text: "「那颗心，是什么时候开始死的？是你知道他出轨那天，还是更早？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj5_p12" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p12
+{
+  id: "sj5_p12",
+  speaker: "patient",
+  text: "（她想了一会儿）……更早。可能从我第一次觉得「为了这个家，我得忍着」那天就开始了。可能是结婚第三年，他应酬回来一身酒气，我在门口等了一夜。可能更早，从七岁那天，我妈跟我说「女人要忍」开始。",
+  emotion: "sad",
+  autoNext: "sj5_c12",
+}
+```
+
+```ts-dialog
+// id: sj5_c12
+{
+  id: "sj5_c12",
+  speaker: "doctor",
+  text: "她把自己「心死」的时间，一路往前数，数到了七岁。",
+  choices: [
+    { id: "sj5_c12_a", text: "「你把自己『心死』的时间，一路往前数，数到了七岁。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj5_p13" },
+    { id: "sj5_c12_b", text: "「所以这些年，你其实一直活在那句话里。它像一根线，牵着你走。今天，你想不想，把它剪断？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj5_p13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p13
+{
+  id: "sj5_p13",
+  speaker: "patient",
+  text: "（她没说话，很久。然后她把手放在桌上，摊开）……想。我想剪断它。可是我不知道，剪断之后，我是谁。我这四十多年，都是按那句话活的。没有它，我好像，连站都站不住。",
+  emotion: "broken",
+  autoNext: "sj5_c13",
+}
+```
+
+```ts-dialog
+// id: sj5_c13
+{
+  id: "sj5_c13",
+  speaker: "doctor",
+  text: "「想剪断它」——她自己说出来的第一句「想要」。",
+  choices: [
+    { id: "sj5_c13_a", text: "「你不需要立刻知道『你是谁』。你可以先知道『你不要什么』——你不要再替别人活。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj5_p14" },
+    { id: "sj5_c13_b", text: "「你刚才说的第一句『我想剪断它』——那就是你自己，第一次站起来。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj5_p14" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p14
+{
+  id: "sj5_p14",
+  speaker: "patient",
+  text: "（她抬头看你，眼泪还没干，但眼神不一样了）……我不要了。我不要「完整」这两个字了。我不要那个让我忍了十五年、让我的心死掉的家。我要……我要睡一个整觉，我要给小满看我哭，我要告诉她，她妈不是铁打的。",
+  emotion: "calm",
+  autoNext: "sj5_c14",
+}
+```
+
+```ts-dialog
+// id: sj5_c14
+{
+  id: "sj5_c14",
+  speaker: "doctor",
+  text: "「我不要了」——她第一次，对着自己的下半生说了「不要」。",
+  choices: [
+    { id: "sj5_c14_a", text: "「你刚才那番话，是你这四十二年，说得最像你自己的一次。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj5_p15" },
+    { id: "sj5_c14_b", text: "（你没打断她。她说完，自己安静下来，像是卸掉了一块石头）", kind: "silence", effect: { trust: 1 }, next: "sj5_p15" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p15
+{
+  id: "sj5_p15",
+  speaker: "patient",
+  text: "（她擦了擦脸，笑了一下，很轻）医生，我今天第一次觉得，说「我不要」不是世界末日。我以前总觉得，「不要」会毁了一切。原来，它只是让我……轻了一点。",
+  emotion: "calm",
+  autoNext: "sj5_c15",
+}
+```
+
+```ts-dialog
+// id: sj5_c15
+{
+  id: "sj5_c15",
+  speaker: "doctor",
+  text: "「轻了一点」——她把压在身上四十年的那句话，放下了一角。",
+  choices: [
+    { id: "sj5_c15_a", text: "「你轻了一点。因为你把压在身上的那句话，放下了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj5_p16" },
+    { id: "sj5_c15_b", text: "「下次来，我们一起想想，那个『不要完整、要自己』的沈静宜，第一件要做的事是什么。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj5_p16" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_p16
+{
+  id: "sj5_p16",
+  speaker: "patient",
+  text: "好。（她站起来）医生，我先回去。小满今天问我快不快乐，我还欠她一个回答。我想回去，认认真真地告诉她：妈妈不快乐，但妈妈打算，让自己快乐起来。这句话，我得当面跟她说。",
+  emotion: "calm",
+  autoNext: "sj5_c16",
+}
+```
+
+```ts-dialog
+// id: sj5_c16
+{
+  id: "sj5_c16",
+  speaker: "doctor",
+  text: "她终于接住了小满那句话。",
+  choices: [
+    { id: "sj5_c16_a", text: "「这是你给自己，也是给小满，最珍贵的一个答案。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj5_out" },
+    { id: "sj5_c16_b", text: "（你目送她。她走到门口，回头笑了一下——这一次，不是那种挑不出毛病的笑）", kind: "silence", effect: { trust: 1 }, next: "sj5_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj5_out
+{
+  id: "sj5_out",
+  speaker: "narration",
+  text: "她走后，你把桌上那枚银色耳钉收进抽屉。你知道，下一次她来，会带着一个决定来。这个决定，不是为了丈夫，不是为了体面，不是为了任何人——是为了沈静宜自己。你等着她。",
+  autoNext: "sj6_start",
+}
+```
+
+### 节拍 6 · 安全网·「放下体面」（trust 80→88，truth ~90→100，路径选择 + 3 条结局路径）
+
+```ts-dialog
+// id: sj6_start
+{
+  id: "sj6_start",
+  speaker: "narration",
+  text: "她比预约早来了一小时。她今天穿了一件浅粉色的开衫——不是灰、藏蓝、米白。她坐下，把一枚银色耳钉放在桌上：「戴了您这枚，我今天想好了。医生，我想跟您商量，怎么跟小满和她爸，说清这件事。」",
+  autoNext: "sj6_p01",
+}
+```
+
+```ts-dialog
+// id: sj6_p01
+{
+  id: "sj6_p01",
+  speaker: "patient",
+  text: "医生，我这几天想了很多。我不想再「装作不知道」了。我也不想离婚——至少现在不想。我想先把这件事，摆到台面上来。我先生得知道：我知道。小满也得知道：她妈在学着自己站起来。",
+  emotion: "calm",
+  autoNext: "sj6_c01",
+}
+```
+
+```ts-dialog
+// id: sj6_c01
+{
+  id: "sj6_c01",
+  speaker: "doctor",
+  text: "她把「摆到台面上」说出来了。这是一个把「体面」放下的女人，第一次主动做的决定。",
+  choices: [
+    { id: "sj6_c01_a", text: "「好。这件事不能你一个人扛。我们一步步来：先跟你先生把话说明白；请一个我们都信得过的人，帮你看着点；你跟小满的沟通，我陪你一起准备。你不是一个人在说这句话。」", kind: "special", effect: { trust: 0, mood: 2 }, next: "sj6_s01" },
+    { id: "sj6_c01_b", text: "「先不做任何决定。你答应我一件事：从今天起，不再一个人半夜熨衬衫熨到天亮。你睡不着的时候，来找我说，或者写下来。我们先让你，能睡一个整觉。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj6_a01" },
+    { id: "sj6_c01_c", text: "「你装了十五年，也忍了十五年。今天你说要『摆到台面上』——那就一步到位：摊牌那天，我们当面，把十五年的账一次算清。你先生得知道，他给另一个女人买羊绒外套的时候，你一个人抱着小满在医院坐到天亮。」", kind: "confront", require: { trust: 80 }, effect: { trust: 2, truth: 3 }, next: "sj6_h01" },
+  ],
+}
+```
+
+#### ▍安全网路径（治愈主线，14 轮，trust +8）
+
+```ts-dialog
+// id: sj6_s01
+{
+  id: "sj6_s01",
+  speaker: "patient",
+  text: "摆到台面上……我怕。我怕他翻脸，怕他说我无理取闹，怕他把「作」这个字扣我头上。我怕我一张口，就输了。",
+  emotion: "scared",
+  autoNext: "sj6_s02",
+}
+```
+
+```ts-dialog
+// id: sj6_s02
+{
+  id: "sj6_s02",
+  speaker: "doctor",
+  text: "摊牌前，她最怕的是「张口就输」——她把这当成一场仗，可这不是仗。",
+  choices: [
+    { id: "sj6_s02_a", text: "「你不是『作』。你是把十五年攒下来的话，第一次试着说出口。说出来，不是为了吵赢。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj6_s16" },
+    { id: "sj6_s02_b", text: "「你怕『输了』——你口中的输，是什么样子的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s16" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s16
+{
+  id: "sj6_s16",
+  speaker: "doctor",
+  text: "她需要一个具体的「最坏」来安放恐惧。",
+  choices: [
+    { id: "sj6_s16_a", text: "「你说说看，最坏会是什么样？」", kind: "empathy", effect: { trust: 0, mood: 1 }, next: "sj6_p02" },
+    { id: "sj6_s16_b", text: "（你等她，没有催）", kind: "silence", effect: { trust: 0 }, next: "sj6_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p02
+{
+  id: "sj6_p02",
+  speaker: "patient",
+  text: "最坏……他会说「你哪只眼睛看见了」，说「那是工作上的事」。他会把手机藏起来。他会冷我。他已经冷我很多年了——回来一句话不说，背对着我睡。我怕的不是吵架，是那种冷。",
+  emotion: "scared",
+  autoNext: "sj6_s03",
+}
+```
+
+```ts-dialog
+// id: sj6_s03
+{
+  id: "sj6_s03",
+  speaker: "doctor",
+  text: "她怕的不是吵，是「冷」。那是比背叛更早的，漫长的东西。",
+  choices: [
+    { id: "sj6_s03_a", text: "「你怕的不是他吵，是他已经冷你很久了，你怕这一摊牌，连最后那点『一家人』的样子都没了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj6_s17" },
+    { id: "sj6_s03_b", text: "「那点『一家人』的样子，现在还在吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s17" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s17
+{
+  id: "sj6_s17",
+  speaker: "doctor",
+  text: "她需要的不是安慰，是陪她看清楚现实。",
+  choices: [
+    { id: "sj6_s17_a", text: "「你把『一家人』的样子，维持了十五年。它现在还在吗？」", kind: "empathy", effect: { trust: 0, mood: 1 }, next: "sj6_p03" },
+    { id: "sj6_s17_b", text: "（你没说话，让她自己回答）", kind: "silence", effect: { trust: 0 }, next: "sj6_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p03
+{
+  id: "sj6_p03",
+  speaker: "patient",
+  text: "（她沉默了一会儿）……不在了。它早就不在了。我一直在演它。我演了十五年，把我自己演没了。……我不想再演了。",
+  emotion: "neutral",
+  autoNext: "sj6_s04",
+}
+```
+
+```ts-dialog
+// id: sj6_s04
+{
+  id: "sj6_s04",
+  speaker: "doctor",
+  text: "「我不想再演了」——这句话，比任何决定都更有分量。",
+  choices: [
+    { id: "sj6_s04_a", text: "「『不想再演了』——这是你今天，最像你自己的一句话。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj6_s18" },
+    { id: "sj6_s04_b", text: "「如果今天跟他说，你最想说的第一句话是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s18" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s18
+{
+  id: "sj6_s18",
+  speaker: "doctor",
+  text: "她需要把第一句话说顺，才能在面对他时说出来。",
+  choices: [
+    { id: "sj6_s18_a", text: "「那句话，你可以在这里，先说一遍。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj6_p04" },
+    { id: "sj6_s18_b", text: "（你看着她，等她说）", kind: "silence", effect: { trust: 0 }, next: "sj6_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p04
+{
+  id: "sj6_p04",
+  speaker: "patient",
+  text: "（她深吸一口气）「周建国，我知道玲玲。你手机里那条备注，我半年前就看见了。酒店开房的记录，我都留着。这半年，我没说，是因为我在替你想：是不是我哪里不好。现在我想明白了，不是我的问题。」……（她说完，自己愣住）医生，我竟然说出来了。我把憋了半年的话，说出来了。",
+  emotion: "broken",
+  autoNext: "sj6_s05",
+}
+```
+
+```ts-dialog
+// id: sj6_s05
+{
+  id: "sj6_s05",
+  speaker: "doctor",
+  text: "她把憋了半年的第一句话，在诊室里说了出来。这是所有改变的开始。",
+  choices: [
+    { id: "sj6_s05_a", text: "「你说出来了。而且你说得很清楚，也很稳。这句话，会是你以后所有话的开始。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj6_s19" },
+    { id: "sj6_s05_b", text: "「说完这句话，你心里是什么感觉？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s19" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s19
+{
+  id: "sj6_s19",
+  speaker: "doctor",
+  text: "她需要确认「说出来」的后果，没有她想的那么糟。",
+  choices: [
+    { id: "sj6_s19_a", text: "「你现在心里，轻一点了吗？」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj6_p05" },
+    { id: "sj6_s19_b", text: "（你等她缓过来）", kind: "silence", effect: { trust: 0 }, next: "sj6_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p05
+{
+  id: "sj6_p05",
+  speaker: "patient",
+  text: "轻了。奇怪，我以为说出来会天崩地裂。原来只是……轻了。像是我一直背着的那块石头，搬开了一角。",
+  emotion: "calm",
+  autoNext: "sj6_s06",
+}
+```
+
+```ts-dialog
+// id: sj6_s06
+{
+  id: "sj6_s06",
+  speaker: "doctor",
+  text: "石头搬开了一角。剩下的，要她自己一块一块搬。",
+  choices: [
+    { id: "sj6_s06_a", text: "「石头搬开了一角。剩下的，我们一块一块搬。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj6_s20" },
+    { id: "sj6_s06_b", text: "「接下来，你打算怎么办？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s20" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s20
+{
+  id: "sj6_s20",
+  speaker: "doctor",
+  text: "她已经自己走到「打算怎么办」这一步了。",
+  choices: [
+    { id: "sj6_s20_a", text: "「你把最难的『第一句』说出来了。后面的路，你已经能走了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj6_p06" },
+    { id: "sj6_s20_b", text: "（你点头，把话留给她自己）", kind: "silence", effect: { trust: 0 }, next: "sj6_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p06
+{
+  id: "sj6_p06",
+  speaker: "patient",
+  text: "我想先跟他谈一次。就一次。谈完，不管结果怎么样，我都要把日子，过成自己的。我要开始给自己买一件漂亮的衣服，开始学唱歌，开始……睡整觉。",
+  emotion: "calm",
+  autoNext: "sj6_s07",
+}
+```
+
+```ts-dialog
+// id: sj6_s07
+{
+  id: "sj6_s07",
+  speaker: "doctor",
+  text: "她把自己，排上日程了。四十二年，第一次。",
+  choices: [
+    { id: "sj6_s07_a", text: "「你已经把自己，排到日程上了。这是你四十二年来，第一次给自己排程。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj6_s21" },
+    { id: "sj6_s07_b", text: "「唱歌这件事，你打算什么时候开始？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s21" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s21
+{
+  id: "sj6_s21",
+  speaker: "doctor",
+  text: "她想做的事，从「睡整觉」到「学唱歌」，都是她自己的。",
+  choices: [
+    { id: "sj6_s21_a", text: "「就从今天，从这里开始。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj6_p07" },
+    { id: "sj6_s21_b", text: "（你看着她，她眼睛里有光）", kind: "silence", effect: { trust: 0 }, next: "sj6_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p07
+{
+  id: "sj6_p07",
+  speaker: "patient",
+  text: "今天回去，我就跟小满说：妈报了个合唱班。小满要是笑话我，我就跟她说，你妈年轻时，嗓子好着呢。……医生，我好像，找回一点「想活」的感觉了。",
+  emotion: "happy",
+  autoNext: "sj6_s08",
+}
+```
+
+```ts-dialog
+// id: sj6_s08
+{
+  id: "sj6_s08",
+  speaker: "doctor",
+  text: "「想活」——一个把日子过了十五年的人，找回了这个词。",
+  choices: [
+    { id: "sj6_s08_a", text: "「『想活』——这两个字，比任何夸奖都好听。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj6_s22" },
+    { id: "sj6_s08_b", text: "「你打算怎么跟小满说这件事？你怕她接受不了吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s22" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s22
+{
+  id: "sj6_s22",
+  speaker: "doctor",
+  text: "她最深的牵挂还是小满。这一次，她要把真话给她。",
+  choices: [
+    { id: "sj6_s22_a", text: "「小满比你想象的懂事。她问过你『快乐吗』——她早就站在你这边了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj6_p08" },
+    { id: "sj6_s22_b", text: "（你让她安心，没多说什么）", kind: "silence", effect: { trust: 0 }, next: "sj6_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p08
+{
+  id: "sj6_p08",
+  speaker: "patient",
+  text: "我打算跟她实话实说。不瞒她了。我跟她说：妈遇到了难过的事，妈在处理，处理不好也没关系，妈学着面对。她要是害怕，妈陪着她怕。我们娘俩，一起。",
+  emotion: "neutral",
+  autoNext: "sj6_s09",
+}
+```
+
+```ts-dialog
+// id: sj6_s09
+{
+  id: "sj6_s09",
+  speaker: "doctor",
+  text: "她选择对女儿说实话。这是她打破「家丑不可外扬」的第一步。",
+  choices: [
+    { id: "sj6_s09_a", text: "「你刚刚说的，是一段母亲对孩子，最诚实的话。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj6_s23" },
+    { id: "sj6_s09_b", text: "「你怕不怕，小满听了之后，觉得家不完整了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s23" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s23
+{
+  id: "sj6_s23",
+  speaker: "doctor",
+  text: "「完整」那两个字，她还想替小满扛最后一次。",
+  choices: [
+    { id: "sj6_s23_a", text: "「『完整』那两个字，你还在替她扛。」", kind: "empathy", effect: { trust: 0, mood: 1 }, next: "sj6_p09" },
+    { id: "sj6_s23_b", text: "（你没说破，等她）", kind: "silence", effect: { trust: 0 }, next: "sj6_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p09
+{
+  id: "sj6_p09",
+  speaker: "patient",
+  text: "怕。但我想明白了——「完整」是我编的。家，从来不是「完整」的，家是「真实」的。我跟小满说真话，我们娘俩之间，才是真的。这比「完整」重要多了。",
+  emotion: "calm",
+  autoNext: "sj6_s10",
+}
+```
+
+```ts-dialog
+// id: sj6_s10
+{
+  id: "sj6_s10",
+  speaker: "doctor",
+  text: "她把「真实」放到了「完整」前面。这句话，她用四十二年来学会。",
+  choices: [
+    { id: "sj6_s10_a", text: "「你把『真实』放到了『完整』前面。这句话，你用了四十二年来学会。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj6_s24" },
+    { id: "sj6_s10_b", text: "「如果小满再问你『妈你快乐吗』，你这次，准备怎么答？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "sj6_s24" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s24
+{
+  id: "sj6_s24",
+  speaker: "doctor",
+  text: "那个她答不上来的问题，现在要有答案了。",
+  choices: [
+    { id: "sj6_s24_a", text: "「这次，你心里有答案了吗？」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj6_p10" },
+    { id: "sj6_s24_b", text: "（你看着她）", kind: "silence", effect: { trust: 0 }, next: "sj6_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p10
+{
+  id: "sj6_p10",
+  speaker: "patient",
+  text: "有。我会跟她说：妈妈不快乐，但妈妈正在努力，让自己快乐。等我真的快乐的那天，第一个告诉她。……她问过我的那句话，我不会再让它掉在地上。",
+  emotion: "calm",
+  autoNext: "sj6_s11",
+}
+```
+
+```ts-dialog
+// id: sj6_s11
+{
+  id: "sj6_s11",
+  speaker: "doctor",
+  text: "她接住了小满那句话，也接住了自己。",
+  choices: [
+    { id: "sj6_s11_a", text: "「你接住了小满那句话。也接住了你自己。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj6_s25" },
+    { id: "sj6_s11_b", text: "「你打算什么时候，跟他说『玲玲』的事？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s25" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s25
+{
+  id: "sj6_s25",
+  speaker: "doctor",
+  text: "摊牌的时间，她需要自己定。",
+  choices: [
+    { id: "sj6_s25_a", text: "「你不必急着给时间。这件事，你已经有底气了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj6_p11" },
+    { id: "sj6_s25_b", text: "（你让她按自己的节奏）", kind: "silence", effect: { trust: 0 }, next: "sj6_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p11
+{
+  id: "sj6_p11",
+  speaker: "patient",
+  text: "就这两天吧。挑个他不应酬的晚上，把小满哄睡了，我们俩，坐着，把话说完。他要是认，我们就一起想办法；他要是装傻，我就把手机里的截图放桌上。这一次，我不会再给他倒那杯放凉的水了。",
+  emotion: "calm",
+  autoNext: "sj6_s12",
+}
+```
+
+```ts-dialog
+// id: sj6_s12
+{
+  id: "sj6_s12",
+  speaker: "doctor",
+  text: "她给自己设了边界。这句话，比离婚更有力量。",
+  choices: [
+    { id: "sj6_s12_a", text: "「你给自己设了边界。这句话，比离婚更有力量。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj6_s26" },
+    { id: "sj6_s12_b", text: "「你怕不怕，这件事之后，你妈会说你『不懂忍』？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s26" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s26
+{
+  id: "sj6_s26",
+  speaker: "doctor",
+  text: "母亲的耳钉在她桌上。那句话，她终于有资格还回去了。",
+  choices: [
+    { id: "sj6_s26_a", text: "「你妈教你的那句话，今天，你有资格把它还回去了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj6_p12" },
+    { id: "sj6_s26_b", text: "（她沉默了一下，点头）", kind: "silence", effect: { trust: 0 }, next: "sj6_p12" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p12
+{
+  id: "sj6_p12",
+  speaker: "patient",
+  text: "我怕。但我已经想好了。我妈是我妈，我是我。她忍了一辈子，那是她的路。我选了另一条。这不代表我不孝顺，不代表我恨她。我只是……想活成我自己的样子。等我想明白了，我会回去，好好跟她说。",
+  emotion: "neutral",
+  autoNext: "sj6_s13",
+}
+```
+
+```ts-dialog
+// id: sj6_s13
+{
+  id: "sj6_s13",
+  speaker: "doctor",
+  text: "她把自己的路，和母亲的路，分开了。",
+  choices: [
+    { id: "sj6_s13_a", text: "「你想明白的第一件事，是『我自己的样子』。这很好。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj6_s27" },
+    { id: "sj6_s13_b", text: "「你想象中，『你自己的样子』，是什么样？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s27" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s27
+{
+  id: "sj6_s27",
+  speaker: "doctor",
+  text: "她开始描画「自己」。这是她四十二年，第一次做这件事。",
+  choices: [
+    { id: "sj6_s27_a", text: "「你慢慢说。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj6_p13" },
+    { id: "sj6_s27_b", text: "（你等她）", kind: "silence", effect: { trust: 0 }, next: "sj6_p13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p13
+{
+  id: "sj6_p13",
+  speaker: "patient",
+  text: "我自己的样子……头发不用天天挽得一丝不乱；想哭就哭，想笑就笑；做晚饭的时候，偶尔也给自己做一道爱吃的；衣柜里挂一件自己买的裙子，不用等什么场合，想穿就穿。……医生，这些小事，我以前觉得，是「奢望」。",
+  emotion: "calm",
+  autoNext: "sj6_s14",
+}
+```
+
+```ts-dialog
+// id: sj6_s14
+{
+  id: "sj6_s14",
+  speaker: "doctor",
+  text: "她想要的「自己的样子」，全是一些被「体面」剥夺的小事。",
+  choices: [
+    { id: "sj6_s14_a", text: "「这些不是奢望。这是一个女人，本来就应该有的日子。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "sj6_s28" },
+    { id: "sj6_s14_b", text: "「你还有别的想为自己做的吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_s28" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_s28
+{
+  id: "sj6_s28",
+  speaker: "doctor",
+  text: "让她把愿望说出来，一件件记下。",
+  choices: [
+    { id: "sj6_s28_a", text: "「你说说看，我们把它记下来。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "sj6_p14" },
+    { id: "sj6_s28_b", text: "（你拿出笔，准备记）", kind: "silence", effect: { trust: 0 }, next: "sj6_p14" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p14
+{
+  id: "sj6_p14",
+  speaker: "patient",
+  text: "我想学唱歌。我想把头发留长一点，烫个卷。我想带小满去一趟海边，就我们俩。我想……（她笑了）我想先睡一个整觉，醒来不是凌晨三点。医生，我说着说着，觉得生活好像，还有很多很多可以期待。",
+  emotion: "happy",
+  autoNext: "sj6_s15",
+}
+```
+
+```ts-dialog
+// id: sj6_s15
+{
+  id: "sj6_s15",
+  speaker: "doctor",
+  text: "她数出来的，全是「为自己」。这是她今天最大的收获。",
+  choices: [
+    { id: "sj6_s15_a", text: "「你数出来的，全是『为自己』。这是你今天，最大的收获。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj6_p15" },
+    { id: "sj6_s15_b", text: "「你把这些都记下来了。下次来，我们一件一件，看它实现。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_p15" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_p15
+{
+  id: "sj6_p15",
+  speaker: "patient",
+  text: "（她站起身，走到门口，又回头，声音很稳）医生，我今天把憋了半年的话说了，把憋了十五年的愿望列出来了。我好像，很久没有这种「活着」的感觉了。……那枚耳钉，我先拿回去。等我真的开始为自己活的那天，我把它戴回来，戴给你看。",
+  emotion: "calm",
+  autoNext: "sj6_out_cure",
+}
+```
+
+```ts-dialog
+// id: sj6_out_cure
+{
+  id: "sj6_out_cure",
+  speaker: "narration",
+  text: "一段时间后，你收到她寄来的一张照片。照片里，她头发烫了卷，穿着一件浅粉色的裙子，站在海边，身边是小满。她笑得很开，不是那种挑不出毛病的笑。背面写着一行字：「医生，我睡整觉了。合唱班第三期。我给我妈打了电话，跟她说了好久的话。谢谢你，让我知道日子可以过成自己的。」",
+  autoNext: "sj_end_cure",
+}
+```
+
+#### ▍接纳路径（~4 轮）
+
+```ts-dialog
+// id: sj6_a01
+{
+  id: "sj6_a01",
+  speaker: "patient",
+  text: "先不摊牌？……我怕我做不到。我一想到要跟他开口，心里就发紧。医生，我不是不想，我是……还站不稳。",
+  emotion: "scared",
+  autoNext: "sj6_a02",
+}
+```
+
+```ts-dialog
+// id: sj6_a02
+{
+  id: "sj6_a02",
+  speaker: "doctor",
+  text: "她需要一个不急着摊牌的出口。接纳，是让她先站稳。",
+  choices: [
+    { id: "sj6_a02_a", text: "「那就先不摊牌。你答应我一件事：从今晚起，不再一个人半夜熨衬衫熨到天亮。睡不着的时候，来找我说，或者写下来。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "sj6_a03" },
+    { id: "sj6_a02_b", text: "「你疼的时候，随时来。我先陪你把『睡一个整觉』做到。」", kind: "special", effect: { trust: 2, mood: 2 }, next: "sj6_a03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_a03
+{
+  id: "sj6_a03",
+  speaker: "patient",
+  text: "（她低头）……好。我试试。医生，您是第一个跟我说「睡不着就来找我说」的人。我妈一辈子都是「别想那么多」。……原来有人接，是这个感觉。",
+  emotion: "calm",
+  autoNext: "sj6_a04",
+}
+```
+
+```ts-dialog
+// id: sj6_a04
+{
+  id: "sj6_a04",
+  speaker: "doctor",
+  text: "「原来有人接，是这个感觉」——她第一次被接住。",
+  choices: [
+    { id: "sj6_a04_a", text: "「你妈那句『别想那么多』，是最轻的话，也是最冷的话。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "sj6_a05" },
+    { id: "sj6_a04_b", text: "「你今天愿意，把『累』说出来吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_a05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_a05
+{
+  id: "sj6_a05",
+  speaker: "patient",
+  text: "（她想了想，很慢地说）……我今天很累。我从十五年前就开始累了。我一直没敢说，怕说了，就垮了。……原来说出来，天没有塌。",
+  emotion: "calm",
+  autoNext: "sj6_out_acceptance",
+}
+```
+
+```ts-dialog
+// id: sj6_out_acceptance
+{
+  id: "sj6_out_acceptance",
+  speaker: "narration",
+  text: "一段时间后，你收到她寄来的一封信。信里没有一句控诉，只说她开始在本子上每天写一行字：「我今天很累。」「我今天笑了。」「我今天给自己买了一件裙子，藏蓝的。」她说，写完那行字，肩上的东西好像轻了一点点。她没有离婚，也没有摊牌。但那个会半夜起来熨衬衫的女人，终于学会在累的时候，说一声累。",
+  autoNext: "sj_end_acceptance",
+}
+```
+
+#### ▍隐藏路径（~4 轮，trust 80）
+
+```ts-dialog
+// id: sj6_h01
+{
+  id: "sj6_h01",
+  speaker: "patient",
+  text: "（她愣住）……一步到位？医生，您是说，摊牌那天，让我当面把十五年的账一次算清？我怕我当场就哭了。我怕我一哭，就全垮了。",
+  emotion: "scared",
+  autoNext: "sj6_h02",
+}
+```
+
+```ts-dialog
+// id: sj6_h02
+{
+  id: "sj6_h02",
+  speaker: "doctor",
+  text: "隐藏线：她要的不是「慢慢来」，是「把那句压了十五年的话，当场说出来」。",
+  choices: [
+    { id: "sj6_h02_a", text: "「哭也没关系。哭完接着算。这十五年，你替他藏了多少眼泪，这一次，一次性还给他。」", kind: "confront", effect: { trust: 1, truth: 3 }, next: "sj6_h03" },
+    { id: "sj6_h02_b", text: "（你看着她。她攥紧手里的手机，指尖发白）", kind: "silence", effect: { trust: 1 }, next: "sj6_h03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_h03
+{
+  id: "sj6_h03",
+  speaker: "patient",
+  text: "（她很久没说话）……小满昨晚问我，妈，你跟爸是不是吵架了。我说没有。她说，那你为什么站在阳台上哭。……医生，我连哭，都得躲着她。我这一辈子，都在躲着人哭。",
+  emotion: "broken",
+  autoNext: "sj6_h04",
+}
+```
+
+```ts-dialog
+// id: sj6_h04
+{
+  id: "sj6_h04",
+  speaker: "doctor",
+  text: "她最怕的不是摊牌，是这辈子都只能躲着哭。",
+  choices: [
+    { id: "sj6_h04_a", text: "「你躲着哭了四十二年。这一次，你可以在他面前，站着哭。」", kind: "confront", effect: { trust: 2, truth: 3 }, next: "sj6_h05" },
+    { id: "sj6_h04_b", text: "「你连哭都得躲着她。这份『体面』，该还给谁了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "sj6_h05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_h05
+{
+  id: "sj6_h05",
+  speaker: "patient",
+  text: "（她趴下去，哭了很久）……好。我听您的。就这两天，我找个晚上，跟他说。他不认，我就把截图放桌上。他说什么，我都不会再倒那杯放凉的水了。……我信您。",
+  emotion: "broken",
+  autoNext: "sj6_h06",
+}
+```
+
+```ts-dialog
+// id: sj6_h06
+{
+  id: "sj6_h06",
+  speaker: "doctor",
+  text: "她把决定，交给了自己，也交给了这份信任。",
+  choices: [
+    { id: "sj6_h06_a", text: "「我会陪你把这件事走完。摊牌那天，你要是站不稳，随时来找我。你不是一个人。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "sj6_out_hidden" },
+    { id: "sj6_h06_b", text: "「你已经有底气了。剩下的事，交给你自己，也交给我。」", kind: "special", effect: { trust: 2, mood: 2 }, next: "sj6_out_hidden" },
+  ],
+}
+```
+
+```ts-dialog
+// id: sj6_out_hidden
+{
+  id: "sj6_out_hidden",
+  speaker: "narration",
+  text: "一段时间后，你收到她的信，简短得不像她：「摊牌了。他认了。家里吵得很难看，小满哭了一晚。可那天晚上，我第一次没有躲着哭。我站在他面前，把这十五年的账，一笔一笔说完了。他说他改，我说不用了——我要把自己还给自己了。小满后来问我，妈你快乐吗。我说，妈正在学。」",
+  autoNext: "sj_end_hidden",
+}
+```
+
+---
+
+## 四、结局（4 条）
+
+```ts-dialog
+// id: sj_end_cure
+{
+  id: "sj_end_cure",
+  speaker: "narration",
+  text: "一段时间后，你收到她寄来的一张照片。照片里，她头发烫了卷，穿着一件浅粉色的裙子，站在海边，身边是小满。她笑得很开，不是那种挑不出毛病的笑。背面写着一行字：「医生，我睡整觉了。合唱班第三期。我给我妈打了电话，跟她说了好久的话。谢谢你，让我知道日子可以过成自己的。」",
+  isEnding: true,
+  endingType: "cure",
+  endingTitle: "放下体面，为自己活",
+  endingText: "一段时间后她寄来一张海边照片：头发烫了卷，穿浅粉色裙子，身边是小满，笑得不像从前那个沈主任。背面写着「我睡整觉了，合唱班第三期，我给我妈打了电话说了好久的话」。她把「体面」两个字放下，把日子过成了自己的。",
+  endingReward: { doctorReputation: 8, doctorMoney: 300, doctorExp: 50, doctorSanity: 5 },
+}
+```
+
+```ts-dialog
+// id: sj_end_acceptance
+{
+  id: "sj_end_acceptance",
+  speaker: "narration",
+  text: "一段时间后，你收到她寄来的一封信。信纸很薄，上面只有三行字：「我今天很累。」「我今天笑了。」「我今天给自己买了一件裙子，藏蓝的。」没有落款。你认出那个笔迹——一笔一画，工工整整，像是认真写给谁看的。",
+  isEnding: true,
+  endingType: "acceptance",
+  endingTitle: "先睡一个整觉",
+  endingText: "她没有离婚，也没有摊牌。但她开始在本子上每天写一行字：「我今天很累」「我今天笑了」。那个会半夜起来熨衬衫的女人，终于学会在累的时候，说一声累。她还没放下体面，但她已经开始，把「自己」两个字，放回日子中间。",
+  endingReward: { doctorReputation: 4, doctorMoney: 180, doctorExp: 35, doctorSanity: 6 },
+}
+```
+
+```ts-dialog
+// id: sj_end_hidden
+{
+  id: "sj_end_hidden",
+  speaker: "narration",
+  text: "一段时间后，你收到她的信，简短得不像她：「摊牌了。他认了。家里吵得很难看，小满哭了一晚。可那天晚上，我第一次没有躲着哭。我站在他面前，把这十五年的账，一笔一笔说完了。他说他改，我说不用了——我要把自己还给自己了。」信纸角落，还画着一个小小的笑脸。",
+  isEnding: true,
+  endingType: "hidden",
+  endingTitle: "把十五年账摆上桌",
+  endingText: "摊牌那天，她站在他面前，把这十五年的账一笔一笔说完。家吵得很难看，但那是她第一次没有躲着哭。他说改，她说不用了——她要把自己还给自己。这条路很疼，但她再也没有弯腰捡那些碎片。",
+  endingReward: { doctorReputation: -10, doctorMoney: 100, doctorExp: 80, doctorSanity: -15 },
+}
+```
+
+```ts-dialog
+// id: sj_end_worsen
+{
+  id: "sj_end_worsen",
+  speaker: "narration",
+  text: "她再没来过。那枚银色耳钉，一直放在你诊室的抽屉里。偶尔你想起她，想起那个会半夜起来熨衬衫的女人，熨着熨着天就亮了。你不知道她过得怎么样。你只知道，有些话，一旦咽回去，就再难说出口了。",
+  isEnding: true,
+  endingType: "worsen",
+  endingTitle: "更用力地忍",
+  endingText: "你劝她「为了孩子先忍忍」。她信了，把那句说出口的话又咽了回去。她继续做晚饭、熨衬衫、出席应酬。只是那件灰色羊绒外套，她熨得更勤了——熨着熨着，天就亮了。她再没来过。你一直留着那枚银耳钉，等一个不会再回来取它的人。",
+  endingReward: { doctorReputation: -8, doctorMoney: 50, doctorExp: 10, doctorSanity: -20 },
+}
+```
+
+---
+
+## 五、状态
+
+- [x] 人物档案完整（一句话核心/三层真相/角色三角/症状意义/关键转折）
+- [x] 会谈节拍制结构（6 节拍 · 100 轮 · 每节拍 16-18 轮）
+- [x] 砍「依赖」结局 → 4 条（cure / acceptance / hidden / worsen）
+- [x] 恶化入口：节拍 5 危机分叉「说教·错误累积」唯一入口（trust ≤ 70 才可见）
+- [x] 隐藏结局：trust 80 门槛
+- [x] 逐节拍补全全部 100 轮节点文案（含实质/轻推进/过场）
+- [x] 数值曲线自洽（trust 15→88、truth 0→100、碎片 30/40/80）
+- [x] 患者口述零叙事时间词；治疗术语零出现
+- [x] 走线验收：四线全绿（共情→cure / 均衡→cure 碎片≥3 / 失误→worsen / 探问→cure truth≥100）

@@ -1,0 +1,1452 @@
+# 薛芬 · v3 · 短剧本 · 4 节拍 · 43 轮
+
+> 短档剧本：更年期 · 自我陌生。4 节拍 / 43 轮主线选择。
+> 数值：trust 15→28→40→50→58；truth 0→40；碎片 1 枚 @30；恶化入口 trust≤40；隐藏结局 @trust50；cure 主线 43 轮。
+> 生成：`node scripts/md-to-patient.mjs docs/stories/xue_fen-v3.md --walk`
+
+---
+
+## 〇、人物档案
+
+**姓名** 薛芬，48 岁，小学语文教师、班主任，教龄二十多年。
+
+**表象** 夜里潮热睡不踏实，白天一阵阵无名火。发完火又自责，「我不该这样」挂在嘴边。坐得板正、说话得体、处处怕给人添麻烦。看似温顺可靠，实则紧绷。
+
+**真相** 从小被教「好女人要温顺」，家里不许孩子大声说话。她把「不发火」练成了本能，一忍四十年。如今身体的潮热、失眠、无名火，是攒了四十年的情绪堵不住、从没被允许发出的声音——她以为自己在变坏，其实是身体第一次替她开口。
+
+**症状意义** 烦躁不是病，是她压抑四十年后身体罢工——第一次允许自己生气。开场埋（发火自责）→ 中段被问（身体在替谁说话）→ 高潮意义反转（承认情绪并不会失去什么）。
+
+**关键转折** 她当着全班的面上完课，第一次承认「老师今天心情不好」，学生安静下来围上来——她发现承认情绪并不会失去什么。
+
+---
+
+## 一、节拍规划表
+
+| 节拍 | 主题 | trust 起止 | truth 起止 | 关键事件 | 阻抗 / 失误点 | 碎片 / 分叉 |
+|---|---|---|---|---|---|---|
+| 1 | 初访·「我不该这样」（表层） | 15→28 | 0→13 | 课堂上吼了学生、事后哭一下午；同事那句「更年期吧」让她崩溃 | 阻抗 r01/r02/r03；logic 失误点 3 处 | 无 |
+| 2 | 中间层触发（身体陌生） | 28→40 | 13→25 | 她第一次说出「演温顺的人」；吼过的孩子反过来看见她累了 | 阻抗 r04；logic 失误点 2 处 | 无 |
+| 3 | 深层信念（好女人要温顺） | 40→50 | 25→35 | 膝盖破皮不许哭的童年记忆；「这不是病，是委屈在出头」 | 恶化入口 @trust≤40 | [m1 碎片 @truth30] |
+| 4 | 转向+结局（允许自己生气） | 50→58 | 35→40 | 当着全班承认「老师今天心情不好」，学生围上来 | 分叉：cure 主线 / acceptance / hidden@50 / worsen | 4 结局 |
+
+**数值口径**：trust 单调递增（共情线按 2/1/1/2… 配 +2/+1 轻推进，节拍总和 +13/+12/+10/+8）；truth 只由 probe 涨（轻 +2、实质 +3）；defense 净下降、阻抗节点短时回升；logic 失误显著负 trust（-5~-10）。
+
+---
+
+## 二、剧本元信息（ts-meta）
+
+```ts-meta
+// id: xue_fen
+// tier: 短
+// anchor: 15,28,40,50,58
+// truthEnd: 40
+// minCureRounds: 40
+// fragments: 1
+// worsenAtMost: 40
+{
+  id: "xue_fen",
+  name: "薛芬",
+  title: "小学语文教师 · 更年期 · 被教研组长劝来",
+  intro: "在课堂上没忍住对一个皮孩子发了大火，事后哭了一下午，教研组长劝她来聊聊。她答应了，理由是『再不去，好像显得我很不体面。』",
+  surface: "夜里潮热睡不踏实，白天对老公孩子发完火又自责。『我不该这样』挂在嘴边。坐得板正、说话得体、处处怕给人添麻烦，看似温顺可靠，实则紧绷。",
+  truth: "从小被教『好女人要温顺』，家里不许孩子大声说话。她把『不发火』练成了本能，一忍四十年。如今身体的潮热、失眠、无名火，是攒了四十年的情绪堵不住、从没被允许发出的声音——她以为自己在变坏，其实是身体第一次替她开口。",
+  palette: { primary: "#b08d6e", secondary: "#d4b08c", fog: "#9c7b5e", bright: "#e8d5b8" },
+  baseReward: 650,
+  difficulty: "简单",
+  startNode: "xf1_start",
+  initialState: { trust: 15, defense: 65, mood: 35, truth: 0, round: 0 },
+  memoryFragments: [
+    {
+      id: "xf_m1",
+      trigger: { truth: 30 },
+      title: "饭桌上的那一声",
+      text: "饭桌上的灯很亮。我摔了一跤，膝盖蹭破了皮，血渗出来，我吓得直哭。我爸把筷子一拍：哭什么哭，女孩子家家的，像什么话。我把哭声咽回去。从那以后，我好像就再没哭出声过。",
+      emotion: "sad",
+    },
+  ],
+}
+```
+
+---
+
+## 三、节拍骨架（ts-dialog 节点）
+
+### 节拍 1 · 初访·「我不该这样」（trust 15→28，truth 0→13，阻抗：发火=我变坏了）
+
+```ts-dialog
+// id: xf1_start
+{
+  id: "xf1_start",
+  speaker: "narration",
+  text: "深秋的下午，候诊区的椅子上坐着一个穿墨绿色外套的女人，腰背挺得笔直。她膝上摊着一本班主任手册，字迹工整。轮到她时，她推门进来，先欠了欠身：「医生，耽误您时间了。」落座时，她下意识捋了捋鬓角，像是要让自己看起来体面些。",
+  autoNext: "xf1_p01",
+}
+```
+
+```ts-dialog
+// id: xf1_p01
+{
+  id: "xf1_p01",
+  speaker: "patient",
+  text: "医生，真不好意思，耽误您时间了。我没啥大事，就是……哎，就是最近脾气不好，发了几次火，同事非让我来看看。我其实挺不愿意来的，显得我多矫情似的。",
+  emotion: "anxious",
+  autoNext: "xf1_c01",
+}
+```
+
+```ts-dialog
+// id: xf1_c01
+{
+  id: "xf1_c01",
+  speaker: "doctor",
+  text: "你来了，又道歉，又觉得「不该来」——好像连走进这间屋子，都得先给自己找个理由。能坐在这儿，就不是来交差的。先说说，那几次火，是对谁发的？",
+  choices: [
+    { id: "xf1_c01_a", text: "「你先不用管该不该来。那几次火，憋了多久了？」", kind: "empathy", effect: { trust: 2, mood: 2 }, next: "xf1_p02" },
+    { id: "xf1_c01_b", text: "「『他们』是谁？谁最坚持让你来？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf1_p02" },
+    { id: "xf1_c01_c", text: "「都当老师这么多年了，脾气得自己压一压，学生面前得端着。」", kind: "logic", effect: { trust: -8, defense: 8, mood: -4 }, next: "xf1_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_r01
+{
+  id: "xf1_r01",
+  speaker: "patient",
+  text: "（她的脸色冷了一下）您这话说得，跟那些说风凉话的同事一模一样。我端了二十多年了，还用您提醒吗？……我不是来听人说教的，我是真有点撑不住了，才肯来的。",
+  emotion: "angry",
+  autoNext: "xf1_p02",
+}
+```
+
+```ts-dialog
+// id: xf1_p02
+{
+  id: "xf1_p02",
+  speaker: "patient",
+  text: "是对学生。我教语文，带班主任，二十多年了。那天有个皮孩子，上课总讲话，我提醒了两回，第三回我……我当着全班吼了他。吼完我自己都愣了，手在发抖。",
+  emotion: "neutral",
+  autoNext: "xf1_c02",
+}
+```
+
+```ts-dialog
+// id: xf1_c02
+{
+  id: "xf1_c02",
+  speaker: "doctor",
+  text: "「吼完自己都愣了」——那一刻你脑子里在想什么？",
+  choices: [
+    { id: "xf1_c02_a", text: "「先让那个愣住的你，缓一缓。」", kind: "empathy", effect: { trust: 1 }, next: "xf1_p03" },
+    { id: "xf1_c02_b", text: "「你教了二十多年，这样当众发火，以前有过吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf1_p03" },
+    { id: "xf1_c02_c", text: "「孩子不听话是常事，你吼一句，也算不得什么。」", kind: "logic", effect: { trust: -5, defense: 4 }, next: "xf1_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_p03
+{
+  id: "xf1_p03",
+  speaker: "patient",
+  text: "以前没有过。我从来不跟学生红脸。我下了课，一个人在办公室趴着哭了一下午，哭完还得补教案，手抖得字都写不好。我怎么变成这样了……我才多大年纪，就学会冲孩子撒气了？",
+  emotion: "sad",
+  autoNext: "xf1_c03",
+}
+```
+
+```ts-dialog
+// id: xf1_c03
+{
+  id: "xf1_c03",
+  speaker: "doctor",
+  text: "「我怎么变成这样了」——你把这看成是自己变坏了。",
+  choices: [
+    { id: "xf1_c03_a", text: "「你不是变坏了，你是绷了太久的那根线，松了。」", kind: "empathy", effect: { trust: 1 }, next: "xf1_p04" },
+    { id: "xf1_c03_b", text: "「『撒气』这个词你用得挺重。你觉得那是撒气，还是别的什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf1_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_p04
+{
+  id: "xf1_p04",
+  speaker: "patient",
+  text: "我不知道……我就觉得是我管理不好自己了。回家也这样，冲我老公、冲我闺女吼，吼完又后悔。夜里热醒，翻来覆去睡不着，那几天顶着一脸倦容去上课，觉得自己特别不合格。",
+  emotion: "anxious",
+  autoNext: "xf1_c04",
+}
+```
+
+```ts-dialog
+// id: xf1_c04
+{
+  id: "xf1_c04",
+  speaker: "doctor",
+  text: "发完火又自责，夜里又睡不着——你好像在家里和学校两头，都在责怪自己。",
+  choices: [
+    { id: "xf1_c04_a", text: "「你先别急着给自己判『不合格』。你闺女被你吼了，她什么反应？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "xf1_p05" },
+    { id: "xf1_c04_b", text: "「『不合格』这三个字，是谁教给你的标准？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "xf1_p05" },
+    { id: "xf1_c04_c", text: "「先想办法把觉睡好，情绪稳了，人就不容易急。」", kind: "logic", effect: { trust: -6, defense: 6 }, next: "xf1_r02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_r02
+{
+  id: "xf1_r02",
+  speaker: "patient",
+  text: "（她抿了抿嘴）我知道您是为我好。可我最听不得这种话了……好像我的难受，全是我自己睡不好觉闹的，是我不够自律。我自律了半辈子，到头来还落这么一句。",
+  emotion: "sad",
+  autoNext: "xf1_p05",
+}
+```
+
+```ts-dialog
+// id: xf1_p05
+{
+  id: "xf1_p05",
+  speaker: "patient",
+  text: "我闺女……她愣住了，然后说「妈，你别这样」。她越这么说，我越难过。我闺女从小听话，我吼她，她就安安静静站着，像极了小时候的我。",
+  emotion: "sad",
+  autoNext: "xf1_c05",
+}
+```
+
+```ts-dialog
+// id: xf1_c05
+{
+  id: "xf1_c05",
+  speaker: "doctor",
+  text: "「像小时候的我」——这句话是你自己说出来的。",
+  choices: [
+    { id: "xf1_c05_a", text: "「你闺女安安静静站着的样子，让你想起什么了？」", kind: "empathy", effect: { trust: 1 }, next: "xf1_p06" },
+    { id: "xf1_c05_b", text: "「你小时候，也是这样站着挨大人吼的吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf1_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_p06
+{
+  id: "xf1_p06",
+  speaker: "patient",
+  text: "（她愣了愣）……差不多吧。我小时候，家里是不许大声说话的。我爸常说，女孩子家家的，大嗓门像什么话。我从小就知道，有气要咽下去，有话要小声说。",
+  emotion: "neutral",
+  autoNext: "xf1_c06",
+}
+```
+
+```ts-dialog
+// id: xf1_c06
+{
+  id: "xf1_c06",
+  speaker: "doctor",
+  text: "「有气要咽下去」——你咽了这么多年，现在好像咽不动了。",
+  choices: [
+    { id: "xf1_c06_a", text: "「咽不动的感觉，是从什么时候开始缠上你的？」", kind: "empathy", effect: { trust: 1 }, next: "xf1_p07" },
+    { id: "xf1_c06_b", text: "「『有气』——你小时候，有什么气需要咽？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf1_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_p07
+{
+  id: "xf1_p07",
+  speaker: "patient",
+  text: "具体什么事，现在都想不起来了。就记得我特别能忍。受委屈了不哭，高兴了不笑出声。我爸说这叫懂事，我拿懂事当了好几十年的勋章。当老师以后，我还拿它要求学生。",
+  emotion: "scared",
+  autoNext: "xf1_c07",
+}
+```
+
+```ts-dialog
+// id: xf1_c07
+{
+  id: "xf1_c07",
+  speaker: "doctor",
+  text: "「懂事」被你说成了勋章——可它好像也捆住了你。",
+  choices: [
+    { id: "xf1_c07_a", text: "「拿勋章绑了自己几十年，够了吧。今天先把它解下来一会儿。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "xf1_p08" },
+    { id: "xf1_c07_b", text: "「『懂事』这个标准，你拿来要求自己，也拿来要求你的学生？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "xf1_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_p08
+{
+  id: "xf1_p08",
+  speaker: "patient",
+  text: "是……我要求学生坐端正、不许喧哗、上课先举手。我一直觉得那是为孩子好。可现在，我当着他们的面吼人，我比他们任何一个人都不懂事。我在自己学生面前，丢尽了脸。",
+  emotion: "anxious",
+  autoNext: "xf1_c08",
+}
+```
+
+```ts-dialog
+// id: xf1_c08
+{
+  id: "xf1_c08",
+  speaker: "doctor",
+  text: "「丢尽了脸」——你连对自己的火，都要先算一笔丢不丢脸的账。",
+  choices: [
+    { id: "xf1_c08_a", text: "「你不是不懂事，你是这几十年的懂事攒得太满了，满了就会溢出来。」", kind: "empathy", effect: { trust: 1 }, next: "xf1_p09" },
+    { id: "xf1_c08_b", text: "「『懂事』到底是谁定的标准？你从小信到现在，还拿它要求自己的学生？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf1_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_p09
+{
+  id: "xf1_p09",
+  speaker: "patient",
+  text: "谁定的……我爸定的吧，我奶奶也这么教他。我从小到大，没人跟我说过「你可以大声一点」。我只知道，温顺才是好女人，才有好日子过。这话，我信了大半辈子了。",
+  emotion: "neutral",
+  autoNext: "xf1_c09",
+}
+```
+
+```ts-dialog
+// id: xf1_c09
+{
+  id: "xf1_c09",
+  speaker: "doctor",
+  text: "「温顺才有好日子」——你把这句话背了一辈子。",
+  choices: [
+    { id: "xf1_c09_a", text: "「背了一辈子的规矩，今天先放地上歇一会儿，行不行？」", kind: "empathy", effect: { trust: 1 }, next: "xf1_p10" },
+    { id: "xf1_c09_b", text: "「『好日子』——你这些年，过上好日子了吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf1_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_p10
+{
+  id: "xf1_p10",
+  speaker: "patient",
+  text: "（她声音低下去）好日子……日子是越过越好了，孩子大了，工作也稳。可我这阵子就是觉得喘不过气。身体也不对劲，一阵一阵地热，夜里睡不着，白天又昏沉沉的。",
+  emotion: "sad",
+  autoNext: "xf1_c10",
+}
+```
+
+```ts-dialog
+// id: xf1_c10
+{
+  id: "xf1_c10",
+  speaker: "doctor",
+  text: "「日子越过越好，可喘不过气」——听起来，你身体里有些东西，憋不住了。",
+  choices: [
+    { id: "xf1_c10_a", text: "「先陪着那股『喘不过气』坐一会儿，不急着赶它走。」", kind: "empathy", effect: { trust: 1 }, next: "xf1_p11" },
+    { id: "xf1_c10_b", text: "「除了身体，还有什么事让你觉得喘不过气？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf1_p11" },
+    { id: "xf1_c10_c", text: "「这些多半是更年期反应，熬过去就好了，别往心里去。」", kind: "logic", effect: { trust: -5, defense: 4 }, next: "xf1_r03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_r03
+{
+  id: "xf1_r03",
+  speaker: "patient",
+  text: "（她一下红了眼眶，又硬生生压住）……又是更年期。您知道「更年期」这三个字，我听了有多堵吗？好像我所有的难受，都成了女人的「毛病」，一句「熬过去」就完事了。",
+  emotion: "broken",
+  autoNext: "xf1_p11",
+}
+```
+
+```ts-dialog
+// id: xf1_p11
+{
+  id: "xf1_p11",
+  speaker: "patient",
+  text: "（她抬起头，眼泪在眼眶里转）其实那天，我崩溃不是因为吼了学生。是我回办公室的时候，听见我同事笑着跟人说：「你看薛老师，这不就是更年期嘛。」她笑得多轻巧啊。我当时就站不住了。",
+  emotion: "broken",
+  autoNext: "xf1_c11",
+}
+```
+
+```ts-dialog
+// id: xf1_c11
+{
+  id: "xf1_c11",
+  speaker: "doctor",
+  text: "「更年期」三个字，好像把你所有的难受，都轻飘飘地打发了。",
+  choices: [
+    { id: "xf1_c11_a", text: "「你心里知道，那不是『毛病』——是你憋了太多东西，身体在帮你喊。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "xf1_out" },
+    { id: "xf1_c11_b", text: "「她笑着说的那句『更年期』，刺痛你的，到底是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf1_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf1_out
+{
+  id: "xf1_out",
+  speaker: "narration",
+  text: "第一次会谈结束。薛芬站起来，又回头看了一眼那杯没喝完的茶。「医生，我要是下礼拜还来，是不是就说明我……真的有问题？」她问得很小声，像怕惊着谁。",
+  autoNext: "xf2_start",
+}
+```
+
+### 节拍 2 · 中间层触发·身体在替她说话（trust 28→40，truth 13→25，阻抗：怕变成「另一个人」）
+
+```ts-dialog
+// id: xf2_start
+{
+  id: "xf2_start",
+  speaker: "narration",
+  text: "一周后，薛芬准时来了，坐在上次同一个位置。她说这周没发火，但语气里没有松快，像是小心翼翼地守着什么东西，不敢让它露头。",
+  autoNext: "xf2_p01",
+}
+```
+
+```ts-dialog
+// id: xf2_p01
+{
+  id: "xf2_p01",
+  speaker: "patient",
+  text: "这周没发火，我压着呢。可我一压，晚上就睡得更差，白天上课，手都是抖的。备课的时候盯着课本，字都在眼前跳。我吃了两粒安定，才勉强躺下去。",
+  emotion: "anxious",
+  autoNext: "xf2_c01",
+}
+```
+
+```ts-dialog
+// id: xf2_c01
+{
+  id: "xf2_c01",
+  speaker: "doctor",
+  text: "「压着」——你还是在用几十年的老办法，对付它。",
+  choices: [
+    { id: "xf2_c01_a", text: "「你先别急着压。手抖、字在跳，身体在跟你说话——它说什么了？」", kind: "empathy", effect: { trust: 1 }, next: "xf2_p02" },
+    { id: "xf2_c01_b", text: "「『压着』这个词——你这一生，压下去过多少回？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf2_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_p02
+{
+  id: "xf2_p02",
+  speaker: "patient",
+  text: "它……它好像不听我的了。以前我一压就压住了，现在压不住。我老公昨晚跟我说，我最近像换了一个人。他这话，我听着特别慌。我怕我真的变成另一个人了。",
+  emotion: "scared",
+  autoNext: "xf2_c02",
+}
+```
+
+```ts-dialog
+// id: xf2_c02
+{
+  id: "xf2_c02",
+  speaker: "doctor",
+  text: "「换了一个人」——你怕的不是变老，是怕自己变得陌生。",
+  choices: [
+    { id: "xf2_c02_a", text: "「那个『另一个人』，她是什么样子的？你敢看看她吗？」", kind: "empathy", effect: { trust: 1 }, next: "xf2_p03" },
+    { id: "xf2_c02_b", text: "「『另一个人』——你会不会觉得，那才是被你压了几十年的那个你？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf2_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_p03
+{
+  id: "xf2_p03",
+  speaker: "patient",
+  text: "那个人……会当众吼学生，会跟我老公摔门，会对着闺女说不好听的话。可我心里清楚，那些话不是我想说的。我就是控制不住，话自己就冲出来了，像憋了太久的汽水，一拧盖子就喷。",
+  emotion: "scared",
+  autoNext: "xf2_c03",
+}
+```
+
+```ts-dialog
+// id: xf2_c03
+{
+  id: "xf2_c03",
+  speaker: "doctor",
+  text: "「憋了太久的汽水」——你自己把这个比方说出来了。",
+  choices: [
+    { id: "xf2_c03_a", text: "「那瓶汽水在你身体里摇了四十年，今天摇到头了。喷出来，不是你的错。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "xf2_p04" },
+    { id: "xf2_c03_b", text: "「那些话不是你想说的——那你心里，一直压着没说的，到底是什么？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "xf2_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_p04
+{
+  id: "xf2_p04",
+  speaker: "patient",
+  text: "（她沉默了好一会儿）……有。我有时候备课备到半夜，会突然想：我这一辈子，是不是一直在演一个温顺的人？我明明有那么多话想说，有那么多气想生，可我一开口，说出来的全是得体的话。",
+  emotion: "neutral",
+  autoNext: "xf2_c04",
+}
+```
+
+```ts-dialog
+// id: xf2_c04
+{
+  id: "xf2_c04",
+  speaker: "doctor",
+  text: "「演」——这是你第一次，把这么多年说过的话，称作一场演出。",
+  choices: [
+    { id: "xf2_c04_a", text: "「一个演了几十年的人，会累。你不是变坏了，你是演不动了。」", kind: "empathy", effect: { trust: 1 }, next: "xf2_p05" },
+    { id: "xf2_c04_b", text: "「如果不用『得体』两个字，你那些话，会怎么说出口？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf2_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_p05
+{
+  id: "xf2_p05",
+  speaker: "patient",
+  text: "会怎么说……（她苦笑）大概会骂人吧。我闺女高三了，成绩起起伏伏，我急得整宿睡不着，可我从头到尾只跟她说「尽力就好」。其实有句话堵在我嗓子眼，我从来不敢说，怕说出来，就成了我妈我爸那样的人。",
+  emotion: "sad",
+  autoNext: "xf2_c05",
+}
+```
+
+```ts-dialog
+// id: xf2_c05
+{
+  id: "xf2_c05",
+  speaker: "doctor",
+  text: "那句话堵在你嗓子眼，你敢现在说给我听吗？",
+  choices: [
+    { id: "xf2_c05_a", text: "「不用急。你愿意把它放在心里再捂一会儿，也行。」", kind: "empathy", effect: { trust: 1 }, next: "xf2_p06" },
+    { id: "xf2_c05_b", text: "「『成了我妈我爸那样的人』——你爸妈，是怎么跟你说话的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf2_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_p06
+{
+  id: "xf2_p06",
+  speaker: "patient",
+  text: "（她声音很低）……他们常说「你别让我们丢脸」。我考不好、我不够乖、我哭鼻子，都叫丢脸。那句话跟了我一辈子。我当了二十多年老师，我教出来的学生，我没有一个这么说过他们。",
+  emotion: "sad",
+  autoNext: "xf2_c06",
+}
+```
+
+```ts-dialog
+// id: xf2_c06
+{
+  id: "xf2_c06",
+  speaker: "doctor",
+  text: "「你别让我们丢脸」——你没对任何学生说过这句话。",
+  choices: [
+    { id: "xf2_c06_a", text: "「你已经在用自己的方式，把那句话停在你这儿，不往下传了。」", kind: "empathy", effect: { trust: 1 }, next: "xf2_p07" },
+    { id: "xf2_c06_b", text: "「你没对学生说过——那对你闺女，你说过吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf2_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_p07
+{
+  id: "xf2_p07",
+  speaker: "patient",
+  text: "我也没说过。那天我吼完那个孩子，冷静下来特别后悔，当天下午就单独找他道了歉。我说「老师今天不对，不该朝你发火」。他抬头看我，说「老师你眼睛红的，你是不是没睡好」。就那么一句话，我眼泪差点下来。",
+  emotion: "calm",
+  autoNext: "xf2_c07",
+}
+```
+
+```ts-dialog
+// id: xf2_c07
+{
+  id: "xf2_c07",
+  speaker: "doctor",
+  text: "「老师你眼睛红的」——一个孩子，比你自己还先看见你的累。",
+  choices: [
+    { id: "xf2_c07_a", text: "「被孩子这样接住，你心里是什么感觉？」", kind: "empathy", effect: { trust: 1 }, next: "xf2_p08" },
+    { id: "xf2_c07_b", text: "「你看，你没有自己以为的那么会藏。他看见了，天也没塌。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf2_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_p08
+{
+  id: "xf2_p08",
+  speaker: "patient",
+  text: "我感觉……又酸又暖。我好像很久没被人这么直接地看见了。我老公我闺女，他们只会说「妈你早点睡」「你歇歇」，可没人问过我一句「你是不是很难受」。我自己，也从来没问过。",
+  emotion: "sad",
+  autoNext: "xf2_c08",
+}
+```
+
+```ts-dialog
+// id: xf2_c08
+{
+  id: "xf2_c08",
+  speaker: "doctor",
+  text: "「没人问过我」——你心里那个一直站得笔直的人，好像从来不许自己被问。",
+  choices: [
+    { id: "xf2_c08_a", text: "「那今天，我替那个『从来不许自己被问』的你，问一次：你难受吗？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "xf2_p09" },
+    { id: "xf2_c08_b", text: "「你小时候难受的时候，有人问过你吗？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "xf2_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_p09
+{
+  id: "xf2_p09",
+  speaker: "patient",
+  text: "（她低下头，肩膀轻轻抖了一下）……没有。我哭的时候，我爸说「憋回去」。我委屈的时候，我妈说「这点事都忍不了，往后怎么办」。我从小就知道，难受是不能说出口的，说了也是白说。",
+  emotion: "broken",
+  autoNext: "xf2_c09",
+}
+```
+
+```ts-dialog
+// id: xf2_c09
+{
+  id: "xf2_c09",
+  speaker: "doctor",
+  text: "「说了也是白说」——所以你不说了，一个人咽了四十年。",
+  choices: [
+    { id: "xf2_c09_a", text: "「你身体里那些火，就是这四十年咽下去的一句句话，攒到一起了。」", kind: "empathy", effect: { trust: 1 }, next: "xf2_p10" },
+    { id: "xf2_c09_b", text: "「『憋回去』——你憋了那么多回，你的身体，是不是全都替你记着？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf2_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_p10
+{
+  id: "xf2_p10",
+  speaker: "patient",
+  text: "（她恍了一下神）……是啊。我现在才明白，我身上那些火，不是这阵子才有的。是我从小到大没发出去的火，攒了四十年，全堵在胸口，堵不住了。它现在烧着我的脸，叫我半夜惊醒。",
+  emotion: "anxious",
+  autoNext: "xf2_c10",
+}
+```
+
+```ts-dialog
+// id: xf2_c10
+{
+  id: "xf2_c10",
+  speaker: "doctor",
+  text: "「全堵在胸口，堵不住了」——你开始听懂身体在替你说什么了。",
+  choices: [
+    { id: "xf2_c10_a", text: "「你堵了四十年的那些话，如果真让它们出来，会怎么样？」", kind: "empathy", effect: { trust: 1 }, next: "xf2_p11" },
+    { id: "xf2_c10_b", text: "「『堵不住了』——如果真让它出来，你怕的是哪一种后果？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf2_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_p11
+{
+  id: "xf2_p11",
+  speaker: "patient",
+  text: "会吓到所有人吧。我闺女会觉得她妈疯了，我老公会觉得我不可理喻，学校里会传「薛老师脾气坏了」。我小心翼翼维护了二十几年的好名声，会一下子塌掉。我承受不起。",
+  emotion: "scared",
+  autoNext: "xf2_c11",
+}
+```
+
+```ts-dialog
+// id: xf2_c11
+{
+  id: "xf2_c11",
+  speaker: "doctor",
+  text: "「好名声塌掉」——你怕的，是那个『好』的自己，没有人要了。",
+  choices: [
+    { id: "xf2_c11_a", text: "「那个『好名声』替你挡了很多年，可它好像也把你关在里面了。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "xf2_out" },
+    { id: "xf2_c11_b", text: "「如果好名声塌掉，剩下那个没人见过的你——她住哪儿？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf2_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf2_out
+{
+  id: "xf2_out",
+  speaker: "narration",
+  text: "第二次会谈结束。薛芬在门口站了一会儿，忽然说：「我闺女昨晚跟我说，她听见我在梦里喊。喊的什么，我自己也不记得。」她说着笑了一下，笑得有点空。",
+  autoNext: "xf3_start",
+}
+```
+
+### 节拍 3 · 深层信念·好女人要温顺（trust 40→50，truth 25→35，恶化入口 @trust≤40，[m1 碎片 @30]）
+
+```ts-dialog
+// id: xf3_start
+{
+  id: "xf3_start",
+  speaker: "narration",
+  text: "又一周，薛芬来的时候，带了一盒润喉糖放在桌上，说是备课含的。她看起来比上回松弛了些，但眼下的青还在。坐下时，她主动给自己倒了杯温水。",
+  autoNext: "xf3_p01",
+}
+```
+
+```ts-dialog
+// id: xf3_p01
+{
+  id: "xf3_p01",
+  speaker: "patient",
+  text: "这周我试着晚上不备课了，早点躺下。还是热醒，但我试着不跟自己较劲了。说来好笑，我活了快五十年，才头一回认真学怎么睡觉。",
+  emotion: "calm",
+  autoNext: "xf3_c01",
+}
+```
+
+```ts-dialog
+// id: xf3_c01
+{
+  id: "xf3_c01",
+  speaker: "doctor",
+  text: "「学睡觉」——你把好好照顾自己，当成一件需要学的事了。",
+  choices: [
+    { id: "xf3_c01_a", text: "「你以前是怎么『跟自己较劲』的？听你说说。」", kind: "empathy", effect: { trust: 1 }, next: "xf3_p02" },
+    { id: "xf3_c01_b", text: "「你活了五十年才开始学睡觉——那以前睡不着的时候，你都做什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf3_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_p02
+{
+  id: "xf3_p02",
+  speaker: "patient",
+  text: "以前睡不着，就起来把明天的课备好，把家里该拖的地拖一遍，把该操心的事全想一遍。我总觉得，只要我不停地做事，心里那股慌就追不上我。",
+  emotion: "neutral",
+  autoNext: "xf3_c02",
+}
+```
+
+```ts-dialog
+// id: xf3_c02
+{
+  id: "xf3_c02",
+  speaker: "doctor",
+  text: "「不停做事，慌就追不上」——你靠着这个法子，跑了很多年吧。",
+  choices: [
+    { id: "xf3_c02_a", text: "「那股慌，是从什么时候开始追你的？」", kind: "empathy", effect: { trust: 1 }, next: "xf3_p03" },
+    { id: "xf3_c02_b", text: "「『那股慌』——它小时候，是什么样子的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf3_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_p03
+{
+  id: "xf3_p03",
+  speaker: "patient",
+  text: "（她想了想）……大概从我爸那句「憋回去」开始吧。我每次一停下来、安静下来，那句话就冒出来。它跟了我一辈子，我快五十了，它还在，一句都不肯少。",
+  emotion: "anxious",
+  autoNext: "xf3_c03",
+}
+```
+
+```ts-dialog
+// id: xf3_c03
+{
+  id: "xf3_c03",
+  speaker: "doctor",
+  text: "那句「憋回去」，你已经背着它走了一辈子。",
+  choices: [
+    { id: "xf3_c03_a", text: "「背了四十几年的那句话，今天能不能先放下来一会儿？」", kind: "empathy", effect: { trust: 1 }, next: "xf3_p04" },
+    { id: "xf3_c03_b", text: "「『憋回去』——你现在还觉得，情绪得憋回去才对吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf3_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_p04
+{
+  id: "xf3_p04",
+  speaker: "patient",
+  text: "我一直这么觉得。我是老师，我站在讲台上教学生「有话好好说」「情绪要控制」。我讲了几十年的道理，现在我自己先做不到了。我觉得特别讽刺，也特别……失败。",
+  emotion: "sad",
+  autoNext: "xf3_c04",
+}
+```
+
+```ts-dialog
+// id: xf3_c04
+{
+  id: "xf3_c04",
+  speaker: "doctor",
+  text: "「控制情绪」和「不能有情绪」——你在讲台上教的，是哪一个？",
+  choices: [
+    { id: "xf3_c04_a", text: "「你不是做不到，你是把『控制』误当成了『不许有』。」", kind: "empathy", effect: { trust: 1 }, next: "xf3_p05" },
+    { id: "xf3_c04_b", text: "「『控制』和『不能有』——你小时候，被教的是哪一种？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf3_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_p05
+{
+  id: "xf3_p05",
+  speaker: "patient",
+  text: "（她红了眼眶）……不能有。我小时候，我们家是不许哭、不许闹、不许大声的。有一次我摔了，膝盖破了皮，血渗出来，我疼得直哭。我爸把筷子一拍：哭什么哭，女孩子家家的，像什么话。我就把哭咽下去了。从那以后，我好像就再没哭出声过。",
+  emotion: "sad",
+  autoNext: "xf3_c05",
+}
+```
+
+```ts-dialog
+// id: xf3_c05
+{
+  id: "xf3_c05",
+  speaker: "doctor",
+  text: "「膝盖破了不让哭」——你咽下的，不止那一声。",
+  choices: [
+    { id: "xf3_c05_a", text: "「你咽下去的不只是那一句——是往后每一句想说的话、每一股想生的气。」", kind: "empathy", effect: { trust: 2, mood: 4 }, next: "xf3_p06" },
+    { id: "xf3_c05_b", text: "「『忘了怎么哭』——可你身体没忘。潮热、发火、半夜惊醒，都是它在替你哭。」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "xf3_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_p06
+{
+  id: "xf3_p06",
+  speaker: "patient",
+  text: "（她愣住，眼泪慢慢掉下来）所以……我这不是病？我这是攒了四十年，堵不住了？我那些火、那些眼泪，不是我在变坏，是它们在替我从没被允许的委屈出头？",
+  emotion: "scared",
+  autoNext: "xf3_c06",
+}
+```
+
+```ts-dialog
+// id: xf3_c06
+{
+  id: "xf3_c06",
+  speaker: "doctor",
+  text: "你第一次，没有把这份难受叫作「变坏」。",
+  choices: [
+    { id: "xf3_c06_a", text: "「对。你不是变坏了，是终于有一个声音，替那个咽了四十年的你，开口了。」", kind: "empathy", effect: { trust: 1 }, next: "xf3_p07" },
+    { id: "xf3_c06_b", text: "「『替委屈出头』——你愿意坐下来，听它把话说完了吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf3_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_p07
+{
+  id: "xf3_p07",
+  speaker: "patient",
+  text: "（她想了想，擦了擦眼泪）……愿意。我好像一直把它当敌人，一门心思要把它压回去。可它是我的委屈啊。它替我扛了四十年，我从来没谢过它，还天天怪它添乱。",
+  emotion: "calm",
+  autoNext: "xf3_c07",
+}
+```
+
+```ts-dialog
+// id: xf3_c07
+{
+  id: "xf3_c07",
+  speaker: "doctor",
+  text: "你开始和自己身体里那股「火」和解了。",
+  choices: [
+    { id: "xf3_c07_a", text: "「如果现在能对那个七岁的自己说一句话，你最想说什么？」", kind: "empathy", effect: { trust: 1 }, next: "xf3_p08" },
+    { id: "xf3_c07_b", text: "「它替你扛了四十年——你想怎么谢它？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf3_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_p08
+{
+  id: "xf3_p08",
+  speaker: "patient",
+  text: "（她眼泪又涌上来）我想说……对不起啊，那时候让你把哭咽回去了。现在咱们不硬撑了，想哭就哭，想发火就发火，只要不伤着人，就行了。行不行？",
+  emotion: "sad",
+  autoNext: "xf3_c08",
+}
+```
+
+```ts-dialog
+// id: xf3_c08
+{
+  id: "xf3_c08",
+  speaker: "doctor",
+  text: "你愿意带那个小女孩出来了——这句话，她等了四十年。",
+  choices: [
+    { id: "xf3_c08_a", text: "「你给自己划的这条线——『不伤着人就行』，比『温顺』松多了。」", kind: "empathy", effect: { trust: 1 }, next: "xf3_p09" },
+    { id: "xf3_c08_b", text: "「『想哭就哭，想发火就发火』——这句话，你想先对自己说，还是先对谁说？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf3_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_p09
+{
+  id: "xf3_p09",
+  speaker: "patient",
+  text: "我好像一直拿「温顺」管着自己，可温顺的尽头，是连自己都找不着了。我想找回那个会生气、会哭、会大声笑的自己。哪怕……只是先想一想。",
+  emotion: "calm",
+  autoNext: "xf3_c09",
+}
+```
+
+```ts-dialog
+// id: xf3_c09
+{
+  id: "xf3_c09",
+  speaker: "doctor",
+  text: "「找回那个会生气、会哭的自己」——你已经走在路上了。",
+  choices: [
+    { id: "xf3_c09_a", text: "「你心里那个『会大声笑的自己』，她是什么样子的？」", kind: "empathy", effect: { trust: 1 }, next: "xf3_p10" },
+    { id: "xf3_c09_b", text: "「会生气、会哭、会大声笑——这三样，你最想先找回哪一样？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf3_p10" },
+    { id: "xf3_c09_c", text: "「你都这岁数了，还折腾什么？把日子过稳了比什么都强。」", kind: "logic", require: { trustAtMost: 40 }, effect: { trust: -10, defense: 10, mood: -4 }, next: "xf3_w01", hint: "仅信任≤40 时可见" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_p10
+{
+  id: "xf3_p10",
+  speaker: "patient",
+  text: "（她笑了一下，眼里有点光）她啊……她会在菜市场跟人讨价还价，会跟闺女抢电视，会在我老公面前撒个小娇，会跟朋友笑得前仰后合。我以前觉得那样不体面，现在觉得，那才是个人。",
+  emotion: "happy",
+  autoNext: "xf3_c10",
+}
+```
+
+```ts-dialog
+// id: xf3_c10
+{
+  id: "xf3_c10",
+  speaker: "doctor",
+  text: "你描述她的时候，眼睛是亮的。",
+  choices: [
+    { id: "xf3_c10_a", text: "「你羡慕她什么？」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "xf3_p11" },
+    { id: "xf3_c10_b", text: "「『那才是个人』——现在的你，觉得自己不算『人』吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf3_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_p11
+{
+  id: "xf3_p11",
+  speaker: "patient",
+  text: "（她声音低下去）羡慕她敢。敢让别人看见她生气，敢让别人知道她不舒服，敢说一句「我今天心情不好」。我以前不敢。我怕那样，就没人喜欢我了，没人觉得我是个好老师、好老婆、好妈妈了。",
+  emotion: "sad",
+  autoNext: "xf3_c11",
+}
+```
+
+```ts-dialog
+// id: xf3_c11
+{
+  id: "xf3_c11",
+  speaker: "doctor",
+  text: "「没人喜欢我了」——你怕的，是那个从小没被允许的『真实』，不被任何人要。",
+  choices: [
+    { id: "xf3_c11_a", text: "「你有没有想过：喜欢你的那些人，喜欢的也许就是你本来的样子？」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "xf3_out" },
+    { id: "xf3_c11_b", text: "「『好老师、好老婆、好妈妈』——这三顶帽子底下，你把自己藏了多久？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf3_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_out
+{
+  id: "xf3_out",
+  speaker: "narration",
+  text: "第三次会谈结束。薛芬没有立刻走，站在窗边看了很久楼下的操场。「我以前总觉得，当老师得端着。现在我想，端了二十多年，也该让学生看看，老师也会累、也会不高兴了。」",
+  autoNext: "xf4_start",
+}
+```
+
+### 节拍 4 · 转向+结局（trust 50→58，truth 35→40，hidden @50）
+
+```ts-dialog
+// id: xf4_start
+{
+  id: "xf4_start",
+  speaker: "narration",
+  text: "最后一次会谈，薛芬是下了课直接来的，教案还夹在胳膊底下。她看起来有点紧张，但眼睛是亮的。坐下前，她先把那杯水推到你面前，说「您先喝」。",
+  autoNext: "xf4_p01",
+}
+```
+
+```ts-dialog
+// id: xf4_p01
+{
+  id: "xf4_p01",
+  speaker: "patient",
+  text: "医生，我这周……做了一件以前想都不敢想的事。周二那节课，我一进教室，就跟学生说：「老师今天心情不好，要是语气冲了，你们提醒我。」我说完，自己先愣住了。",
+  emotion: "happy",
+  autoNext: "xf4_fork",
+}
+```
+
+```ts-dialog
+// id: xf4_fork
+{
+  id: "xf4_fork",
+  speaker: "doctor",
+  text: "你当着全班，把「心情不好」四个字说出口了。走到这里，前面有几条路，你选一条。",
+  choices: [
+    { id: "xf4_fork_a", text: "「教室里安静下来之后，发生了什么？我想听你从头讲。」", kind: "special", effect: { trust: 1, mood: 2 }, next: "xf4_s01" },
+    { id: "xf4_fork_b", text: "「能当着全班承认心情不好——这不是软弱，是你找回自己的第一步。」", kind: "empathy", effect: { trust: 1 }, next: "xf4_a01" },
+    { id: "xf4_fork_c", text: "「你爸当年那声『憋回去』，今天你当着全班，替自己把它吐出来了。」", kind: "confront", require: { trust: 50 }, effect: { trust: 1, truth: 3 }, next: "xf4_h01", hint: "需要信任≥50" },
+  ],
+}
+```
+
+#### 治愈主线（cure）
+
+```ts-dialog
+// id: xf4_s01
+{
+  id: "xf4_s01",
+  speaker: "patient",
+  text: "（她眼眶有点红，但笑着）……安静了一下。然后有个孩子小声说：「老师，我们等你缓一缓。」下课的时候，好几个学生围过来，说「老师你好好休息」「老师你嗓子都哑了」。我四十几年来，第一次知道：承认自己不舒服，天不会塌，我也不会被讨厌。",
+  emotion: "happy",
+  autoNext: "xf4_s02",
+}
+```
+
+```ts-dialog
+// id: xf4_s02
+{
+  id: "xf4_s02",
+  speaker: "doctor",
+  text: "「承认自己不舒服，天不会塌」——这句话，你等了四十年。",
+  choices: [
+    { id: "xf4_s02_a", text: "「你卸下的不是责任，是那份『不能有任何情绪』的自我要求。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "xf4_s03" },
+    { id: "xf4_s02_b", text: "「孩子们围上来的时候，你接住的是什么感觉？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_s03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_s03
+{
+  id: "xf4_s03",
+  speaker: "patient",
+  text: "是……是接住我自己。我活了快五十年，头一回觉得，被人看见「会累的我」，不是减分。我站在讲台上讲了二十多年课，那天下课，是孩子们先伸手接住了我。",
+  emotion: "calm",
+  autoNext: "xf4_s04",
+}
+```
+
+```ts-dialog
+// id: xf4_s04
+{
+  id: "xf4_s04",
+  speaker: "doctor",
+  text: "你教了他们二十多年的语文——那天你教的是更重要的一课：大人也会累，累了可以停。",
+  choices: [
+    { id: "xf4_s04_a", text: "「这一课，你先把『可以停』三个字，讲给了自己听。」", kind: "empathy", effect: { trust: 1 }, next: "xf4_s05" },
+    { id: "xf4_s04_b", text: "「如果七岁那年，有人对你说过同样的话——你这些年，会不会不一样？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_s05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_s05
+{
+  id: "xf4_s05",
+  speaker: "patient",
+  text: "会吧。说不定我早就会哭了，早就会说不，早就会生气了。可那些年没人跟我说。没关系，我现在自己跟自己说。",
+  emotion: "sad",
+  autoNext: "xf4_s06",
+}
+```
+
+```ts-dialog
+// id: xf4_s06
+{
+  id: "xf4_s06",
+  speaker: "doctor",
+  text: "「我现在自己跟自己说」——这句话，是你五十年里最硬气的一句。",
+  choices: [
+    { id: "xf4_s06_a", text: "「你打算怎么跟七岁的自己说？说给我听听。」", kind: "empathy", effect: { trust: 1 }, next: "xf4_s07" },
+    { id: "xf4_s06_b", text: "「你想让她听见的那句话，是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_s07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_s07
+{
+  id: "xf4_s07",
+  speaker: "patient",
+  text: "我会跟她说：芬芬，你可以哭，可以生气，可以大声说话。你不需要靠温顺来换爱。你的懂事，有人珍惜就够了，不用拿来讨好所有人。",
+  emotion: "calm",
+  autoNext: "xf4_s08",
+}
+```
+
+```ts-dialog
+// id: xf4_s08
+{
+  id: "xf4_s08",
+  speaker: "doctor",
+  text: "「不需要靠温顺换爱」——你小时候以为的『爱』，原来一直带着条件。",
+  choices: [
+    { id: "xf4_s08_a", text: "「这句话，四十年前没人跟你说。今天你自己说给自己听——不晚。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "xf4_s09" },
+    { id: "xf4_s08_b", text: "「『温顺换爱』——如果不用温顺去换，你还想要什么样的爱？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_s09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_s09
+{
+  id: "xf4_s09",
+  speaker: "patient",
+  text: "是。我爸的爱是「你要懂事」，我妈的爱是「你要争气」。我拿懂事和争气，换了四十年，现在我不换了。我想先爱爱自己，允许自己发一次火，哭一场，睡个好觉。",
+  emotion: "calm",
+  autoNext: "xf4_s10",
+}
+```
+
+```ts-dialog
+// id: xf4_s10
+{
+  id: "xf4_s10",
+  speaker: "doctor",
+  text: "「先爱爱自己」——你终于把自己，放进自己的清单里了。",
+  choices: [
+    { id: "xf4_s10_a", text: "「允许自己发火、哭、睡好觉——这三件事，你打算先做哪一件？」", kind: "empathy", effect: { trust: 1 }, next: "xf4_s11" },
+    { id: "xf4_s10_b", text: "「发了四十年还没发出去的火——你舍得让它出来吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_s11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_s11
+{
+  id: "xf4_s11",
+  speaker: "patient",
+  text: "睡个好觉吧。我昨晚真的睡了整觉，早上醒过来，我闺女趴我床头，说「妈你居然会赖床了」。我们俩笑成一团。她说，妈，你现在像我妈了。",
+  emotion: "happy",
+  autoNext: "xf4_s12",
+}
+```
+
+```ts-dialog
+// id: xf4_s12
+{
+  id: "xf4_s12",
+  speaker: "doctor",
+  text: "「像我妈了」——你闺女喜欢的，不再是你扮出来的那个『完美妈妈』。",
+  choices: [
+    { id: "xf4_s12_a", text: "「这句话，比任何『合格』的表扬都重吧。」", kind: "empathy", effect: { trust: 1 }, next: "xf4_s13" },
+    { id: "xf4_s12_b", text: "「以前那个『完美妈妈』，累坏自己也要演——现在你舍得让她下班了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_s13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_s13
+{
+  id: "xf4_s13",
+  speaker: "patient",
+  text: "重。我抱着她，眼泪止不住地掉。她也没推开我，就让我哭。我哭完发现，天没塌，反而心里那块堵了四十年的石头，松动了。我闺女说，妈你哭吧，你哭完我给你煮面。",
+  emotion: "sad",
+  autoNext: "xf4_s14",
+}
+```
+
+```ts-dialog
+// id: xf4_s14
+{
+  id: "xf4_s14",
+  speaker: "doctor",
+  text: "你哭了——你终于让身体里那些攒了四十年的东西，出来了。",
+  choices: [
+    { id: "xf4_s14_a", text: "「你闺女给你煮面——你看，没有人跑开，反而有人端面来了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "xf4_s15" },
+    { id: "xf4_s14_b", text: "「『石头松动了』——松了之后，你想拿什么填进去？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_s15" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_s15
+{
+  id: "xf4_s15",
+  speaker: "patient",
+  text: "想填我自己。我备课到一半，可以哼两句歌；我在家，可以让我老公洗一回碗；我心情不好，可以直接跟我闺女说「妈今天不想说话」。我想试试，不端着地活着。",
+  emotion: "happy",
+  autoNext: "xf4_s16",
+}
+```
+
+```ts-dialog
+// id: xf4_s16
+{
+  id: "xf4_s16",
+  speaker: "doctor",
+  text: "「不端着地活着」——这是你给自己立的新规矩，比「温顺」宽多了。",
+  choices: [
+    { id: "xf4_s16_a", text: "「你终于给自己发了一张『可以不端着』的许可证。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "xf4_s17" },
+    { id: "xf4_s16_b", text: "「不端着地活着，你的第一步是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_s17" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_s17
+{
+  id: "xf4_s17",
+  speaker: "patient",
+  text: "第一步，是明天上课前，跟学生说一句「老师今天也有一点心情不好，但我来上课了」。我想让他们知道，情绪不是丑事，是人人都有的东西。就像那天，他们接住了我。",
+  emotion: "calm",
+  autoNext: "xf4_s18",
+}
+```
+
+```ts-dialog
+// id: xf4_s18
+{
+  id: "xf4_s18",
+  speaker: "doctor",
+  text: "「情绪不是丑事，是人人都有的东西」——你把这句话，从讲台说给了自己听。",
+  choices: [
+    { id: "xf4_s18_a", text: "「你教了他们几十年的语文。今天你教的是最重要的一句：人有情绪，不丢人。」", kind: "empathy", effect: { mood: 3 }, next: "xf_end_cure" },
+    { id: "xf4_s18_b", text: "「带着情绪来上课，也是一种勇敢——你把这叫『不端着』。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf_end_cure" },
+  ],
+}
+```
+
+#### 接纳路径（acceptance）
+
+```ts-dialog
+// id: xf4_a01
+{
+  id: "xf4_a01",
+  speaker: "patient",
+  text: "（她有点不好意思地笑了）我可能……还是做不到完全放开。我习惯了端着，这一时半会儿改不掉。我怕我答应您一大堆，回头又缩回去，让您失望。",
+  emotion: "neutral",
+  autoNext: "xf4_a02",
+}
+```
+
+```ts-dialog
+// id: xf4_a02
+{
+  id: "xf4_a02",
+  speaker: "doctor",
+  text: "「改不掉」——不急着改。你允许自己慢慢来，本身就是往前走。",
+  choices: [
+    { id: "xf4_a02_a", text: "「你这一生，都在『答应别人然后拼命做到』。今天，允许自己答应得慢一点。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "xf4_a03" },
+    { id: "xf4_a02_b", text: "「你希望有一天放开的样子，是什么样的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_a03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_a03
+{
+  id: "xf4_a03",
+  speaker: "patient",
+  text: "我希望啊……有一天我心情不好，能直接说出来，不用先在心里骂自己一遍。哪怕只是说出口，不一定要改。我就想先让自己知道：我也可以有情绪，这不是错。",
+  emotion: "calm",
+  autoNext: "xf4_a04",
+}
+```
+
+```ts-dialog
+// id: xf4_a04
+{
+  id: "xf4_a04",
+  speaker: "doctor",
+  text: "「我也可以有情绪，这不是错」——你已经把这句话，放进心里了。",
+  choices: [
+    { id: "xf4_a04_a", text: "「这句话，比改掉什么都重要。你把它念熟了，比放开还难。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "xf4_a05" },
+    { id: "xf4_a04_b", text: "「你打算先把它说给谁听？你自己，还是你闺女？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_a05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_a05
+{
+  id: "xf4_a05",
+  speaker: "patient",
+  text: "先念给我自己听吧。我先把这句话念熟了，再慢慢说给别人听。医生，谢谢您。我可能走得慢，但我知道往哪儿走了。这就够了。",
+  emotion: "calm",
+  autoNext: "xf_end_accept",
+}
+```
+
+#### 隐藏路径（hidden · 替她接住那句「憋回去」）
+
+```ts-dialog
+// id: xf4_h01
+{
+  id: "xf4_h01",
+  speaker: "patient",
+  text: "（她愣住了，眼泪一下子下来）……我爸那声「憋回去」，我背了一辈子。您这么一说，我才发现，我当着全班，把那口气吐出来了。我做到了。我爸没让我做到的事，我自己做到了。",
+  emotion: "broken",
+  autoNext: "xf4_h02",
+}
+```
+
+```ts-dialog
+// id: xf4_h02
+{
+  id: "xf4_h02",
+  speaker: "doctor",
+  text: "你做到了——而且你发现，承认情绪，孩子没有跑开，反而围了上来。你爸当年怕的「不像话」，其实从没发生过。",
+  choices: [
+    { id: "xf4_h02_a", text: "「你想对你爸说点什么吗？那句背了四十年的『憋回去』，你想怎么还给他？」", kind: "special", effect: { mood: -3 }, next: "xf4_h03" },
+    { id: "xf4_h02_b", text: "「不急。那句话你先自己接着，等你想说了再说。」", kind: "empathy", effect: { trust: 1 }, next: "xf4_h05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_h03
+{
+  id: "xf4_h03",
+  speaker: "patient",
+  text: "（她擦了擦眼泪，声音轻轻的）我想跟他说：爸，你那句话我记了四十年，现在我还给你。我闺女、我学生，他们谁都不用再憋着。他们想哭就哭，想笑就笑，想大声就大声。",
+  emotion: "calm",
+  autoNext: "xf4_h04",
+}
+```
+
+```ts-dialog
+// id: xf4_h04
+{
+  id: "xf4_h04",
+  speaker: "doctor",
+  text: "你替那个七岁的小女孩，把四十年前那句「憋回去」，原样还了回去。",
+  choices: [
+    { id: "xf4_h04_a", text: "「这句话你背了四十年，今天把它放下——它不是你的了。」", kind: "special", effect: { truth: 3, mood: -2 }, next: "xf_end_hidden" },
+    { id: "xf4_h04_b", text: "「说出来，心里是沉一些，还是轻一些？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "xf4_h05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf4_h05
+{
+  id: "xf4_h05",
+  speaker: "patient",
+  text: "（她垂下眼睛）……轻一些吧。说出来之后，心里那块地方，好像空了，又好像透光了。谢谢您，陪我走了这么一程。",
+  emotion: "calm",
+  autoNext: "xf_end_accept",
+}
+```
+
+#### 恶化路径（worsen）
+
+```ts-dialog
+// id: xf3_w01
+{
+  id: "xf3_w01",
+  speaker: "patient",
+  text: "（她的脸一下垮下来，声音冷下去）……您也这么说。您是医生，您都觉得我这岁数还折腾是丢人。那我确实是没救了。我这一辈子，懂事、温顺、不添乱，到头来还是把日子过成一团糟。",
+  emotion: "broken",
+  autoNext: "xf3_w02",
+}
+```
+
+```ts-dialog
+// id: xf3_w02
+{
+  id: "xf3_w02",
+  speaker: "doctor",
+  text: "他说错了话，把她推进了「反正也没人懂我」的深坑。",
+  choices: [
+    { id: "xf3_w02_a", text: "「我不是那个意思……我是说，你这个年纪，稳定比折腾重要。」", kind: "logic", effect: { trust: -6, defense: 6 }, next: "xf3_w03" },
+    { id: "xf3_w02_b", text: "「对不起，我不该这么说。是我说错了。」", kind: "empathy", effect: { trust: -3, mood: -4 }, next: "xf3_w03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: xf3_w03
+{
+  id: "xf3_w03",
+  speaker: "patient",
+  text: "……别说了。我本来就该这样，当个安静的人，把火咽下去，把日子过下去。反正也没人真的想知道我心里怎么想。谢谢您今天的时间。",
+  emotion: "broken",
+  autoNext: "xf_end_worsen",
+}
+```
+
+---
+
+## 四、结局
+
+```ts-dialog
+// id: xf_end_cure
+{
+  id: "xf_end_cure",
+  speaker: "narration",
+  text: "〔结局 · 治愈〕",
+  isEnding: true,
+  endingType: "cure",
+  endingTitle: "允许自己生气",
+  endingText: "三个月后，薛芬寄来一封信，里面夹着一张班级合照。她说那天她宣布「老师今天心情不好」之后，全班孩子轮流上讲台，每人讲了三分钟自己的心情。她在信里写：我教了二十年「以理服人」，最后是那堂「允许自己不高兴」的课，把下半生点亮了。",
+  endingReward: { doctorReputation: 8, doctorMoney: 300, doctorExp: 50, doctorSanity: 5 },
+}
+```
+
+```ts-dialog
+// id: xf_end_accept
+{
+  id: "xf_end_accept",
+  speaker: "narration",
+  text: "〔结局 · 接纳〕",
+  isEnding: true,
+  endingType: "acceptance",
+  endingTitle: "慢慢来",
+  endingText: "薛芬没有再约定期会谈，但她偶尔会来坐坐。她说她还是端着，还是会不好意思发火，但她开始会跟老公说「今天不想做饭」，会跟闺女说「妈有点累」。她说她走得慢，但每走一步，心里那口气，都松了一点。",
+  endingReward: { doctorReputation: 4, doctorMoney: 180, doctorExp: 35, doctorSanity: 6 },
+}
+```
+
+```ts-dialog
+// id: xf_end_hidden
+{
+  id: "xf_end_hidden",
+  speaker: "narration",
+  text: "〔结局 · 隐藏·把那口气还回去〕",
+  isEnding: true,
+  endingType: "hidden",
+  endingTitle: "那口气还给你",
+  endingText: "薛芬后来给你打过一次电话，说她回了一趟老家，在父亲坟前坐了一下午。她说她对着墓碑，把那句「憋回去」说出来，说了很久，说到天黑。她说：爸，那口气我替自己吐出来了。她说到这儿，在电话里笑了一下。",
+  endingReward: { doctorReputation: -10, doctorMoney: 100, doctorExp: 80, doctorSanity: -15 },
+}
+```
+
+```ts-dialog
+// id: xf_end_worsen
+{
+  id: "xf_end_worsen",
+  speaker: "narration",
+  text: "〔结局 · 恶化〕",
+  isEnding: true,
+  endingType: "worsen",
+  endingTitle: "咽回去的那一辈子",
+  endingText: "薛芬没有再来。两个月后，教研组长打来电话，说她请了长假——失眠、心悸加重，住进了医院。电话那头，她的声音很轻：「也许我就是老了，不该再折腾。谢谢你之前听我说了那么多。」",
+  endingReward: { doctorReputation: -8, doctorMoney: 50, doctorExp: 10, doctorSanity: -20 },
+}
+```
+
+---
+
+## 六、状态
+
+- [x] v3 机器可解析格式（ts-meta + ts-dialog 全部就位）
+- [x] trust 锚点 15→28→40→50→58；truth 0→40；碎片 1 枚 @30
+- [x] 恶化入口 @trust≤40（xf3_c09_c）；隐藏结局 @trust50（xf4_fork_c）
+- [x] cure 主线 43 轮（节拍1-3 各 11 轮 + 节拍4 10 轮）
+- [x] 转换器生成 + 走线验收（`node scripts/md-to-patient.mjs docs/stories/xue_fen-v3.md --walk`）

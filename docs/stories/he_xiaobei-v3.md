@@ -1,0 +1,1451 @@
+# 贺小北 · v3 · 短剧本 · 4 节拍 · 43 轮
+
+> 短档剧本：4 节拍 · 43 轮（cure 主线）。
+> 数值：trust 15→28→40→50→58；truth 0→40；碎片 1 枚 @30；恶化入口 trust≤40；隐藏结局 @50；cure 主线 40+ 轮。
+> 生成：`node scripts/md-to-patient.mjs docs/stories/he_xiaobei-v3.md --walk`
+
+---
+
+## 〇、人物档案
+
+**姓名** 贺小北，24 岁，机械厂技术员（画图纸、管操作，话不多）。从云贵小镇考进城，是家里第一个大学生。
+
+**来诊渠道** 师傅（班组里照顾他的老工人）发现他在会上被起哄学口音后，一周没吃好饭，硬把他劝来看心理门诊。他来了，坐下说的第一句话是「我真没什么大事」。
+
+**一句话核心** 不是普通话说不标准，是他一张嘴，就听见「你不属于这里」。
+
+**三层真相**：
+- 表层：开会不敢发言；点外卖都要在脑子里把菜名念三遍；发语音前反复删。话少，技术好，总觉得自己的口音配不上这份工作。
+- 中间层：刚入职时被同事学着念他的名字、学他口音笑过；领导说他「技术没问题，就是说话太闷」；为了不再露怯，他回宿舍对着镜子练了一晚上发音。
+- 深层：爸妈供得苦，姐姐把念书的机会让给他。他背着「全家的希望」，相信自己的土配不上这份来之不易——沉默是他的铠甲，少说话就不会露怯，不会让家里人丢脸。
+
+**角色三角**：
+- 施压者：起哄学他口音的同事，与「得混出人样」的期待（全村都看着他走出来）。
+- 情感忽视者：供他读书却从没夸过他一句的爸妈（「我们家不兴夸人」）。
+- 被守护者：把念书机会让给他的姐姐——他活成了一封写给姐姐的、始终没寄出的信。
+
+**症状意义**：沉默不是性格，是选择。他宁可不说，也不让爸妈和姐姐「脸上没光」——沉默是他替整个家护住体面的方式。
+
+**关键转折**：一个客户用他的家乡话跟他聊图纸，他愣住后眼眶发热——原来有人听懂他，而且他没有因此变差。
+
+---
+
+## 一、节拍规划表
+
+| 节拍 | 主题 | trust 起→止 | truth 起→止 | 阻抗 | 关键事件 | 碎片 | 过场 |
+|---|---|---|---|---|---|---|---|
+| 1 | 初访·「我讲不准」 | 15→28 | 0→9 | c05 | c07 说出姐姐让机会 | — | hxb1_out |
+| 2 | 中间层·「他们笑过我的名字」 | 28→40 | 9→18 | c05 | c06 靠灶火写作业 | hxb_m1@30 | hxb2_out |
+| 3 | 深层·「全家的希望」 | 40→50 | 18→33 | c04 | c09 满院子喊的自己 | — | hxb3_out |
+| 4 | 转向+结局 | 50→58 | 33→43 | — | fork 客户家乡话 | — | hxb_end_* |
+
+**四线数值口径**（trust 单调递增，共情线精确到锚点）：
+- 共情线：节拍1 共情选项 trust 增量 2,1,2,1,1,1,2,1,1,1,0 = 13；节拍2 2,1,1,1,1,2,1,1,1,1,0 = 12；节拍3 1×10+0 = 10；节拍4 fork+2 + 安全网 1,1,1,1,0,1,0,1,0 = 8。合计 +43，15→58。
+- truth 只由 probe 涨（轻 +2 取消，统一实质 +3），均衡线每节拍 3-4 次 probe，节拍3 中段过 30 触发碎片。
+- 失误线：每节拍 1-2 个 logic（-8~-10），节拍3 恶化入口（trust≤40）可见，worsen 链 trust 最终 ≈2。
+- defense：阻抗节点短时 +7~+10 再回落；mood 全程波动、过场回中。
+
+**四线验收断言**（写进 --walk 测试）：
+- 共情线 → cure，trust 58，轮数 ≥40
+- 均衡线 → cure，碎片触发 ≥1
+- 失误线 → worsen，trust ≤40
+- 探问线 → cure，truth 冲顶 ≥40
+
+---
+
+## 二、剧本元信息（ts-meta）
+
+```ts-meta
+// id: he_xiaobei
+// tier: 短
+// anchor: 15,28,40,50,58
+// truthEnd: 40
+// minCureRounds: 40
+// fragments: 1
+// worsenAtMost: 40
+{
+  id: "he_xiaobei",
+  name: "贺小北",
+  title: "机械厂技术员 · 从云贵小镇考进城 · 被师傅劝来",
+  intro: "师傅发现他在会上被起哄学口音后，一周没吃好饭，硬把他劝来。他来了，坐下说的第一句话是『我真没什么大事。』",
+  surface: "开会不敢发言；点外卖都要在脑子里把菜名念三遍；发语音前反复删。话少，技术好，总觉得自己的口音配不上这份工作。",
+  truth: "他从小镇考进城，是家里第一个大学生。爸妈供得苦，姐姐把念书的机会让给了他——他背着『全家的希望』，相信自己的土配不上这份来之不易，于是沉默成了铠甲：少说话，就不会露怯，不会让家里人丢脸。",
+  palette: { primary: "#8a7d6b", secondary: "#a8a08a", fog: "#7a6a5f", bright: "#d9cfb8" },
+  baseReward: 650,
+  difficulty: "简单",
+  startNode: "hxb1_start",
+  initialState: { trust: 15, defense: 65, mood: 35, truth: 0, round: 0 },
+  memoryFragments: [
+    {
+      id: "hxb_m1",
+      trigger: { truth: 30 },
+      title: "姐姐让出的那个名额",
+      text: "那年成绩出来，姐姐把我叫到屋里，把她攒的笔记本塞给我。她说她不想念了，让我好好读。她说完就笑，笑得跟没事人一样。后来我才知道，她那年其实也考上了，只是家里只能供一个人。",
+      emotion: "sad",
+    },
+  ],
+}
+```
+
+---
+
+## 三、节拍骨架（ts-dialog 节点）
+
+### 节拍 1 · 初访·「我讲不准」（trust 15→28，truth 0→9，阻抗：别人劝「别想太多」）
+
+```ts-dialog
+// id: hxb1_start
+{
+  id: "hxb1_start",
+  speaker: "narration",
+  text: "深秋的傍晚，候诊区的灯亮起来。贺小北坐在最靠门的位置，低头刷手机，拇指在屏幕上划来划去，一条语音打了又删。轮到他时，他站起来，把屏幕按灭，冲你点了点头，没说话。",
+  autoNext: "hxb1_p01",
+}
+```
+
+```ts-dialog
+// id: hxb1_p01
+{
+  id: "hxb1_p01",
+  speaker: "patient",
+  text: "……师傅非让我来。他说我这周没吃好饭，让我来找您聊聊。其实我就是有点没胃口，真不是什么大事。",
+  emotion: "neutral",
+  autoNext: "hxb1_c01",
+}
+```
+
+```ts-dialog
+// id: hxb1_c01
+{
+  id: "hxb1_c01",
+  speaker: "doctor",
+  text: "他坐得很直，像是怕把沙发坐旧了。开场白是「没什么大事」——这句话往往才是真正的事。",
+  choices: [
+    { id: "hxb1_c01_a", text: "「师傅能看出你没吃好饭，是有人真在惦记你。坐这儿，不用急着证明自己没事。」", kind: "empathy", effect: { trust: 2, defense: -1 }, next: "hxb1_p02" },
+    { id: "hxb1_c01_b", text: "「『没胃口』——是身体不想吃，还是心里有什么堵着吃不下？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb1_p02" },
+    { id: "hxb1_c01_c", text: "「年轻人少吃两顿没事，回去按时吃饭，别想太多。」", kind: "logic", effect: { trust: -8, defense: 6, mood: -4 }, next: "hxb1_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_p02
+{
+  id: "hxb1_p02",
+  speaker: "patient",
+  text: "（他低头搓了搓手）……有点堵着。过些天厂里有个会，师傅让我上去讲两句。我……我从小就怵这个。",
+  emotion: "anxious",
+  autoNext: "hxb1_c02",
+}
+```
+
+```ts-dialog
+// id: hxb1_c02
+{
+  id: "hxb1_c02",
+  speaker: "doctor",
+  text: "「从小就怵」——怵的不是会，是他自己先下了判断。",
+  choices: [
+    { id: "hxb1_c02_a", text: "「怵到连饭都吃不下，那件事在你心里挺大的吧。」", kind: "empathy", effect: { trust: 1 }, next: "hxb1_p03" },
+    { id: "hxb1_c02_b", text: "「讲两句而已，你最怕的是哪一步？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb1_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_p03
+{
+  id: "hxb1_p03",
+  speaker: "patient",
+  text: "怕开口。我在家说话挺好，一对着人说普通话，就……（他的声音低下去）我讲不准。我怕一张嘴，人家就听出来我是打哪儿来的。",
+  emotion: "anxious",
+  autoNext: "hxb1_c03",
+}
+```
+
+```ts-dialog
+// id: hxb1_c03
+{
+  id: "hxb1_c03",
+  speaker: "doctor",
+  text: "「怕人听出来」——他开口说的不是话，是身世。",
+  choices: [
+    { id: "hxb1_c03_a", text: "「『听出来是哪儿来的』——这句话里，好像有个东西在替你做主。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "hxb1_p04" },
+    { id: "hxb1_c03_b", text: "「听出来会怎么样？会有人说什么吗？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "hxb1_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_p04
+{
+  id: "hxb1_p04",
+  speaker: "patient",
+  text: "（他沉默了一会儿）刚入职那阵儿，有同事学我说话，学着叫我的名字，围着笑。他们可能没恶意……但那天我回宿舍，对着镜子练了一晚上发音。",
+  emotion: "sad",
+  autoNext: "hxb1_c04",
+}
+```
+
+```ts-dialog
+// id: hxb1_c04
+{
+  id: "hxb1_c04",
+  speaker: "doctor",
+  text: "他把「没恶意」和「练一晚上」放在一起说——这两件事本来不该同时发生。",
+  choices: [
+    { id: "hxb1_c04_a", text: "「练了一晚上，是练给谁听的？」", kind: "empathy", effect: { trust: 1 }, next: "hxb1_p05" },
+    { id: "hxb1_c04_b", text: "「那一晚上，你练的是什么？是声音，还是别的东西？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb1_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_p05
+{
+  id: "hxb1_p05",
+  speaker: "patient",
+  text: "（他扯了下嘴角）练的……是让自己听着不那么土。我以前没觉得土，是到了城里，才被人提醒，我原来这么土。",
+  emotion: "neutral",
+  autoNext: "hxb1_c05",
+}
+```
+
+```ts-dialog
+// id: hxb1_c05
+{
+  id: "hxb1_c05",
+  speaker: "doctor",
+  text: "「到了城里才觉得自己土」——他正在把别人眼里的自己，装进心里。",
+  choices: [
+    { id: "hxb1_c05_a", text: "「『土』这个字，是别人先说的，还是你自己也信了？」", kind: "empathy", effect: { trust: 1, defense: -1 }, next: "hxb1_p06" },
+    { id: "hxb1_c05_b", text: "「『土』在你心里，会连累什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb1_p06" },
+    { id: "hxb1_c05_c", text: "「你别这么敏感，大家就是闹着玩，哪有那么严重。」", kind: "logic", effect: { trust: -8, defense: 8, mood: -4 }, next: "hxb1_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_r01
+{
+  id: "hxb1_r01",
+  speaker: "patient",
+  text: "（他的脸色沉下去，声音也冷下来）您是不是也觉得我想太多？我姐以前也这么说我，说我想太多。行，那我以后少想。……我是不是有点多嘴了？",
+  emotion: "angry",
+  autoNext: "hxb1_p06",
+}
+```
+
+```ts-dialog
+// id: hxb1_p06
+{
+  id: "hxb1_p06",
+  speaker: "patient",
+  text: "（他缓了缓）……我姐也说过我，说我想太多。可有些事，不是想多，是它就在那儿。",
+  emotion: "neutral",
+  autoNext: "hxb1_c06",
+}
+```
+
+```ts-dialog
+// id: hxb1_c06
+{
+  id: "hxb1_c06",
+  speaker: "doctor",
+  text: "他把姐姐搬出来当裁判——姐姐的话，他记到今天。",
+  choices: [
+    { id: "hxb1_c06_a", text: "「你姐说的话，你好像都记得挺清楚。」", kind: "empathy", effect: { trust: 1 }, next: "hxb1_p07" },
+    { id: "hxb1_c06_b", text: "「除了『想太多』，你姐还说过你什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb1_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_p07
+{
+  id: "hxb1_p07",
+  speaker: "patient",
+  text: "（他忽然坐直了一点）……她没说过我什么好话，也没说过什么坏话。我们家不兴夸人。爸妈供我读书，我姐把机会让给我，这些恩，我记得比谁都清。",
+  emotion: "anxious",
+  autoNext: "hxb1_c07",
+}
+```
+
+```ts-dialog
+// id: hxb1_c07
+{
+  id: "hxb1_c07",
+  speaker: "doctor",
+  text: "「供我读书」「把机会让给我」——他心里的账本，比谁都厚。",
+  choices: [
+    { id: "hxb1_c07_a", text: "「你把家里的好都记在心里——这份心意，背起来重不重？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "hxb1_p08" },
+    { id: "hxb1_c07_b", text: "「『把机会让给你』——你姐让的是什么机会？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "hxb1_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_p08
+{
+  id: "hxb1_p08",
+  speaker: "patient",
+  text: "（他低下头）……念书的机会。那年家里只能供一个，我姐说她不想念了，让我好好读。后来我才知道，她其实考上了。……我这张嘴，就是背着这个念出来的。",
+  emotion: "sad",
+  autoNext: "hxb1_c08",
+}
+```
+
+```ts-dialog
+// id: hxb1_c08
+{
+  id: "hxb1_c08",
+  speaker: "doctor",
+  text: "「我这张嘴，就是背着这个念出来的」——他第一次把自己的口音和姐姐连在一起。",
+  choices: [
+    { id: "hxb1_c08_a", text: "「背着这么重的东西说话，难怪你每次开口都要掂量。」", kind: "empathy", effect: { trust: 1 }, next: "hxb1_p09" },
+    { id: "hxb1_c08_b", text: "「你觉得自己配不上念出来的书，是因为背着姐姐那件事吗？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb1_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_p09
+{
+  id: "hxb1_p09",
+  speaker: "patient",
+  text: "……说不好。我就是觉得，我得争气。我要是说话让人笑，我爸妈、我姐，脸上都没光。所以我宁可不说。",
+  emotion: "anxious",
+  autoNext: "hxb1_c09",
+}
+```
+
+```ts-dialog
+// id: hxb1_c09
+{
+  id: "hxb1_c09",
+  speaker: "doctor",
+  text: "「宁可不说」——沉默不是他的性格，是他的选择。",
+  choices: [
+    { id: "hxb1_c09_a", text: "「你宁可不说，也不想让他们没光——这份替家里人着想，自己扛着累不累？」", kind: "empathy", effect: { trust: 1 }, next: "hxb1_p10" },
+    { id: "hxb1_c09_b", text: "「『没光』——你怕的是他们脸上没光，还是怕他们对你失望？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb1_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_p10
+{
+  id: "hxb1_p10",
+  speaker: "patient",
+  text: "（他轻轻叹了口气）……都有吧。不过今天跟您说这些，比我想的轻松点。我以为一开口就要挨笑，您没笑我。",
+  emotion: "calm",
+  autoNext: "hxb1_c10",
+}
+```
+
+```ts-dialog
+// id: hxb1_c10
+{
+  id: "hxb1_c10",
+  speaker: "doctor",
+  text: "「您没笑我」——他正在一点点确认，开口不等于挨笑。",
+  choices: [
+    { id: "hxb1_c10_a", text: "「对，我没笑你。你说话的样子，我听着挺好。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "hxb1_p11" },
+    { id: "hxb1_c10_b", text: "「如果这里说话不会挨笑，你想先说什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb1_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_p11
+{
+  id: "hxb1_p11",
+  speaker: "patient",
+  text: "（他顿了顿）……先跟您说声谢谢。还有，过些天那个会，我想试试。不是想争气，是……师傅让我讲的那两句，我准备了好几天了。",
+  emotion: "neutral",
+  autoNext: "hxb1_c11",
+}
+```
+
+```ts-dialog
+// id: hxb1_c11
+{
+  id: "hxb1_c11",
+  speaker: "doctor",
+  text: "他想试着开口了——不是为了证明什么，是为了不辜负备好的那两句话。",
+  choices: [
+    { id: "hxb1_c11_a", text: "「准备了好几天的话，值得有个出口。想讲就讲，讲砸了这儿还有我接着。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "hxb1_out" },
+    { id: "hxb1_c11_b", text: "「那两句话，是你自己写的，还是师傅教你的？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb1_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb1_out
+{
+  id: "hxb1_out",
+  speaker: "narration",
+  text: "第一次会谈结束。贺小北走到门口，又停住，回头说：「那个会，要是讲完没事，我……我回头跟您说。」他讲得慢，但一个字一个字，说得挺稳。",
+  autoNext: "hxb2_start",
+}
+```
+
+### 节拍 2 · 中间层·「他们笑过我的名字」（trust 28→40，truth 9→18，[m1 碎片 @30]）
+
+```ts-dialog
+// id: hxb2_start
+{
+  id: "hxb2_start",
+  speaker: "narration",
+  text: "几天后贺小北又来。这次他进门时，嘴唇抿着，像在消化什么。坐下后他先开口：「那会说完了。」他顿了顿，「讲砸了，但没挨笑。」",
+  autoNext: "hxb2_p01",
+}
+```
+
+```ts-dialog
+// id: hxb2_p01
+{
+  id: "hxb2_p01",
+  speaker: "patient",
+  text: "讲的时候腿一直在抖，讲到一半还卡壳了。可底下没人笑，师傅还带头给我鼓了个掌。……回家我给我姐发了条消息，第一次没删。",
+  emotion: "calm",
+  autoNext: "hxb2_c01",
+}
+```
+
+```ts-dialog
+// id: hxb2_c01
+{
+  id: "hxb2_c01",
+  speaker: "doctor",
+  text: "「第一次没删」——这句话的分量，他大概自己都没察觉。",
+  choices: [
+    { id: "hxb2_c01_a", text: "「发出去的这条消息，你姐回你了吗？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "hxb2_p02" },
+    { id: "hxb2_c01_b", text: "「以前发语音反复删，删的是声音，还是删的是怕？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "hxb2_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_p02
+{
+  id: "hxb2_p02",
+  speaker: "patient",
+  text: "（他低头看着手机）……回了。她说「说得挺好」。就四个字，我看了半天。她很少夸我，我们家都不兴这个。",
+  emotion: "sad",
+  autoNext: "hxb2_c02",
+}
+```
+
+```ts-dialog
+// id: hxb2_c02
+{
+  id: "hxb2_c02",
+  speaker: "doctor",
+  text: "「就四个字，看了半天」——他在把姐姐的这四个字，翻来覆去地焐热。",
+  choices: [
+    { id: "hxb2_c02_a", text: "「这四个字，你等了很久吧。」", kind: "empathy", effect: { trust: 1 }, next: "hxb2_p03" },
+    { id: "hxb2_c02_b", text: "「她夸你『说得挺好』——你为什么想让她夸？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb2_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_p03
+{
+  id: "hxb2_p03",
+  speaker: "patient",
+  text: "（他沉默了一会儿）……我从小到大，就老想着让她觉得，她的机会没白让。我考出来，出来工作，就是想告诉她：你让给我的那个名额，我好好用了。",
+  emotion: "anxious",
+  autoNext: "hxb2_c03",
+}
+```
+
+```ts-dialog
+// id: hxb2_c03
+{
+  id: "hxb2_c03",
+  speaker: "doctor",
+  text: "「名额没白让」——他活成了一封写给姐姐的、始终没寄出的信。",
+  choices: [
+    { id: "hxb2_c03_a", text: "「你做的每件事，都在给姐姐的那份好意一个交代。」", kind: "empathy", effect: { trust: 1 }, next: "hxb2_p04" },
+    { id: "hxb2_c03_b", text: "「那你自己呢？你想不想让谁觉得，你这一路走得不错？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb2_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_p04
+{
+  id: "hxb2_p04",
+  speaker: "patient",
+  text: "……自己？我好像没怎么想过自己。光想着别给家里丢脸了。",
+  emotion: "neutral",
+  autoNext: "hxb2_c04",
+}
+```
+
+```ts-dialog
+// id: hxb2_c04
+{
+  id: "hxb2_c04",
+  speaker: "doctor",
+  text: "「没怎么想过自己」——这是句大实话，也是一声很轻的呼救。",
+  choices: [
+    { id: "hxb2_c04_a", text: "「没想过自己——那你自己累不累，有人问过吗？」", kind: "empathy", effect: { trust: 1 }, next: "hxb2_p05" },
+    { id: "hxb2_c04_b", text: "「『别丢脸』这三个字，你背了多少年了？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb2_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_p05
+{
+  id: "hxb2_p05",
+  speaker: "patient",
+  text: "（他声音低下去）……从小背到大吧。我们镇上有句话，叫「走出去就是人上人」。我走出来那天，全村都来送我。我坐在车上，一路都在想：我要是不混出个人样，拿什么回这条街。",
+  emotion: "sad",
+  autoNext: "hxb2_c05",
+}
+```
+
+```ts-dialog
+// id: hxb2_c05
+{
+  id: "hxb2_c05",
+  speaker: "doctor",
+  text: "「全村来送」「拿什么回这条街」——他走出小镇那天，就把自己押上了桌。",
+  choices: [
+    { id: "hxb2_c05_a", text: "「全村人的目光，和你想活成的样子，是同一个东西吗？」", kind: "empathy", effect: { trust: 1 }, next: "hxb2_p06" },
+    { id: "hxb2_c05_b", text: "「『混出个人样』——什么样才算人样，有人跟你定过标准吗？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb2_p06" },
+    { id: "hxb2_c05_c", text: "「别想那么重，路是你自己走的，跟乡亲们没关系。」", kind: "logic", effect: { trust: -8, defense: 7, mood: -3 }, next: "hxb2_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_r01
+{
+  id: "hxb2_r01",
+  speaker: "patient",
+  text: "（他抬眼看了你一下）……您说得轻巧。您没在我们那儿待过，不知道一大家子供一个娃读书有多难。我要是不出人头地，对不起的不光是我自己。",
+  emotion: "angry",
+  autoNext: "hxb2_p06",
+}
+```
+
+```ts-dialog
+// id: hxb2_p06
+{
+  id: "hxb2_p06",
+  speaker: "patient",
+  text: "（他平复了一下）……我说得有点冲，您别往心里去。我不是冲您。我就是……有时候想起家里，心里就紧一下。",
+  emotion: "calm",
+  autoNext: "hxb2_c06",
+}
+```
+
+```ts-dialog
+// id: hxb2_c06
+{
+  id: "hxb2_c06",
+  speaker: "doctor",
+  text: "他没冲你，他是冲那份放不下的负担。能认出自己在紧，本身就是松动的开始。",
+  choices: [
+    { id: "hxb2_c06_a", text: "「想起家里心里就紧——紧的那一下，是什么画面？」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "hxb2_p07" },
+    { id: "hxb2_c06_b", text: "「家里供你读书的时候，你在哪儿？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "hxb2_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_p07
+{
+  id: "hxb2_p07",
+  speaker: "patient",
+  text: "（他陷入回忆，声音放轻）……我在屋里写作业，我姐在灶台边烧火。家里灯泡坏了半个月，我妈说先修电表的钱，作业靠着灶火的光写。那会儿我不觉得苦，就觉得灯再坏下去，就写不成字了。",
+  emotion: "sad",
+  autoNext: "hxb2_c07",
+}
+```
+
+```ts-dialog
+// id: hxb2_c07
+{
+  id: "hxb2_c07",
+  speaker: "doctor",
+  text: "「灯再坏下去就写不成字了」——那时候他害怕的，一直是失去写字的机会。",
+  choices: [
+    { id: "hxb2_c07_a", text: "「靠着灶火的光写字——那段日子，你在心里珍藏很久了吧。」", kind: "empathy", effect: { trust: 1 }, next: "hxb2_p08" },
+    { id: "hxb2_c07_b", text: "「你姐在灶台边，那时候她在做什么梦？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb2_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_p08
+{
+  id: "hxb2_p08",
+  speaker: "patient",
+  text: "（他的眼眶红了，没压住）……她烧着火，跟我说「弟，你要好好念」。她那年十六，说这话的时候，笑得可灿烂了。后来我才知道，她成绩其实比我好。是我占了她那条路。",
+  emotion: "broken",
+  autoNext: "hxb2_c08",
+}
+```
+
+```ts-dialog
+// id: hxb2_c08
+{
+  id: "hxb2_c08",
+  speaker: "doctor",
+  text: "「是我占了她那条路」——这句藏了很多年的话，终于说出口了。",
+  choices: [
+    { id: "hxb2_c08_a", text: "「那不是占，是姐姐递到你手里的。你接下来这些年，一直都在替她走这条路。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "hxb2_p09" },
+    { id: "hxb2_c08_b", text: "「『占』这个字，是谁教你说的？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb2_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_p09
+{
+  id: "hxb2_p09",
+  speaker: "patient",
+  text: "（他摇头）……没人教我，是我自己这么觉得。我姐现在在镇上开个小店，日子还行。可我一想到她那年要是没让，现在坐在城里的可能就是她，我心里就……",
+  emotion: "anxious",
+  autoNext: "hxb2_c09",
+}
+```
+
+```ts-dialog
+// id: hxb2_c09
+{
+  id: "hxb2_c09",
+  speaker: "doctor",
+  text: "「现在坐在城里的可能就是她」——他替姐姐补了一整套人生，把自己补成了亏欠的人。",
+  choices: [
+    { id: "hxb2_c09_a", text: "「你替姐姐想的这套人生，她想不想要，你问过她吗？」", kind: "empathy", effect: { trust: 1 }, next: "hxb2_p10" },
+    { id: "hxb2_c09_b", text: "「如果她那年坐了你的位置，你会不会也替她觉得，她欠了你什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb2_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_p10
+{
+  id: "hxb2_p10",
+  speaker: "patient",
+  text: "（他愣了一下）……我没想过反过来。她让给我，是她的好；我要是让她，她说舍不得。……您这一问，把我问住了。",
+  emotion: "neutral",
+  autoNext: "hxb2_c10",
+}
+```
+
+```ts-dialog
+// id: hxb2_c10
+{
+  id: "hxb2_c10",
+  speaker: "doctor",
+  text: "「把我问住了」——问住他的不是问题，是他第一次站到姐姐的位置上看了一眼。",
+  choices: [
+    { id: "hxb2_c10_a", text: "「你一直觉得自己欠姐姐的，可从没想过她乐不乐意看你这么还。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "hxb2_p11" },
+    { id: "hxb2_c10_b", text: "「如果姐姐知道，你这些年开口前都要掂量，怕丢她的脸——她会说什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb2_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_p11
+{
+  id: "hxb2_p11",
+  speaker: "patient",
+  text: "（他低头想了一会儿，声音轻下来）……她会说，傻弟弟，姐要的是你好好活，不是活得像个谢罪的。",
+  emotion: "calm",
+  autoNext: "hxb2_c11",
+}
+```
+
+```ts-dialog
+// id: hxb2_c11
+{
+  id: "hxb2_c11",
+  speaker: "doctor",
+  text: "他替姐姐说出了这句话——其实是他自己终于听见了这句话。",
+  choices: [
+    { id: "hxb2_c11_a", text: "「这句『好好活』，是从你心里说出来的，也是替姐姐说的。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "hxb2_out" },
+    { id: "hxb2_c11_b", text: "「『活得像个谢罪的』——你打算什么时候不再谢罪，开始好好活？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb2_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb2_out
+{
+  id: "hxb2_out",
+  speaker: "narration",
+  text: "第二次会谈结束，贺小北没急着走。他站在门口，忽然开口，用带着乡音的普通话问：「医生，您说，我要是哪天跟人说一句家乡话，会丢脸吗？」",
+  autoNext: "hxb3_start",
+}
+```
+
+### 节拍 3 · 深层·「全家的希望」（trust 40→50，truth 18→33，恶化入口 @trust≤40）
+
+```ts-dialog
+// id: hxb3_start
+{
+  id: "hxb3_start",
+  speaker: "narration",
+  text: "贺小北这次来得比约定早。他坐在候诊区，手里攥着一个旧得卷边的笔记本，像是来赴一场迟到的约。坐下后，他把它放在膝上，没打开。",
+  autoNext: "hxb3_p01",
+}
+```
+
+```ts-dialog
+// id: hxb3_p01
+{
+  id: "hxb3_p01",
+  speaker: "patient",
+  text: "这是我姐当年塞给我的笔记本，我一直留着。里头有一页，写的是她想考的学校。字写得比我好看多了。……我今天带来，是想跟您说说她。",
+  emotion: "neutral",
+  autoNext: "hxb3_c01",
+}
+```
+
+```ts-dialog
+// id: hxb3_c01
+{
+  id: "hxb3_c01",
+  speaker: "doctor",
+  text: "他把最贵重的物件带来了——这是他把门打开了的信号。",
+  choices: [
+    { id: "hxb3_c01_a", text: "「你把它留到现在，这页纸在你心里一定很重。」", kind: "empathy", effect: { trust: 1 }, next: "hxb3_p02" },
+    { id: "hxb3_c01_b", text: "「她写的那个学校，现在怎么样了？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_p02
+{
+  id: "hxb3_p02",
+  speaker: "patient",
+  text: "早就不招生了。她那年要是去了，学的还是老专业。可我知道，这不是重点。重点是，那个学校那扇门，是我姐替我关上的。",
+  emotion: "sad",
+  autoNext: "hxb3_c02",
+}
+```
+
+```ts-dialog
+// id: hxb3_c02
+{
+  id: "hxb3_c02",
+  speaker: "doctor",
+  text: "「那扇门是姐姐替你关上的」——他到现在还替那扇门遗憾。",
+  choices: [
+    { id: "hxb3_c02_a", text: "「你替姐姐遗憾那扇门——她本人遗憾过吗？」", kind: "empathy", effect: { trust: 1 }, next: "hxb3_p03" },
+    { id: "hxb3_c02_b", text: "「你记着这页纸这么多年，是为了替她记着，还是为了提醒自己？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_p03
+{
+  id: "hxb3_p03",
+  speaker: "patient",
+  text: "（他摩挲着纸页）……都有。我总想，我要是把日子过好了，那扇门就没白关。可我把日子过好了，还是觉得不够。我开会不敢说话，怕一开口露怯，坏了家里这些年的指望。",
+  emotion: "anxious",
+  autoNext: "hxb3_c03",
+}
+```
+
+```ts-dialog
+// id: hxb3_c03
+{
+  id: "hxb3_c03",
+  speaker: "doctor",
+  text: "「怕坏了指望」——他把家里的指望，拴在了自己一张嘴上。",
+  choices: [
+    { id: "hxb3_c03_a", text: "「你觉得自己说话土，会坏了姐姐那扇门换来的东西——是这样吗？」", kind: "empathy", effect: { trust: 1 }, next: "hxb3_p04" },
+    { id: "hxb3_c03_b", text: "「『指望』这个词，你从小就懂吧？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_p04
+{
+  id: "hxb3_p04",
+  speaker: "patient",
+  text: "懂。太懂了。我六岁那年，我妈跟邻居说，我家娃以后要考出去，在城里买房。她说着，眼里有光。我那时候就明白，我这条命，是带着全村的光走的。",
+  emotion: "sad",
+  autoNext: "hxb3_c04",
+}
+```
+
+```ts-dialog
+// id: hxb3_c04
+{
+  id: "hxb3_c04",
+  speaker: "doctor",
+  text: "「带着全村的光走」——他把自己活成了一道题，所有人都在等他给出答案。",
+  choices: [
+    { id: "hxb3_c04_a", text: "「带着光走的人，往往最不敢熄灯——你也怕自己不够亮吧。」", kind: "empathy", effect: { trust: 1 }, next: "hxb3_p05" },
+    { id: "hxb3_c04_b", text: "「如果有一天你没答好，那束光会灭吗？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_p05" },
+    { id: "hxb3_c04_c", text: "「你已经做得很好了，别把自己看得那么重，天塌不下来。」", kind: "logic", effect: { trust: -8, defense: 8, mood: -4 }, next: "hxb3_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_r01
+{
+  id: "hxb3_r01",
+  speaker: "patient",
+  text: "（他把笔记本抱紧了些）……天是塌不下来，可我心里那根弦，一直都在。您没背过别人的指望，您不知道那是什么分量。",
+  emotion: "angry",
+  autoNext: "hxb3_p05",
+}
+```
+
+```ts-dialog
+// id: hxb3_p05
+{
+  id: "hxb3_p05",
+  speaker: "patient",
+  text: "（他松开紧抱的手臂，叹了口气）……我说话冲，是因为说到这儿了。这根弦绷了这么多年，今天当着您，总算敢松一下。",
+  emotion: "calm",
+  autoNext: "hxb3_c05",
+}
+```
+
+```ts-dialog
+// id: hxb3_c05
+{
+  id: "hxb3_c05",
+  speaker: "doctor",
+  text: "「敢松一下」——他承认了，自己这些年一直是绷着的。",
+  choices: [
+    { id: "hxb3_c05_a", text: "「松这一下，疼吗？」", kind: "empathy", effect: { trust: 1 }, next: "hxb3_p06" },
+    { id: "hxb3_c05_b", text: "「这根弦绷到今天，是靠什么撑住的？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_p06
+{
+  id: "hxb3_p06",
+  speaker: "patient",
+  text: "……靠想着不能丢脸撑住的。开会不敢说，点外卖念三遍菜名，发语音删了又发——全是怕一开口，就露出那个「不够格」的我。",
+  emotion: "neutral",
+  autoNext: "hxb3_c06",
+}
+```
+
+```ts-dialog
+// id: hxb3_c06
+{
+  id: "hxb3_c06",
+  speaker: "doctor",
+  text: "他第一次把自己所有的症状串成了一条线——那条线的名字叫「怕露怯」。",
+  choices: [
+    { id: "hxb3_c06_a", text: "「怕露怯这三个字，藏着你所有的谨慎。」", kind: "empathy", effect: { trust: 1 }, next: "hxb3_p07" },
+    { id: "hxb3_c06_b", text: "「『不够格』——跟谁比不够格？跟城里人吗？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_p07
+{
+  id: "hxb3_p07",
+  speaker: "patient",
+  text: "（他点头）……跟城里人比吧。他们说话又快又利索，我在旁边听着，插不上话。一插不上话，我就想，完了，又露怯了。",
+  emotion: "sad",
+  autoNext: "hxb3_c07",
+}
+```
+
+```ts-dialog
+// id: hxb3_c07
+{
+  id: "hxb3_c07",
+  speaker: "doctor",
+  text: "他把「插不上话」也归成了自己的错——好像那份利索是天生的资格。",
+  choices: [
+    { id: "hxb3_c07_a", text: "「他们说话利索，是天生的；你从小镇走出来，也是天生的。谁也没比谁多什么。」", kind: "empathy", effect: { trust: 1 }, next: "hxb3_p08" },
+    { id: "hxb3_c07_b", text: "「你插不上话的时候，他们在说什么？有没有人等你插话？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_p08
+{
+  id: "hxb3_p08",
+  speaker: "patient",
+  text: "……没谁等我。我有时候想，我要是不说话，他们是不是根本注意不到我在。可我又怕，真被注意了，他们发现我说得不好，更丢脸。",
+  emotion: "anxious",
+  autoNext: "hxb3_c08",
+}
+```
+
+```ts-dialog
+// id: hxb3_c08
+{
+  id: "hxb3_c08",
+  speaker: "doctor",
+  text: "他卡在「想被看见」和「怕被看见」之间，很多年了。",
+  choices: [
+    { id: "hxb3_c08_a", text: "「想被看见，又想躲着不被看见——这两种怕，哪边更重？」", kind: "empathy", effect: { trust: 1 }, next: "hxb3_p09" },
+    { id: "hxb3_c08_b", text: "「如果有一种说话方式，是本来就属于你的，你觉得那是什么话？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_p09
+{
+  id: "hxb3_p09",
+  speaker: "patient",
+  text: "（他想了想）……家乡话吧。我在家里，说家乡话从来不卡壳，想说什么说什么。我妈说我小时候话可多了，满院子跑着喊。是来了这儿，才慢慢不说了。",
+  emotion: "calm",
+  autoNext: "hxb3_c09",
+}
+```
+
+```ts-dialog
+// id: hxb3_c09
+{
+  id: "hxb3_c09",
+  speaker: "doctor",
+  text: "「是来了这儿才不说了」——他认出了沉默的起点。",
+  choices: [
+    { id: "hxb3_c09_a", text: "「满院子跑着喊的你，现在想不想听听他说话？」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "hxb3_p10" },
+    { id: "hxb3_c09_b", text: "「你藏起的不止是口音，还有那个话很多的自己，对吧？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_p10
+{
+  id: "hxb3_p10",
+  speaker: "doctor",
+  text: "他把那个「话很多的自己」藏了这么久，今天终于摆到了桌面上。",
+  choices: [
+    { id: "hxb3_p10_a", text: "「那个满院子喊的自己，值得被请回来。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "hxb3_p11" },
+    { id: "hxb3_p10_b", text: "「如果让你用家乡话，先跟谁说一句？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_p11" },
+    { id: "hxb3_p10_c", text: "「算了吧，一个人改不了自己从小养成的毛病，你就认了吧。」", kind: "logic", require: { trustAtMost: 40 }, effect: { trust: -10, defense: 10 }, next: "hxb3_w01", hint: "仅信任≤40 时可见" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_p11
+{
+  id: "hxb3_p11",
+  speaker: "patient",
+  text: "（他笑了，有点不好意思）……先跟师傅说吧。他教会我看图纸，是我在城里第一个没笑话我的人。我想用我自己的话，跟他好好说声谢谢。",
+  emotion: "calm",
+  autoNext: "hxb3_c11",
+}
+```
+
+```ts-dialog
+// id: hxb3_c11
+{
+  id: "hxb3_c11",
+  speaker: "doctor",
+  text: "他想用「自己的话」道谢——这是把丢的那部分自己，接回来的开始。",
+  choices: [
+    { id: "hxb3_c11_a", text: "「用你的话道谢，那句话一定会很重。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "hxb3_out" },
+    { id: "hxb3_c11_b", text: "「师傅听你说家乡话，你觉得他会笑话你吗？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb3_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_out
+{
+  id: "hxb3_out",
+  speaker: "narration",
+  text: "第三次会谈结束。贺小北走前，把笔记本摊开给你看了一眼——姐姐写的那页字旁边，他用铅笔添了一行：「我姐那扇门，我替她开回来了。」",
+  autoNext: "hxb4_start",
+}
+```
+
+#### 恶化链（worsen 分支）
+
+```ts-dialog
+// id: hxb3_w01
+{
+  id: "hxb3_w01",
+  speaker: "patient",
+  text: "（他愣了很久，声音发冷）……您说得对。我改不了。反正从小到大，也没人觉得我能改。我这张嘴，就是丢脸的嘴。",
+  emotion: "broken",
+  autoNext: "hxb3_w02",
+}
+```
+
+```ts-dialog
+// id: hxb3_w02
+{
+  id: "hxb3_w02",
+  speaker: "doctor",
+  text: "你的一句「认了吧」，把他推进了「我就是丢脸的」那个坑里。",
+  choices: [
+    { id: "hxb3_w02_a", text: "「我不是那个意思，我是说，你得自己接受现实。」", kind: "logic", effect: { trust: -6, defense: 6, mood: -3 }, next: "hxb3_w03" },
+    { id: "hxb3_w02_b", text: "（你意识到说错了，试着补救）「别这么说，你能走到今天已经很了不起了。」", kind: "empathy", effect: { trust: -3, mood: -4 }, next: "hxb3_w03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb3_w03
+{
+  id: "hxb3_w03",
+  speaker: "patient",
+  text: "……不用补救了。我姐那扇门，本来就是我欠的。就这样吧。师傅那边，我过几天就去辞了他那两句。谢谢您今天的时间。",
+  emotion: "broken",
+  autoNext: "hxb_end_worsen",
+}
+```
+
+### 节拍 4 · 转向 + 结局（trust 50→58，cure 主线分叉 + 安全网）
+
+```ts-dialog
+// id: hxb4_start
+{
+  id: "hxb4_start",
+  speaker: "narration",
+  text: "最后一次会谈前，贺小北来得很早。他在门口转了两圈才进来，坐下后，眼睛亮亮的，先开口说：「过几天来了个客户，南方人，跟我讲我家乡话。」",
+  autoNext: "hxb4_p01",
+}
+```
+
+```ts-dialog
+// id: hxb4_p01
+{
+  id: "hxb4_p01",
+  speaker: "patient",
+  text: "我一听就愣了。他问我图纸，用我家乡的话问的。我回他，也是家乡话。聊完图纸，他跟我说：「小伙子，你老乡音真好听。」……他说好听。他说我说话好听。",
+  emotion: "happy",
+  autoNext: "hxb4_fork",
+}
+```
+
+```ts-dialog
+// id: hxb4_fork
+{
+  id: "hxb4_fork",
+  speaker: "doctor",
+  text: "一个客户用他的家乡话叫住了他——他第一次听见，自己的声音是「好听」的，而不是「土」。这条路走到这儿，有件事需要你陪他一起决定。",
+  choices: [
+    { id: "hxb4_fork_a", text: "「我们一起，把你那张嘴从『怕丢脸』里领出来：今天回去，用家乡话跟师傅道一句谢。就一句，说完就赢。」", kind: "special", effect: { trust: 2, mood: 2 }, next: "hxb4_s01" },
+    { id: "hxb4_fork_b", text: "「你不用逼自己一下子变成话多的人。先从『不再为自己开口道歉』开始，也是一种答案。」", kind: "empathy", effect: { trust: 1 }, next: "hxb4_a01" },
+    { id: "hxb4_fork_c", text: "「你姐那扇门，不是要你一辈子还债。我想陪你，当着家乡话的面，把『欠』这个字拆掉。」", kind: "confront", require: { trust: 50 }, effect: { trust: 1, truth: 3 }, next: "hxb4_h01", hint: "需要信任≥50" },
+  ],
+}
+```
+
+#### 安全网路径（cure 主线）
+
+```ts-dialog
+// id: hxb4_s01
+{
+  id: "hxb4_s01",
+  speaker: "patient",
+  text: "（他低头搓着衣角，声音有点抖）……跟师傅说家乡话？他听得懂吗？他要是听不懂，我这不是又……又自找丢脸吗？",
+  emotion: "sad",
+  autoNext: "hxb4_s02",
+}
+```
+
+```ts-dialog
+// id: hxb4_s02
+{
+  id: "hxb4_s02",
+  speaker: "doctor",
+  text: "他怕的已经不是口音，是「自找丢脸」那个判断本身。",
+  choices: [
+    { id: "hxb4_s02_a", text: "「师傅要是听不懂，他会问你什么意思——那也是一句你好，不是一句笑话。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "hxb4_s03" },
+    { id: "hxb4_s02_b", text: "「『自找丢脸』——这个剧本，你给自己写了多少年了？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb4_s03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_s03
+{
+  id: "hxb4_s03",
+  speaker: "patient",
+  text: "（他想了想，笑了一下）……这个剧本，我可能写了有一辈子了。可那个客户那句话，好像往剧本上泼了杯水，字都花了。",
+  emotion: "calm",
+  autoNext: "hxb4_s04",
+}
+```
+
+```ts-dialog
+// id: hxb4_s04
+{
+  id: "hxb4_s04",
+  speaker: "doctor",
+  text: "「字花了」——他第一次允许自己的剧本被改写了。",
+  choices: [
+    { id: "hxb4_s04_a", text: "「字花了，正好重新写一版。这一版，声音是你的，话也是你的。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "hxb4_s05" },
+    { id: "hxb4_s04_b", text: "「新的这一版，第一句你会写什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb4_s05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_s05
+{
+  id: "hxb4_s05",
+  speaker: "patient",
+  text: "……先写「谢谢」。我欠师傅一句谢，欠我姐一句谢，也欠我自己的嘴一句谢——它替我背了那么多年的「别开口」。",
+  emotion: "neutral",
+  autoNext: "hxb4_s06",
+}
+```
+
+```ts-dialog
+// id: hxb4_s06
+{
+  id: "hxb4_s06",
+  speaker: "doctor",
+  text: "他把「谢谢」写给了自己——那张最该被谢的嘴，终于被看见了。",
+  choices: [
+    { id: "hxb4_s06_a", text: "「这句话，说给以前的自己听，他会吓一跳吗？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "hxb4_s07" },
+    { id: "hxb4_s06_b", text: "「你那张嘴替你扛了这么久，你想怎么还它？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb4_s07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_s07
+{
+  id: "hxb4_s07",
+  speaker: "patient",
+  text: "（他眼里有点热）……我想还它一口气。让它想说话的时候，就说。说普通话也行，说家乡话也行，说一半卡住也行。我在这个城里待了这么久，原来一直没敢好好出过声。",
+  emotion: "sad",
+  autoNext: "hxb4_s08",
+}
+```
+
+```ts-dialog
+// id: hxb4_s08
+{
+  id: "hxb4_s08",
+  speaker: "doctor",
+  text: "「没敢好好出过声」——他说出了这些年最大的秘密。",
+  choices: [
+    { id: "hxb4_s08_a", text: "「现在你说了，我听着呢。你这一声，出得挺好。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "hxb4_s09" },
+    { id: "hxb4_s08_b", text: "「你第一次觉得『出声』是可以的，是在什么瞬间？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb4_s09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_s09
+{
+  id: "hxb4_s09",
+  speaker: "patient",
+  text: "（他笑了，带着点如释重负）……是那个客户说「好听」的时候。您知道吗，他还说，他们那儿老家也有口音，他说普通话也带着味儿，他也没觉得丢人。他说话的时候，特别坦然。",
+  emotion: "happy",
+  autoNext: "hxb4_s10",
+}
+```
+
+```ts-dialog
+// id: hxb4_s10
+{
+  id: "hxb4_s10",
+  speaker: "doctor",
+  text: "一个坦然说着乡音的人，让他第一次看见：口音不是来处的伤疤，是来处的路标。",
+  choices: [
+    { id: "hxb4_s10_a", text: "「你也有来处，你的来处带着音调，那不可耻，那很珍贵。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "hxb4_s11" },
+    { id: "hxb4_s10_b", text: "「从今天起，你想让『贺小北』这三个字，被人用哪种声音叫出来？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb4_s11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_s11
+{
+  id: "hxb4_s11",
+  speaker: "patient",
+  text: "（他想了想，认真地说）……用我自己不发抖的声音。慢一点没关系，带点味儿也没关系。那才是我。",
+  emotion: "calm",
+  autoNext: "hxb4_s12",
+}
+```
+
+```ts-dialog
+// id: hxb4_s12
+{
+  id: "hxb4_s12",
+  speaker: "doctor",
+  text: "「那才是我」——这是整场会谈，他说的最有底气的一句话。",
+  choices: [
+    { id: "hxb4_s12_a", text: "「对，那才是你。这句话，回去也别忘了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "hxb4_s13" },
+    { id: "hxb4_s12_b", text: "「你觉得，姐姐听见你这么说，会是什么表情？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb4_s13" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_s13
+{
+  id: "hxb4_s13",
+  speaker: "patient",
+  text: "（他笑出声来）……我姐会先愣一下，然后说，臭小子，会说话了嘛。她要是知道我敢用家乡话跟师傅道谢，她准得高兴半天。……我回家就给她打电话，用家乡话，从头说到尾。",
+  emotion: "happy",
+  autoNext: "hxb4_s14",
+}
+```
+
+```ts-dialog
+// id: hxb4_s14
+{
+  id: "hxb4_s14",
+  speaker: "doctor",
+  text: "他给自己许了一个具体的承诺——用家乡话，从头说到尾。那是他给姐姐、也给自己的第一声自由。",
+  choices: [
+    { id: "hxb4_s14_a", text: "「这句家乡话，会是你这些年说过最好听的一句话。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "hxb4_s15" },
+    { id: "hxb4_s14_b", text: "「挂电话前，你想对姐姐说一句什么？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb4_s15" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_s15
+{
+  id: "hxb4_s15",
+  speaker: "patient",
+  text: "（他声音有点哑）……就跟她说：姐，那扇门，我替你也开回来了。我没丢你的人，我也没丢我自己。",
+  emotion: "calm",
+  autoNext: "hxb4_s16",
+}
+```
+
+```ts-dialog
+// id: hxb4_s16
+{
+  id: "hxb4_s16",
+  speaker: "doctor",
+  text: "「我没丢我自己」——那个满院子跑着喊的孩子，今天回来了。",
+  choices: [
+    { id: "hxb4_s16_a", text: "「这句话，说给姐姐，也说给那个靠灶火写字的自己听。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "hxb4_s17" },
+    { id: "hxb4_s16_b", text: "「替姐姐把门开回来之后，你自己的路，打算往哪走？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb4_s17" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_s17
+{
+  id: "hxb4_s17",
+  speaker: "patient",
+  text: "（他想了想，笑得很松）……往厂里走呗，该上班上班，该开会开会。以后会上，师傅要是再让我讲两句，我就讲。讲得慢，也讲。讲砸了，我也认。",
+  emotion: "happy",
+  autoNext: "hxb4_s18",
+}
+```
+
+```ts-dialog
+// id: hxb4_s18
+{
+  id: "hxb4_s18",
+  speaker: "doctor",
+  text: "「讲砸了，我也认」——他终于把「讲砸」和「丢脸」拆开了。",
+  choices: [
+    { id: "hxb4_s18_a", text: "「从『怕讲砸』到『敢讲砸』，这条路你走了整整一个冬天。收下它。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "hxb_end_cure" },
+    { id: "hxb4_s18_b", text: "「讲砸之后，你打算怎么对待自己？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb_end_cure" },
+  ],
+}
+```
+
+#### 接纳路径（acceptance）
+
+```ts-dialog
+// id: hxb4_a01
+{
+  id: "hxb4_a01",
+  speaker: "patient",
+  text: "（他点点头）……您说得对，我不逼自己。能让那个客户说我说话好听，我已经很高兴了。以后慢慢来，先不跟人较劲。",
+  emotion: "neutral",
+  autoNext: "hxb4_a02",
+}
+```
+
+```ts-dialog
+// id: hxb4_a02
+{
+  id: "hxb4_a02",
+  speaker: "doctor",
+  text: "他没有逼自己脱胎换骨，而是选择了「不较劲」——这也是向前，只是慢一点。",
+  choices: [
+    { id: "hxb4_a02_a", text: "「不较劲，不代表不往前走。你走慢一点，方向没偏。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "hxb4_a03" },
+    { id: "hxb4_a02_b", text: "「以后开口前，你会怎么提醒自己？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb4_a03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_a03
+{
+  id: "hxb4_a03",
+  speaker: "patient",
+  text: "……就提醒自己：那个人说我说话好听。就算只有一个人说过，那也是真的。……我记着这句话，够我顶一阵了。",
+  emotion: "calm",
+  autoNext: "hxb4_a04",
+}
+```
+
+```ts-dialog
+// id: hxb4_a04
+{
+  id: "hxb4_a04",
+  speaker: "doctor",
+  text: "他把一句「好听」存成了口粮——这比任何道理都管用。",
+  choices: [
+    { id: "hxb4_a04_a", text: "「这句话，你随时可以拿出来嚼一嚼。它是真话。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "hxb_end_accept" },
+    { id: "hxb4_a04_b", text: "「这句话，你会告诉姐姐吗？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "hxb_end_accept" },
+  ],
+}
+```
+
+#### 隐藏路径（hidden · 拆掉「欠」字）
+
+```ts-dialog
+// id: hxb4_h01
+{
+  id: "hxb4_h01",
+  speaker: "patient",
+  text: "（他愣了很久，声音发抖）……拆掉「欠」这个字？我欠了我姐一辈子，您说拆就拆？她让给我的那扇门，是我拿命换都换不回来的。",
+  emotion: "broken",
+  autoNext: "hxb4_h02",
+}
+```
+
+```ts-dialog
+// id: hxb4_h02
+{
+  id: "hxb4_h02",
+  speaker: "doctor",
+  text: "「拿命换都换不回来」——他说得决绝，可这句话里，藏着这么多年从没跟任何人说过的愧。接下来这一步很重，你想好了。",
+  choices: [
+    { id: "hxb4_h02_a", text: "「我想陪你，跟你姐好好谈一次。有些话，不该只有你一个人背着。有些账，也该当面算清。」", kind: "special", effect: { truth: 3, mood: -2 }, next: "hxb4_h03" },
+    { id: "hxb4_h02_b", text: "「我们先不急着拆。今天你愿意说出『欠』，已经是第一步。等你想好再说。」", kind: "empathy", effect: { trust: 1 }, next: "hxb4_h05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_h03
+{
+  id: "hxb4_h03",
+  speaker: "patient",
+  text: "……跟我姐谈？医生，我这么多年都没敢当面跟她提这个事。我怕一提，她就觉得我记她的恩记成了仇。我怕她难过。",
+  emotion: "scared",
+  autoNext: "hxb4_h04",
+}
+```
+
+```ts-dialog
+// id: hxb4_h04
+{
+  id: "hxb4_h04",
+  speaker: "doctor",
+  text: "他怕的不是谈话，是怕自己那笔账一翻出来，把姐姐也拽进愧疚里。",
+  choices: [
+    { id: "hxb4_h04_a", text: "「你背着这笔账，姐姐也未必不知道。有些话当面说开，比隔着十几年互相疼要轻。」", kind: "special", effect: { truth: 3, mood: -2 }, next: "hxb_end_hidden" },
+    { id: "hxb4_h04_b", text: "「那我们把谈的时间往后放。但你今天这句话，我会帮你记住：你不欠她，你只是很爱她。」", kind: "empathy", effect: { trust: 1 }, next: "hxb4_h05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: hxb4_h05
+{
+  id: "hxb4_h05",
+  speaker: "patient",
+  text: "（他垂下眼睛，半天没说话，最后轻轻点头）……好。我不急。今天能跟您说出这些，我已经觉得，那根弦松了一点了。……谢谢您没逼我。",
+  emotion: "calm",
+  autoNext: "hxb_end_accept",
+}
+```
+
+---
+
+## 四、结局
+
+```ts-dialog
+// id: hxb_end_cure
+{
+  id: "hxb_end_cure",
+  speaker: "narration",
+  text: "〔结局 · 治愈〕",
+  isEnding: true,
+  endingType: "cure",
+  endingTitle: "敢用母语说话，也是本事",
+  endingText: "几个月后，贺小北来信。他说那天下班，他站在车间门口，等师傅出来，用家乡话喊了一声「师傅」。师傅愣住，随即笑了，用半生不熟的官话回他：「小北，你这句话，最顺耳。」他说他回家给姐姐打了电话，从进门讲到挂机，全用家乡话。他写：原来我不是没有声音，是终于敢用了。我的口音，是我来处的路标。",
+  endingReward: { doctorReputation: 8, doctorMoney: 300, doctorExp: 50, doctorSanity: 5 },
+}
+```
+
+```ts-dialog
+// id: hxb_end_accept
+{
+  id: "hxb_end_accept",
+  speaker: "narration",
+  text: "〔结局 · 接纳〕",
+  isEnding: true,
+  endingType: "acceptance",
+  endingTitle: "那句话，够我顶一阵",
+  endingText: "贺小北没有再来会谈。但每隔一阵，他会来诊所坐一会儿。他说他还在学着开口，偶尔还是会删掉没发出去的语音，但删之前，会多想一句：有人说过我说话好听。他说他慢慢知道，那不叫原谅自己，叫肯给自己留点余地。",
+  endingReward: { doctorReputation: 4, doctorMoney: 180, doctorExp: 35, doctorSanity: 6 },
+}
+```
+
+```ts-dialog
+// id: hxb_end_hidden
+{
+  id: "hxb_end_hidden",
+  speaker: "narration",
+  text: "〔结局 · 隐藏·那扇门当面开〕",
+  isEnding: true,
+  endingType: "hidden",
+  endingTitle: "那扇门，当面开",
+  endingText: "你陪贺小北回了一趟镇上。姐姐在店门口看见他，先是愣了一下，然后把他拽进门，翻出当年那个笔记本。姐弟俩用家乡话说了很久，说着说着，姐姐忽然红了眼：「傻弟弟，姐让给你，不是让你还。是姐看不得你窝在家里，跟姐一样。」贺小北站在她面前，第一次没躲。回来的路上他一直没说话，快进城时，他开口：「医生，我好像，真的不欠了。」这段关系没有立刻和解，但那根栓了他十几年的弦，终于被人亲手解开了。",
+  endingReward: { doctorReputation: -10, doctorMoney: 100, doctorExp: 80, doctorSanity: -15 },
+}
+```
+
+```ts-dialog
+// id: hxb_end_worsen
+{
+  id: "hxb_end_worsen",
+  speaker: "narration",
+  text: "〔结局 · 恶化〕",
+  isEnding: true,
+  endingType: "worsen",
+  endingTitle: "那扇没人替他开回来的门",
+  endingText: "贺小北没有再出现。师傅后来辗转转来一句话：他辞了讲两句的差事，在班组里更沉默了，图纸照样画得漂亮，可谁跟他说话，他都只点头。有一天他提交了一张请假条，就三个字——「回趟家」。他是不是回去了、跟姐姐说了什么，没有人知道。那扇被他背了十几年的门，终究没等到他亲手打开。",
+  endingReward: { doctorReputation: -8, doctorMoney: 50, doctorExp: 10, doctorSanity: -20 },
+}
+```
+
+---
+
+## 六、状态
+
+- [x] v3 机器可解析格式（ts-meta + ts-dialog 全部就位）
+- [x] trust 锚点 15→28→40→50→58；truth 0→40；碎片 1 枚 @30
+- [x] 恶化入口 @trust≤40（hxb3_p10_c）；隐藏结局 @trust50（hxb4_fork_c）
+- [x] cure 主线 43 轮（节拍1-3 各 11 轮 + 节拍4 安全网 10 轮）
+- [x] 转换器生成 + 走线验收（`node scripts/md-to-patient.mjs docs/stories/he_xiaobei-v3.md --walk`）
+- [ ] 走线四线全绿

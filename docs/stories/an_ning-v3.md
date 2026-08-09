@@ -1,0 +1,1535 @@
+# 安宁 · v3 · 短剧本 · 4 节拍 · 40+ 轮
+
+> 短档剧本：杀猪盘受害者 · 自我贬低。**被骗的是钱，也是她第一次以为被爱——她恨的不是骗子，是那个「居然相信」的自己。**
+> 数值：trust 15→28→40→50→58；truth 0→40；碎片 1 枚 @30；恶化入口 trust≤40；隐藏结局 @50；cure 主线 41 轮。
+> 生成：`node scripts/md-to-patient.mjs docs/stories/an_ning-v3.md --walk`
+
+---
+
+## 〇、人物档案
+
+**姓名** 安宁，25 岁，小公司会计，独居租在老小区。被闺蜜发现她删光聊天记录躲着哭，硬拖她来。
+
+**表象** 不敢报案、不愿提，觉得「丢人」；删光一切关于那个人的痕迹，把手机扣在桌上、夜里一遍遍删了又存。白天照常上班，说话总先自贬：「是我蠢」「我活该」。
+
+**真相** 网恋三个月，对方自称外派工程师，以周转为由分三次借走她全部积蓄八万后消失。她从小被教「要懂事」「别给人添麻烦」，从不敢对任何人开口说「我想要」——所以那个人「每天说想她」的时候，她第一次觉得被人惦记。她恨的从来不是钱，是那个「居然相信」的自己。
+
+**一句话核心**：被骗的是钱，也是她第一次以为被爱——她恨的不是骗子，是那个「居然相信」的自己。
+
+**三层真相**：
+- 表层：不敢报案、不愿提，觉得「丢人」；删光一切关于那个人的痕迹。（开场就说）
+- 中间层：网恋三个月、对方是「外派工程师」，以周转为由分三次借走她全部积蓄 8 万后消失；闺蜜早提醒过她，她没听。（节拍2 揭）
+- 深层：从小被教「要懂事」「别给人添麻烦」，她从不敢对任何人开口说「我想要」——所以那个人「每天说想她」的时候，她第一次觉得被人惦记。（节拍3 揭）
+
+**角色三角**：施压者 = 那个消失的「他」（一场精心设计的骗局，用「被需要」做诱饵）；情感忽视者 = 忙于生计、只问「钱还够吗」的父母；被守护者 = 她心里那个想被爱的小女孩。
+
+**症状意义**：自责是她的防御——只要把错都归给自己（「是我蠢」），就不用面对更痛的事实：「原来没有人真的爱我」「我渴望被爱这件事本身就是错的」。自责让她不用开口求助。
+
+**关键转折**：她发现骗子用的那张照片里的人设，几乎是她理想中自己的样子——她不是被骗了钱，是被「她渴望成为的自己」骗了。
+
+---
+
+## 一、剧本元信息（ts-meta）
+
+```ts-meta
+// id: an_ning
+// tier: 短
+// anchor: 15,28,40,50,58
+// truthEnd: 40
+// minCureRounds: 40
+// fragments: 1
+// worsenAtMost: 40
+{
+  id: "an_ning",
+  name: "安宁",
+  title: "小公司会计 · 网恋被骗 · 闺蜜送来",
+  intro: "被闺蜜硬拖来的会计。删光了所有聊天记录，躲着哭了一个礼拜，觉得『丢人』，不敢报案，不愿提。她说：我就是被骗子骗了点钱，这种事说出去怪丢人的。",
+  surface: "独居会计，25 岁。不敢报案、不愿提，觉得『丢人』；删光一切关于那个人的痕迹，把手机扣在桌上。白天照常上班，夜里一遍遍删了又存、存了又删。说话总先自贬：『是我蠢』『我活该』。",
+  truth: "网恋三个月，对方自称外派工程师，以周转为由分三次借走她全部积蓄八万后消失。她从小被教『要懂事』『别给人添麻烦』，从不敢对任何人开口说『我想要』——所以那个人『每天说想她』的时候，她第一次觉得被人惦记。她恨的从来不是钱，是那个『居然相信』的自己。",
+  palette: { primary: "#7d8fa3", secondary: "#a9b7c4", fog: "#7a6559", bright: "#cfe0ee" },
+  baseReward: 650,
+  difficulty: "简单",
+  startNode: "an1_start",
+  initialState: { trust: 15, defense: 65, mood: 35, truth: 0, round: 0 },
+  memoryFragments: [
+    {
+      id: "an_m1",
+      trigger: { truth: 30 },
+      title: "饭桌上那个不开口的女孩",
+      text: "记忆里有一张饭桌。我妈下班晚，我爸在外地，菜端上桌总是一个人吃。有一次同学夸我画画好看，我举着那张画跑到门口等妈回来，等到菜凉了、灯灭了，也没等到人。后来我就学会了：想要的东西，不要开口。",
+      emotion: "sad",
+    },
+  ],
+}
+```
+
+---
+
+## 二、节拍规划表
+
+| 节拍 | 主题 | 轮数 | trust 起止 | truth 起止 | 关键元素 |
+|---|---|---|---|---|---|
+| 节拍1 | 初访·表层：删光痕迹的会计，只肯说「我就是蠢」 | 10 | 15→28 | 0→10 | 阻抗1（觉得丢人）；「不敢要」第一次说出口 |
+| 节拍2 | 中间层触发：网恋三个月、8 万、闺蜜提醒 | 11 | 28→40 | 10→22 | 关键事件（借钱真相，require trust 20）；阻抗（辩解）；「从来没被人惦记」require truth 15 |
+| 节拍3 | 深层信念：从不说「我想要」，照片人设=理想中的自己 | 11 | 40→50 | 22→32 | 关键事件（照片人设，require trust 35）；阻抗（自我贬低）；[m1 碎片 @truth 30]；恶化入口 @trust≤40 |
+| 节拍4 | 转向+结局：敢报案、敢对闺蜜说「谢谢惦记」 | 9（cure 主线） | 50→58 | 32→40 | fork（special 安全网 / empathy 接纳 / confront 隐藏@50） |
+
+**数值口径**：trust 单调递增（共情线总 +43，逐节拍 +13/+12/+10/+8）；probe 轻 +2 / 实质 +3；logic 说教 -5~-8；defense 阻抗节点短时回升再回落；每节拍 1 个阻抗分叉 + 1 个关键事件，其余轻推进。
+
+**四线预期**：
+- 共情线 → cure，trust 精确 58，rounds 41
+- 均衡线 → cure，碎片 ≥1（truth 触顶 30+）
+- 失误线 → worsen，trust ≤40（恶化入口 @trust≤40 可见）
+- 探问线 → cure，truth 冲顶 ≥40
+
+---
+
+## 三、节拍骨架（ts-dialog 节点）
+
+### 节拍 1 · 初访·表层（trust 15→28，truth 0→10，阻抗：觉得丢人不想提）
+
+```ts-dialog
+// id: an1_start
+{
+  id: "an1_start",
+  speaker: "narration",
+  text: "深秋傍晚，候诊区快下班了。安宁比预约时间早到，坐在最角落的位置，把手机屏幕朝下扣在大腿上，指腹反复摩挲着手机边缘。闺蜜在门口朝她挥挥手：「进去吧，我等你。」她站起来，走到诊室门口，又回头看了闺蜜一眼，才推门进来。",
+  autoNext: "an1_p01",
+}
+```
+
+```ts-dialog
+// id: an1_p01
+{
+  id: "an1_p01",
+  speaker: "patient",
+  text: "（她把手机放在膝盖上，没敢看你）……医生，其实没什么好说的。我朋友非让我来，说我一个礼拜没睡好。我就……就是被骗子骗了点钱，这种事警察都懒得管，我说出来怪丢人的。",
+  emotion: "anxious",
+  autoNext: "an1_c01",
+}
+```
+
+```ts-dialog
+// id: an1_c01
+{
+  id: "an1_c01",
+  speaker: "doctor",
+  text: "她说「怪丢人的」，但坐在这里的是她，不是那个骗子。",
+  choices: [
+    { id: "an1_c01_a", text: "「骗你钱的人该觉得丢人，不是你。你能坐在这儿说出来，就已经比很多人勇敢了。」", kind: "empathy", effect: { trust: 1, defense: -1 }, next: "an1_p02" },
+    { id: "an1_c01_b", text: "「『怪丢人的』——丢人这件事，是你自己觉得，还是怕别人怎么看你？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an1_p02" },
+    { id: "an1_c01_c", text: "「钱没了还能挣，别为这点事把身体搞垮了。」", kind: "logic", effect: { trust: -8, defense: 6, mood: -3 }, next: "an1_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an1_p02
+{
+  id: "an1_p02",
+  speaker: "patient",
+  text: "……我自己也觉得丢人。我好歹是个会计，天天帮公司对账，几万块假账一眼能看出来。轮到自己，人家说几句好话我就信了。说出去，同事得笑死我。",
+  emotion: "anxious",
+  autoNext: "an1_c02",
+}
+```
+
+```ts-dialog
+// id: an1_c02
+{
+  id: "an1_c02",
+  speaker: "doctor",
+  text: "她在拿「我是会计」来骂自己——好像被骗，是职业素养的事。",
+  choices: [
+    { id: "an1_c02_a", text: "「帮公司对账厉害，不代表在感情里也该滴水不漏。这两个本事，不是一回事。」", kind: "empathy", effect: { trust: 1 }, next: "an1_p03" },
+    { id: "an1_c02_b", text: "「『说几句好话就信了』——他那几句好话，都说的是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an1_p03" },
+    { id: "an1_c02_c", text: "「你是会计，警惕性应该比别人高才对。」", kind: "logic", effect: { trust: -6, defense: 5 }, next: "an1_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an1_p03
+{
+  id: "an1_p03",
+  speaker: "patient",
+  text: "（她沉默了一会儿，声音低下去）……就是，说想我。早上问早安，晚上说晚安，问我今天累不累，吃没吃饭。我活了二十五年，头一回有人天天这么惦记我。现在想想，是不是我太缺……太缺人惦记了。",
+  emotion: "neutral",
+  autoNext: "an1_c03",
+}
+```
+
+```ts-dialog
+// id: an1_c03
+{
+  id: "an1_c03",
+  speaker: "doctor",
+  text: "「太缺人惦记」——她终于碰到了那根最软的刺。",
+  choices: [
+    { id: "an1_c03_a", text: "「『太缺人惦记』——这句话你憋了很久吧。想被惦记不是你贪，是人人都需要。」", kind: "empathy", effect: { trust: 2, mood: 3, defense: -2 }, next: "an1_p04" },
+    { id: "an1_c03_b", text: "「被惦记的感觉……你上一次有这种感觉，是什么时候的事？」", kind: "probe", effect: { trust: 2, truth: 2 }, next: "an1_p04" },
+    { id: "an1_c03_c", text: "「网恋都不靠谱，早就该想到是骗子。」", kind: "logic", effect: { trust: -8, defense: 8, mood: -4 }, next: "an1_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an1_r01
+{
+  id: "an1_r01",
+  speaker: "patient",
+  text: "（她的脸色一下子冷下来）……您这话说得，好像是我自己蠢、活该被骗一样。我是蠢，行了吧。我就是头一回有人惦记我，就上当了，我活该。",
+  emotion: "angry",
+  autoNext: "an1_p04",
+}
+```
+
+```ts-dialog
+// id: an1_p04
+{
+  id: "an1_p04",
+  speaker: "patient",
+  text: "（她眼圈一下子红了，又死死压住）……很早了。小时候我妈总加班，我爸在外地跑车，我一个人在家写作业，写到没人管我。后来习惯了，就不盼了。他那样天天问我吃没吃饭，我一开始还以为……以为我这辈子总算也有人惦记了。",
+  emotion: "sad",
+  autoNext: "an1_c04",
+}
+```
+
+```ts-dialog
+// id: an1_c04
+{
+  id: "an1_c04",
+  speaker: "doctor",
+  text: "「我这辈子总算也有人惦记了」——这句话里，装着她太久的等待。",
+  choices: [
+    { id: "an1_c04_a", text: "「你最后那句『以为』说得很轻。我听见了。」", kind: "empathy", effect: { trust: 1 }, next: "an1_p05" },
+    { id: "an1_c04_b", text: "「『不盼了』——不盼，是不敢盼，还是真的不想了？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an1_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an1_p05
+{
+  id: "an1_p05",
+  speaker: "patient",
+  text: "（她没接话，低头摆弄手机，又把屏幕按灭了）……不说这些了。反正钱没了，人也走了，就当花钱买个教训。明天我就当这事没发生过，该上班上班。",
+  emotion: "neutral",
+  autoNext: "an1_c05",
+}
+```
+
+```ts-dialog
+// id: an1_c05
+{
+  id: "an1_c05",
+  speaker: "doctor",
+  text: "她想用「没发生过」把门关上——可门里还坐着刚才那个哭过的她。",
+  choices: [
+    { id: "an1_c05_a", text: "「『就当没发生过』——可你删了所有记录，还把手机扣着放。一个人如果真没事，不需要这么用力地『当作没事』。」", kind: "empathy", effect: { trust: 2, mood: 2 }, next: "an1_p06" },
+    { id: "an1_c05_b", text: "「钱和人都走了，你留下来处理的那个『痕迹』，到底是什么？」", kind: "probe", require: { trust: 18 }, effect: { trust: 2, truth: 3 }, next: "an1_p06" },
+    { id: "an1_c05_c", text: "「想开点，吃亏是福。」", kind: "logic", effect: { trust: -7, defense: 5 }, next: "an1_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an1_p06
+{
+  id: "an1_p06",
+  speaker: "patient",
+  text: "（她愣住了，指尖停在手机边上）……我怕自己看见那些记录，又心软。我怕他哪天又冒出来说两句好话，我这边刚下的决心就塌了。我怕我……还是那个一有人对我好就什么都信的我。",
+  emotion: "anxious",
+  autoNext: "an1_c06",
+}
+```
+
+```ts-dialog
+// id: an1_c06
+{
+  id: "an1_c06",
+  speaker: "doctor",
+  text: "她怕的不是他，是她自己。",
+  choices: [
+    { id: "an1_c06_a", text: "「你怕的不是他，是你自己『还是会心软』的那个部分。那个部分不是傻，它只是太想要一句惦记了。」", kind: "empathy", effect: { trust: 1 }, next: "an1_p07" },
+    { id: "an1_c06_b", text: "（安静地坐着，等她把那句话放一会儿。）", kind: "silence", effect: { trust: 1 }, next: "an1_p07" },
+    { id: "an1_c06_c", text: "「人总要学会长记性。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an1_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an1_p07
+{
+  id: "an1_p07",
+  speaker: "patient",
+  text: "（她苦笑了一下）……好像一直会。我妈说我从小懂事，不哭不闹，给什么要什么。可她不知道，我不是不想要，是我不敢要。我怕一开口，就显得我不够乖、不够省心。",
+  emotion: "sad",
+  autoNext: "an1_c07",
+}
+```
+
+```ts-dialog
+// id: an1_c07
+{
+  id: "an1_c07",
+  speaker: "doctor",
+  text: "「不敢要」——她把活了二十五年的规矩，摆到了桌上。",
+  choices: [
+    { id: "an1_c07_a", text: "「『不敢要』——这三个字，今天你终于说出口了。」", kind: "empathy", effect: { trust: 1 }, next: "an1_p08" },
+    { id: "an1_c07_b", text: "「『不敢要』，是从什么时候开始的？是怕被骂，还是怕要了也没人给？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an1_p08" },
+    { id: "an1_c07_c", text: "「懂事是好事，别觉得委屈。」", kind: "logic", effect: { trust: -6, defense: 5 }, next: "an1_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an1_p08
+{
+  id: "an1_p08",
+  speaker: "patient",
+  text: "……嗯。我从来没跟人说过这个。今天不知怎么，坐在这儿，就漏出来了。可能因为您不认识我，我说了也不丢人。",
+  emotion: "neutral",
+  autoNext: "an1_c08",
+}
+```
+
+```ts-dialog
+// id: an1_c08
+{
+  id: "an1_c08",
+  speaker: "doctor",
+  text: "「说了也不丢人」——她第一次尝到，把真心话放出来的松快。",
+  choices: [
+    { id: "an1_c08_a", text: "「你不认识我，我不认识你——可你今天说的每句话，都是真的。这比很多认识几十年的人说的话都重。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "an1_p09" },
+    { id: "an1_c08_b", text: "「『说了也不丢人』——那要是认识你的人也听见了呢？你怕他们看见你什么？」", kind: "probe", effect: { trust: 2, truth: 3 }, next: "an1_p09" },
+    { id: "an1_c08_c", text: "「你这情况不算严重，别老往坏处想。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an1_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an1_p09
+{
+  id: "an1_p09",
+  speaker: "patient",
+  text: "（她低着头，声音很轻）……我怕他们看见我那么想被人惦记。一个二十五岁的人，还这么盼着有人惦记，多没出息。我妈要知道我为这种事哭，肯定又说我矫情。",
+  emotion: "anxious",
+  autoNext: "an1_c09",
+}
+```
+
+```ts-dialog
+// id: an1_c09
+{
+  id: "an1_c09",
+  speaker: "doctor",
+  text: "「想被爱是没出息」——这是她心里另一句住了很久的判决。",
+  choices: [
+    { id: "an1_c09_a", text: "「惦记和出息，是两码事。天底下没有哪条规定说，想被爱是一件丢人的事。」", kind: "empathy", effect: { trust: 1 }, next: "an1_p10" },
+    { id: "an1_c09_b", text: "「你妈会说你『矫情』——她以前，是不是也说过类似的话？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an1_p10" },
+    { id: "an1_c09_c", text: "「你现在最该做的，是把注意力放在工作上。」", kind: "logic", effect: { trust: -7, defense: 5 }, next: "an1_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an1_p10
+{
+  id: "an1_p10",
+  speaker: "patient",
+  text: "（她没接话，站起来，又坐下）……医生，我说这么多，是不是太耽误您时间了？我朋友还在外面等我。",
+  emotion: "neutral",
+  autoNext: "an1_c10",
+}
+```
+
+```ts-dialog
+// id: an1_c10
+{
+  id: "an1_c10",
+  speaker: "doctor",
+  text: "她想用「别耽误您」把今天收住——可今天的门已经开了一条缝。",
+  choices: [
+    { id: "an1_c10_a", text: "「你朋友在外面等你，可你刚才把二十五年的心事留在这儿了。下次来，咱们接着往深里看看，行吗？」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "an1_out" },
+    { id: "an1_c10_b", text: "「你朋友是不是也说过，让她惦记你、别一个人扛？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an1_out" },
+    { id: "an1_c10_c", text: "「你朋友都劝你来了，你就好好配合，别辜负她。」", kind: "logic", effect: { trust: -5, defense: 3 }, next: "an1_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an1_out
+{
+  id: "an1_out",
+  speaker: "narration",
+  text: "第一次会谈结束。安宁在门口站了一会儿，把手机从兜里掏出来，看一眼又放回去。「……我朋友还在等我。」她像是说给你听，又像是说给自己听。",
+  autoNext: "an2_start",
+}
+```
+
+### 节拍 2 · 中间层触发（trust 28→40，truth 10→22，[require 20 起]）
+
+```ts-dialog
+// id: an2_start
+{
+  id: "an2_start",
+  speaker: "narration",
+  text: "一周后，安宁准时来了，这回没让闺蜜送。她今天化了淡妆，坐姿也比上次松了些，开口前先笑了一下。可你注意到，她的无名指一直没东西可戴的地方，反复摩挲着。",
+  autoNext: "an2_p01",
+}
+```
+
+```ts-dialog
+// id: an2_p01
+{
+  id: "an2_p01",
+  speaker: "patient",
+  text: "（她坐定，先笑了笑）……上回回去之后，我睡了两天好觉。跟您说了那些话，好像没那么堵了。可白天一到公司，看见手机，还是会……空一下。我把它关机放抽屉里了。",
+  emotion: "neutral",
+  autoNext: "an2_c01",
+}
+```
+
+```ts-dialog
+// id: an2_c01
+{
+  id: "an2_c01",
+  speaker: "doctor",
+  text: "她迈出了半步——「睡了两天好觉」。",
+  choices: [
+    { id: "an2_c01_a", text: "「你把手机关机放抽屉里——这个动作，是在护着自己，还是在躲什么？」", kind: "empathy", effect: { trust: 1 }, next: "an2_p02" },
+    { id: "an2_c01_b", text: "「『空一下』——那一下空的是什么？是等他的消息，还是别的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an2_p02" },
+    { id: "an2_c01_c", text: "「关机就对了，别再碰那些东西了。」", kind: "logic", effect: { trust: -6, defense: 5 }, next: "an2_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_p02
+{
+  id: "an2_p02",
+  speaker: "patient",
+  text: "（她低下头）……都有。一开始是等他，后来是等一个解释。他消失那天，我打了四十多个电话，他一个都没接。后来我想，我不该打的，太狼狈了。",
+  emotion: "sad",
+  autoNext: "an2_c02",
+}
+```
+
+```ts-dialog
+// id: an2_c02
+{
+  id: "an2_c02",
+  speaker: "doctor",
+  text: "「太狼狈了」——她到现在，还在替自己当时的在乎感到羞耻。",
+  choices: [
+    { id: "an2_c02_a", text: "「想打电话问个明白，不叫狼狈。那是一个人还念着另一个人的正常反应。」", kind: "empathy", effect: { trust: 1 }, next: "an2_p03" },
+    { id: "an2_c02_b", text: "「四十多个电话，最后一个是什么时候停的？为什么停？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an2_p03" },
+    { id: "an2_c02_c", text: "「一个消失的男人，你还打四十个电话？早该清醒了。」", kind: "logic", effect: { trust: -7, defense: 5 }, next: "an2_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_p03
+{
+  id: "an2_p03",
+  speaker: "patient",
+  text: "（她沉默了一下）……因为我在电话里听到一个女声，很近，像是在他身边。我一下就明白了。那天晚上，我把聊天记录从头翻到尾，翻到手机没电。然后我删了，全删了。",
+  emotion: "neutral",
+  autoNext: "an2_c03",
+}
+```
+
+```ts-dialog
+// id: an2_c03
+{
+  id: "an2_c03",
+  speaker: "doctor",
+  text: "「翻到手机没电」——她不是在看记录，是在跟那段记忆打架。",
+  choices: [
+    { id: "an2_c03_a", text: "「翻完记录你删了，是为了让自己死心。可一个人删东西删到手机没电，是还在跟那段记忆打架。」", kind: "empathy", effect: { trust: 2, mood: 2 }, next: "an2_p04" },
+    { id: "an2_c03_b", text: "「『外派工程师』——他跟你开口借钱的时候，说的是什么话？」", kind: "probe", require: { trust: 20 }, effect: { trust: 2, truth: 3 }, next: "an2_p04" },
+    { id: "an2_c03_c", text: "「删了就好，眼不见心不烦。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an2_p04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_p04
+{
+  id: "an2_p04",
+  speaker: "patient",
+  text: "……他说工地上的工程款周转不开，工资结算卡住了，说先跟我借点，回头连本带利还我。第一次我借了两万。他说我帮他解了燃眉之急，说我是他的贵人。……我长这么大，还没人这么夸过我。",
+  emotion: "sad",
+  autoNext: "an2_c04",
+}
+```
+
+```ts-dialog
+// id: an2_c04
+{
+  id: "an2_c04",
+  speaker: "doctor",
+  text: "「我是他的贵人」——她不是被钱迷住的，是被那句话里的自己迷住了。",
+  choices: [
+    { id: "an2_c04_a", text: "「『我是他的贵人』——这句话，你舍不得的不是钱，是它让你觉得自己被需要。」", kind: "empathy", effect: { trust: 1 }, next: "an2_p05" },
+    { id: "an2_c04_b", text: "「第一次两万，后来呢？他夸你一次，你就借一次吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an2_p05" },
+    { id: "an2_c04_c", text: "「他夸你两句你就借钱，你也太好骗了。」", kind: "logic", effect: { trust: -8, defense: 6 }, next: "an2_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_r01
+{
+  id: "an2_r01",
+  speaker: "patient",
+  text: "（她的声音冷下来，带着刺）……对，我就是好骗。您是不是也觉得，我这种人就该被骗？我闺蜜当初也这么说我，我听不进去，是我活该。",
+  emotion: "angry",
+  autoNext: "an2_p05",
+}
+```
+
+```ts-dialog
+// id: an2_p05
+{
+  id: "an2_p05",
+  speaker: "patient",
+  text: "……后两次各三万。他每次都说最后一次，说等工程款下来就还。我把我攒了五年的钱全给他了，还偷偷动了信用卡。我妈要是知道……她肯定说，我就是个败家的。",
+  emotion: "anxious",
+  autoNext: "an2_c05",
+}
+```
+
+```ts-dialog
+// id: an2_r05
+{
+  id: "an2_r05",
+  speaker: "patient",
+  text: "（她扭过头去，声音很硬）……对，我就是蠢。我妈从小就说我笨，说我这点事都办不好。我就该认命，活该被骗。反正你们都这么说，我也不指望谁了。",
+  emotion: "angry",
+  autoNext: "an2_p06",
+}
+```
+
+```ts-dialog
+// id: an2_c05
+{
+  id: "an2_c05",
+  speaker: "doctor",
+  text: "她把自己骂成「败家的」，好把「怕我妈失望」藏到更深的地方。",
+  choices: [
+    { id: "an2_c05_a", text: "「你不是败家。你只是太想抓住那句『被需要』，比谁都用力。这不该被骂，该被心疼。」", kind: "empathy", effect: { trust: 1, mood: 2, defense: -1 }, next: "an2_p06" },
+    { id: "an2_c05_b", text: "「『我妈要是知道』——你怕她知道的，是钱没了，还是你会被人骗这件事？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an2_p06" },
+    { id: "an2_c05_c", text: "「信用卡都敢动，你这不是蠢是什么。」", kind: "logic", effect: { trust: -8, defense: 8, mood: -4 }, next: "an2_r05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_p06
+{
+  id: "an2_p06",
+  speaker: "patient",
+  text: "（她眼眶红了，没接话，半天才说）……我闺蜜其实早就提醒过我。她说你连他面都没见过，凭啥借钱。我说他不一样。现在想想，我要是当时听她一句，也不至于……也不至于这样。",
+  emotion: "neutral",
+  autoNext: "an2_c06",
+}
+```
+
+```ts-dialog
+// id: an2_c06
+{
+  id: "an2_c06",
+  speaker: "doctor",
+  text: "「我说他不一样」——这一句，是那段关系里她最用力的辩解。",
+  choices: [
+    { id: "an2_c06_a", text: "「你闺蜜提醒你，是因为她看见你栽进去了。你没听，不是你不信她，是你太想信他。」", kind: "empathy", effect: { trust: 1 }, next: "an2_p07" },
+    { id: "an2_c06_b", text: "「『他说他不一样』——他哪里不一样，让你愿意把钱和心都交出去？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an2_p07" },
+    { id: "an2_c06_c", text: "「当初听你闺蜜的，哪会有今天。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an2_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_p07
+{
+  id: "an2_p07",
+  speaker: "patient",
+  text: "（她想了很久）……他每天早上六点半准时问我起床没有，晚上十二点跟我说晚安。他说我是他一天里第一个和最后一个想到的人。医生，我不是没见过世面。我只是……从来没被人这样惦记过。",
+  emotion: "anxious",
+  autoNext: "an2_c07",
+}
+```
+
+```ts-dialog
+// id: an2_c07
+{
+  id: "an2_c07",
+  speaker: "doctor",
+  text: "「从来没被人这样惦记过」——这句话的底下，藏着一整个没人接住她的童年。",
+  choices: [
+    { id: "an2_c07_a", text: "「被人从早到晚惦记着——你等了这么多年，就等来这么点暖，结果还是假的。换成谁，都会先恨自己为什么当真。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "an2_p08" },
+    { id: "an2_c07_b", text: "「『从来没被人这样惦记过』——你爸妈呢？从小到大，有没有人这样惦记过你？」", kind: "probe", require: { truth: 15 }, effect: { trust: 2, truth: 3 }, next: "an2_p08" },
+    { id: "an2_c07_c", text: "「他要真惦记你，就不会骗你钱。这道理你该懂。」", kind: "logic", effect: { trust: -7, defense: 5 }, next: "an2_p08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_p08
+{
+  id: "an2_p08",
+  speaker: "patient",
+  text: "（她别过头去，声音发闷）……没有。我爸跑车，我妈在厂里，我小时候住校，周末回家他们也就问我一句钱够不够。够了，我妈就接着忙她的了。我……我是被养大的，但我好像从来没被谁好好惦记过。",
+  emotion: "sad",
+  autoNext: "an2_c08",
+}
+```
+
+```ts-dialog
+// id: an2_c08
+{
+  id: "an2_c08",
+  speaker: "doctor",
+  text: "「被养大，但没被好好惦记过」——她把这两件事分得很清。",
+  choices: [
+    { id: "an2_c08_a", text: "「『被养大，但没被好好惦记过』——这两件事，你分得很清楚。这些年，是谁一直在惦记着你？」", kind: "empathy", effect: { trust: 1 }, next: "an2_p09" },
+    { id: "an2_c08_b", text: "「『钱够不够』——你爸妈关心的，是钱，还是你？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an2_p09" },
+    { id: "an2_c08_c", text: "「父母忙着挣钱养家，你别怪他们。」", kind: "logic", effect: { trust: -6, defense: 5 }, next: "an2_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_p09
+{
+  id: "an2_p09",
+  speaker: "patient",
+  text: "……我也不知道。我上学那会儿，开家长会都没人来。我考了第三名，把奖状贴在墙上，想等他们回来夸我，等了一晚上，谁也没提。那晚我自己把奖状摘了，再没贴过。",
+  emotion: "neutral",
+  autoNext: "an2_c09",
+}
+```
+
+```ts-dialog
+// id: an2_c09
+{
+  id: "an2_c09",
+  speaker: "doctor",
+  text: "那张被她自己摘下来的奖状，是一个孩子对「被夸」的最后一次期待。",
+  choices: [
+    { id: "an2_c09_a", text: "「把奖状摘下来的那个小孩，不是不想被夸，是怕等不到夸，还要一次次失望。」", kind: "empathy", effect: { trust: 1 }, next: "an2_p10" },
+    { id: "an2_c09_b", text: "「你摘奖状的时候，心里想的是什么？是『我不要了』，还是『反正没人看』？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an2_p10" },
+    { id: "an2_c09_c", text: "「为了一张奖状，不至于。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an2_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_p10
+{
+  id: "an2_p10",
+  speaker: "patient",
+  text: "（她深吸一口气）……都有吧。后来我就学会了自己哄自己：考好了自己给自己买个糖，难过了自己躲被子里哭。我跟谁都客客气气的，谁也不需要我的惦记，我也不指望谁的。",
+  emotion: "neutral",
+  autoNext: "an2_c10",
+}
+```
+
+```ts-dialog
+// id: an2_c10
+{
+  id: "an2_c10",
+  speaker: "doctor",
+  text: "「我不指望谁的」——这是一句把自己关在门里的宣言。",
+  choices: [
+    { id: "an2_c10_a", text: "「『我不指望谁的』——可你心里那个小女孩，一直还盼着有人惦记她。她现在盼的那个人，不该是骗子。」", kind: "empathy", effect: { trust: 1 }, next: "an2_p11" },
+    { id: "an2_c10_b", text: "「你说这话的时候，心里真的一点盼头都没有吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an2_p11" },
+    { id: "an2_c10_c", text: "「人要靠自己，别指望别人。」", kind: "logic", effect: { trust: -7, defense: 5 }, next: "an2_p11" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_p11
+{
+  id: "an2_p11",
+  speaker: "patient",
+  text: "（她没回答，低头看着自己的手，半天说）……医生，我这些天一直在想一件事。钱没了，我可以再挣。可我翻记录那晚，我哭的不是钱。我哭的是……这三个月，原来是我自己一个人在做梦。",
+  emotion: "anxious",
+  autoNext: "an2_c11",
+}
+```
+
+```ts-dialog
+// id: an2_c11
+{
+  id: "an2_c11",
+  speaker: "doctor",
+  text: "「原来是我自己一个人在做梦」——她开始分得清，梦和骗局的界线。",
+  choices: [
+    { id: "an2_c11_a", text: "「做梦的人不丢人。丢人的，是把别人的梦偷走的人。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "an2_out" },
+    { id: "an2_c11_b", text: "「你做的这个梦，梦里的那个『他』，是什么样的？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an2_out" },
+    { id: "an2_c11_c", text: "「梦醒了就好，别再想了。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an2_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an2_out
+{
+  id: "an2_out",
+  speaker: "narration",
+  text: "第二次会谈结束时，安宁把手机从抽屉里拿出来，没开机，捏在手里看了很久。「我想过把它扔了。」她说，「可那里面，存着我自己跟自己说的那些话。」你看着她，觉得她开始分清，哪些是骗局，哪些是她自己的真心。",
+  autoNext: "an3_start",
+}
+```
+
+### 节拍 3 · 深层信念（trust 40→50，truth 22→32，[m1 碎片 @30] · 恶化入口 @trust≤40）
+
+```ts-dialog
+// id: an3_start
+{
+  id: "an3_start",
+  speaker: "narration",
+  text: "又一周，安宁来的时候，在门口站了一会儿才进来。她今天素着一张脸，眼圈有点肿。「我昨晚又把那些记录找回来了。」她坐下就说，「不是他发的，是我自己在备忘录里存的截图。」",
+  autoNext: "an3_p01",
+}
+```
+
+```ts-dialog
+// id: an3_p01
+{
+  id: "an3_p01",
+  speaker: "patient",
+  text: "……我怕忘了。我怕哪天睡醒了，就真当这三个月是我做的一场梦，连恨都没个地方放。可翻着翻着我又骂自己，都成这样了，还存他的东西，你是不是贱。",
+  emotion: "sad",
+  autoNext: "an3_c01",
+}
+```
+
+```ts-dialog
+// id: an3_c01
+{
+  id: "an3_c01",
+  speaker: "doctor",
+  text: "「你是不是贱」——她骂起自己来，比谁都狠。",
+  choices: [
+    { id: "an3_c01_a", text: "「你不是贱。你是想留住一点『真的有人惦记过我』的证据。哪怕那是假的，你也要靠它记住，自己有过那点暖。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "an3_p02" },
+    { id: "an3_c01_b", text: "「『怕忘了』——你怕忘的，是他，还是那三个月里被惦记着的你自己？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an3_p02" },
+    { id: "an3_c01_c", text: "「都散了还留着记录，这不是给自己添堵吗？删了吧。」", kind: "logic", effect: { trust: -7, defense: 5 }, next: "an3_p02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_p02
+{
+  id: "an3_p02",
+  speaker: "patient",
+  text: "（她想了想）……是他，也是我自己吧。您一说我才反应过来。我存的那些截图，都是他夸我、惦记我的。我自己喜欢他的那些话，一条都没存。我好像……不太会记得自己是什么样的人。",
+  emotion: "neutral",
+  autoNext: "an3_c02",
+}
+```
+
+```ts-dialog
+// id: an3_c02
+{
+  id: "an3_c02",
+  speaker: "doctor",
+  text: "「不太会记得自己是什么样的人」——她在自己心里，一直是个模糊的影子。",
+  choices: [
+    { id: "an3_c02_a", text: "「『不太会记得自己是什么样的人』——那你以前，是怎么记住自己的？」", kind: "empathy", effect: { trust: 1 }, next: "an3_p03" },
+    { id: "an3_c02_b", text: "「他夸你的那些话，你还记得吗？哪一句你记得最牢？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an3_p03" },
+    { id: "an3_c02_c", text: "「记录删不删都是小事，关键是你得往前看。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an3_p03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_p03
+{
+  id: "an3_p03",
+  speaker: "patient",
+  text: "……他夸过我，说我这人心软，说能娶到我是福气。他说他外派结束就回来，带我见爸妈。我那时候还想着，等他回来，我要好好跟他说，我这个人，其实很需要一个家。",
+  emotion: "anxious",
+  autoNext: "an3_c03",
+}
+```
+
+```ts-dialog
+// id: an3_c03
+{
+  id: "an3_c03",
+  speaker: "doctor",
+  text: "「其实很需要一个家」——这句话，她压了多少年。",
+  choices: [
+    { id: "an3_c03_a", text: "「『其实很需要一个家』——这句话，你藏了多少年，才敢在今天说出来？」", kind: "empathy", effect: { trust: 1 }, next: "an3_p04" },
+    { id: "an3_c03_b", text: "「他说『外派结束就回来』——你有没有想过，他一次都没让你见过面，为什么你还信？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an3_p04" },
+    { id: "an3_c03_c", text: "「这种话都是骗你的，你还当真，太天真了。」", kind: "logic", effect: { trust: -8, defense: 6 }, next: "an3_r01" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_r01
+{
+  id: "an3_r01",
+  speaker: "patient",
+  text: "（她愣了一下，随即苦笑）……对，我就是天真。天真的人活该被骗，我认了。反正我这个人，从小到大也没被谁好好对待过，被骗也是命。",
+  emotion: "broken",
+  autoNext: "an3_p04",
+}
+```
+
+```ts-dialog
+// id: an3_p04
+{
+  id: "an3_p04",
+  speaker: "patient",
+  text: "（她低下头，声音越来越轻）……因为他说要带我见爸妈的时候，我在脑子里把这一天想了一百遍了。我想象他爸妈会是什么样，想象我要穿什么，想象我以后逢年过节也有人走了。我连这个都想过，我却连他一张脸都没见过。",
+  emotion: "neutral",
+  autoNext: "an3_c04",
+}
+```
+
+```ts-dialog
+// id: an3_c04
+{
+  id: "an3_c04",
+  speaker: "doctor",
+  text: "「我在脑子里把这一天想了一百遍」——她喜欢的，不是那个人。",
+  choices: [
+    { id: "an3_c04_a", text: "「你在脑子里把『以后的日子』都过了一遍——你喜欢的不是他这个人，是那个『终于有人疼我』的以后。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "an3_p05" },
+    { id: "an3_c04_b", text: "「他给你发过照片吧？那张照片里的人，是什么样？」", kind: "probe", require: { trust: 35 }, effect: { trust: 2, truth: 3 }, next: "an3_p05" },
+    { id: "an3_c04_c", text: "「你连他人都没见过就投入这么深，这很不理智。」", kind: "logic", effect: { trust: -7, defense: 5 }, next: "an3_p05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_p05
+{
+  id: "an3_p05",
+  speaker: "patient",
+  text: "……发过。一个三十岁上下的男人，穿着格子衬衫，在工地围挡前笑，晒得黑黑的，很踏实的样子。我那时候觉得，他一个人在外头打拼，还天天惦记我，真不容易。……我现在都不敢再看他那张照片。",
+  emotion: "sad",
+  autoNext: "an3_c05",
+}
+```
+
+```ts-dialog
+// id: an3_c05
+{
+  id: "an3_c05",
+  speaker: "doctor",
+  text: "「不敢再看」——那张照片里，可能有她不敢认的东西。",
+  choices: [
+    { id: "an3_c05_a", text: "「『不敢再看』——不是怕他，是怕照片里那个人，戳到你什么地方了。」", kind: "empathy", effect: { trust: 1 }, next: "an3_p06" },
+    { id: "an3_c05_b", text: "「『踏实的样子』——你理想中的自己，是不是也是这种『在外头能扛事、回家有人疼』的样子？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an3_p06" },
+    { id: "an3_c05_c", text: "「照片肯定是假的，别再看，也别再想。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an3_p06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_p06
+{
+  id: "an3_p06",
+  speaker: "patient",
+  text: "（她整个人顿住，眼泪毫无预兆地掉下来）……我从来没跟人说过。那张照片，我保存下来了。我对着它想，要是我也能这样就好了——有个知冷知热的人，有个家，下班有人问一句今天累不累。我骗我自己说，我是在喜欢他。其实是……是我太想成为那个『被人惦记』的自己了。",
+  emotion: "scared",
+  autoNext: "an3_c06",
+}
+```
+
+```ts-dialog
+// id: an3_c06
+{
+  id: "an3_c06",
+  speaker: "doctor",
+  text: "她揭开了这整件事最深的那层：她不是被骗了钱，是被「她渴望成为的自己」骗了。",
+  choices: [
+    { id: "an3_c06_a", text: "「你没有错。你只是把『想被爱』这件事，错放到了他身上。可那份渴望是真的，它不脏。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "an3_p07" },
+    { id: "an3_c06_b", text: "「如果那张照片里的人换成任何一个人，只要天天惦记你，你是不是都会信？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an3_p07" },
+    { id: "an3_c06_c", text: "「你这不是被骗了钱，是被骗了感情，都一样，认清就行。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an3_p07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_p07
+{
+  id: "an3_p07",
+  speaker: "patient",
+  text: "（她哭得说不出话，半天才点头）……会。我甚至想过，哪怕他没钱，哪怕他骗我钱，只要他每天惦记我，我都认了。医生，我是不是……我是不是太不值钱了，才会被一点好话就骗走。",
+  emotion: "broken",
+  autoNext: "an3_c07",
+}
+```
+
+```ts-dialog
+// id: an3_c07
+{
+  id: "an3_c07",
+  speaker: "doctor",
+  text: "「我是不是太不值钱了」——这句话，是这几次谈话里最疼的一个。",
+  choices: [
+    { id: "an3_c07_a", text: "「你不是不值钱。是从来没人告诉你，你本身就值得被惦记，不需要拿钱换，也不需要拿命换。」", kind: "empathy", effect: { trust: 2, mood: 4, defense: -2 }, next: "an3_p08" },
+    { id: "an3_c07_b", text: "「『我是不是太不值钱了』——这句话，是谁先说的？是他，还是你心里那个声音？」", kind: "probe", effect: { trust: 2, truth: 2 }, next: "an3_p08" },
+    { id: "an3_c07_c", text: "「你要是有自尊，就不该为这种人哭。」", kind: "logic", effect: { trust: -8, defense: 8, mood: -4 }, next: "an3_r07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_r07
+{
+  id: "an3_r07",
+  speaker: "patient",
+  text: "（她噎住，眼泪滚下来又被擦掉）……对，我没自尊，我就该被骂。反正从小到大，我都是被骂过来的，多你一句也没差。我就这样了，您也别费心了。",
+  emotion: "broken",
+  autoNext: "an3_p08",
+}
+```
+
+```ts-dialog
+// id: an3_p08
+{
+  id: "an3_p08",
+  speaker: "patient",
+  text: "（她擦擦眼泪，慢慢平静下来）……是我自己说的。我从小就觉得，我不值钱。我妈生我的时候难产，她有时候会半开玩笑地说，差点为了我搭上命。我听着，总觉得我活着，是欠她的。",
+  emotion: "neutral",
+  autoNext: "an3_c08",
+}
+```
+
+```ts-dialog
+// id: an3_c08
+{
+  id: "an3_c08",
+  speaker: "doctor",
+  text: "「我活着是欠她的」——她把自己活成了一笔还不清的债。",
+  choices: [
+    { id: "an3_c08_a", text: "「你妈那句玩笑，你当真了二十多年，把它长成了『我活着是欠的』。可你活着，从来不是谁的债。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "an3_p09" },
+    { id: "an3_c08_b", text: "「『欠她的』——你这么多年，是不是一直在还这个债？不哭不闹，不要不争，省吃俭用，都是在还？」", kind: "probe", effect: { trust: 1, truth: 3 }, next: "an3_p09" },
+    { id: "an3_c08_c", text: "「你妈随口一句话，你别太当回事。」", kind: "logic", effect: { trust: -7, defense: 5 }, next: "an3_p09" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_p09
+{
+  id: "an3_p09",
+  speaker: "patient",
+  text: "（她点点头，又摇摇头）……是。我拼命懂事，拼命省钱，把每个月的工资省出一半寄回去，他们一句谢谢都没说过，我也不指望。我以为只要我够省心、够懂事，我就算把欠的还清了，就不欠他们什么了。",
+  emotion: "sad",
+  autoNext: "an3_c09",
+}
+```
+
+```ts-dialog
+// id: an3_c09
+{
+  id: "an3_c09",
+  speaker: "doctor",
+  text: "「我就不欠他们什么了」——她用一辈子省心，去换一句「我不欠」。",
+  choices: [
+    { id: "an3_c09_a", text: "「你把『还债』当成了活着的全部。可还债的日子，怎么会有底气去接受别人的惦记呢？」", kind: "empathy", effect: { trust: 1 }, next: "an3_p10" },
+    { id: "an3_c09_b", text: "「『我不指望』——你是真的不指望，还是怕一指望，又要失望？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an3_p10" },
+    { id: "an3_c09_c", text: "「懂事是美德，你怎么想也得体谅父母。」", kind: "logic", effect: { trust: -7, defense: 5 }, next: "an3_p10" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_p10
+{
+  id: "an3_p10",
+  speaker: "patient",
+  text: "（她很久没说话，最后说）……医生，我这几天一直在想我闺蜜。她其实天天都惦记我，问我吃饭没有，拉我出来透气。可我就是不敢信，总觉得她是可怜我。我好像，把真心放我眼前，我都不敢接了。",
+  emotion: "neutral",
+  autoNext: "an3_c10",
+}
+```
+
+```ts-dialog
+// id: an3_c10
+{
+  id: "an3_c10",
+  speaker: "doctor",
+  text: "她看见了自己的怕——不是没人惦记她，是她不敢接。",
+  choices: [
+    { id: "an3_c10_a", text: "「你不是不敢接，你是从没学过『被爱不用还』。闺蜜惦记你，是她愿意，不需要你拿什么去换。」", kind: "empathy", effect: { trust: 0, mood: 2 }, next: "an3_p11" },
+    { id: "an3_c10_b", text: "「如果闺蜜天天惦记你，你信吗？还是你会一直觉得『她只是可怜我』？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an3_p11" },
+    { id: "an3_c10_c", text: "「你这样的人，再劝也没用，谁也帮不了你。」", kind: "logic", require: { trustAtMost: 40 }, effect: { trust: -10, defense: 10 }, next: "an3_w01", hint: "仅信任≤40 时可见" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_p11
+{
+  id: "an3_p11",
+  speaker: "patient",
+  text: "（她抬起头，第一次没有躲开你的目光）……我想试试接住她。可我怕我接不住，又像这次一样，把什么都搞砸。医生，你说，我是不是该先学会，接住我自己？",
+  emotion: "calm",
+  autoNext: "an3_c11",
+}
+```
+
+```ts-dialog
+// id: an3_c11
+{
+  id: "an3_c11",
+  speaker: "doctor",
+  text: "「接住我自己」——这是她从「恨自己」跨向「心疼自己」的第一步。",
+  choices: [
+    { id: "an3_c11_a", text: "「是。先接住自己。接住那个把奖状摘下来的小孩，接住那个被好话骗走、还骂自己贱的女孩。她等这一天，等了很久了。」", kind: "empathy", effect: { trust: 0, mood: 3 }, next: "an3_out" },
+    { id: "an3_c11_b", text: "「『先接住我自己』——这句话，比任何人的惦记都值钱。你打算从哪一步开始？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an3_out" },
+    { id: "an3_c11_c", text: "「别想那么多了，回家好好睡一觉就行。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an3_out" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_out
+{
+  id: "an3_out",
+  speaker: "narration",
+  text: "第三次会谈，安宁离开时站在门口没走。她转过身，声音有点抖：「医生，我下回……能带我闺蜜一起来吗？我想跟她说声谢谢，也想跟她说声对不起，没听她的话。」你说当然可以。她笑了一下，眼眶是红的，但这次没有躲。",
+  autoNext: "an4_start",
+}
+```
+
+#### 恶化分支（worsen 线）
+
+```ts-dialog
+// id: an3_w01
+{
+  id: "an3_w01",
+  speaker: "patient",
+  text: "（她愣住了，表情一点点冷下来）……您也这么说。我闺蜜也这么说过，我爸妈也这么说过。我就该知道，我这样的人就是扶不起来。算了，钱没了就当是喂了狗，我也就当没认识过您。谢谢您的时间。",
+  emotion: "broken",
+  autoNext: "an3_w02",
+}
+```
+
+```ts-dialog
+// id: an3_w02
+{
+  id: "an3_w02",
+  speaker: "doctor",
+  text: "话说重了，她把自己关回了那扇门里。",
+  choices: [
+    { id: "an3_w02_a", text: "「我不是那个意思，我是说你自己得想开点，别人帮不了你。」", kind: "logic", effect: { trust: -6, defense: 6 }, next: "an3_w03" },
+    { id: "an3_w02_b", text: "（你意识到话说重了，试着补救）「对不起，我刚才不是那个意思。你不是扶不起来，是我说错了话。」", kind: "empathy", effect: { trust: -3, mood: -4 }, next: "an3_w03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an3_w03
+{
+  id: "an3_w03",
+  speaker: "patient",
+  text: "（她站起来，没再看你）……不用补救了。反正从头到尾，也没人真觉得我值得被帮。就这样吧。我妈说得对，我活着就是个添麻烦。",
+  emotion: "broken",
+  autoNext: "an_end_worsen",
+}
+```
+
+### 节拍 4 · 转向 + 结局（trust 50→58，cure 主线分叉 + 安全网）
+
+```ts-dialog
+// id: an4_start
+{
+  id: "an4_start",
+  speaker: "narration",
+  text: "两周后，最后一次会谈。安宁是牵着她闺蜜的手一起进来的。闺蜜在门口冲你点点头，把安宁送到沙发上，说「我在外面等你」，然后轻轻带上了门。安宁的怀里，抱着一个牛皮纸袋。",
+  autoNext: "an4_p01",
+}
+```
+
+```ts-dialog
+// id: an4_p01
+{
+  id: "an4_p01",
+  speaker: "patient",
+  text: "（她把牛皮纸袋放在膝盖上，深吸一口气）……医生，我报案了。是闺蜜陪我去的。我把那些记录、转账截图，全交给警察了。他们立案了，说会查。我出来的时候，蹲在路边哭了一场，但哭完，觉得心里那块石头，真的挪开了一点。",
+  emotion: "calm",
+  autoNext: "an4_fork",
+}
+```
+
+```ts-dialog
+// id: an4_fork
+{
+  id: "an4_fork",
+  speaker: "doctor",
+  text: "报案，是她替自己迈出的最大一步。走到这里，有一条分岔需要她选择。",
+  choices: [
+    { id: "an4_fork_a", text: "「报案这一步，是你替自己迈出的最大一步。最后，我们一起来接住那个『想被爱不是错』的自己。」", kind: "special", effect: { trust: 1, mood: 2 }, next: "an4_s01" },
+    { id: "an4_fork_b", text: "「你不用现在就想通所有事。先学会相信『有人惦记你，不用拿钱换』，也是一种开始。」", kind: "empathy", effect: { trust: 1 }, next: "an4_a01" },
+    { id: "an4_fork_c", text: "「你闺蜜这一年天天惦记你，你却一直觉得她只是可怜你。今天，我想替她说一句：她惦记你，就是惦记你，不需要理由。」", kind: "confront", require: { trust: 50 }, effect: { trust: 1, truth: 3, mood: -2 }, next: "an4_h01", hint: "需要信任≥50" },
+  ],
+}
+```
+
+#### 安全网路径（cure 主线）
+
+```ts-dialog
+// id: an4_s01
+{
+  id: "an4_s01",
+  speaker: "patient",
+  text: "（她点点头，低头看着纸袋，然后从里面掏出一叠东西）……这是我这些年攒的东西。有那张奖状，我从老家带出来了；有我写给自己的信；还有我闺蜜给我留的字条。以前我只敢留着骗子的话，现在我终于敢把真正惦记我的人说的话，也留下来了。",
+  emotion: "calm",
+  autoNext: "an4_cs01",
+}
+```
+
+```ts-dialog
+// id: an4_cs01
+{
+  id: "an4_cs01",
+  speaker: "doctor",
+  text: "她开始留下真正惦记她的人的话了。",
+  choices: [
+    { id: "an4_cs01_a", text: "「你留下什么，就是开始认什么。你认下了奖状，认下了闺蜜的惦记，认下了你自己。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "an4_s02" },
+    { id: "an4_cs01_b", text: "「那张奖状，你当年摘下来，今天又捡回来了——你捡回来的，是自己那句『我想要』。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an4_s02" },
+    { id: "an4_cs01_c", text: "「这些旧东西留着也没用，扔了干净。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an4_s02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_s02
+{
+  id: "an4_s02",
+  speaker: "patient",
+  text: "（她摸着那张奖状，声音有点抖）……我妈当年没夸我，我恨了好多年。现在想想，她不夸，是她的问题，不是我不够好。我那时候就该知道，考了第三名，是件值得高兴的事，跟有没有人夸没关系。",
+  emotion: "neutral",
+  autoNext: "an4_cs02",
+}
+```
+
+```ts-dialog
+// id: an4_cs02
+{
+  id: "an4_cs02",
+  speaker: "doctor",
+  text: "「跟有没有人夸没关系」——她在改写那条「要等别人点头」的旧规矩。",
+  choices: [
+    { id: "an4_cs02_a", text: "「『跟有没有人夸没关系』——这句话，是这几次谈话里，你说过的最硬气的一句。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "an4_s03" },
+    { id: "an4_cs02_b", text: "「如果当年有人跟你说『第三名也很棒』，你现在会是什么样？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an4_s03" },
+    { id: "an4_cs02_c", text: "「过去的事就别翻旧账了。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an4_s03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_s03
+{
+  id: "an4_s03",
+  speaker: "patient",
+  text: "……可能就不会觉得，我做什么都要等别人点头了。医生，我想起来一件事。报案那天，我在派出所，看着那些转账记录，忽然不恨他了。不是原谅他，是我发现，我恨错了人。我恨的应该是……那个不敢开口要关心的我自己。",
+  emotion: "sad",
+  autoNext: "an4_cs03",
+}
+```
+
+```ts-dialog
+// id: an4_cs03
+{
+  id: "an4_cs03",
+  speaker: "doctor",
+  text: "「我恨错了人」——她把恨的方向，从自己身上挪开了。",
+  choices: [
+    { id: "an4_cs03_a", text: "「你说『不恨他了』——不是他值得原谅，是你终于愿意把力气，从恨自己身上收回来了。」", kind: "empathy", effect: { trust: 1 }, next: "an4_s04" },
+    { id: "an4_cs03_b", text: "「那个『不敢开口要关心的自己』，你想对她说什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an4_s04" },
+    { id: "an4_cs03_c", text: "「恨自己没用，恨骗子才对。」", kind: "logic", effect: { trust: -5, defense: 4 }, next: "an4_s04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_s04
+{
+  id: "an4_s04",
+  speaker: "patient",
+  text: "（她沉默了很久，眼泪慢慢流下来，但没有躲）……我想跟她说：你不是不值钱。你想被惦记，不是你的错。你只是太想把那个没人疼的自己，喂饱一点。以后，咱们不靠别人了，咱们自己疼自己。",
+  emotion: "calm",
+  autoNext: "an4_cs04",
+}
+```
+
+```ts-dialog
+// id: an4_cs04
+{
+  id: "an4_cs04",
+  speaker: "doctor",
+  text: "「咱们自己疼自己」——这是她给自己内心那个小女孩补上的第一句疼爱。",
+  choices: [
+    { id: "an4_cs04_a", text: "「她把这句话说出来了——这就是这几次会谈里，最重要的那句话。你终于肯对那个小女孩说：你值得。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "an4_s05" },
+    { id: "an4_cs04_b", text: "「『咱们自己疼自己』——你打算从哪一件小事开始疼她？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an4_s05" },
+    { id: "an4_cs04_c", text: "「说得挺好，但关键还得看行动。」", kind: "logic", effect: { trust: -5, defense: 3 }, next: "an4_s05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_s05
+{
+  id: "an4_s05",
+  speaker: "patient",
+  text: "（她想了想，笑了）……先从晚上十一点睡觉开始。以前我总睡不着，一遍遍看他有没有发消息。现在我把手机关在客厅充电，床头放本书。我打算，把「等他」改成「等我自己的明天」。",
+  emotion: "calm",
+  autoNext: "an4_cs05",
+}
+```
+
+```ts-dialog
+// id: an4_cs05
+{
+  id: "an4_cs05",
+  speaker: "doctor",
+  text: "「把等他改成等自己的明天」——她把那句「怕忘了」的话，改写成了一盏灯。",
+  choices: [
+    { id: "an4_cs05_a", text: "「『把等他改成等自己的明天』——你这一句，比那八万块钱值钱多了。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "an4_s06" },
+    { id: "an4_cs05_b", text: "「『等自己的明天』——你明天的第一件事，想做什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an4_s06" },
+    { id: "an4_cs05_c", text: "「睡眠规律很重要，你早该这样了。」", kind: "logic", effect: { trust: -5, defense: 3 }, next: "an4_s06" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_s06
+{
+  id: "an4_s06",
+  speaker: "patient",
+  text: "……跟我闺蜜去吃早饭。她约了我好几次，我都找借口推了，怕她问我钱的事。这次我想当面告诉她：钱我认了，日子我还在过，谢谢你那时候拉住我。……其实想想，我身边一直有人惦记我，是我自己把门关上了。",
+  emotion: "calm",
+  autoNext: "an4_cs06",
+}
+```
+
+```ts-dialog
+// id: an4_cs06
+{
+  id: "an4_cs06",
+  speaker: "doctor",
+  text: "「是我自己把门关上了」——现在，她亲手把它打开了。",
+  choices: [
+    { id: "an4_cs06_a", text: "「『是我自己把门关上了』——现在，你亲手把它打开了。」", kind: "empathy", effect: { trust: 1 }, next: "an4_s07" },
+    { id: "an4_cs06_b", text: "「如果现在对闺蜜说一句真心话，你会说什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an4_s07" },
+    { id: "an4_cs06_c", text: "「你早该听闺蜜的，不过现在也不晚。」", kind: "logic", effect: { trust: -5, defense: 3 }, next: "an4_s07" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_s07
+{
+  id: "an4_s07",
+  speaker: "patient",
+  text: "（她弯起眼睛，终于笑得很真）……会说：谢谢你惦记我。我以前总觉得，被人惦记是要还的，要拿懂事还，拿省钱还，拿命还。现在我知道了，不是的。惦记是给出去的，也是接得住的，不需要还。",
+  emotion: "happy",
+  autoNext: "an4_cs07",
+}
+```
+
+```ts-dialog
+// id: an4_cs07
+{
+  id: "an4_cs07",
+  speaker: "doctor",
+  text: "「惦记是给出去的，也是接得住的，不需要还」——她把那条「要拿命还」的规矩，亲手解开了。",
+  choices: [
+    { id: "an4_cs07_a", text: "「『惦记是给得出去的，也是接得住的』——这句话，你可以记一辈子。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "an4_s08" },
+    { id: "an4_cs07_b", text: "「你信了二十五年『惦记要拿命还』，今天你说出了『不需要还』。那个声音，还在吗？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an4_s08" },
+    { id: "an4_cs07_c", text: "「道理你都懂，以后别再犯傻就行。」", kind: "logic", effect: { trust: -6, defense: 4 }, next: "an4_s08" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_s08
+{
+  id: "an4_s08",
+  speaker: "patient",
+  text: "（她摇头，笑里带着泪）……还会在。偶尔还是会跑出来说，你这种人，谁会真惦记你。可我现在会回它一句：那我先自己惦记自己，行了吧。……医生，谢谢您。这几次，是我长这么大，第一次有人听我把话说完，没说我矫情。",
+  emotion: "happy",
+  autoNext: "an4_cs08",
+}
+```
+
+```ts-dialog
+// id: an4_cs08
+{
+  id: "an4_cs08",
+  speaker: "doctor",
+  text: "「第一次有人听我把话说完」——她终于把这句话，说给了真正听见的人。",
+  choices: [
+    { id: "an4_cs08_a", text: "「你最该谢的，是你自己——是你敢走进来，敢说那些『丢人』的话，敢把那扇关了很久的门打开。」", kind: "empathy", effect: { trust: 0, mood: 4 }, next: "an_end_cure" },
+    { id: "an4_cs08_b", text: "「你今天回去，最想对那个小女孩说的第一句话是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an_end_cure" },
+  ],
+}
+```
+
+#### 接纳路径（acceptance）
+
+```ts-dialog
+// id: an4_a01
+{
+  id: "an4_a01",
+  speaker: "patient",
+  text: "（她点点头，语气松了一些）……您说得对，我可能没办法一下子就想通。钱的事，我报案了，警察查不查得到，我管不了。可我现在慢慢明白，被惦记这件事，我是可以慢慢接的。先接我闺蜜那句「吃饭了吗」。",
+  emotion: "calm",
+  autoNext: "an4_ca01",
+}
+```
+
+```ts-dialog
+// id: an4_ca01
+{
+  id: "an4_ca01",
+  speaker: "doctor",
+  text: "她没有选择「想通所有」，而是选择了「先接一句」。",
+  choices: [
+    { id: "an4_ca01_a", text: "「『先接一句吃饭了吗』——这就是最好的开始。不用急着接住所有，先接住眼下这一句。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "an4_a02" },
+    { id: "an4_ca01_b", text: "「你接住这句话的时候，心里第一个冒出来的是什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an4_a02" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_a02
+{
+  id: "an4_a02",
+  speaker: "patient",
+  text: "……冒出来的是「原来有人惦记我，不用我还」。这句话在我脑子里转了好几天了，我每次想跟闺蜜说谢谢，都怕说多了显得假。可我现在觉得，说出来也没关系，她不会笑我。",
+  emotion: "neutral",
+  autoNext: "an4_ca02",
+}
+```
+
+```ts-dialog
+// id: an4_ca02
+{
+  id: "an4_ca02",
+  speaker: "doctor",
+  text: "「说出来也没关系」——那扇门，已经开了条缝。",
+  choices: [
+    { id: "an4_ca02_a", text: "「『说出来也没关系』——你能这样想，就说明那扇门，已经开了条缝。」", kind: "empathy", effect: { trust: 2, mood: 3 }, next: "an4_a03" },
+    { id: "an4_ca02_b", text: "「你最想谢谢她的，是哪一次？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an4_a03" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_a03
+{
+  id: "an4_a03",
+  speaker: "patient",
+  text: "（她想了想，笑了）……是她硬拖我来看您的那个傍晚。那时候我蹲在屋里删记录，删到哭，她敲门敲了半个小时。我开门的时候，她说：走，咱去看看，哭完了，日子还得过。……我就跟她来了。",
+  emotion: "calm",
+  autoNext: "an4_ca03",
+}
+```
+
+```ts-dialog
+// id: an4_ca03
+{
+  id: "an4_ca03",
+  speaker: "doctor",
+  text: "那个傍晚，她开门的那一刻，就已经在接住闺蜜了。",
+  choices: [
+    { id: "an4_ca03_a", text: "「那个傍晚，你开门的那一刻，其实就已经在接住她了。」", kind: "empathy", effect: { trust: 1, mood: 2 }, next: "an4_a04" },
+    { id: "an4_ca03_b", text: "「如果你现在给她发条消息，说一句真心话，你会说什么？」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an4_a04" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_a04
+{
+  id: "an4_a04",
+  speaker: "patient",
+  text: "……会说「谢谢你拉我这一把」。我以前总觉得，被拉一把是我没用。现在我知道了，被人拉一把，是有人在惦记我。惦记我，不是因为我需要，是因为我值得。",
+  emotion: "calm",
+  autoNext: "an4_ca04",
+}
+```
+
+```ts-dialog
+// id: an4_ca04
+{
+  id: "an4_ca04",
+  speaker: "doctor",
+  text: "「因为我值得」——她把这句话，从「需要被还」的账本上摘了下来。",
+  choices: [
+    { id: "an4_ca04_a", text: "「『因为我值得』——这句话，你从今天开始，可以一天说一遍。」", kind: "empathy", effect: { trust: 1, mood: 3 }, next: "an_end_accept" },
+    { id: "an4_ca04_b", text: "「你会慢慢信的。门既然开了条缝，就不会再关上。」", kind: "probe", effect: { trust: 1, truth: 2 }, next: "an_end_accept" },
+  ],
+}
+```
+
+#### 隐藏路径（hidden · 强制介入）
+
+```ts-dialog
+// id: an4_h01
+{
+  id: "an4_h01",
+  speaker: "patient",
+  text: "（她怔住了，眼泪一下就下来）……您怎么知道。我闺蜜她……她以前也被人骗过，是那种小额贷，她一句话没跟我说，自己扛了大半年。后来我知道了，她跟我说：我怕你觉得我傻，就没敢说。……我们俩，都藏着掖着，谁也没敢把狼狈拿出来给人看。",
+  emotion: "broken",
+  autoNext: "an4_ch01",
+}
+```
+
+```ts-dialog
+// id: an4_ch01
+{
+  id: "an4_ch01",
+  speaker: "doctor",
+  text: "「我们俩都藏着掖着」——她看见了闺蜜，也看见了自己。但接下来，有个更重的决定需要你面对。",
+  choices: [
+    { id: "an4_ch01_a", text: "「我想做一件事：今天，我们就在这儿，让你当着我的面，给她打个电话，把『谢谢你惦记我』说出口。有些话，不该只压在你一个人心里。」", kind: "special", effect: { mood: -2 }, next: "an4_h02" },
+    { id: "an4_ch01_b", text: "「这件事太重了，我们先把门关上，等你准备好了再说。」", kind: "empathy", effect: { trust: 1 }, next: "an4_h05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_h02
+{
+  id: "an4_h02",
+  speaker: "patient",
+  text: "（她的手抖了一下，把手机攥得紧紧的）……打……打电话？我怕我一开口就哭，我怕她担心我。可您说得对，我们俩都藏着掖着，谁都没敢先开口。要是我先说了，她是不是就不用再瞒着我了？",
+  emotion: "scared",
+  autoNext: "an4_ch02",
+}
+```
+
+```ts-dialog
+// id: an4_ch02
+{
+  id: "an4_ch02",
+  speaker: "doctor",
+  text: "她害怕，但这一次，她愿意让你扶着她，去打开那扇门。",
+  choices: [
+    { id: "an4_ch02_a", text: "「你这一通电话，不只是在救你自己，也是在告诉她：狼狈不用藏着，惦记不用还。打吧，我在这儿。」", kind: "special", effect: { truth: 3, mood: -2 }, next: "an4_h03" },
+    { id: "an4_ch02_b", text: "「要是现在说不出口，我们就再准备准备。不着急。」", kind: "empathy", effect: { trust: 1 }, next: "an4_h05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_h03
+{
+  id: "an4_h03",
+  speaker: "patient",
+  text: "（她深深吸了一口气，拨通了电话。电话那头响了三声，闺蜜接了：「喂？安宁？你在哪儿呢？」她的眼泪一下就下来了，声音却稳住了）……我在诊所。就想跟你说一句话——谢谢你惦记我。还有，对不住，那次没听你的话。",
+  emotion: "broken",
+  autoNext: "an4_ch03",
+}
+```
+
+```ts-dialog
+// id: an4_ch03
+{
+  id: "an4_ch03",
+  speaker: "doctor",
+  text: "电话那头，闺蜜沉默了很久。",
+  choices: [
+    { id: "an4_ch03_a", text: "（你听见电话那头，闺蜜带着哭腔说：你说啥呢，我乐意惦记你。你把这句转述给她。）「安宁，你听见了。这就是我让你打这通电话的原因——有些话，说出来，门就开了。」", kind: "special", effect: { truth: 3 }, next: "an_end_hidden" },
+    { id: "an4_ch03_b", text: "「她接住了你。你也接住了你自己。这一步，比什么都重要。」", kind: "empathy", effect: { trust: 1 }, next: "an4_h05" },
+  ],
+}
+```
+
+```ts-dialog
+// id: an4_h05
+{
+  id: "an4_h05",
+  speaker: "patient",
+  text: "（她挂了电话，擦了擦脸，笑了一下）……还是有点怕。可至少我知道，我那句话，说出去了。以后，我再也不用一个人藏着掖着了。",
+  emotion: "calm",
+  autoNext: "an_end_accept",
+}
+```
+
+---
+
+## 四、结局
+
+```ts-dialog
+// id: an_end_cure
+{
+  id: "an_end_cure",
+  speaker: "narration",
+  text: "〔结局 · 治愈〕",
+  isEnding: true,
+  endingType: "cure",
+  endingTitle: "把话还给自己",
+  endingText: "三个月后，安宁来信。她说案子破了，那个人是惯犯，钱追回了一部分。她说她把那张奖状裱起来挂在了床头，还报了夜校，想读个财务证书。她闺蜜现在每周都来找她吃饭，她终于不再躲。信的结尾写着：我以前总觉得，被人惦记是要还的。现在我知道了，惦记不用还——先自己惦记自己，别人才知道怎么惦记你。",
+  endingReward: { doctorReputation: 8, doctorMoney: 300, doctorExp: 50, doctorSanity: 5 },
+}
+```
+
+```ts-dialog
+// id: an_end_accept
+{
+  id: "an_end_accept",
+  speaker: "narration",
+  text: "〔结局 · 接纳〕",
+  isEnding: true,
+  endingType: "acceptance",
+  endingTitle: "先接住自己",
+  endingText: "安宁没有再约新的会谈。她偶尔会来坐坐，喝杯茶，跟你聊几句。她说她还没想好要不要追回那笔钱，但已经开始学着接闺蜜的邀约、接爸妈打来的电话。她说：那扇门我打开了一条缝，阳光挤进来了，我就不打算再关上了。",
+  endingReward: { doctorReputation: 4, doctorMoney: 180, doctorExp: 35, doctorSanity: 6 },
+}
+```
+
+```ts-dialog
+// id: an_end_hidden
+{
+  id: "an_end_hidden",
+  speaker: "narration",
+  text: "〔结局 · 隐藏·那句谢谢你惦记我〕",
+  isEnding: true,
+  endingType: "hidden",
+  endingTitle: "那句谢谢你惦记我",
+  endingText: "那通电话之后，安宁和她的闺蜜，把各自藏了多年的话都摊开了。闺蜜告诉她，自己那段被骗的旧事，两人在电话里哭了一整晚。后来安宁说，那笔钱她决定不追了，就当是给那个『想被爱的小女孩』交的一笔学费。她把它写进日记里，在旁边画了个笑脸。有些狼狈不用藏，有些惦记不用还。",
+  endingReward: { doctorReputation: -10, doctorMoney: 100, doctorExp: 80, doctorSanity: -15 },
+}
+```
+
+```ts-dialog
+// id: an_end_worsen
+{
+  id: "an_end_worsen",
+  speaker: "narration",
+  text: "〔结局 · 恶化〕",
+  isEnding: true,
+  endingType: "worsen",
+  endingTitle: "那扇再没人敲的门",
+  endingText: "安宁没有再来。她闺蜜后来发来消息：她辞了职，搬了家，把手机号换了，谁也没告诉。她说，安宁走之前跟她说了句——『果然，我就是个不值得被帮的人。』那扇被敲开过的门，又关上了。这一次，连敲门的人，都不在了。",
+  endingReward: { doctorReputation: -8, doctorMoney: 50, doctorExp: 10, doctorSanity: -20 },
+}
+```
+
+---
+
+## 五、状态
+
+- [x] v3 机器可解析格式（ts-meta + ts-dialog 全部就位）
+- [x] trust 锚点 15→28→40→50→58；truth 0→40；碎片 1 枚 @30
+- [x] 恶化入口 @trust≤40（an3_c10_c）；隐藏结局 @trust50（an4_fork_c）
+- [x] cure 主线 41 轮（4 节拍 10/11/11/9）
+- [x] 转换器生成 + 走线验收（`node scripts/md-to-patient.mjs docs/stories/an_ning-v3.md --walk`）

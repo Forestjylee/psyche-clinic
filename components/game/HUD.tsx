@@ -12,6 +12,8 @@ export function HUD() {
   const d = game.doctor;
   const sanColor = d.sanity > 60 ? "var(--good)" : d.sanity > 30 ? "var(--warn)" : "var(--bad)";
   const repColor = d.reputation > 60 ? "var(--accent)" : d.reputation > 30 ? "var(--accent-2)" : "var(--text-muted)";
+  // 经验进度：当前经验 / 升级所需（动态上限，条宽按比例）
+  const expPct = Math.min(100, (d.exp / expToNext(d.level)) * 100);
   const phase = slotPhaseLabel(game.slot);
   const night = isNightSlot(game.slot);
   const slotsFull = game.slot >= todayCapacity(game);
@@ -44,6 +46,12 @@ export function HUD() {
           <div className="hud-stat-body">
             <span className="hud-stat-label">等级</span>
             <div className="hud-stat-row">
+              <div className="hud-stat-bar">
+                <div
+                  className="hud-stat-bar-fill"
+                  style={{ width: `${expPct}%`, background: "var(--accent-2)", color: "var(--accent-2)" }}
+                />
+              </div>
               <span
                 className="hud-stat-value pop"
                 key={`${d.exp}-${expToNext(d.level)}`}

@@ -95,13 +95,30 @@
   padding: 0 40px 96px;
   overflow: hidden;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-/* 左侧候诊室 */
+/* 候诊室清单（今日预约 / 已完成两类共用） */
 .patient-section {
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+
+/* 主清单「今日预约」：占满剩余空间 */
+.patient-section.today-section {
+  flex: 1;
+}
+
+/* 已完成清单「可重新接诊」：受控高度、内部滚动，与主清单虚线分隔 */
+.patient-section.completed-section {
+  flex: 0 0 auto;
+  max-height: 34%;
+  min-height: 0;
+  border-top: 1px dashed var(--border-soft);
+  padding-top: 14px;
 }
 
 .section-title {
